@@ -15,9 +15,27 @@ const authCopy = {
     eyebrow: "Register Credentials",
     subtitle: "Start your Educational Journey",
   },
+  forgot: {
+    title: "Reset Password",
+    eyebrow: "Account Recovery",
+    subtitle: "Request a secure reset link",
+  },
+  reset: {
+    title: "New Password",
+    eyebrow: "Account Recovery",
+    subtitle: "Choose a new password",
+  },
 } as const;
 
-export function AuthLayout({ mode }: { mode: AuthMode }) {
+export function AuthLayout({
+  mode,
+  message,
+  messageStatus = "success",
+}: {
+  mode: AuthMode;
+  message?: string;
+  messageStatus?: "success" | "error";
+}) {
   const copy = authCopy[mode];
 
   return (
@@ -53,6 +71,14 @@ export function AuthLayout({ mode }: { mode: AuthMode }) {
           <h2 id={`${mode}-title`}>{copy.title}</h2>
           <p className="auth-subtitle">{copy.subtitle}</p>
           <p className="auth-eyebrow">{copy.eyebrow}</p>
+          {message && (
+            <p
+              className={`auth-status auth-status--${messageStatus}`}
+              role={messageStatus === "error" ? "alert" : "status"}
+            >
+              {message}
+            </p>
+          )}
           <AuthForm mode={mode} />
         </div>
       </section>

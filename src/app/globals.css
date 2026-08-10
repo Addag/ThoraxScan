@@ -494,7 +494,8 @@ input:focus-visible {
 }
 
 .auth-field-group input[type="email"],
-.auth-field-group input[type="password"] {
+.auth-field-group input[type="password"],
+.auth-field-group input[type="text"] {
   width: 100%;
   height: 53px;
   border: 1px solid #777777;
@@ -518,29 +519,20 @@ input:focus-visible {
 .auth-options {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-end;
   margin: 12px 0 0;
   color: var(--text-primary);
   font-size: 14px;
   line-height: 18px;
 }
 
-.remember-option {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
+.auth-options a {
+  color: var(--text-secondary);
+  text-decoration: none;
 }
 
-.remember-option input {
-  width: 14px;
-  height: 13px;
-  margin: 0;
-  accent-color: #d9d9d9;
-}
-
-.disabled-auth-link,
-.remember-option {
-  color: var(--text-disabled);
+.auth-options a:hover {
+  color: var(--brand-blue-text);
 }
 
 .auth-submit {
@@ -551,6 +543,11 @@ input:focus-visible {
   line-height: 34px;
 }
 
+.auth-submit:disabled {
+  cursor: wait;
+  opacity: 0.72;
+}
+
 .auth-status {
   margin: 16px 0 0;
   border: 1px solid #013ab5;
@@ -559,6 +556,18 @@ input:focus-visible {
   padding: 10px 12px;
   font-size: 13px;
   line-height: 1.4;
+}
+
+.auth-status--error {
+  border-color: #8b2929;
+  background: rgba(160, 32, 32, 0.2);
+  color: #ffb4b4;
+}
+
+.auth-status--success {
+  border-color: #17643a;
+  background: rgba(33, 135, 78, 0.2);
+  color: #b8f3ce;
 }
 
 .auth-switch {
@@ -572,6 +581,55 @@ input:focus-visible {
 .auth-switch a {
   color: var(--brand-blue-text);
   font-weight: 800;
+}
+
+.role-page {
+  min-height: 100svh;
+  background: radial-gradient(circle at 50% 20%, #071c4d 0%, #020817 60%);
+  color: var(--text-primary);
+  padding: 32px clamp(20px, 6vw, 88px) 80px;
+}
+
+.role-header {
+  display: flex;
+  min-height: 76px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.role-header .brand {
+  position: static;
+}
+
+.role-header .secondary-button {
+  min-width: 110px;
+  min-height: 44px;
+}
+
+.role-card {
+  width: min(680px, 100%);
+  margin: clamp(80px, 14vh, 150px) auto 0;
+  border: 1px solid var(--border-strong);
+  border-radius: 12px;
+  background: rgba(1, 13, 42, 0.92);
+  padding: clamp(28px, 5vw, 52px);
+}
+
+.role-card h1 {
+  margin: 10px 0 22px;
+  font-size: clamp(32px, 5vw, 52px);
+  line-height: 1.05;
+}
+
+.role-card p:not(.auth-eyebrow) {
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.role-card .primary-button {
+  min-width: 150px;
+  min-height: 48px;
+  margin-top: 18px;
 }
 
 @media (max-width: 1200px) and (min-width: 1025px) {
