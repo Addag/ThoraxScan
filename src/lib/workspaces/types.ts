@@ -33,6 +33,48 @@ export type StudentWorkspace = Workspace & {
   joined_at: string;
 };
 
+export type ProfessorWorkspace = Workspace & {
+  membership_role: "professor";
+  joined_at: string;
+  is_owner: boolean;
+};
+
+export type WorkspaceMemberWithProfile = WorkspaceMember & {
+  display_name: string;
+  is_owner: boolean;
+};
+
+export type ProfessorWorkspaceDetails = Workspace & {
+  joined_at: string;
+  is_owner: boolean;
+  members: WorkspaceMemberWithProfile[];
+  invitations: InvitationCode[];
+};
+
+export type WorkspaceActionField =
+  | "name"
+  | "code"
+  | "expiresInDays"
+  | "maxUses";
+
+export type WorkspaceActionState = {
+  status:
+    | "idle"
+    | "error"
+    | "success"
+    | "expired"
+    | "revoked"
+    | "unauthorized";
+  message: string;
+  fieldErrors?: Partial<Record<WorkspaceActionField, string>>;
+  invitationCode?: string;
+};
+
+export const initialWorkspaceActionState: WorkspaceActionState = {
+  status: "idle",
+  message: "",
+};
+
 export type InvitationFormState = {
   status:
     | "idle"

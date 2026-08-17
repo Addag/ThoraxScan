@@ -21,7 +21,7 @@ One line per important noun. live cards are source-backed; ghost entries are doc
 
 | Noun | Universe | Card or source stub | Source |
 |---|---|---|---|
-| Role workspace surface | live | [role-workspace-surface.md](learning/role-workspace-surface.md) | Student workspace pages; Professor remains a placeholder |
+| Role workspace surface | live | [role-workspace-surface.md](learning/role-workspace-surface.md) | Student and Professor workspace dashboards and detail pages |
 | Workspace | live | [workspace.md](learning/workspace.md) | public.workspaces and student workspace projections |
 | Workspace membership | live | [workspace-membership.md](learning/workspace-membership.md) | public.workspace_members and its RLS helpers |
 | Invitation code | live | [invitation-code.md](learning/invitation-code.md) | public.invitation_codes and redemption RPC |

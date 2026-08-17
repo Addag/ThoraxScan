@@ -15,8 +15,9 @@ Permitted membership delete → RLS and owner-protection trigger → removed mem
 1. A co-professor may delete their own membership; an owner may delete another Professor membership; teaching staff may delete Student memberships in [workspace migration](<../../supabase/migrations/20260817110952_workspace_membership_invitations.sql:338>).
 2. Before deletion, the owner-protection trigger rejects removal when the target user owns the workspace in [workspace migration](<../../supabase/migrations/20260817110952_workspace_membership_invitations.sql:238>).
 3. After a permitted delete, Workspace RLS no longer exposes that workspace to the former member in [workspace migration](<../../supabase/migrations/20260817110952_workspace_membership_invitations.sql:307>).
+4. `leaveWorkspaceAction` re-derives co-professor access, rejects owners, deletes only the caller’s membership, and redirects to the Professor dashboard in [professor/actions.ts](<../../src/app/(protected)/professor/actions.ts:326>).
 
-The database process is live. `removeMemberAction` and `leaveWorkspaceAction` are deferred.
+Owner and Student exits are not exposed as self-service application controls in this milestone.
 
 ## Consumes
 
@@ -31,7 +32,7 @@ The database process is live. `removeMemberAction` and `leaveWorkspaceAction` ar
 
 ### Hits
 
-- Delete grants/RLS, owner trigger, workspace visibility, and future remove/leave actions.
+- Delete grants/RLS, owner trigger, workspace visibility, Professor leave control, and redirect behavior.
 
 ### Does not hit
 
@@ -39,4 +40,4 @@ The database process is live. `removeMemberAction` and `leaveWorkspaceAction` ar
 
 ## See
 
-[workspace migration](<../../supabase/migrations/20260817110952_workspace_membership_invitations.sql:338>)
+[professor/actions.ts](<../../src/app/(protected)/professor/actions.ts:326>)

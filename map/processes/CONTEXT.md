@@ -18,7 +18,7 @@ snapshot: working tree @ 2026-08-17
 
 ## Job
 
-Record only movements that currently run in the repository. The process shelf covers authentication plus the live database-level workspace creation, invitation redemption, roster management, and membership exit contracts. Professor-facing Server Actions and UI remain deferred where the cards say so.
+Record only movements that currently run in the repository. The process shelf covers authentication plus live application/database workspace creation, invitation redemption and management, roster management, and membership exit contracts.
 
 ## Outputs
 

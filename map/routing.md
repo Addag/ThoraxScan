@@ -31,7 +31,7 @@ This is a source-backed map of the ThoraxScan application repository one level a
 ## Name collisions
 
 - Profile means the public.profiles row plus the TypeScript projection used by the app.
-- Role workspace surface covers the live Student dashboard/detail routes and the remaining Professor placeholder; Workspace means the live professor-owned learning-space record.
+- Role workspace surface covers the live Student and Professor dashboard/detail routes; Workspace means the professor-owned learning-space record shared by both roles.
 - X-ray sample means the static presentation image; it is not the planned inference input pipeline.
 - Attention Heatmap is planned explanatory output; its current appearance in copy and design documents is not implementation evidence.
 

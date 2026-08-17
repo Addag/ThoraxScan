@@ -8,7 +8,7 @@ snapshot: working tree @ 2026-08-17
 
 # Workspace
 
-Workspace is the professor-owned learning-space record stored as `public.workspaces` and projected into Student workspace views.
+Workspace is the professor-owned learning-space record stored as `public.workspaces` and projected into Student and Professor workspace views.
 
 ## Why this shape
 
@@ -28,7 +28,7 @@ Owned by a Profile; joined through [Workspace membership](workspace-membership.m
 
 ### Hits
 
-- Workspace migration constraints and policies, Student projections, dashboard cards, and detail routes.
+- Workspace migration constraints and policies, Student/Professor projections, dashboard cards, detail routes, creation, and rename actions.
 
 ### Does not hit
 
@@ -36,8 +36,8 @@ Owned by a Profile; joined through [Workspace membership](workspace-membership.m
 
 ## Surfaces
 
-Database, Server Components, Student dashboard, Student workspace detail, and future Professor actions.
+Database, Server Components, both role dashboards/details, and Professor creation/rename actions.
 
 ## See
 
-[server.ts](<../../../src/lib/workspaces/server.ts:10>)
+[server.ts](<../../../src/lib/workspaces/server.ts:70>)
