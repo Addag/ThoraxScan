@@ -2,7 +2,7 @@
 
 import { redirect } from "next/navigation";
 
-import type { AuthActionState, AuthField } from "@/lib/auth/types";
+import type { AppRole, AuthActionState, AuthField } from "@/lib/auth/types";
 import { createClient } from "@/lib/supabase/server";
 
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -26,6 +26,10 @@ function validateEmail(email: string) {
 function validatePassword(password: string) {
   if (!password) return "Enter your password.";
   if (password.length < 8) return "Use at least 8 characters.";
+}
+
+function isAppRole(role: string): role is AppRole {
+  return role === "student" || role === "professor";
 }
 
 function authMessage(code: string | undefined, fallback: string) {
@@ -100,10 +104,14 @@ export async function loginAction(
 ): Promise<AuthActionState> {
   const email = value(formData, "email").trim().toLowerCase();
   const password = value(formData, "password");
+  const expectedRole = value(formData, "expectedRole");
   const fieldErrors: Partial<Record<AuthField, string>> = {};
 
   fieldErrors.email = validateEmail(email);
   if (!password) fieldErrors.password = "Enter your password.";
+  if (!isAppRole(expectedRole)) {
+    fieldErrors.expectedRole = "Choose Student or Professor.";
+  }
 
   Object.keys(fieldErrors).forEach((key) => {
     if (!fieldErrors[key as AuthField]) delete fieldErrors[key as AuthField];
@@ -114,11 +122,35 @@ export async function loginAction(
   }
 
   const supabase = await createClient();
-  const { error } = await supabase.auth.signInWithPassword({ email, password });
+  const { data, error } = await supabase.auth.signInWithPassword({
+    email,
+    password,
+  });
 
   if (error) {
     return errorState(
       authMessage(error.code, "Unable to log in. Please try again."),
+    );
+  }
+
+  const { data: profile, error: profileError } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", data.user.id)
+    .single<{ role: AppRole }>();
+
+  if (profileError || !profile || !isAppRole(profile.role)) {
+    await supabase.auth.signOut({ scope: "local" });
+    return errorState(
+      "We could not verify your account profile. Please contact an administrator.",
+    );
+  }
+
+  if (profile.role !== expectedRole) {
+    await supabase.auth.signOut({ scope: "local" });
+    return errorState(
+      `This account is registered as ${profile.role}. Select ${profile.role === "student" ? "Student" : "Professor"} and try again.`,
+      { expectedRole: "The selected account type does not match this account." },
     );
   }
 

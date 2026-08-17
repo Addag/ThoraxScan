@@ -4,7 +4,8 @@ export type AuthField =
   | "displayName"
   | "email"
   | "password"
-  | "confirmPassword";
+  | "confirmPassword"
+  | "expectedRole";
 
 export type AuthActionState = {
   status: "idle" | "error" | "success";

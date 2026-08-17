@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useActionState } from "react";
 
@@ -161,6 +162,13 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
         {pending ? "Please wait…" : submitLabels[mode]}
       </button>
 
+      {(mode === "login" || mode === "register") && (
+        <RoleSelector
+          mode={mode}
+          error={state.fieldErrors?.expectedRole}
+        />
+      )}
+
       {state.message && (
         <p
           className={`auth-status auth-status--${state.status}`}
@@ -172,6 +180,87 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
 
       <AuthSwitch mode={mode} />
     </form>
+  );
+}
+
+function RoleSelector({
+  mode,
+  error,
+}: {
+  mode: "login" | "register";
+  error?: string;
+}) {
+  const professorDisabled = mode === "register";
+  const descriptionId = `${mode}-role-description`;
+  const errorId = `${mode}-role-error`;
+
+  return (
+    <fieldset
+      className="role-selector"
+      aria-describedby={error ? `${descriptionId} ${errorId}` : descriptionId}
+    >
+      <legend className="sr-only">Account type</legend>
+      <div className="role-selector__cards">
+        <div className="role-option">
+          <input
+            className="role-option__input"
+            id={`${mode}-role-student`}
+            name={mode === "login" ? "expectedRole" : undefined}
+            type="radio"
+            value="student"
+            defaultChecked
+          />
+          <label className="role-option__card" htmlFor={`${mode}-role-student`}>
+            <Image
+              className="role-option__image role-option__image--student"
+              src="/images/student-role.png"
+              alt=""
+              width={125}
+              height={88}
+              aria-hidden="true"
+            />
+            <span className="role-option__title">Student</span>
+            <span className="role-option__copy">Learning workspace</span>
+          </label>
+        </div>
+
+        <div className="role-option">
+          <input
+            className="role-option__input"
+            id={`${mode}-role-professor`}
+            name={mode === "login" ? "expectedRole" : undefined}
+            type="radio"
+            value="professor"
+            disabled={professorDisabled}
+          />
+          <label className="role-option__card" htmlFor={`${mode}-role-professor`}>
+            <Image
+              className="role-option__image role-option__image--professor"
+              src="/images/professor-role.png"
+              alt=""
+              width={86}
+              height={83}
+              aria-hidden="true"
+            />
+            <span className="role-option__title">Professor</span>
+            <span className="role-option__copy">
+              {professorDisabled ? "Approval required" : "Teaching workspace"}
+            </span>
+          </label>
+        </div>
+      </div>
+
+      <p className="role-selector__description" id={descriptionId}>
+        {professorDisabled
+          ? "Public registration creates Student accounts. Professor access is assigned by an administrator."
+          : "Choose the account type assigned to your ThoraxScan profile."}
+      </p>
+      {error && (
+        <p className="field-error role-selector__error" id={errorId} role="alert">
+          {error}
+        </p>
+      )}
+    </fieldset>
   );
 }
 

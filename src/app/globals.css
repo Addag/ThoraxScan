@@ -445,10 +445,22 @@ input:focus-visible {
 
 .auth-card {
   width: min(551px, 100%);
-  border: 1px solid var(--border-strong);
+  border: 1px solid rgba(55, 74, 215, 0.6);
   border-radius: 10px;
-  background: var(--surface-primary);
+  background: rgba(55, 74, 215, 0.1);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
   padding: 31px 38px 40px;
+}
+
+.auth-card--register {
+  width: min(547px, 100%);
+}
+
+@supports not ((-webkit-backdrop-filter: blur(6px)) or (backdrop-filter: blur(6px))) {
+  .auth-card {
+    background: rgba(8, 18, 61, 0.94);
+  }
 }
 
 .auth-card h2 {
@@ -546,6 +558,139 @@ input:focus-visible {
 .auth-submit:disabled {
   cursor: wait;
   opacity: 0.72;
+}
+
+.role-selector {
+  width: min(507px, calc(100% + 38px));
+  align-self: center;
+  min-width: 0;
+  padding: 0;
+  margin: 30px 0 0;
+  border: 0;
+}
+
+.role-selector__cards {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 26px;
+}
+
+.role-option {
+  position: relative;
+  min-width: 0;
+}
+
+.role-option__input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.role-option__card {
+  position: relative;
+  display: flex;
+  height: 147px;
+  overflow: hidden;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(0, 25, 223, 0.79);
+  border-radius: 10px;
+  background: rgba(152, 155, 179, 0.15);
+  color: var(--text-primary);
+  cursor: pointer;
+  flex-direction: column;
+  padding: 0;
+  text-align: center;
+  transition: background-color 160ms ease, border-color 160ms ease, transform 160ms ease;
+}
+
+.role-option__card:hover {
+  background: rgba(0, 119, 255, 0.28);
+}
+
+.role-option__input:checked + .role-option__card {
+  border-color: #0077ff;
+  background: rgba(0, 119, 255, 0.6);
+}
+
+.role-option__input:focus-visible + .role-option__card {
+  outline: 3px solid #ffffff;
+  outline-offset: 4px;
+}
+
+.role-option__input:active:not(:disabled) + .role-option__card {
+  transform: translateY(1px);
+}
+
+.role-option__input:disabled + .role-option__card {
+  border-color: rgba(0, 25, 223, 0.48);
+  color: #a7a7a7;
+  cursor: not-allowed;
+  opacity: 0.68;
+}
+
+.role-option__input:disabled + .role-option__card:hover {
+  background: rgba(152, 155, 179, 0.15);
+}
+
+.role-option__title {
+  position: absolute;
+  right: 12px;
+  bottom: 27px;
+  left: 12px;
+  font-size: 20px;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.role-option__copy {
+  position: absolute;
+  right: 12px;
+  bottom: 9px;
+  left: 12px;
+  max-width: 170px;
+  margin: 0 auto;
+  color: #d0d4e6;
+  font-size: 12px;
+  line-height: 1.3;
+}
+
+.role-option__image {
+  position: absolute;
+  top: 7px;
+  left: 50%;
+  display: block;
+  object-fit: fill;
+}
+
+.role-option__image--student {
+  width: 125px;
+  height: 88px;
+  transform: translateX(-50%) scaleX(-1);
+}
+
+.role-option__image--professor {
+  width: 86px;
+  height: 83px;
+  transform: translateX(-50%);
+}
+
+.role-selector__description {
+  margin: 12px 4px 0;
+  color: var(--text-secondary);
+  font-size: 12px;
+  line-height: 1.4;
+  text-align: center;
+}
+
+.role-selector__error {
+  margin: 8px 4px 0;
+  text-align: center;
 }
 
 .auth-status {
@@ -867,6 +1012,16 @@ input:focus-visible {
     padding-right: 18px;
     padding-left: 18px;
   }
+
+  .role-selector__cards {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .role-selector {
+    width: 100%;
+  }
+
 }
 
 @media (prefers-reduced-motion: reduce) {
