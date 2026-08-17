@@ -19,7 +19,7 @@
 - Student frames: 473:1183, 485:1025, 651:882, 560:777, 653:797, 653:811, 473:514, 498:1412, 473:580, 657:1091, 657:1222, 473:633, 473:834, 473:914, 473:1045, 473:981
 - Professor frames: 651:852, 667:960, 667:971, 667:982, 678:1015, 681:1448, 681:1577, 681:1754, 684:1934, 684:2126, 684:2268
 - Shared settings frames: 473:834, 473:914, 473:1045, 473:981
-- Previous derived flow: outputs/thoraxscan-app-flow.md
+- Previous derived flow: map/thoraxscan-app-flow.md
 - User-provided master prompt: pasted-text.txt
 
 The exact title of some linked frames was not exposed by the available Figma context. Those frames are named by role and sequence and marked Inferred or Needs confirmation.

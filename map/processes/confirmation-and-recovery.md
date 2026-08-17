@@ -1,0 +1,44 @@
+---
+node_type: process
+universe: live
+status: verified
+audited: 2026-08-17
+snapshot: main @ 1e5cbf8
+---
+
+# Confirmation and password recovery
+
+Email link or OTP/code → Supabase confirmation or recovery session → verified destination or password update.
+
+## Steps
+
+1. Forgot-password validates the email and requests a reset link with a destination of /auth/confirm?next=/reset-password in [actions.ts](<../../src/app/(auth)/actions.ts:160>).
+2. The confirmation route accepts a token hash and OTP type or a code, then verifies it with Supabase Auth in [route.ts](<../../src/app/auth/confirm/route.ts:21>).
+3. The route allows only safe relative next destinations and sends failures to /login in [route.ts](<../../src/app/auth/confirm/route.ts:14>).
+4. The reset page checks for valid claims and redirects unauthenticated users back to forgot-password in [page.tsx](<../../src/app/(auth)/reset-password/page.tsx:12>).
+5. The reset action validates the new password, updates the Auth user, globally signs out, and redirects to login in [actions.ts](<../../src/app/(auth)/actions.ts:193>).
+
+## Consumes
+
+- [Authentication surface](../objects/ui/auth-surface.md)
+- [Auth session and claims](../objects/identity/auth-session.md)
+
+## Produces
+
+- A confirmed or recovered Auth session
+- A password-updated sign-in state
+
+## If you change this
+
+### Hits
+
+- Reset destinations, confirmation handling, safe redirect rules, password validation, and login messaging.
+
+### Does not hit
+
+- Profile role values or planned LMS records.
+- The public landing layout unless the recovery links change.
+
+## See
+
+[route.ts](<../../src/app/auth/confirm/route.ts:21>)
