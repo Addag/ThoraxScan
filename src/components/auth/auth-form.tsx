@@ -190,13 +190,13 @@ function RoleSelector({
   mode: "login" | "register";
   error?: string;
 }) {
-  const professorDisabled = mode === "register";
   const descriptionId = `${mode}-role-description`;
   const errorId = `${mode}-role-error`;
+  const fieldName = mode === "login" ? "expectedRole" : "requestedRole";
 
   return (
     <fieldset
-      className="role-selector"
+      className={`role-selector role-selector--${mode}`}
       aria-describedby={error ? `${descriptionId} ${errorId}` : descriptionId}
     >
       <legend className="sr-only">Account type</legend>
@@ -205,7 +205,7 @@ function RoleSelector({
           <input
             className="role-option__input"
             id={`${mode}-role-student`}
-            name={mode === "login" ? "expectedRole" : undefined}
+            name={fieldName}
             type="radio"
             value="student"
             defaultChecked
@@ -228,10 +228,9 @@ function RoleSelector({
           <input
             className="role-option__input"
             id={`${mode}-role-professor`}
-            name={mode === "login" ? "expectedRole" : undefined}
+            name={fieldName}
             type="radio"
             value="professor"
-            disabled={professorDisabled}
           />
           <label className="role-option__card" htmlFor={`${mode}-role-professor`}>
             <Image
@@ -244,16 +243,33 @@ function RoleSelector({
             />
             <span className="role-option__title">Professor</span>
             <span className="role-option__copy">
-              {professorDisabled ? "Approval required" : "Teaching workspace"}
+              {mode === "register" ? "Approval required" : "Teaching workspace"}
             </span>
           </label>
         </div>
+
+        {mode === "login" && (
+          <div className="role-option">
+            <input
+              className="role-option__input"
+              id="login-role-administrator"
+              name="expectedRole"
+              type="radio"
+              value="administrator"
+            />
+            <label className="role-option__card" htmlFor="login-role-administrator">
+              <span className="role-option__admin-icon" aria-hidden="true">◇</span>
+              <span className="role-option__title">Administrator</span>
+              <span className="role-option__copy">Professor approvals</span>
+            </label>
+          </div>
+        )}
       </div>
 
       <p className="role-selector__description" id={descriptionId}>
-        {professorDisabled
-          ? "Public registration creates Student accounts. Professor access is assigned by an administrator."
-          : "Choose the account type assigned to your ThoraxScan profile."}
+        {mode === "register"
+          ? "Professor accounts remain pending until an administrator approves the application."
+          : "Choose the portal assigned to your ThoraxScan account."}
       </p>
       {error && (
         <p className="field-error role-selector__error" id={errorId} role="alert">

@@ -4,7 +4,7 @@ import { createHash, randomBytes } from "node:crypto";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
-import type { AppRole } from "@/lib/auth/types";
+import type { AppRole, ProfessorApplicationStatus } from "@/lib/auth/types";
 import { createClient } from "@/lib/supabase/server";
 import type { WorkspaceActionState } from "@/lib/workspaces/types";
 
@@ -42,6 +42,14 @@ async function getProfessorSession() {
     .maybeSingle<{ id: string; role: AppRole }>();
 
   if (profileError || profile?.role !== "professor") return null;
+
+  const { data: application, error: applicationError } = await supabase
+    .from("professor_applications")
+    .select("status")
+    .eq("user_id", userId)
+    .maybeSingle<{ status: ProfessorApplicationStatus }>();
+
+  if (applicationError || application?.status !== "approved") return null;
   return { supabase, userId };
 }
 

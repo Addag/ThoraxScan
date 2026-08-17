@@ -2,7 +2,12 @@
 
 import { redirect } from "next/navigation";
 
-import type { AppRole, AuthActionState, AuthField } from "@/lib/auth/types";
+import type {
+  AppRole,
+  AuthActionState,
+  AuthField,
+  LoginPortal,
+} from "@/lib/auth/types";
 import { createClient } from "@/lib/supabase/server";
 
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -32,6 +37,10 @@ function isAppRole(role: string): role is AppRole {
   return role === "student" || role === "professor";
 }
 
+function isLoginPortal(portal: string): portal is LoginPortal {
+  return isAppRole(portal) || portal === "administrator";
+}
+
 function authMessage(code: string | undefined, fallback: string) {
   if (code === "invalid_credentials") return "Email or password is incorrect.";
   if (code === "email_not_confirmed") {
@@ -51,6 +60,7 @@ export async function registerAction(
   const email = value(formData, "email").trim().toLowerCase();
   const password = value(formData, "password");
   const confirmPassword = value(formData, "confirmPassword");
+  const requestedRole = value(formData, "requestedRole");
   const fieldErrors: Partial<Record<AuthField, string>> = {};
 
   if (!displayName) fieldErrors.displayName = "Enter your display name.";
@@ -63,6 +73,9 @@ export async function registerAction(
     fieldErrors.confirmPassword = "Confirm your password.";
   } else if (password !== confirmPassword) {
     fieldErrors.confirmPassword = "Passwords must match.";
+  }
+  if (!isAppRole(requestedRole)) {
+    fieldErrors.requestedRole = "Choose Student or Professor.";
   }
 
   Object.keys(fieldErrors).forEach((key) => {
@@ -80,7 +93,7 @@ export async function registerAction(
     email,
     password,
     options: {
-      data: { display_name: displayName },
+      data: { display_name: displayName, requested_role: requestedRole },
       emailRedirectTo: `${siteUrl}/auth/confirm?next=/dashboard`,
     },
   });
@@ -94,7 +107,9 @@ export async function registerAction(
   return {
     status: "success",
     message:
-      "Check your email and follow the confirmation link before logging in.",
+      requestedRole === "professor"
+        ? "Check your email to confirm your account. Your Professor application will then be ready for administrator review."
+        : "Check your email and follow the confirmation link before logging in.",
   };
 }
 
@@ -109,8 +124,8 @@ export async function loginAction(
 
   fieldErrors.email = validateEmail(email);
   if (!password) fieldErrors.password = "Enter your password.";
-  if (!isAppRole(expectedRole)) {
-    fieldErrors.expectedRole = "Choose Student or Professor.";
+  if (!isLoginPortal(expectedRole)) {
+    fieldErrors.expectedRole = "Choose Student, Professor, or Administrator.";
   }
 
   Object.keys(fieldErrors).forEach((key) => {
@@ -131,6 +146,23 @@ export async function loginAction(
     return errorState(
       authMessage(error.code, "Unable to log in. Please try again."),
     );
+  }
+
+  if (expectedRole === "administrator") {
+    const { data: administrator, error: administratorError } = await supabase
+      .from("platform_admins")
+      .select("user_id")
+      .eq("user_id", data.user.id)
+      .maybeSingle<{ user_id: string }>();
+
+    if (administratorError || !administrator) {
+      await supabase.auth.signOut({ scope: "local" });
+      return errorState("This account does not have Administrator access.", {
+        expectedRole: "Select the account type assigned to this account.",
+      });
+    }
+
+    redirect("/admin");
   }
 
   const { data: profile, error: profileError } = await supabase

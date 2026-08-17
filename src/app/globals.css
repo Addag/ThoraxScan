@@ -569,6 +569,14 @@ input:focus-visible {
   border: 0;
 }
 
+.role-selector--login {
+  width: min(507px, calc(100% + 38px));
+}
+
+.role-selector--login .role-selector__cards {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
 .role-selector__cards {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -678,6 +686,20 @@ input:focus-visible {
   width: 86px;
   height: 83px;
   transform: translateX(-50%);
+}
+
+.role-option__admin-icon {
+  position: absolute;
+  top: 13px;
+  display: grid;
+  width: 66px;
+  height: 66px;
+  place-items: center;
+  border: 2px solid #8bc9ff;
+  border-radius: 18px;
+  color: #d5edff;
+  font-size: 42px;
+  line-height: 1;
 }
 
 .role-selector__description {
@@ -2233,5 +2255,361 @@ input:focus-visible {
 
   .professor-copy-result {
     grid-template-columns: 1fr;
+  }
+}
+
+/* Professor approval administration */
+.admin-dashboard,
+.professor-application-page {
+  padding-bottom: 60px;
+}
+
+.admin-access-card i,
+.professor-application-access-card i {
+  background: #ffce4b;
+  box-shadow: 0 0 10px rgba(255, 206, 75, 0.7);
+}
+
+.admin-applications-panel,
+.professor-application-card {
+  margin-top: 22px;
+  border: 1px solid #33425c;
+  border-radius: 10px;
+  background: #18202d;
+}
+
+.admin-applications-panel {
+  padding: 24px;
+}
+
+.admin-applications-heading {
+  margin-bottom: 20px;
+}
+
+.admin-application-tools {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 12px;
+}
+
+.admin-application-tools > label {
+  grid-column: 1 / -1;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.admin-application-tools > div {
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px;
+}
+
+.admin-application-tools input,
+.admin-reject-details textarea {
+  width: 100%;
+  border: 1px solid #66718b;
+  border-radius: 6px;
+  background: #0c1320;
+  color: #fff;
+  padding: 0 12px;
+}
+
+.admin-application-tools input {
+  min-height: 43px;
+}
+
+.admin-application-filters {
+  display: flex;
+  overflow-x: auto;
+  gap: 8px;
+  margin: 18px 0;
+  padding-bottom: 2px;
+}
+
+.admin-application-filters a {
+  border: 1px solid #526078;
+  border-radius: 999px;
+  color: #c7ccda;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 8px 14px;
+  text-decoration: none;
+}
+
+.admin-application-filters a.is-active {
+  border-color: #2caeff;
+  background: rgba(44, 174, 255, 0.18);
+  color: #fff;
+}
+
+.admin-application-list {
+  display: grid;
+  gap: 14px;
+}
+
+.admin-application-card {
+  border: 1px solid #33425c;
+  border-radius: 9px;
+  background: #101725;
+  padding: 18px;
+}
+
+.admin-application-card__identity {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+}
+
+.admin-application-card__identity > span {
+  display: grid;
+  width: 44px;
+  height: 44px;
+  place-items: center;
+  border-radius: 50%;
+  background: rgba(44, 174, 255, 0.19);
+  color: #75c5ff;
+  font-weight: 900;
+}
+
+.admin-application-card h3,
+.admin-application-card p {
+  margin: 0;
+}
+
+.admin-application-card__identity p {
+  margin-top: 3px;
+  color: #9da6b8;
+  font-size: 12px;
+}
+
+.admin-status-badge {
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  padding: 6px 9px;
+  text-transform: uppercase;
+}
+
+.admin-status-badge--pending { color: #ffd166; }
+.admin-status-badge--approved { color: #63e6a4; }
+.admin-status-badge--rejected { color: #ff8585; }
+
+.admin-application-card__facts {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin: 16px 0 0;
+}
+
+.admin-application-card__facts div {
+  border-radius: 6px;
+  background: rgba(52, 65, 85, 0.45);
+  padding: 10px;
+}
+
+.admin-application-card__facts dt {
+  color: #8f99ad;
+  font-size: 10px;
+  text-transform: uppercase;
+}
+
+.admin-application-card__facts dd {
+  margin: 4px 0 0;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.admin-application-card__reason,
+.professor-application-reason {
+  margin-top: 14px;
+  border-left: 3px solid #e16b70;
+  background: rgba(147, 41, 48, 0.15);
+  padding: 11px 13px;
+}
+
+.admin-application-card__reason strong,
+.professor-application-reason strong {
+  color: #ffb1b4;
+  font-size: 11px;
+}
+
+.admin-application-card__reason p,
+.professor-application-reason p {
+  margin-top: 5px;
+  color: #ddd4d6;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.admin-review-form {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(220px, 1fr);
+  align-items: start;
+  gap: 12px;
+  margin-top: 16px;
+  border-top: 1px solid #33425c;
+  padding-top: 16px;
+}
+
+.admin-review-form__primary {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.admin-review-form__primary small {
+  color: #d0ab56;
+  font-size: 10px;
+}
+
+.admin-review-form button:disabled {
+  cursor: not-allowed;
+  opacity: 0.58;
+}
+
+.admin-reject-details {
+  border: 1px solid #633f49;
+  border-radius: 6px;
+  padding: 10px;
+}
+
+.admin-reject-details summary {
+  color: #ffb4b4;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.admin-reject-details label {
+  display: block;
+  margin: 12px 0 6px;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.admin-reject-details label span {
+  color: #8f99ad;
+  font-weight: 500;
+}
+
+.admin-reject-details textarea {
+  min-height: 78px;
+  padding-top: 9px;
+  resize: vertical;
+}
+
+.admin-reject-button {
+  margin-top: 9px;
+  border: 1px solid #d45b60;
+  border-radius: 6px;
+  background: rgba(160, 32, 32, 0.2);
+  color: #ffb4b4;
+  cursor: pointer;
+  font-weight: 800;
+  padding: 9px 12px;
+}
+
+.admin-review-form > .professor-form-status {
+  grid-column: 1 / -1;
+}
+
+.professor-application-card {
+  max-width: 790px;
+  padding: clamp(24px, 5vw, 42px);
+}
+
+.professor-application-card__icon {
+  display: grid;
+  width: 58px;
+  height: 58px;
+  place-items: center;
+  margin-bottom: 18px;
+  border-radius: 12px;
+  background: rgba(255, 193, 7, 0.15);
+  color: #ffd166;
+  font-size: 30px;
+}
+
+.professor-application-card--rejected .professor-application-card__icon {
+  background: rgba(207, 54, 64, 0.17);
+  color: #ff8585;
+}
+
+.professor-application-card h2 {
+  margin: 0;
+  font-size: clamp(25px, 4vw, 34px);
+}
+
+.professor-application-card > p:not(.student-section-kicker) {
+  max-width: 650px;
+  color: #aeb6c5;
+  font-size: 14px;
+  line-height: 1.65;
+}
+
+.professor-application-card dl {
+  display: grid;
+  gap: 10px;
+  margin: 24px 0 0;
+}
+
+.professor-application-card dl div {
+  display: grid;
+  grid-template-columns: 130px minmax(0, 1fr);
+  gap: 16px;
+  border-top: 1px solid #33425c;
+  padding-top: 10px;
+}
+
+.professor-application-card dt {
+  color: #8893a8;
+  font-size: 11px;
+  text-transform: uppercase;
+}
+
+.professor-application-card dd {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+@media (max-width: 760px) {
+  .role-selector--login .role-selector__cards {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-review-form,
+  .admin-application-card__facts {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 560px) {
+  .admin-applications-panel {
+    padding: 18px;
+  }
+
+  .admin-application-tools > div,
+  .admin-application-card__identity,
+  .professor-application-card dl div {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-application-card__identity > span {
+    display: none;
+  }
+
+  .admin-status-badge {
+    width: fit-content;
+  }
+
+  .admin-review-form__primary {
+    align-items: stretch;
+    flex-direction: column;
   }
 }

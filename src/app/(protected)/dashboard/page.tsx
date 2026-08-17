@@ -27,5 +27,12 @@ export default async function DashboardPage() {
     );
   }
 
+  if (
+    result.profile.role === "professor" &&
+    result.profile.professor_application_status !== "approved"
+  ) {
+    redirect("/professor/application");
+  }
+
   redirect(`/${result.profile.role}`);
 }
