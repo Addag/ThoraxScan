@@ -2,7 +2,7 @@
 node_type: contract
 status: live
 audited: 2026-08-17
-snapshot: main @ 1e5cbf8
+snapshot: main @ 767ee8f + working tree
 ---
 
 # Map contract
@@ -32,6 +32,8 @@ Map the nouns, live movements, schemas, and first-order change impact of the Tho
 - A ghost claim is documented or named but not wired; it must not be treated as current behavior.
 - A leftover claim remains in the tree but is not the main path.
 - The implementation wins when a planning document and source code disagree.
+- An Administrator is a separately bootstrapped capability, not a third application or membership role.
+- Professor profile role and Professor approval status are distinct; workspace teaching access requires both.
 - Existing planning documents remain references. They are not moved or rewritten by this map creation.
 
 ## Reference shelves

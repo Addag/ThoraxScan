@@ -3,7 +3,7 @@ node_type: object
 universe: live
 status: verified
 audited: 2026-08-17
-snapshot: working tree @ 2026-08-17
+snapshot: main @ 767ee8f + working tree
 ---
 
 # Workspace
@@ -17,18 +17,18 @@ It gives membership and invitations one stable tenant boundary while ownership r
 ## Shape
 
 - UUID primary key, trimmed 3–100 character name, owner foreign key, and timestamps are constrained in [workspace migration](<../../../supabase/migrations/20260817110952_workspace_membership_invitations.sql:1>).
-- Owner validation and automatic Professor membership run after insertion in [workspace migration](<../../../supabase/migrations/20260817110952_workspace_membership_invitations.sql:262>).
-- Members can read joined workspaces; only Professor profiles can insert owned workspaces; only owners can rename them in [workspace migration](<../../../supabase/migrations/20260817110952_workspace_membership_invitations.sql:307>).
+- Owner validation now requires approved Professor status, prevents transfer, and still precedes automatic Professor membership in [the approval migration](<../../../supabase/migrations/20260817124643_professor_approval_administration.sql:252>).
+- Joined-workspace reads and owner insert/update policies consume helpers whose current approval-aware definitions are in [the approval migration](<../../../supabase/migrations/20260817124643_professor_approval_administration.sql:157>).
 
 ## Connected to
 
-Owned by a Profile; joined through [Workspace membership](workspace-membership.md); entered through [Invitation code](invitation-code.md).
+Owned by an approved Professor [Profile](../identity/profile.md); joined through [Workspace membership](workspace-membership.md); entered through [Invitation code](invitation-code.md); teaching authority depends on [Professor application](../identity/professor-application.md) status.
 
 ## If you change this
 
 ### Hits
 
-- Workspace migration constraints and policies, Student/Professor projections, dashboard cards, detail routes, creation, and rename actions.
+- Workspace constraints, approval-aware owner validation/policies, Student/Professor projections, dashboard cards, detail routes, creation, and rename actions.
 
 ### Does not hit
 

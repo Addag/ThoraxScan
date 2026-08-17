@@ -2,7 +2,7 @@
 node_type: catalog
 subject: ThoraxScan repository
 status: live
-snapshot: working tree @ 2026-08-17
+snapshot: main @ 767ee8f + working tree
 audited: 2026-08-17
 ---
 
@@ -17,7 +17,9 @@ This is a source-backed map of the ThoraxScan application repository one level a
 | How do I walk this map? | [CONTEXT.md](CONTEXT.md) |
 | What is X? | [objects/_index.md](objects/_index.md), then the linked card |
 | What actually runs? | [processes/CONTEXT.md](processes/CONTEXT.md) |
-| What schema is live? | [objects/runtime/supabase-profile-schema.md](objects/runtime/supabase-profile-schema.md) plus [Workspace](objects/learning/workspace.md), [Membership](objects/learning/workspace-membership.md), and [Invitation Code](objects/learning/invitation-code.md) |
+| What schema is live? | [Profile schema](objects/runtime/supabase-profile-schema.md), [Platform administrator](objects/identity/platform-administrator.md), [Professor application](objects/identity/professor-application.md), [Workspace](objects/learning/workspace.md), [Membership](objects/learning/workspace-membership.md), and [Invitation Code](objects/learning/invitation-code.md) |
+| How are Professor accounts approved? | [Professor application](objects/identity/professor-application.md), then [application review](processes/professor-application-review.md) |
+| What protects the administrator dashboard? | [Platform administrator](objects/identity/platform-administrator.md) and [Administrator approval surface](objects/ui/administrator-approval-surface.md) |
 | What else moves if I change X? | [effects/CONTEXT.md](effects/CONTEXT.md) |
 | What is planned but not wired? | The ghost cards in [objects/_index.md](objects/_index.md) |
 | What are the product/design references? | The six original planning/design documents in this folder; they are references, not runtime source |
@@ -31,6 +33,8 @@ This is a source-backed map of the ThoraxScan application repository one level a
 ## Name collisions
 
 - Profile means the public.profiles row plus the TypeScript projection used by the app.
+- AppRole remains student | professor. Administrator is a login portal backed by a separate platform_admins capability, not a profile or workspace-membership role.
+- Professor application status gates Professor workspace access; it does not replace the Professor profile role.
 - Role workspace surface covers the live Student and Professor dashboard/detail routes; Workspace means the professor-owned learning-space record shared by both roles.
 - X-ray sample means the static presentation image; it is not the planned inference input pipeline.
 - Attention Heatmap is planned explanatory output; its current appearance in copy and design documents is not implementation evidence.

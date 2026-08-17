@@ -2,7 +2,7 @@
 node_type: catalog
 status: live
 audited: 2026-08-17
-snapshot: working tree @ 2026-08-17
+snapshot: main @ 767ee8f + working tree
 ---
 
 # Object index
@@ -15,6 +15,8 @@ One line per important noun. live cards are source-backed; ghost entries are doc
 |---|---|---|---|
 | Profile | live | [profile.md](identity/profile.md) | public.profiles plus the TypeScript projection |
 | AppRole | live | [app-role.md](identity/app-role.md) | TypeScript union and SQL role constraint |
+| Platform administrator | live | [platform-administrator.md](identity/platform-administrator.md) | public.platform_admins and the protected administrator route |
+| Professor application | live | [professor-application.md](identity/professor-application.md) | public.professor_applications and review RPC |
 | Auth session and claims | live | [auth-session.md](identity/auth-session.md) | Supabase adapters, proxy, and auth routes |
 
 ## Learning
@@ -49,6 +51,7 @@ One line per important noun. live cards are source-backed; ghost entries are doc
 |---|---|---|---|
 | Landing surface | live | [landing-surface.md](ui/landing-surface.md) | src/app/page.tsx |
 | Authentication surface | live | [auth-surface.md](ui/auth-surface.md) | auth pages, layout, form, and actions |
+| Administrator approval surface | live | [administrator-approval-surface.md](ui/administrator-approval-surface.md) | /admin, review actions, and administrator shell |
 | Design tokens | live | [design-tokens.md](ui/design-tokens.md) | src/app/globals.css |
 | X-ray sample asset | live | [xray-sample-asset.md](ui/xray-sample-asset.md) | public/images/xray-sample.png |
 

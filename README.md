@@ -1,36 +1,44 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# ThoraxScan
 
-## Getting Started
+ThoraxScan is a Next.js and Supabase educational workspace prototype for chest X-ray learning.
 
-First, run the development server:
+## Getting started
+
+Install dependencies and run the development server:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Bootstrap the first administrator
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Administrator is a separate capability, not a public registration role. After the first administrator has registered and confirmed their email, run this once in the linked development project's Supabase SQL Editor:
 
-## Learn More
+```sql
+insert into public.platform_admins (user_id)
+select auth_user.id
+from auth.users as auth_user
+where lower(auth_user.email) = lower('administrator@example.com')
+  and auth_user.email_confirmed_at is not null
+on conflict (user_id) do nothing;
+```
 
-To learn more about Next.js, take a look at the following resources:
+Replace `administrator@example.com`, then verify the result:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```sql
+select profile.display_name, auth_user.email, administrator.created_at
+from public.platform_admins as administrator
+join public.profiles as profile on profile.id = administrator.user_id
+join auth.users as auth_user on auth_user.id = administrator.user_id;
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+The administrator then selects **Administrator** on the normal login page and is routed to `/admin`.
 
-## Deploy on Vercel
+## Verification
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+npm run lint
+npm run build
+```
