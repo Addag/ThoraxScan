@@ -3,37 +3,37 @@ node_type: object
 universe: live
 status: verified
 audited: 2026-08-17
-snapshot: main @ 1e5cbf8
+snapshot: working tree @ 2026-08-17
 ---
 
-# Role workspace surface
+# Role workspace surfaces
 
-The current student and professor routes are authenticated role surfaces that render a shared placeholder, not the planned LMS workspaces.
+The Student route is now a live workspace dashboard and read-only workspace detail surface; the Professor route still renders the shared placeholder.
 
 ## Why this shape
 
-The repository has role-gated entry points before the complete student/professor dashboards are implemented.
+The student milestone exposes only membership redemption and joined-workspace reading while keeping activities and the professor application interface deferred.
 
 ## Shape
 
-- Student page requires student and renders RolePlaceholder in [student/page.tsx](<../../../src/app/(protected)/student/page.tsx:10>).
-- Professor page requires professor and renders the same component in [professor/page.tsx](<../../../src/app/(protected)/professor/page.tsx:10>).
-- The placeholder explicitly says the complete LMS dashboard is a future milestone in [role-placeholder.tsx](<../../../src/components/auth/role-placeholder.tsx:23>).
+- Student page requires the Student role, reads joined workspaces, renders invitation redemption, and links to read-only details in [student/page.tsx](<../../../src/app/(protected)/student/page.tsx:13>).
+- Student workspace detail re-checks the role and membership-derived workspace access in [workspaces/[workspaceId]/page.tsx](<../../../src/app/(protected)/student/workspaces/[workspaceId]/page.tsx:15>).
+- Professor page still renders RolePlaceholder in [professor/page.tsx](<../../../src/app/(protected)/professor/page.tsx:10>).
 
 ## Connected to
 
-The [Profile](../identity/profile.md), [AppRole](../identity/app-role.md), /dashboard, and requireRole.
+The [Profile](../identity/profile.md), [AppRole](../identity/app-role.md), [Workspace](workspace.md), [Workspace membership](workspace-membership.md), [Invitation code](invitation-code.md), /dashboard, and requireRole.
 
 ## If you change this
 
 ### Hits
 
-- Protected route guards and role-specific page behavior.
-- Shared role placeholder layout and logout surface.
+- Protected route guards, Student data projections/actions, the Student shell, and role-specific page behavior.
+- Professor placeholder and the shared logout action.
 
 ### Does not hit
 
-- The planned Workspace database record.
+- Professor workspace management UI.
 - Model inference, activities, submissions, or feedback, which have no current route implementation.
 
 ## Surfaces
@@ -42,4 +42,4 @@ Authenticated server-rendered pages and the current user.
 
 ## See
 
-[role-placeholder.tsx](<../../../src/components/auth/role-placeholder.tsx:5>)
+[student/page.tsx](<../../../src/app/(protected)/student/page.tsx:13>)

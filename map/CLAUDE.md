@@ -2,7 +2,7 @@
 node_type: catalog
 subject: ThoraxScan repository
 status: live
-snapshot: main @ 1e5cbf8
+snapshot: working tree @ 2026-08-17
 audited: 2026-08-17
 ---
 
@@ -17,7 +17,7 @@ This is a source-backed map of the ThoraxScan application repository one level a
 | How do I walk this map? | [CONTEXT.md](CONTEXT.md) |
 | What is X? | [objects/_index.md](objects/_index.md), then the linked card |
 | What actually runs? | [processes/CONTEXT.md](processes/CONTEXT.md) |
-| What schema is live? | [objects/runtime/supabase-profile-schema.md](objects/runtime/supabase-profile-schema.md) |
+| What schema is live? | [objects/runtime/supabase-profile-schema.md](objects/runtime/supabase-profile-schema.md) plus [Workspace](objects/learning/workspace.md), [Membership](objects/learning/workspace-membership.md), and [Invitation Code](objects/learning/invitation-code.md) |
 | What else moves if I change X? | [effects/CONTEXT.md](effects/CONTEXT.md) |
 | What is planned but not wired? | The ghost cards in [objects/_index.md](objects/_index.md) |
 | What are the product/design references? | The six original planning/design documents in this folder; they are references, not runtime source |
@@ -31,7 +31,7 @@ This is a source-backed map of the ThoraxScan application repository one level a
 ## Name collisions
 
 - Profile means the public.profiles row plus the TypeScript projection used by the app.
-- Role workspace means the implemented /student or /professor placeholder surface; Workspace means the planned professor-managed learning-space record.
+- Role workspace surface covers the live Student dashboard/detail routes and the remaining Professor placeholder; Workspace means the live professor-owned learning-space record.
 - X-ray sample means the static presentation image; it is not the planned inference input pipeline.
 - Attention Heatmap is planned explanatory output; its current appearance in copy and design documents is not implementation evidence.
 

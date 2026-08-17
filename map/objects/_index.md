@@ -2,7 +2,7 @@
 node_type: catalog
 status: live
 audited: 2026-08-17
-snapshot: main @ 1e5cbf8
+snapshot: working tree @ 2026-08-17
 ---
 
 # Object index
@@ -21,10 +21,10 @@ One line per important noun. live cards are source-backed; ghost entries are doc
 
 | Noun | Universe | Card or source stub | Source |
 |---|---|---|---|
-| Role workspace surface | live | [role-workspace-surface.md](learning/role-workspace-surface.md) | Student/professor pages and placeholder |
-| Workspace | ghost | stub | [technical design](../TECHNICAL_DESIGN_DOCUMENT.md#L315) |
-| Workspace membership | ghost | stub | [technical design](../TECHNICAL_DESIGN_DOCUMENT.md#L316) |
-| Invitation code | ghost | stub | [technical design](../TECHNICAL_DESIGN_DOCUMENT.md#L317) |
+| Role workspace surface | live | [role-workspace-surface.md](learning/role-workspace-surface.md) | Student workspace pages; Professor remains a placeholder |
+| Workspace | live | [workspace.md](learning/workspace.md) | public.workspaces and student workspace projections |
+| Workspace membership | live | [workspace-membership.md](learning/workspace-membership.md) | public.workspace_members and its RLS helpers |
+| Invitation code | live | [invitation-code.md](learning/invitation-code.md) | public.invitation_codes and redemption RPC |
 | X-ray case | ghost | stub | [technical design](../TECHNICAL_DESIGN_DOCUMENT.md#L318) |
 | Activity | ghost | stub | [technical design](../TECHNICAL_DESIGN_DOCUMENT.md#L319) |
 | AI analysis | ghost | stub | [technical design](../TECHNICAL_DESIGN_DOCUMENT.md#L320) |
