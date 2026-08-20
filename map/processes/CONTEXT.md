@@ -1,8 +1,8 @@
 ---
 node_type: contract
 status: live
-audited: 2026-08-17
-snapshot: main @ 767ee8f + working tree
+audited: 2026-08-20
+snapshot: main @ ed26b07 + working tree
 ---
 
 # Processes contract
@@ -13,12 +13,14 @@ snapshot: main @ 767ee8f + working tree
 - Auth/session adapters under ../../src/lib/auth/ and ../../src/lib/supabase/.
 - Protected route actions and pages under ../../src/app/(protected)/.
 - Workspace data projections under ../../src/lib/workspaces/.
+- Activity data projections under ../../src/lib/activities/ and activity UI under ../../src/components/activities/.
 - Workspace schema, authorization helpers, triggers, and RPC under ../../supabase/migrations/.
+- Activity/case schema, lifecycle triggers, RLS, and Storage policies under ../../supabase/migrations/20260820101401_activities_case_publication.sql.
 - Auth confirmation route under ../../src/app/auth/confirm/route.ts.
 
 ## Job
 
-Record only movements that currently run in the repository. The process shelf covers authentication, Professor approval, workspace creation, invitation management, roster management, and membership exit contracts.
+Record only movements that currently run in the repository. The process shelf covers authentication, Professor approval, workspace membership/rosters, Professor activity publication, and Student activity viewing.
 
 ## Outputs
 
@@ -32,8 +34,10 @@ Record only movements that currently run in the repository. The process shelf co
 - [invitation-redemption.md](invitation-redemption.md)
 - [roster-management.md](roster-management.md)
 - [membership-exit.md](membership-exit.md)
+- [activity-authoring-publication.md](activity-authoring-publication.md)
+- [student-activity-view.md](student-activity-view.md)
 
-Activity, inference, submission, feedback, and evaluation movements remain ghost concepts in the object index and technical references; they do not receive live process cards yet.
+Inference, Student submission, AI feedback release, faculty evaluation, analytics, and notification movements remain ghost concepts; they do not receive live process cards.
 
 ## Human check
 

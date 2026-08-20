@@ -2,8 +2,8 @@
 node_type: catalog
 subject: ThoraxScan repository
 status: live
-snapshot: main @ 767ee8f + working tree
-audited: 2026-08-17
+snapshot: main @ ed26b07 + working tree
+audited: 2026-08-20
 ---
 
 # ThoraxScan system map
@@ -17,7 +17,8 @@ This is a source-backed map of the ThoraxScan application repository one level a
 | How do I walk this map? | [CONTEXT.md](CONTEXT.md) |
 | What is X? | [objects/_index.md](objects/_index.md), then the linked card |
 | What actually runs? | [processes/CONTEXT.md](processes/CONTEXT.md) |
-| What schema is live? | [Profile schema](objects/runtime/supabase-profile-schema.md), [Platform administrator](objects/identity/platform-administrator.md), [Professor application](objects/identity/professor-application.md), [Workspace](objects/learning/workspace.md), [Membership](objects/learning/workspace-membership.md), and [Invitation Code](objects/learning/invitation-code.md) |
+| What schema is live? | [Profile schema](objects/runtime/supabase-profile-schema.md), [Platform administrator](objects/identity/platform-administrator.md), [Professor application](objects/identity/professor-application.md), [Workspace](objects/learning/workspace.md), [Membership](objects/learning/workspace-membership.md), [Invitation Code](objects/learning/invitation-code.md), [Activity](objects/learning/activity.md), and [X-ray case](objects/learning/xray-case.md) |
+| How are activities published and viewed? | [Activity authoring/publication](processes/activity-authoring-publication.md), then [Student activity viewing](processes/student-activity-view.md) |
 | How are Professor accounts approved? | [Professor application](objects/identity/professor-application.md), then [application review](processes/professor-application-review.md) |
 | What protects the administrator dashboard? | [Platform administrator](objects/identity/platform-administrator.md) and [Administrator approval surface](objects/ui/administrator-approval-surface.md) |
 | What else moves if I change X? | [effects/CONTEXT.md](effects/CONTEXT.md) |
@@ -35,8 +36,8 @@ This is a source-backed map of the ThoraxScan application repository one level a
 - Profile means the public.profiles row plus the TypeScript projection used by the app.
 - AppRole remains student | professor. Administrator is a login portal backed by a separate platform_admins capability, not a profile or workspace-membership role.
 - Professor application status gates Professor workspace access; it does not replace the Professor profile role.
-- Role workspace surface covers the live Student and Professor dashboard/detail routes; Workspace means the professor-owned learning-space record shared by both roles.
-- X-ray sample means the static presentation image; it is not the planned inference input pipeline.
+- Role workspace surface covers the live Student and Professor workspace/activity routes; Workspace means the professor-owned tenant shared by both roles.
+- X-ray case means the live private activity object/audit row. X-ray sample means the unrelated static public presentation image.
 - Attention Heatmap is planned explanatory output; its current appearance in copy and design documents is not implementation evidence.
 
 ## Source rule

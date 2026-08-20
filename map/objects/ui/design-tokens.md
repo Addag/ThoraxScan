@@ -2,8 +2,8 @@
 node_type: schema
 universe: live
 status: verified
-audited: 2026-08-17
-snapshot: main @ 1e5cbf8
+audited: 2026-08-20
+snapshot: main @ ed26b07 + working tree
 ---
 
 # Design tokens
@@ -12,7 +12,7 @@ ThoraxScan’s current visual token layer is the CSS custom-property and class c
 
 ## Why this shape
 
-The landing, authentication, and placeholder surfaces share colors, typography, borders, status treatments, and responsive rules through one stylesheet.
+The landing, authentication, administration, role dashboards, and activity surfaces share colors, typography, borders, status treatments, and responsive rules through one stylesheet.
 
 ## Shape
 
@@ -20,7 +20,7 @@ Core variables include canvas, app background, surfaces, borders, text, brand bl
 
 ## Connected to
 
-The [landing surface](landing-surface.md), [authentication surface](auth-surface.md), Brand, role placeholder, and static assets.
+The [landing surface](landing-surface.md), [authentication surface](auth-surface.md), [Administrator approval surface](administrator-approval-surface.md), [Role workspace surfaces](../learning/role-workspace-surface.md), [Activity](../learning/activity.md), Brand, and static assets.
 
 ## If you change this
 

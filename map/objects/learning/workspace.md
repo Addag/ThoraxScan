@@ -2,8 +2,8 @@
 node_type: object
 universe: live
 status: verified
-audited: 2026-08-17
-snapshot: main @ 767ee8f + working tree
+audited: 2026-08-20
+snapshot: main @ ed26b07 + working tree
 ---
 
 # Workspace
@@ -22,17 +22,17 @@ It gives membership and invitations one stable tenant boundary while ownership r
 
 ## Connected to
 
-Owned by an approved Professor [Profile](../identity/profile.md); joined through [Workspace membership](workspace-membership.md); entered through [Invitation code](invitation-code.md); teaching authority depends on [Professor application](../identity/professor-application.md) status.
+Owned by an approved Professor [Profile](../identity/profile.md); joined through [Workspace membership](workspace-membership.md); entered through [Invitation code](invitation-code.md); scopes [Activities](activity.md) and [X-ray cases](xray-case.md); teaching authority depends on [Professor application](../identity/professor-application.md) status.
 
 ## If you change this
 
 ### Hits
 
-- Workspace constraints, approval-aware owner validation/policies, Student/Professor projections, dashboard cards, detail routes, creation, and rename actions.
+- Workspace constraints, approval-aware owner validation/policies, Student/Professor projections, dashboard cards, detail routes, activity filters/RLS, case object paths, creation, and rename actions.
 
 ### Does not hit
 
-- Activities, cases, inference, analytics, or workspace deletion, which remain deferred.
+- Inference, Student submissions, faculty evaluation, analytics, or ownership transfer.
 
 ## Surfaces
 

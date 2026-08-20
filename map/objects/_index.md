@@ -1,8 +1,8 @@
 ---
 node_type: catalog
 status: live
-audited: 2026-08-17
-snapshot: main @ 767ee8f + working tree
+audited: 2026-08-20
+snapshot: main @ ed26b07 + working tree
 ---
 
 # Object index
@@ -27,12 +27,13 @@ One line per important noun. live cards are source-backed; ghost entries are doc
 | Workspace | live | [workspace.md](learning/workspace.md) | public.workspaces and student workspace projections |
 | Workspace membership | live | [workspace-membership.md](learning/workspace-membership.md) | public.workspace_members and its RLS helpers |
 | Invitation code | live | [invitation-code.md](learning/invitation-code.md) | public.invitation_codes and redemption RPC |
-| X-ray case | ghost | stub | [technical design](../TECHNICAL_DESIGN_DOCUMENT.md#L318) |
-| Activity | ghost | stub | [technical design](../TECHNICAL_DESIGN_DOCUMENT.md#L319) |
+| X-ray case | live | [xray-case.md](learning/xray-case.md) | public.xray_cases, private activity-cases bucket, and signed upload/read flow |
+| Activity | live | [activity.md](learning/activity.md) | public.activities, private reference evaluation, Server Actions, and role routes |
 | AI analysis | ghost | stub | [technical design](../TECHNICAL_DESIGN_DOCUMENT.md#L320) |
 | Student submission | ghost | stub | [technical design](../TECHNICAL_DESIGN_DOCUMENT.md#L321) |
 | AI feedback release | ghost | stub | [technical design](../TECHNICAL_DESIGN_DOCUMENT.md#L322) |
 | Faculty evaluation | ghost | stub | [technical design](../TECHNICAL_DESIGN_DOCUMENT.md#L323) |
+| Analytics | ghost | stub | [application flow reference](../thoraxscan-app-flow.md#L48) |
 
 ## Inference
 
