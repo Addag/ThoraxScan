@@ -3,6 +3,8 @@ import Link from "next/link";
 
 import { InvitationForm } from "@/components/student/invitation-form";
 import { StudentShell } from "@/components/student/student-shell";
+import { formatDueDate } from "@/components/activities/activity-ui";
+import { getStudentActivities } from "@/lib/activities/server";
 import { requireRole } from "@/lib/auth/server";
 import { getStudentWorkspaces } from "@/lib/workspaces/server";
 
@@ -12,7 +14,10 @@ export const metadata: Metadata = {
 
 export default async function StudentPage() {
   const profile = await requireRole("student");
-  const workspaces = await getStudentWorkspaces(profile.id);
+  const [workspaces, recentActivities] = await Promise.all([
+    getStudentWorkspaces(profile.id),
+    getStudentActivities(3),
+  ]);
 
   return (
     <StudentShell>
@@ -83,9 +88,34 @@ export default async function StudentPage() {
           )}
         </section>
 
+        <section className="student-recent-activities" aria-labelledby="recent-activities-title">
+          <div className="student-section-heading">
+            <div>
+              <p className="student-section-kicker">Published assignments</p>
+              <h2 id="recent-activities-title">Recent activities</h2>
+            </div>
+            <Link href="/student/activities">View all</Link>
+          </div>
+          {recentActivities.error ? (
+            <p className="professor-list-empty">Recent activities are unavailable.</p>
+          ) : recentActivities.data.length === 0 ? (
+            <p className="professor-list-empty">No activities have been published to your workspaces yet.</p>
+          ) : (
+            <div className="student-recent-activity-grid">
+              {recentActivities.data.map((activity) => (
+                <Link href={`/student/activities/${activity.id}`} key={activity.id}>
+                  <span>{activity.workspaceName}</span>
+                  <strong>{activity.title}</strong>
+                  <small>{formatDueDate(activity.dueAt)}</small>
+                </Link>
+              ))}
+            </div>
+          )}
+        </section>
+
         <aside className="student-privacy-note">
           <strong>Privacy notice</strong>
-          <p>Future X-ray learning activities will process images locally in your browser.</p>
+          <p>Published case images use private storage and short-lived signed access.</p>
         </aside>
       </main>
     </StudentShell>

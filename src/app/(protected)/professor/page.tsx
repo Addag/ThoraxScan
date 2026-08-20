@@ -6,6 +6,7 @@ import {
   ProfessorRedeemForm,
 } from "@/components/professor/professor-forms";
 import { ProfessorShell } from "@/components/professor/professor-shell";
+import { getProfessorActivities } from "@/lib/activities/server";
 import { requireRole } from "@/lib/auth/server";
 import { getProfessorWorkspaces } from "@/lib/workspaces/server";
 
@@ -15,7 +16,10 @@ export const metadata: Metadata = {
 
 export default async function ProfessorPage() {
   const profile = await requireRole("professor");
-  const workspaces = await getProfessorWorkspaces(profile.id);
+  const [workspaces, activities] = await Promise.all([
+    getProfessorWorkspaces(profile.id),
+    getProfessorActivities(),
+  ]);
   const ownedCount = workspaces.data.filter((workspace) => workspace.is_owner).length;
   const joinedCount = workspaces.data.length - ownedCount;
 
@@ -58,11 +62,16 @@ export default async function ProfessorPage() {
           </article>
           <article>
             <span aria-hidden="true">＋</span>
-            <strong>—</strong>
+            <strong>{activities.data.length}</strong>
             <p>Activities</p>
-            <small>Deferred milestone</small>
+            <small>{activities.data.filter((activity) => activity.status === "published").length} published · {activities.data.filter((activity) => activity.status === "draft").length} drafts</small>
           </article>
         </section>
+
+        <Link className="professor-activities-cta" href="/professor/activities">
+          <span><strong>Manage activities</strong><small>Author, publish, and archive case-backed assignments</small></span>
+          <span aria-hidden="true">→</span>
+        </Link>
 
         <section className="professor-dashboard-actions" aria-label="Workspace actions">
           <article>

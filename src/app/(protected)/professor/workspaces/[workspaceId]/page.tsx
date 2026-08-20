@@ -102,6 +102,9 @@ export default async function ProfessorWorkspacePage({
               currentName={workspace.name}
             />
           )}
+          <Link className="activity-secondary-button" href={`/professor/activities?workspace=${workspace.id}`}>
+            View workspace activities
+          </Link>
         </section>
 
         <div className="professor-management-grid">

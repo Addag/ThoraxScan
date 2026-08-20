@@ -31,7 +31,7 @@ export default async function StudentWorkspacePage({
           <p className="student-section-kicker">Student workspace</p>
           <h1>{workspace.name}</h1>
           <p className="student-detail-card__description">
-            This workspace is your entry point for future chest X-ray learning activities.
+            Review published chest X-ray learning activities from this workspace.
           </p>
           <dl>
             <div><dt>Your access</dt><dd>Student · Read only</dd></div>
@@ -42,10 +42,11 @@ export default async function StudentWorkspacePage({
           </dl>
         </section>
         <section className="student-future-panel">
-          <span aria-hidden="true">◎</span>
+          <span aria-hidden="true">▣</span>
           <div>
-            <h2>Activities are coming next</h2>
-            <p>Your professor’s activities and case assignments will appear here in a future milestone.</p>
+            <h2>Workspace activities</h2>
+            <p>Published assignments are available from the Activities page.</p>
+            <Link href="/student/activities">Browse activities →</Link>
           </div>
         </section>
       </main>
