@@ -2,8 +2,8 @@
 node_type: object
 universe: live
 status: verified
-audited: 2026-08-17
-snapshot: main @ 1e5cbf8
+audited: 2026-08-22
+snapshot: main @ 59e6d7d + working tree
 ---
 
 # Supabase auth boundary
@@ -17,6 +17,7 @@ Browser code needs the public Supabase configuration, while server components an
 ## Shape
 
 - Browser client uses NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY in [client.ts](<../../../src/lib/supabase/client.ts:3>).
+- The shared auth form uses `NEXT_PUBLIC_TURNSTILE_SITE_KEY`, while Supabase Auth verifies the resulting token with its server-only Turnstile secret in [auth-form.tsx](<../../../src/components/auth/auth-form.tsx:35>) and [config.toml](<../../../supabase/config.toml:214>).
 - Server client reads cookies from Next headers in [server.ts](<../../../src/lib/supabase/server.ts:4>).
 - Proxy refreshes claims and writes refreshed cookies in [proxy.ts](<../../../src/lib/supabase/proxy.ts:4>).
 - The root proxy wrapper applies the matcher to non-static requests in [src/proxy.ts](<../../../src/proxy.ts:5>).
@@ -30,7 +31,7 @@ The [auth session](../identity/auth-session.md), auth actions, confirmation rout
 ### Hits
 
 - Authenticated request behavior, cookie refresh, and protected pages.
-- Environment configuration and deployment setup.
+- Supabase, Turnstile, environment configuration, and deployment setup.
 
 ### Does not hit
 

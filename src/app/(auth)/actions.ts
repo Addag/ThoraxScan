@@ -33,6 +33,10 @@ function validatePassword(password: string) {
   if (password.length < 8) return "Use at least 8 characters.";
 }
 
+function validateCaptchaToken(captchaToken: string) {
+  if (!captchaToken) return "Complete the security verification.";
+}
+
 function isAppRole(role: string): role is AppRole {
   return role === "student" || role === "professor";
 }
@@ -52,6 +56,12 @@ function authMessage(code: string | undefined, fallback: string) {
   return fallback;
 }
 
+function captchaErrorState() {
+  return errorState("Security verification failed or expired. Try again.", {
+    captchaToken: "Complete the security verification again.",
+  });
+}
+
 export async function registerAction(
   _previousState: AuthActionState,
   formData: FormData,
@@ -60,6 +70,7 @@ export async function registerAction(
   const email = value(formData, "email").trim().toLowerCase();
   const password = value(formData, "password");
   const confirmPassword = value(formData, "confirmPassword");
+  const captchaToken = value(formData, "captchaToken").trim();
   const requestedRole = value(formData, "requestedRole");
   const fieldErrors: Partial<Record<AuthField, string>> = {};
 
@@ -69,6 +80,7 @@ export async function registerAction(
   }
   fieldErrors.email = validateEmail(email);
   fieldErrors.password = validatePassword(password);
+  fieldErrors.captchaToken = validateCaptchaToken(captchaToken);
   if (!confirmPassword) {
     fieldErrors.confirmPassword = "Confirm your password.";
   } else if (password !== confirmPassword) {
@@ -93,12 +105,15 @@ export async function registerAction(
     email,
     password,
     options: {
+      captchaToken,
       data: { display_name: displayName, requested_role: requestedRole },
       emailRedirectTo: `${siteUrl}/auth/confirm?next=/dashboard`,
     },
   });
 
   if (error) {
+    if (error.code === "captcha_failed") return captchaErrorState();
+
     return errorState(
       authMessage(error.code, "Unable to create your account. Please try again."),
     );
@@ -119,11 +134,13 @@ export async function loginAction(
 ): Promise<AuthActionState> {
   const email = value(formData, "email").trim().toLowerCase();
   const password = value(formData, "password");
+  const captchaToken = value(formData, "captchaToken").trim();
   const expectedRole = value(formData, "expectedRole");
   const fieldErrors: Partial<Record<AuthField, string>> = {};
 
   fieldErrors.email = validateEmail(email);
   if (!password) fieldErrors.password = "Enter your password.";
+  fieldErrors.captchaToken = validateCaptchaToken(captchaToken);
   if (!isLoginPortal(expectedRole)) {
     fieldErrors.expectedRole = "Choose Student, Professor, or Administrator.";
   }
@@ -140,9 +157,12 @@ export async function loginAction(
   const { data, error } = await supabase.auth.signInWithPassword({
     email,
     password,
+    options: { captchaToken },
   });
 
   if (error) {
+    if (error.code === "captcha_failed") return captchaErrorState();
+
     return errorState(
       authMessage(error.code, "Unable to log in. Please try again."),
     );
@@ -194,18 +214,26 @@ export async function forgotPasswordAction(
   formData: FormData,
 ): Promise<AuthActionState> {
   const email = value(formData, "email").trim().toLowerCase();
+  const captchaToken = value(formData, "captchaToken").trim();
   const emailError = validateEmail(email);
+  const captchaError = validateCaptchaToken(captchaToken);
 
-  if (emailError) {
-    return errorState("Check the highlighted field.", { email: emailError });
+  if (emailError || captchaError) {
+    return errorState("Check the highlighted fields.", {
+      email: emailError,
+      captchaToken: captchaError,
+    });
   }
 
   const supabase = await createClient();
   const siteUrl =
     process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
   const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    captchaToken,
     redirectTo: `${siteUrl}/auth/confirm?next=/reset-password`,
   });
+
+  if (error?.code === "captcha_failed") return captchaErrorState();
 
   if (error?.code === "over_email_send_rate_limit") {
     return errorState(authMessage(error.code, ""));

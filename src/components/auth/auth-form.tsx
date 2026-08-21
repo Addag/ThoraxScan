@@ -1,8 +1,12 @@
 "use client";
 
+import {
+  Turnstile,
+  type TurnstileInstance,
+} from "@marsidev/react-turnstile";
 import Image from "next/image";
 import Link from "next/link";
-import { useActionState } from "react";
+import { useActionState, useEffect, useRef, useState } from "react";
 
 import {
   forgotPasswordAction,
@@ -28,6 +32,8 @@ const submitLabels = {
   reset: "Update password",
 };
 
+const turnstileSiteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
+
 export function AuthForm({ mode }: { mode: AuthMode }) {
   const [state, formAction, pending] = useActionState(
     actions[mode],
@@ -36,6 +42,26 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
   const showEmail = mode !== "reset";
   const showPassword = mode !== "forgot";
   const showConfirmation = mode === "register" || mode === "reset";
+  const requiresCaptcha = mode !== "reset";
+  const turnstileRef = useRef<TurnstileInstance | null>(null);
+  const [captchaToken, setCaptchaToken] = useState("");
+  const [captchaError, setCaptchaError] = useState("");
+
+  useEffect(() => {
+    if (!requiresCaptcha || state.status === "idle") return;
+
+    const resetTimer = window.setTimeout(() => {
+      setCaptchaToken("");
+      turnstileRef.current?.reset();
+    }, 0);
+
+    return () => window.clearTimeout(resetTimer);
+  }, [requiresCaptcha, state]);
+
+  const captchaMessage = !turnstileSiteKey
+    ? "Security verification is unavailable. Contact an administrator."
+    : captchaError || (!captchaToken ? state.fieldErrors?.captchaToken : undefined);
+  const captchaReady = !requiresCaptcha || Boolean(captchaToken);
 
   return (
     <form className="auth-form" action={formAction} noValidate>
@@ -154,10 +180,70 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
         </div>
       )}
 
+      {requiresCaptcha && (
+        <div
+          className="auth-captcha"
+          aria-describedby={captchaMessage ? `${mode}-captcha-error` : undefined}
+        >
+          <input name="captchaToken" type="hidden" value={captchaToken} />
+          {turnstileSiteKey && (
+            <Turnstile
+              ref={turnstileRef}
+              siteKey={turnstileSiteKey}
+              onSuccess={(token) => {
+                setCaptchaToken(token);
+                setCaptchaError("");
+              }}
+              onExpire={() => {
+                setCaptchaToken("");
+                setCaptchaError(
+                  "Security verification expired. Complete it again.",
+                );
+              }}
+              onError={() => {
+                setCaptchaToken("");
+                setCaptchaError(
+                  "Security verification failed to load. Refresh and try again.",
+                );
+              }}
+              onTimeout={() => {
+                setCaptchaToken("");
+                setCaptchaError(
+                  "Security verification timed out. Complete it again.",
+                );
+              }}
+              onUnsupported={() => {
+                setCaptchaToken("");
+                setCaptchaError(
+                  "This browser cannot run security verification. Try a current browser.",
+                );
+              }}
+              options={{
+                appearance: "always",
+                refreshExpired: "auto",
+                responseField: false,
+                size: "normal",
+                theme: "dark",
+              }}
+            />
+          )}
+          {captchaMessage && (
+            <p
+              className="field-error auth-captcha__error"
+              id={`${mode}-captcha-error`}
+              role="alert"
+            >
+              {captchaMessage}
+            </p>
+          )}
+        </div>
+      )}
+
       <button
         className="primary-button auth-submit"
         type="submit"
-        disabled={pending}
+        disabled={pending || !captchaReady}
+        aria-busy={pending}
       >
         {pending ? "Please wait…" : submitLabels[mode]}
       </button>
