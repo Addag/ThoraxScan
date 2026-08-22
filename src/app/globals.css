@@ -1215,11 +1215,11 @@ textarea:focus-visible {
 }
 
 .landing-login {
-  width: 294px;
-  height: 76px;
+  width: 206px;
+  height: 53px;
   margin: 58px 0 0 8px;
-  gap: 10px;
-  font-size: 36px;
+  gap: 7px;
+  font-size: 25.2px;
   line-height: 1;
 }
 
@@ -1863,9 +1863,9 @@ textarea:focus-visible {
   }
 
   .landing-login {
-    width: min(294px, 100%);
+    width: min(206px, 100%);
     margin: 34px 0 0;
-    font-size: 32px;
+    font-size: 22.4px;
   }
 
   .landing-xray {
@@ -2017,9 +2017,9 @@ textarea:focus-visible {
   }
 
   .landing-login {
-    width: min(294px, 100%);
+    width: min(206px, 100%);
     margin: 34px 0 0;
-    font-size: 32px;
+    font-size: 22.4px;
   }
 
   .landing-xray {
