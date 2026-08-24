@@ -1,8 +1,8 @@
 ---
 node_type: contract
 status: live
-audited: 2026-08-20
-snapshot: main @ ed26b07 + working tree
+audited: 2026-08-24
+snapshot: main @ 46c18c1 + working tree
 ---
 
 # Objects contract
@@ -24,7 +24,7 @@ Maintain one source-backed card or stub line per important noun. Cluster by the 
 
 ## Status rule
 
-Live cards cite code, SQL, or configuration. Planned product records and model artifacts remain ghost stubs until the repository contains their source. A UI label or planning paragraph is not enough to promote a noun to live.
+Live cards cite code, SQL, or configuration. The model registry, manifest, preprocessing, runtime, and transient result are live foundation objects; product-facing AI analysis and persistence remain ghost. A UI label or planning paragraph is not enough to promote a noun to live.
 
 ## Human check
 

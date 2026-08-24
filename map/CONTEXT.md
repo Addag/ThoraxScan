@@ -1,8 +1,8 @@
 ---
 node_type: contract
 status: live
-audited: 2026-08-20
-snapshot: main @ ed26b07 + working tree
+audited: 2026-08-24
+snapshot: main @ 46c18c1 + working tree
 ---
 
 # Map contract
@@ -15,6 +15,7 @@ Map the nouns, live movements, schemas, and first-order change impact of the Tho
 
 - Runtime source: ../src/
 - Database source: ../supabase/migrations/ and ../supabase/config.toml
+- Model release source: ../src/lib/inference/, ../scripts/model-release.ts, and ../supabase/tests/database/
 - Product assets: ../public/
 - Repository contracts: ../AGENTS.md, ../CLAUDE.md, ../package.json, ../README.md
 - Stable references: the six original planning/design documents in this folder

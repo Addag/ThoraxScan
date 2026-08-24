@@ -46,7 +46,10 @@ disable CAPTCHA in Supabase before rolling back the application.
 
 ## Bootstrap the first administrator
 
-Administrator is a separate capability, not a public registration role. After the first administrator has registered and confirmed their email, run this once in the linked development project's Supabase SQL Editor:
+Administrator is a separate capability, not a public registration role. After
+the first administrator has registered and confirmed their email, run this once
+in the hosted production project's Supabase SQL Editor. Audit the target project
+and take a current backup before changing production data:
 
 ```sql
 insert into public.platform_admins (user_id)
@@ -71,6 +74,14 @@ The administrator then selects **Administrator** on the normal login page and is
 ## Verification
 
 ```bash
+npm test
+npm run test:model:browser
 npm run lint
 npm run build
 ```
+
+Model releases are developed against local Supabase and promoted to the hosted
+production project with the operator-only CLI. See
+[`docs/model-releases.md`](docs/model-releases.md). Vercel Production uses the
+hosted project's public URL and publishable key; model publisher credentials
+must never be configured in Vercel.

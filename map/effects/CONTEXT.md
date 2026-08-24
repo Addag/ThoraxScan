@@ -2,8 +2,8 @@
 node_type: effect
 universe: live
 status: live
-audited: 2026-08-20
-snapshot: main @ ed26b07 + working tree
+audited: 2026-08-24
+snapshot: main @ 46c18c1 + working tree
 ---
 
 # Change-impact index
@@ -29,7 +29,10 @@ Use this catalog before editing. Open the named cards and their source files; do
 | Activity record, lifecycle, or reference evaluation | [Activity](../objects/learning/activity.md), [authoring/publication](../processes/activity-authoring-publication.md), [Student view](../processes/student-activity-view.md), [role surface](../objects/learning/role-workspace-surface.md) | Migration constraints/RLS/triggers, Professor actions/forms/routes, Student projections/routes, dashboards, workspace activity links | Student submission, AI inference, grading, notifications |
 | X-ray case upload, metadata, or storage policy | [X-ray case](../objects/learning/xray-case.md), [Activity](../objects/learning/activity.md), [authoring/publication](../processes/activity-authoring-publication.md) | Case schema/trigger, private bucket, Storage RLS, signed upload/read flow, `sharp` dependency and server decode validation, preview errors, draft cleanup, publication prerequisites | Static sample image, model preprocessing, heatmaps |
 | Planned submission, AI feedback, faculty evaluation, or analytics rule | Ghost entries in [object index](../objects/_index.md), then [technical design](../TECHNICAL_DESIGN_DOCUMENT.md) | Future migrations, RLS, server routes, role surfaces, and workflow cards after implementation | Current Activity/Case publication and auth behavior unless the new feature changes their contracts |
-| Planned model, labels, thresholds, or heatmap | Ghost entries in [object index](../objects/_index.md), then [technical design](../TECHNICAL_DESIGN_DOCUMENT.md) | Future model assets, browser preprocessing, inference UI, parity tests, and privacy verification | Current auth/profile and static presentation asset |
+| Model contract, labels, thresholds, or preprocessing | [Manifest/configuration](../objects/inference/model-manifest-configuration.md), [preprocessing tensor](../objects/inference/preprocessing-tensor.md), [validation](../processes/model-validation.md), [browser conformance](../processes/browser-model-conformance.md) | Manifest parser, publisher bundle/evidence, ONNX compatibility, preprocessing/postprocessing, parity tests, and application redeploy for a new manifest version | Training weights/internal architecture that preserve version 1; current auth/profile |
+| Model registry schema, Storage layout, or active RPC | [Model release](../objects/inference/model-release.md), [active slot](../objects/inference/active-model-slot.md), [staging](../processes/model-staging.md), [activation](../processes/model-activation.md) | Migration, grants/RLS, bucket paths/limits, service-role CLI, authenticated resolver, audit history, and production rollout | Vercel publisher secrets, which must remain absent; Student analysis UI |
+| Runtime provider, integrity, or session cache | [Browser runtime](../objects/inference/browser-inference-runtime.md), [prediction result](../objects/inference/prediction-result.md), [browser conformance](../processes/browser-model-conformance.md) | ONNX Runtime dependency, dynamic import, SHA-256 gate, WebGPU/WASM behavior, cache eviction, provenance, unit/browser tests | Active release pointer semantics and saved AI analyses |
+| Planned heatmap or product-facing AI analysis | Ghost entries in [object index](../objects/_index.md), then [technical design](../TECHNICAL_DESIGN_DOCUMENT.md) | Future inference UI, heatmap generation, persistence, privacy review, and workflow cards after implementation | Live model registry/runtime foundation unless the new feature changes those contracts |
 
 ## Human check
 

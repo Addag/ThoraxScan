@@ -6,13 +6,21 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "test": "vitest run --project unit",
+    "test:model:browser": "vitest run --project browser",
+    "model:validate": "tsx scripts/model-release.ts validate",
+    "model:stage": "tsx scripts/model-release.ts stage",
+    "model:status": "tsx scripts/model-release.ts status",
+    "model:activate": "tsx scripts/model-release.ts activate",
+    "model:rollback": "tsx scripts/model-release.ts rollback"
   },
   "dependencies": {
     "@marsidev/react-turnstile": "1.6.0",
     "@supabase/ssr": "0.12.4",
     "@supabase/supabase-js": "2.112.2",
     "next": "16.3.0",
+    "onnxruntime-web": "1.27.0",
     "react": "19.2.8",
     "react-dom": "19.2.8",
     "sharp": "0.35.3"
@@ -22,10 +30,15 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@vitest/browser-playwright": "4.1.11",
     "eslint": "^9",
     "eslint-config-next": "16.3.0",
+    "playwright": "1.62.1",
     "supabase": "2.113.0",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "tsx": "4.23.12",
+    "tus-js-client": "4.3.1",
+    "typescript": "^5",
+    "vitest": "4.1.11"
   }
 }

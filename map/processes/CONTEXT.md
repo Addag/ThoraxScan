@@ -1,8 +1,8 @@
 ---
 node_type: contract
 status: live
-audited: 2026-08-20
-snapshot: main @ ed26b07 + working tree
+audited: 2026-08-24
+snapshot: main @ 46c18c1 + working tree
 ---
 
 # Processes contract
@@ -17,10 +17,11 @@ snapshot: main @ ed26b07 + working tree
 - Workspace schema, authorization helpers, triggers, and RPC under ../../supabase/migrations/.
 - Activity/case schema, lifecycle triggers, RLS, and Storage policies under ../../supabase/migrations/20260820101401_activities_case_publication.sql.
 - Auth confirmation route under ../../src/app/auth/confirm/route.ts.
+- Model registry/runtime under ../../supabase/migrations/20260824081329_replaceable_model_foundation.sql, ../../scripts/model-release.ts, and ../../src/lib/inference/.
 
 ## Job
 
-Record only movements that currently run in the repository. The process shelf covers authentication, Professor approval, workspace membership/rosters, Professor activity publication, and Student activity viewing.
+Record only movements that currently run in the repository. The process shelf covers authentication, Professor approval, workspace membership/rosters, activity publication/viewing, and operator-run model validation, staging, activation, rollback, and browser conformance.
 
 ## Outputs
 
@@ -36,8 +37,13 @@ Record only movements that currently run in the repository. The process shelf co
 - [membership-exit.md](membership-exit.md)
 - [activity-authoring-publication.md](activity-authoring-publication.md)
 - [student-activity-view.md](student-activity-view.md)
+- [model-validation.md](model-validation.md)
+- [model-staging.md](model-staging.md)
+- [model-activation.md](model-activation.md)
+- [model-rollback.md](model-rollback.md)
+- [browser-model-conformance.md](browser-model-conformance.md)
 
-Inference, Student submission, AI feedback release, faculty evaluation, analytics, and notification movements remain ghost concepts; they do not receive live process cards.
+Student-facing inference, Student submission, AI feedback release, faculty evaluation, analytics, and notification movements remain ghost concepts; they do not receive live process cards.
 
 ## Human check
 

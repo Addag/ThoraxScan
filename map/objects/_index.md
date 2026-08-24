@@ -1,8 +1,8 @@
 ---
 node_type: catalog
 status: live
-audited: 2026-08-20
-snapshot: main @ ed26b07 + working tree
+audited: 2026-08-24
+snapshot: main @ 46c18c1 + working tree
 ---
 
 # Object index
@@ -39,10 +39,12 @@ One line per important noun. live cards are source-backed; ghost entries are doc
 
 | Noun | Universe | Card or source stub | Source |
 |---|---|---|---|
-| Image input and preprocessing tensor | ghost | stub | [technical design](../TECHNICAL_DESIGN_DOCUMENT.md#L146) |
-| ONNX model artifact | ghost | stub | [technical design](../TECHNICAL_DESIGN_DOCUMENT.md#L115) |
-| Label and threshold configuration | ghost | stub | [technical design](../TECHNICAL_DESIGN_DOCUMENT.md#L172) |
-| Prediction result | ghost | stub | [technical design](../TECHNICAL_DESIGN_DOCUMENT.md#L199) |
+| Model release / ONNX artifact | live | [model-release.md](inference/model-release.md) | Immutable registry row and content-addressed Storage objects |
+| Active model slot | live | [active-model-slot.md](inference/active-model-slot.md) | One seeded pointer and append-only activation history per Supabase instance |
+| Model manifest, labels, and thresholds | live | [model-manifest-configuration.md](inference/model-manifest-configuration.md) | ModelManifestV1 parser and publisher-generated manifest |
+| Browser inference runtime | live | [browser-inference-runtime.md](inference/browser-inference-runtime.md) | Active resolver, verified session cache, provider fallback, and analyzeImage library |
+| Image input and preprocessing tensor | live | [preprocessing-tensor.md](inference/preprocessing-tensor.md) | Browser decode and pure version 1 preprocessing transform |
+| Transient prediction result | live | [prediction-result.md](inference/prediction-result.md) | In-memory InferenceResult; not persisted or rendered by a product page |
 | Attention heatmap | ghost | stub | [technical design](../TECHNICAL_DESIGN_DOCUMENT.md#L250) |
 | Local Learning Mode image | ghost | stub | [product requirements](../PRODUCT_REQUIREMENTS_DOCUMENT.md#L84) |
 
