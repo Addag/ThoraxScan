@@ -1,8 +1,8 @@
 ---
 node_type: contract
 status: live
-audited: 2026-08-17
-snapshot: main @ 1e5cbf8
+audited: 2026-08-30
+snapshot: main @ 7aed17a + working tree
 ---
 
 # Runtime and schema objects
@@ -20,7 +20,7 @@ Record the database shape and the client/server boundary that are live in the re
 
 ## Outputs
 
-Cards for the [profiles schema](supabase-profile-schema.md) and [Supabase auth boundary](supabase-auth-boundary.md).
+Cards for the [profiles schema](supabase-profile-schema.md), self-private [Account settings](account-settings.md), and [Supabase auth boundary](supabase-auth-boundary.md).
 
 ## Human check
 

@@ -2,8 +2,8 @@
 node_type: object
 universe: live
 status: verified
-audited: 2026-08-20
-snapshot: main @ ed26b07 + working tree
+audited: 2026-08-30
+snapshot: main @ 7aed17a + working tree
 ---
 
 # Role workspace surfaces
@@ -23,16 +23,17 @@ The role surfaces share one responsive shell while keeping Professor activity au
 - Professor workspace detail derives owner/co-professor capabilities and renders roster, invitation, rename, removal, and exit controls in [workspaces/[workspaceId]/page.tsx](<../../../src/app/(protected)/professor/workspaces/[workspaceId]/page.tsx:67>).
 - Professor activity routes expose filtered lifecycle lists, draft authoring, direct case upload, publishing, and archive controls in [activities/page.tsx](<../../../src/app/(protected)/professor/activities/page.tsx:21>).
 - Student activity routes list joined published assignments and render read-only instructions/private previews without reference answers in [student activities](<../../../src/app/(protected)/student/activities/page.tsx:17>).
+- Both responsive shells link to one role-aware [Shared settings surface](../ui/shared-settings-surface.md), with active navigation state and the existing truthful future-feature/model labels preserved.
 
 ## Connected to
 
-The [Profile](../identity/profile.md), [Professor application](../identity/professor-application.md), [AppRole](../identity/app-role.md), [Workspace](workspace.md), [Workspace membership](workspace-membership.md), [Invitation code](invitation-code.md), [Activity](activity.md), [X-ray case](xray-case.md), `/dashboard`, and `requireRole`.
+The [Profile](../identity/profile.md), [Account settings](../runtime/account-settings.md), [Shared settings surface](../ui/shared-settings-surface.md), [Professor application](../identity/professor-application.md), [AppRole](../identity/app-role.md), [Workspace](workspace.md), [Workspace membership](workspace-membership.md), [Invitation code](invitation-code.md), [Activity](activity.md), [X-ray case](xray-case.md), `/dashboard`, and `requireRole`.
 
 ## If you change this
 
 ### Hits
 
-- Protected route guards, Professor approval routing, Student and Professor workspace/activity projections/actions, both responsive shells, and role-specific page behavior.
+- Protected route guards, Professor approval routing, Student and Professor workspace/activity/settings projections/actions, both responsive shells, and role-specific page behavior.
 - Shared logout action and workspace form-state contracts.
 
 ### Does not hit

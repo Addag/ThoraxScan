@@ -11,6 +11,7 @@ import {
 import { StudentShell } from "@/components/student/student-shell";
 import { getStudentActivity } from "@/lib/activities/server";
 import { requireRole } from "@/lib/auth/server";
+import { getOwnAccountSettings } from "@/lib/settings/server";
 
 export const metadata: Metadata = {
   title: "Activity | ThoraxScan",
@@ -24,11 +25,14 @@ export default async function StudentActivityPage({
 }: {
   params: Promise<{ activityId: string }>;
 }) {
-  await requireRole("student");
+  const profile = await requireRole("student");
   const { activityId } = await params;
   if (!uuidPattern.test(activityId)) notFound();
 
-  const activity = await getStudentActivity(activityId);
+  const [activity, accountSettings] = await Promise.all([
+    getStudentActivity(activityId),
+    getOwnAccountSettings(profile.id),
+  ]);
   if (!activity) notFound();
 
   return (
@@ -61,6 +65,7 @@ export default async function StudentActivityPage({
               imageUrl={activity.imageUrl}
               imageError={activity.imageError}
               title={activity.title}
+              darkImageBackground={accountSettings.settings.darkImageBackground}
             />
             <aside className="activity-future-panel">
               <span aria-hidden="true">➤</span>

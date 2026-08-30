@@ -2,8 +2,8 @@
 node_type: schema
 universe: live
 status: verified
-audited: 2026-08-20
-snapshot: main @ ed26b07 + working tree
+audited: 2026-08-30
+snapshot: main @ 7aed17a + working tree
 ---
 
 # Design tokens
@@ -16,11 +16,11 @@ The landing, authentication, administration, role dashboards, and activity surfa
 
 ## Shape
 
-Core variables include canvas, app background, surfaces, borders, text, brand blue, success green, warning yellow, and purple accent in [globals.css](<../../../src/app/globals.css:3>).
+Core variables include canvas, app background, surfaces, borders, text, brand blue, success green, warning yellow, and purple accent in [globals.css](<../../../src/app/globals.css:3>). The shared Settings surface adds responsive category rows, panels, status treatments, a switch, action gradient, and dark/light activity-image frames in [the settings styles](<../../../src/app/globals.css:3746>).
 
 ## Connected to
 
-The [landing surface](landing-surface.md), [authentication surface](auth-surface.md), [Administrator approval surface](administrator-approval-surface.md), [Role workspace surfaces](../learning/role-workspace-surface.md), [Activity](../learning/activity.md), Brand, and static assets.
+The [landing surface](landing-surface.md), [authentication surface](auth-surface.md), [Administrator approval surface](administrator-approval-surface.md), [Shared settings surface](shared-settings-surface.md), [Role workspace surfaces](../learning/role-workspace-surface.md), [Activity](../learning/activity.md), Brand, and static assets.
 
 ## If you change this
 

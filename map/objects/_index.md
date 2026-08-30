@@ -1,8 +1,8 @@
 ---
 node_type: catalog
 status: live
-audited: 2026-08-24
-snapshot: main @ 46c18c1 + working tree
+audited: 2026-08-30
+snapshot: main @ 7aed17a + working tree
 ---
 
 # Object index
@@ -55,6 +55,7 @@ One line per important noun. live cards are source-backed; ghost entries are doc
 | Landing surface | live | [landing-surface.md](ui/landing-surface.md) | src/app/page.tsx |
 | Authentication surface | live | [auth-surface.md](ui/auth-surface.md) | auth pages, layout, form, and actions |
 | Administrator approval surface | live | [administrator-approval-surface.md](ui/administrator-approval-surface.md) | /admin, review actions, and administrator shell |
+| Shared settings surface | live | [shared-settings-surface.md](ui/shared-settings-surface.md) | Shared role-gated settings wrapper, form, and navigation |
 | Design tokens | live | [design-tokens.md](ui/design-tokens.md) | src/app/globals.css |
 | X-ray sample asset | live | [xray-sample-asset.md](ui/xray-sample-asset.md) | public/images/xray-sample.png |
 
@@ -63,4 +64,5 @@ One line per important noun. live cards are source-backed; ghost entries are doc
 | Noun | Universe | Card | Source of truth |
 |---|---|---|---|
 | Profiles database schema | live | [supabase-profile-schema.md](runtime/supabase-profile-schema.md) | Supabase migration |
+| Account settings | live | [account-settings.md](runtime/account-settings.md) | Self-private settings table and atomic authenticated RPC |
 | Supabase auth boundary | live | [supabase-auth-boundary.md](runtime/supabase-auth-boundary.md) | client/server adapters and environment contract |

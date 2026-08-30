@@ -16,6 +16,7 @@ import {
 import { ProfessorShell } from "@/components/professor/professor-shell";
 import { getProfessorActivity } from "@/lib/activities/server";
 import { requireRole } from "@/lib/auth/server";
+import { getOwnAccountSettings } from "@/lib/settings/server";
 import { getProfessorWorkspaces } from "@/lib/workspaces/server";
 
 export const metadata: Metadata = {
@@ -34,9 +35,10 @@ export default async function ProfessorActivityPage({
   const { activityId } = await params;
   if (!uuidPattern.test(activityId)) notFound();
 
-  const [activity, workspaces] = await Promise.all([
+  const [activity, workspaces, accountSettings] = await Promise.all([
     getProfessorActivity(activityId),
     getProfessorWorkspaces(profile.id),
+    getOwnAccountSettings(profile.id),
   ]);
   if (!activity) notFound();
 
@@ -61,6 +63,7 @@ export default async function ProfessorActivityPage({
               imageError={activity.imageError}
               title={activity.title}
               status={activity.caseUploadStatus}
+              darkImageBackground={accountSettings.settings.darkImageBackground}
             />
             {activity.status === "draft" ? <CaseUploadForm activityId={activity.id} /> : null}
             <aside className="activity-future-panel">

@@ -11,7 +11,7 @@ export function StudentShell({
   sectionDescription = "Student workspaces",
 }: {
   children: ReactNode;
-  activeItem?: "dashboard" | "activities";
+  activeItem?: "dashboard" | "activities" | "settings";
   sectionLabel?: string;
   sectionDescription?: string;
 }) {
@@ -34,6 +34,9 @@ export function StudentShell({
           <span className="student-nav-link student-nav-link--disabled">
             <span aria-hidden="true">◫</span> Learning mode <small>Coming soon</small>
           </span>
+          <Link className={`student-nav-link ${activeItem === "settings" ? "student-nav-link--active" : ""}`} href="/student/settings">
+            <span aria-hidden="true">⚙</span> Settings
+          </Link>
         </nav>
         <form className="student-logout" action={logoutAction}>
           <button type="submit"><span aria-hidden="true">↪</span> Log out</button>

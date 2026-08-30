@@ -2,8 +2,8 @@
 node_type: catalog
 subject: ThoraxScan repository
 status: live
-snapshot: main @ 46c18c1 + working tree
-audited: 2026-08-24
+snapshot: main @ 7aed17a + working tree
+audited: 2026-08-30
 ---
 
 # ThoraxScan system map
@@ -17,10 +17,11 @@ This is a source-backed map of the ThoraxScan application repository one level a
 | How do I walk this map? | [CONTEXT.md](CONTEXT.md) |
 | What is X? | [objects/_index.md](objects/_index.md), then the linked card |
 | What actually runs? | [processes/CONTEXT.md](processes/CONTEXT.md) |
-| What schema is live? | [Profile schema](objects/runtime/supabase-profile-schema.md), [Platform administrator](objects/identity/platform-administrator.md), [Professor application](objects/identity/professor-application.md), [Workspace](objects/learning/workspace.md), [Membership](objects/learning/workspace-membership.md), [Invitation Code](objects/learning/invitation-code.md), [Activity](objects/learning/activity.md), [X-ray case](objects/learning/xray-case.md), [Model release](objects/inference/model-release.md), and [Active model slot](objects/inference/active-model-slot.md) |
+| What schema is live? | [Profile schema](objects/runtime/supabase-profile-schema.md), [Account settings](objects/runtime/account-settings.md), [Platform administrator](objects/identity/platform-administrator.md), [Professor application](objects/identity/professor-application.md), [Workspace](objects/learning/workspace.md), [Membership](objects/learning/workspace-membership.md), [Invitation Code](objects/learning/invitation-code.md), [Activity](objects/learning/activity.md), [X-ray case](objects/learning/xray-case.md), [Model release](objects/inference/model-release.md), and [Active model slot](objects/inference/active-model-slot.md) |
 | How is a model replaced? | [Model validation](processes/model-validation.md), [staging](processes/model-staging.md), [activation](processes/model-activation.md), and [rollback](processes/model-rollback.md) |
 | How are activities published and viewed? | [Activity authoring/publication](processes/activity-authoring-publication.md), then [Student activity viewing](processes/student-activity-view.md) |
 | How are Professor accounts approved? | [Professor application](objects/identity/professor-application.md), then [application review](processes/professor-application-review.md) |
+| How are Student and Professor settings updated? | [Shared settings surface](objects/ui/shared-settings-surface.md), [Account settings](objects/runtime/account-settings.md), then [settings update](processes/account-settings-update.md) |
 | What protects the administrator dashboard? | [Platform administrator](objects/identity/platform-administrator.md) and [Administrator approval surface](objects/ui/administrator-approval-surface.md) |
 | What else moves if I change X? | [effects/CONTEXT.md](effects/CONTEXT.md) |
 | What is planned but not wired? | The ghost cards in [objects/_index.md](objects/_index.md) |

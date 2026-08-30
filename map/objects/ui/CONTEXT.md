@@ -1,8 +1,8 @@
 ---
 node_type: contract
 status: live
-audited: 2026-08-17
-snapshot: main @ 1e5cbf8
+audited: 2026-08-30
+snapshot: main @ 7aed17a + working tree
 ---
 
 # UI objects
@@ -21,7 +21,7 @@ Describe current visual and route surfaces without treating product copy or desi
 
 ## Outputs
 
-Cards for the landing surface, authentication surface, design tokens, and X-ray sample asset.
+Cards for the landing, authentication, administration, shared Settings, design-token, and X-ray sample surfaces.
 
 ## Human check
 

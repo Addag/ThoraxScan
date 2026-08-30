@@ -2,8 +2,8 @@
 node_type: object
 universe: live
 status: verified
-audited: 2026-08-20
-snapshot: main @ ed26b07 + working tree
+audited: 2026-08-30
+snapshot: main @ 7aed17a + working tree
 ---
 
 # X-ray case
@@ -21,6 +21,7 @@ Generated object paths and a separate audit row let the browser upload image byt
 - Storage read policy permits teaching staff and Students with a joined published activity, while upload/delete policies require a reserved or unpublished case in [storage policies](<../../../supabase/migrations/20260820101401_activities_case_publication.sql:521>).
 - The Client Component uploads with the signed token and then invokes server confirmation without sending image bytes through the Server Action in [CaseUploadForm](<../../../src/components/professor/activity-forms.tsx:132>).
 - Server confirmation downloads the reserved object and uses the runtime `sharp` dependency to reject undecodable or structurally unsupported files before database confirmation in [the confirmation action](<../../../src/app/(protected)/professor/activities/actions.ts:367>) and [package manifest](<../../../package.json:17>).
+- Authorized Student and Professor previews read the caller's [Account settings](../runtime/account-settings.md) and apply the saved dark/light frame without changing the signed image or Storage path in [XrayCasePreview](<../../../src/components/activities/activity-ui.tsx:59>).
 
 ## Connected to
 
@@ -30,7 +31,7 @@ Belongs to a [Workspace](workspace.md), attaches to one [Activity](activity.md),
 
 ### Hits
 
-- Storage bucket constraints/policies, signed upload preparation, `sharp`-backed decode validation, metadata confirmation, signed read previews, draft replacement/deletion, and activity publication validation.
+- Storage bucket constraints/policies, signed upload preparation, `sharp`-backed decode validation, metadata confirmation, signed read previews, saved preview framing, draft replacement/deletion, and activity publication validation.
 
 ### Does not hit
 

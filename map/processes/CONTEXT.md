@@ -1,8 +1,8 @@
 ---
 node_type: contract
 status: live
-audited: 2026-08-24
-snapshot: main @ 46c18c1 + working tree
+audited: 2026-08-30
+snapshot: main @ 7aed17a + working tree
 ---
 
 # Processes contract
@@ -21,7 +21,7 @@ snapshot: main @ 46c18c1 + working tree
 
 ## Job
 
-Record only movements that currently run in the repository. The process shelf covers authentication, Professor approval, workspace membership/rosters, activity publication/viewing, and operator-run model validation, staging, activation, rollback, and browser conformance.
+Record only movements that currently run in the repository. The process shelf covers authentication, shared account-settings updates, Professor approval, workspace membership/rosters, activity publication/viewing, and operator-run model validation, staging, activation, rollback, and browser conformance.
 
 ## Outputs
 
@@ -31,6 +31,7 @@ Record only movements that currently run in the repository. The process shelf co
 - [confirmation-and-recovery.md](confirmation-and-recovery.md)
 - [session-protection.md](session-protection.md)
 - [logout.md](logout.md)
+- [account-settings-update.md](account-settings-update.md)
 - [workspace-creation.md](workspace-creation.md)
 - [invitation-redemption.md](invitation-redemption.md)
 - [roster-management.md](roster-management.md)

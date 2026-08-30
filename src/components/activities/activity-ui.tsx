@@ -61,11 +61,13 @@ export function XrayCasePreview({
   title,
   status,
   imageError = false,
+  darkImageBackground = true,
 }: {
   imageUrl: string | null;
   title: string;
   status?: string | null;
   imageError?: boolean;
+  darkImageBackground?: boolean;
 }) {
   return (
     <section className="activity-xray-panel" aria-labelledby="xray-preview-title">
@@ -73,7 +75,7 @@ export function XrayCasePreview({
         <span aria-hidden="true">◉</span>
         <h2 id="xray-preview-title">Chest X-Ray Image</h2>
       </div>
-      <div className="activity-xray-frame">
+      <div className={`activity-xray-frame activity-xray-frame--${darkImageBackground ? "dark" : "light"}`}>
         {imageUrl ? (
           // Signed URLs are short-lived and intentionally bypass the image optimizer.
           // eslint-disable-next-line @next/next/no-img-element
