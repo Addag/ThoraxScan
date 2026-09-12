@@ -2328,6 +2328,17 @@ textarea:focus-visible {
   margin: 0 4px 28px;
 }
 
+.sidebar-menu-toggle {
+  display: none;
+}
+
+.sidebar-content {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  flex-direction: column;
+}
+
 .student-sidebar .brand-mark {
   width: 42px;
   height: 42px;
@@ -2386,6 +2397,14 @@ textarea:focus-visible {
   display: flex;
   flex-direction: column;
   gap: 6px;
+}
+
+.student-nav-icon {
+  display: block;
+  width: 24px;
+  height: 24px;
+  flex: 0 0 24px;
+  object-fit: contain;
 }
 
 .student-nav-link {
@@ -2868,7 +2887,7 @@ textarea:focus-visible {
   }
 
   .student-sidebar {
-    position: static;
+    position: relative;
     height: auto;
     border-right: 0;
     border-bottom: 1px solid #33425c;
@@ -2877,22 +2896,61 @@ textarea:focus-visible {
 
   .student-sidebar .student-brand {
     margin: 0;
+    align-self: flex-start;
   }
 
-  .student-model-card,
-  .student-nav-label,
-  .student-sidebar nav {
+  .student-sidebar .brand-name {
+    font-size: clamp(19px, 5vw, 23px);
+  }
+
+  .student-sidebar .brand-mark {
+    width: 36px;
+    height: 36px;
+  }
+
+  .sidebar-menu-toggle {
+    position: absolute;
+    top: 10px;
+    right: 14px;
+    display: inline-flex;
+    min-height: 44px;
+    align-items: center;
+    gap: 6px;
+    border: 1px solid rgb(153 191 240 / 38%);
+    border-radius: 10px;
+    background: var(--glass-surface);
+    color: var(--text-primary);
+    font-size: 14px;
+    padding: 10px;
+    cursor: pointer;
+  }
+
+  .sidebar-content {
     display: none;
   }
 
+  .student-sidebar[data-expanded="true"] .sidebar-content {
+    display: flex;
+    margin-top: 20px;
+  }
+
+  .student-sidebar .student-nav-link {
+    min-height: 48px;
+    column-gap: 10px;
+    font-size: 15px;
+  }
+
+  .student-sidebar .student-nav-link small {
+    font-size: 12px;
+  }
+
   .student-logout {
-    position: absolute;
-    top: 18px;
-    right: 14px;
-    width: auto;
-    padding: 0;
-    margin: 0;
-    border: 0;
+    padding-top: 12px;
+    margin-top: 16px;
+  }
+
+  .student-logout button {
+    min-height: 48px;
   }
 
   .student-topbar {
