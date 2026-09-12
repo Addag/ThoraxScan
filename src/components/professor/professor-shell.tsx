@@ -1,8 +1,9 @@
+import Image from "next/image";
 import Link from "next/link";
 import type { ReactNode } from "react";
 
 import { logoutAction } from "@/app/(protected)/actions";
-import { Brand } from "@/components/brand";
+import { AppSidebar } from "@/components/app-sidebar";
 
 export function ProfessorShell({
   children,
@@ -17,31 +18,30 @@ export function ProfessorShell({
 }) {
   return (
     <div className="student-app-shell professor-app-shell">
-      <aside className="student-sidebar professor-sidebar">
-        <Brand className="student-brand" />
+      <AppSidebar className="professor-sidebar">
         <div className="student-model-card">
           <span>Future AI model</span>
           <strong><i aria-hidden="true" /> SqueezeViT · inactive</strong>
         </div>
         <p className="student-nav-label">Main menu</p>
         <nav aria-label="Professor navigation">
-          <Link className={`student-nav-link ${activeItem === "dashboard" ? "student-nav-link--active" : ""}`} href="/professor">
-            <span aria-hidden="true">⌂</span> Dashboard
+          <Link aria-current={activeItem === "dashboard" ? "page" : undefined} className={`student-nav-link ${activeItem === "dashboard" ? "student-nav-link--active" : ""}`} href="/professor">
+            <Image className="student-nav-icon" src="/images/menu-icons/dashboard.png" alt="" width={24} height={24} aria-hidden="true" /> Dashboard
           </Link>
-          <Link className={`student-nav-link ${activeItem === "activities" ? "student-nav-link--active" : ""}`} href="/professor/activities">
-            <span aria-hidden="true">▣</span> Activities
+          <Link aria-current={activeItem === "activities" ? "page" : undefined} className={`student-nav-link ${activeItem === "activities" ? "student-nav-link--active" : ""}`} href="/professor/activities">
+            <Image className="student-nav-icon" src="/images/menu-icons/activities.png" alt="" width={24} height={24} aria-hidden="true" /> Activities
           </Link>
           <span className="student-nav-link student-nav-link--disabled">
-            <span aria-hidden="true">◫</span> Evaluations <small>Coming soon</small>
+            <Image className="student-nav-icon" src="/images/menu-icons/learning.png" alt="" width={24} height={24} aria-hidden="true" /> Evaluations <small>Coming soon</small>
           </span>
-          <Link className={`student-nav-link ${activeItem === "settings" ? "student-nav-link--active" : ""}`} href="/professor/settings">
-            <span aria-hidden="true">⚙</span> Settings
+          <Link aria-current={activeItem === "settings" ? "page" : undefined} className={`student-nav-link ${activeItem === "settings" ? "student-nav-link--active" : ""}`} href="/professor/settings">
+            <Image className="student-nav-icon" src="/images/menu-icons/settings.png" alt="" width={24} height={24} aria-hidden="true" /> Settings
           </Link>
         </nav>
         <form className="student-logout" action={logoutAction}>
           <button type="submit"><span aria-hidden="true">↪</span> Log out</button>
         </form>
-      </aside>
+      </AppSidebar>
       <div className="student-main-column">
         <header className="student-topbar">
           <div><strong>{sectionLabel}</strong><span>{sectionDescription}</span></div>

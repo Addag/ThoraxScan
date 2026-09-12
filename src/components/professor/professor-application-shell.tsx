@@ -1,13 +1,12 @@
 import type { ReactNode } from "react";
 
 import { logoutAction } from "@/app/(protected)/actions";
-import { Brand } from "@/components/brand";
+import { AppSidebar } from "@/components/app-sidebar";
 
 export function ProfessorApplicationShell({ children }: { children: ReactNode }) {
   return (
     <div className="student-app-shell professor-application-shell">
-      <aside className="student-sidebar professor-sidebar">
-        <Brand className="student-brand" />
+      <AppSidebar className="professor-sidebar">
         <div className="student-model-card professor-application-access-card">
           <span>Account access</span>
           <strong><i aria-hidden="true" /> Review required</strong>
@@ -21,7 +20,7 @@ export function ProfessorApplicationShell({ children }: { children: ReactNode })
         <form className="student-logout" action={logoutAction}>
           <button type="submit"><span aria-hidden="true">↪</span> Log out</button>
         </form>
-      </aside>
+      </AppSidebar>
       <div className="student-main-column">
         <header className="student-topbar">
           <div><strong>Professor application</strong><span>Account review status</span></div>
