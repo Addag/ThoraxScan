@@ -1322,14 +1322,14 @@ textarea:focus-visible {
 
 .landing-hero {
   position: relative;
-  min-height: 889px;
+  min-height: 820px;
   max-width: 1440px;
   margin: 0 auto;
 }
 
 .hero-tag {
   position: absolute;
-  top: 130px;
+  top: 108px;
   left: 6.25%;
   display: flex;
   width: 479px;
@@ -1348,7 +1348,7 @@ textarea:focus-visible {
 
 .hero-copy {
   position: absolute;
-  top: 239px;
+  top: 214px;
   left: 8.0556%;
   width: 604px;
 }
@@ -1368,12 +1368,12 @@ textarea:focus-visible {
 }
 
 .hero-copy p {
-  width: 340px;
-  margin: 24px 0 0;
+  width: 390px;
+  margin: 22px 0 0;
   color: var(--text-secondary);
   font-size: 16px;
   font-weight: 600;
-  line-height: 1.15;
+  line-height: 1.35;
 }
 
 .primary-button {
@@ -1402,7 +1402,7 @@ textarea:focus-visible {
 .landing-login {
   width: 206px;
   height: 53px;
-  margin: 58px 0 0 8px;
+  margin: 42px 0 0 8px;
   gap: 7px;
   font-size: 25.2px;
   line-height: 1;
@@ -1410,7 +1410,7 @@ textarea:focus-visible {
 
 .landing-xray {
   position: absolute;
-  top: 212px;
+  top: 186px;
   left: 55.5556%;
   width: 580px;
   height: 430px;
@@ -2616,11 +2616,20 @@ textarea:focus-visible {
 }
 
 .student-dashboard {
+  display: flex;
+  flex-direction: column;
   width: min(1120px, calc(100% - 44px));
   flex: 1;
   margin: 0 auto;
   padding: 28px 0 52px;
 }
+
+/* Put actionable learning work ahead of workspace administration. */
+.student-dashboard > .student-page-heading { order: 1; }
+.student-dashboard > .student-recent-activities { order: 2; }
+.student-dashboard > .student-join-panel { order: 3; }
+.student-dashboard > .student-workspaces { order: 4; }
+.student-dashboard > .student-privacy-note { order: 5; }
 
 .student-page-heading {
   display: flex;
