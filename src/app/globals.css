@@ -1,6 +1,9 @@
 @import "tailwindcss";
 
 :root {
+  --glass-surface: linear-gradient(135deg, rgb(87 129 190 / 22%), rgb(9 23 47 / 72%));
+  --glass-shadow: inset 0 1px 0 rgb(255 255 255 / 12%), 0 18px 45px rgb(0 4 18 / 24%);
+  --glass-canvas: radial-gradient(ellipse at 75% 20%, rgb(48 112 255 / 24%), transparent 45%), radial-gradient(ellipse at 90% 80%, rgb(143 77 213 / 18%), transparent 40%), #030b1d;
   --canvas: #000000;
   --app-background: #0c0e1c;
   --surface-primary: #010d2a;
@@ -41,46 +44,6 @@ body {
   background: var(--canvas);
   color: var(--text-primary);
   font-family: var(--font-funnel), Arial, sans-serif;
-}
-
-/* Shared glass surface language across every application route. */
-:where(.dashboard-page, .student-page, .professor-page, .admin-page,
-  .settings-page, .activity-page, .workspace-page) {
-  background:
-    radial-gradient(circle at 10% 0%, rgb(0 119 255 / 12%), transparent 34%),
-    radial-gradient(circle at 90% 20%, rgb(149 0 218 / 10%), transparent 30%),
-    var(--app-background);
-}
-
-:where(.role-card, .activity-card, .activity-step-rail,
-  .activity-xray-panel, .activity-upload-form, .activity-details-form,
-  .activity-authoring-note, .activity-future-panel, .settings-card,
-  .settings-panel, .admin-card, .workspace-card, .dashboard-card) {
-  border: 1px solid rgb(161 194 240 / 24%);
-  background: linear-gradient(135deg, rgb(35 57 94 / 72%), rgb(7 17 38 / 74%));
-  -webkit-backdrop-filter: blur(18px) saturate(135%);
-  backdrop-filter: blur(18px) saturate(135%);
-  box-shadow: inset 0 1px 0 rgb(255 255 255 / 11%), 0 18px 45px rgb(0 0 0 / 20%);
-}
-
-:where(.student-model-card,
-  .student-detail-card, .student-future-panel, .student-assignment-panel,
-  .student-evaluation-panel, .professor-roster-panel, .professor-invitations-panel,
-  .professor-application-card, .settings-category-panel, .settings-detail-panel,
-  .admin-access-card, .admin-application-card) {
-  border: 1px solid rgb(161 194 240 / 24%);
-  background: linear-gradient(135deg, rgb(35 57 94 / 72%), rgb(7 17 38 / 74%));
-  -webkit-backdrop-filter: blur(18px) saturate(135%);
-  backdrop-filter: blur(18px) saturate(135%);
-  box-shadow: inset 0 1px 0 rgb(255 255 255 / 11%), 0 18px 45px rgb(0 0 0 / 20%);
-}
-
-:where(.activity-details-form input, .activity-details-form select, .activity-details-form textarea,
-  .settings-page input, .settings-page select, .settings-page textarea) {
-  border-color: rgb(153 191 240 / 30%);
-  background: rgb(7 18 39 / 62%);
-  -webkit-backdrop-filter: blur(12px);
-  backdrop-filter: blur(12px);
 }
 
 a {
@@ -164,9 +127,12 @@ textarea:focus-visible {
   margin: 0 0 28px;
   border: 1px solid #aeb2b8;
   border-radius: 11px;
-  background: #18202d;
+  background: var(--glass-surface);
   list-style: none;
   padding: 0;
+  -webkit-backdrop-filter: blur(18px) saturate(135%);
+  backdrop-filter: blur(18px) saturate(135%);
+  box-shadow: var(--glass-shadow);
 }
 
 .activity-step {
@@ -381,8 +347,11 @@ textarea:focus-visible {
 .activity-card {
   border: 1px solid #33425c;
   border-radius: 10px;
-  background: #18202d;
+  background: var(--glass-surface);
   padding: 20px;
+  -webkit-backdrop-filter: blur(18px) saturate(135%);
+  backdrop-filter: blur(18px) saturate(135%);
+  box-shadow: var(--glass-shadow);
 }
 
 .activity-card__topline {
@@ -450,9 +419,12 @@ textarea:focus-visible {
   align-content: center;
   border: 1px dashed #536079;
   border-radius: 10px;
-  background: #18202d;
+  background: var(--glass-surface);
   text-align: center;
   padding: 30px;
+  -webkit-backdrop-filter: blur(18px) saturate(135%);
+  backdrop-filter: blur(18px) saturate(135%);
+  box-shadow: var(--glass-shadow);
 }
 
 .activity-empty-state > span {
@@ -502,7 +474,10 @@ textarea:focus-visible {
 .activity-future-panel {
   border: 1px solid #33425c;
   border-radius: 10px;
-  background: #18202d;
+  background: var(--glass-surface);
+  -webkit-backdrop-filter: blur(18px) saturate(135%);
+  backdrop-filter: blur(18px) saturate(135%);
+  box-shadow: var(--glass-shadow);
 }
 
 .activity-panel-title {
@@ -1901,7 +1876,7 @@ textarea:focus-visible {
 
 .role-page {
   min-height: 100svh;
-  background: radial-gradient(circle at 50% 20%, #071c4d 0%, #020817 60%);
+  background: var(--glass-canvas);
   color: var(--text-primary);
   padding: 32px clamp(20px, 6vw, 88px) 80px;
 }
@@ -1927,8 +1902,11 @@ textarea:focus-visible {
   margin: clamp(80px, 14vh, 150px) auto 0;
   border: 1px solid var(--border-strong);
   border-radius: 12px;
-  background: rgba(1, 13, 42, 0.92);
+  background: var(--glass-surface);
   padding: clamp(28px, 5vw, 52px);
+  -webkit-backdrop-filter: blur(18px) saturate(135%);
+  backdrop-filter: blur(18px) saturate(135%);
+  box-shadow: var(--glass-shadow);
 }
 
 .role-card h1 {
@@ -2338,8 +2316,10 @@ textarea:focus-visible {
   height: 100svh;
   flex-direction: column;
   border-right: 1px solid #33425c;
-  background: #040828;
   padding: 24px 14px 20px;
+  background: rgb(8 19 42 / 72%);
+  -webkit-backdrop-filter: blur(18px);
+  backdrop-filter: blur(18px);
 }
 
 .student-sidebar .student-brand {
@@ -2366,8 +2346,11 @@ textarea:focus-visible {
   gap: 9px;
   border: 1px solid var(--brand-blue);
   border-radius: 10px;
-  background: rgba(44, 174, 255, 0.14);
+  background: var(--glass-surface);
   padding: 10px 14px;
+  -webkit-backdrop-filter: blur(18px) saturate(135%);
+  backdrop-filter: blur(18px) saturate(135%);
+  box-shadow: var(--glass-shadow);
 }
 
 .student-model-card span,
@@ -2489,6 +2472,9 @@ textarea:focus-visible {
   align-items: center;
   border-bottom: 1px solid #33425c;
   padding: 0 clamp(22px, 4vw, 54px);
+  background: rgb(8 19 42 / 72%);
+  -webkit-backdrop-filter: blur(18px);
+  backdrop-filter: blur(18px);
 }
 
 .student-topbar div {
@@ -2548,7 +2534,10 @@ textarea:focus-visible {
 .student-future-panel {
   border: 1px solid #33425c;
   border-radius: 10px;
-  background: #18202d;
+  background: var(--glass-surface);
+  -webkit-backdrop-filter: blur(18px) saturate(135%);
+  backdrop-filter: blur(18px) saturate(135%);
+  box-shadow: var(--glass-shadow);
 }
 
 .student-join-panel {
@@ -2671,8 +2660,11 @@ textarea:focus-visible {
   overflow: hidden;
   border: 1px solid #3d4c67;
   border-radius: 9px;
-  background: linear-gradient(145deg, rgba(0, 119, 255, 0.12), rgba(4, 8, 40, 0.45));
+  background: var(--glass-surface);
   padding: 20px;
+  -webkit-backdrop-filter: blur(18px) saturate(135%);
+  backdrop-filter: blur(18px) saturate(135%);
+  box-shadow: var(--glass-shadow);
 }
 
 .student-workspace-card__icon {
@@ -2789,9 +2781,11 @@ textarea:focus-visible {
   justify-content: space-between;
   gap: 20px;
   border-top: 1px solid rgba(255, 255, 255, 0.12);
-  background: #000;
   font-size: 11px;
   padding: 10px clamp(22px, 4vw, 54px);
+  background: rgb(8 19 42 / 72%);
+  -webkit-backdrop-filter: blur(18px);
+  backdrop-filter: blur(18px);
 }
 
 .student-footer span {
@@ -2977,8 +2971,11 @@ textarea:focus-visible {
   overflow: hidden;
   border: 1px solid #33425c;
   border-radius: 10px;
-  background: #18202d;
+  background: var(--glass-surface);
   padding: 18px 22px;
+  -webkit-backdrop-filter: blur(18px) saturate(135%);
+  backdrop-filter: blur(18px) saturate(135%);
+  box-shadow: var(--glass-shadow);
 }
 
 .professor-stat-grid article > span {
@@ -3028,7 +3025,10 @@ textarea:focus-visible {
 .professor-leave-form {
   border: 1px solid #33425c;
   border-radius: 10px;
-  background: #18202d;
+  background: var(--glass-surface);
+  -webkit-backdrop-filter: blur(18px) saturate(135%);
+  backdrop-filter: blur(18px) saturate(135%);
+  box-shadow: var(--glass-shadow);
 }
 
 .professor-dashboard-actions > article {
@@ -3540,7 +3540,10 @@ textarea:focus-visible {
   margin-top: 22px;
   border: 1px solid #33425c;
   border-radius: 10px;
-  background: #18202d;
+  background: var(--glass-surface);
+  -webkit-backdrop-filter: blur(18px) saturate(135%);
+  backdrop-filter: blur(18px) saturate(135%);
+  box-shadow: var(--glass-shadow);
 }
 
 .admin-applications-panel {
@@ -3618,8 +3621,11 @@ textarea:focus-visible {
 .admin-application-card {
   border: 1px solid #33425c;
   border-radius: 9px;
-  background: #101725;
+  background: var(--glass-surface);
   padding: 18px;
+  -webkit-backdrop-filter: blur(18px) saturate(135%);
+  backdrop-filter: blur(18px) saturate(135%);
+  box-shadow: var(--glass-shadow);
 }
 
 .admin-application-card__identity {
@@ -3923,7 +3929,10 @@ textarea:focus-visible {
 .settings-detail-panel {
   border: 1px solid #8d9199;
   border-radius: 10px;
-  background: #07090d;
+  background: var(--glass-surface);
+  -webkit-backdrop-filter: blur(18px) saturate(135%);
+  backdrop-filter: blur(18px) saturate(135%);
+  box-shadow: var(--glass-shadow);
 }
 
 .settings-category-panel {
@@ -4290,5 +4299,11 @@ textarea:focus-visible {
 
   .settings-save-row button {
     width: 100%;
+  }
+}
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  :root {
+    --glass-surface: #14243e;
   }
 }
