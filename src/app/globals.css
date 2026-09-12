@@ -1224,6 +1224,48 @@ textarea:focus-visible {
   }
 }
 
+/* Readability pass: supporting copy stays compact but remains legible. */
+:where(.activity-card > p, .activity-card dt, .activity-card dd,
+  .activity-page-heading p, .student-model-card span, .student-nav-label,
+  .student-nav-link small, .student-topbar span, .student-footer span,
+  .student-workspace-card > p, .student-workspace-card > span,
+  .professor-stat-grid small, .settings-profile-grid label > small:not(.settings-field-error),
+  .settings-tab, .settings-page-heading p) {
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+:where(.activity-card dt, .student-model-card span, .student-nav-label) {
+  font-size: 11px;
+  letter-spacing: 0.06em;
+}
+
+:where(.activity-card > p, .activity-page-heading p, .student-topbar span,
+  .student-footer span, .student-workspace-card > span, .professor-stat-grid small,
+  .settings-profile-grid label > small:not(.settings-field-error), .settings-page-heading p) {
+  color: #aeb9cc;
+}
+
+:where(.auth-subtitle, .auth-options, .auth-switch, .role-selector__description,
+  .auth-status, .auth-captcha__error) {
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.auth-card .auth-subtitle,
+.auth-card .auth-options,
+.auth-card .auth-switch,
+.auth-card .role-selector__description {
+  color: #c5cfdf;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+:where(.student-section-kicker, .student-privacy-note, .student-form-status,
+  .professor-form-status, .admin-status-badge) {
+  line-height: 1.4;
+}
+
 .site-header {
   position: relative;
   height: 81px;
