@@ -43,6 +43,46 @@ body {
   font-family: var(--font-funnel), Arial, sans-serif;
 }
 
+/* Shared glass surface language across every application route. */
+:where(.dashboard-page, .student-page, .professor-page, .admin-page,
+  .settings-page, .activity-page, .workspace-page) {
+  background:
+    radial-gradient(circle at 10% 0%, rgb(0 119 255 / 12%), transparent 34%),
+    radial-gradient(circle at 90% 20%, rgb(149 0 218 / 10%), transparent 30%),
+    var(--app-background);
+}
+
+:where(.role-card, .activity-card, .activity-step-rail,
+  .activity-xray-panel, .activity-upload-form, .activity-details-form,
+  .activity-authoring-note, .activity-future-panel, .settings-card,
+  .settings-panel, .admin-card, .workspace-card, .dashboard-card) {
+  border: 1px solid rgb(161 194 240 / 24%);
+  background: linear-gradient(135deg, rgb(35 57 94 / 72%), rgb(7 17 38 / 74%));
+  -webkit-backdrop-filter: blur(18px) saturate(135%);
+  backdrop-filter: blur(18px) saturate(135%);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 11%), 0 18px 45px rgb(0 0 0 / 20%);
+}
+
+:where(.student-model-card,
+  .student-detail-card, .student-future-panel, .student-assignment-panel,
+  .student-evaluation-panel, .professor-roster-panel, .professor-invitations-panel,
+  .professor-application-card, .settings-category-panel, .settings-detail-panel,
+  .admin-access-card, .admin-application-card) {
+  border: 1px solid rgb(161 194 240 / 24%);
+  background: linear-gradient(135deg, rgb(35 57 94 / 72%), rgb(7 17 38 / 74%));
+  -webkit-backdrop-filter: blur(18px) saturate(135%);
+  backdrop-filter: blur(18px) saturate(135%);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 11%), 0 18px 45px rgb(0 0 0 / 20%);
+}
+
+:where(.activity-details-form input, .activity-details-form select, .activity-details-form textarea,
+  .settings-page input, .settings-page select, .settings-page textarea) {
+  border-color: rgb(153 191 240 / 30%);
+  background: rgb(7 18 39 / 62%);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+}
+
 a {
   color: inherit;
 }
@@ -1108,15 +1148,105 @@ textarea:focus-visible {
   position: relative;
   min-height: max(1024px, 100svh);
   overflow: hidden;
-  background: radial-gradient(
-    ellipse at center,
-    #04297c 0%,
-    #031f5d 25%,
-    #02153e 50%,
-    #010a1f 75%,
-    #010510 87.5%,
-    #000000 100%
-  );
+  background:
+    radial-gradient(ellipse at 78% 35%, rgb(66 111 255 / 34%), transparent 42%),
+    radial-gradient(ellipse at 18% 58%, rgb(0 153 220 / 18%), transparent 46%),
+    radial-gradient(ellipse at 92% 76%, rgb(131 71 208 / 20%), transparent 35%),
+    #030b1d;
+}
+
+/* Frosted surfaces are scoped to the public landing page. */
+.landing-page .site-header,
+.landing-page .hero-tag,
+.landing-page .xray-card,
+.landing-page .workflow-callout,
+.landing-page .educational-disclaimer {
+  -webkit-backdrop-filter: blur(20px) saturate(140%);
+  backdrop-filter: blur(20px) saturate(140%);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 12%),
+    0 16px 48px rgb(0 4 18 / 22%);
+}
+
+.landing-page .site-header {
+  background: rgb(12 25 48 / 58%);
+}
+
+.landing-page .hero-tag {
+  border-color: rgb(123 185 255 / 38%);
+  background: linear-gradient(120deg, rgb(92 155 255 / 20%), rgb(37 75 145 / 14%));
+  color: #b9dbff;
+}
+
+.landing-page .xray-card {
+  border: 1px solid rgb(175 207 255 / 32%);
+  border-radius: 22px;
+  background: linear-gradient(135deg, rgb(207 228 255 / 18%), rgb(66 100 166 / 8%));
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 22%),
+    0 24px 80px rgb(0 4 18 / 42%),
+    0 0 56px rgb(68 135 255 / 12%);
+}
+
+.landing-page .xray-card img {
+  top: 14px;
+  left: 14px;
+  width: calc(100% - 28px);
+  height: calc(100% - 28px);
+  border-radius: 12px;
+}
+
+.landing-page .workflow-callout {
+  border-radius: 16px;
+  background: linear-gradient(135deg, rgb(43 65 105 / 78%), rgb(10 24 49 / 72%));
+  color: #f2f6ff;
+}
+
+.landing-page .workflow-callout--purple {
+  border-color: rgb(194 157 255 / 56%);
+}
+
+.landing-page .workflow-callout--blue {
+  border-color: rgb(112 184 255 / 56%);
+}
+
+.landing-page .workflow-callout--green {
+  border-color: rgb(103 222 179 / 56%);
+}
+
+.landing-page .landing-login {
+  border: 1px solid rgb(168 211 255 / 48%);
+  border-radius: 12px;
+  background: linear-gradient(135deg, #2189ff, #075ad6);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 24%), 0 8px 32px rgb(0 102 255 / 28%);
+}
+
+.landing-page .landing-login:hover {
+  background: linear-gradient(135deg, #3998ff, #146bea);
+}
+
+.landing-page .landing-login:focus-visible {
+  outline: 3px solid #c5e3ff;
+  outline-offset: 5px;
+}
+
+.landing-page .educational-disclaimer {
+  border-color: rgb(244 195 1 / 38%);
+  background: rgb(38 33 18 / 78%);
+  color: #ffe082;
+}
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .landing-page .site-header,
+  .landing-page .hero-tag,
+  .landing-page .xray-card,
+  .landing-page .workflow-callout {
+    background: #14243e;
+  }
+
+  .landing-page .educational-disclaimer {
+    background: #262112;
+  }
 }
 
 .site-header {
@@ -1345,14 +1475,18 @@ textarea:focus-visible {
   min-height: 100svh;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   overflow-x: hidden;
-  background: var(--canvas);
+  background:
+    radial-gradient(ellipse at 72% 28%, rgb(48 112 255 / 32%), transparent 42%),
+    radial-gradient(ellipse at 96% 70%, rgb(143 77 213 / 25%), transparent 38%),
+    radial-gradient(ellipse at 16% 55%, rgb(0 135 220 / 22%), transparent 46%),
+    #030b1d;
 }
 
 .auth-visual-panel {
   position: relative;
   min-height: 1024px;
   overflow: hidden;
-  background: radial-gradient(50% 50% at 50% 50%, rgba(4, 41, 124, 0.54) 0%, #030827 100%);
+  background: linear-gradient(145deg, rgb(24 58 113 / 18%), rgb(3 8 39 / 32%));
 }
 
 .auth-brand {
@@ -1435,16 +1569,17 @@ textarea:focus-visible {
   align-items: flex-start;
   justify-content: center;
   padding: 140px 24px 80px;
-  background: var(--canvas);
+  background: transparent;
 }
 
 .auth-card {
   width: min(551px, 100%);
-  border: 1px solid rgba(55, 74, 215, 0.6);
-  border-radius: 10px;
-  background: rgba(55, 74, 215, 0.1);
-  -webkit-backdrop-filter: blur(6px);
-  backdrop-filter: blur(6px);
+  border: 1px solid rgb(177 208 255 / 32%);
+  border-radius: 22px;
+  background: linear-gradient(135deg, rgb(119 162 223 / 18%), rgb(12 25 51 / 52%));
+  -webkit-backdrop-filter: blur(24px) saturate(140%);
+  backdrop-filter: blur(24px) saturate(140%);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 18%), 0 24px 64px rgb(0 4 18 / 38%);
   padding: 31px 38px 40px;
 }
 
@@ -1505,9 +1640,9 @@ textarea:focus-visible {
 .auth-field-group input[type="text"] {
   width: 100%;
   height: 53px;
-  border: 1px solid #777777;
-  border-radius: 5px;
-  background: var(--surface-field);
+  border: 1px solid rgb(153 191 240 / 38%);
+  border-radius: 9px;
+  background: rgb(7 18 39 / 56%);
   color: var(--text-primary);
   padding: 0 14px;
 }
@@ -1619,9 +1754,10 @@ textarea:focus-visible {
   overflow: hidden;
   align-items: center;
   justify-content: center;
-  border: 1px solid rgba(0, 25, 223, 0.79);
+  border: 1px solid rgb(153 191 240 / 32%);
   border-radius: 10px;
-  background: rgba(152, 155, 179, 0.15);
+  background: linear-gradient(135deg, rgb(139 182 242 / 14%), rgb(8 24 50 / 38%));
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 10%);
   color: var(--text-primary);
   cursor: pointer;
   flex-direction: column;
