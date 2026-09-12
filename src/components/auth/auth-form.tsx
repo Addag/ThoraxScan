@@ -93,6 +93,10 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
         </div>
       )}
 
+      {mode === "login" && (
+        <RoleSelector mode="login" error={state.fieldErrors?.expectedRole} />
+      )}
+
       {showEmail && (
         <div className="auth-field-group">
           <label htmlFor={`${mode}-email`}>Email address</label>
@@ -248,7 +252,7 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
         {pending ? "Please wait…" : submitLabels[mode]}
       </button>
 
-      {(mode === "login" || mode === "register") && (
+      {mode === "register" && (
         <RoleSelector
           mode={mode}
           error={state.fieldErrors?.expectedRole}
