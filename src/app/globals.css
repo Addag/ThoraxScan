@@ -1,8 +1,12 @@
 @import "tailwindcss";
 
 :root {
-  --glass-surface: linear-gradient(135deg, rgb(87 129 190 / 22%), rgb(9 23 47 / 72%));
-  --glass-shadow: inset 0 1px 0 rgb(255 255 255 / 12%), 0 18px 45px rgb(0 4 18 / 24%);
+  /* Shell recedes; main panels carry depth; nested cards use only an edge highlight. */
+  --glass-shell: rgb(6 15 32 / 86%);
+  --glass-surface: linear-gradient(135deg, rgb(65 100 155 / 32%), rgb(10 24 46 / 86%));
+  --glass-inset: linear-gradient(135deg, rgb(135 173 225 / 9%), rgb(4 13 29 / 32%));
+  --glass-inset-shadow: inset 0 1px 0 rgb(255 255 255 / 7%);
+  --glass-shadow: inset 0 1px 0 rgb(255 255 255 / 12%), 0 12px 32px rgb(0 4 18 / 22%);
   --glass-canvas: radial-gradient(ellipse at 75% 20%, rgb(48 112 255 / 24%), transparent 45%), radial-gradient(ellipse at 90% 80%, rgb(143 77 213 / 18%), transparent 40%), #030b1d;
   --canvas: #000000;
   --app-background: #0c0e1c;
@@ -127,12 +131,12 @@ textarea:focus-visible {
   margin: 0 0 28px;
   border: 1px solid #aeb2b8;
   border-radius: 11px;
-  background: var(--glass-surface);
+  background: var(--glass-inset);
   list-style: none;
   padding: 0;
-  -webkit-backdrop-filter: blur(18px) saturate(135%);
-  backdrop-filter: blur(18px) saturate(135%);
-  box-shadow: var(--glass-shadow);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  box-shadow: var(--glass-inset-shadow);
 }
 
 .activity-step {
@@ -419,12 +423,12 @@ textarea:focus-visible {
   align-content: center;
   border: 1px dashed #536079;
   border-radius: 10px;
-  background: var(--glass-surface);
+  background: var(--glass-inset);
   text-align: center;
   padding: 30px;
-  -webkit-backdrop-filter: blur(18px) saturate(135%);
-  backdrop-filter: blur(18px) saturate(135%);
-  box-shadow: var(--glass-shadow);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  box-shadow: var(--glass-inset-shadow);
 }
 
 .activity-empty-state > span {
@@ -1144,13 +1148,17 @@ textarea:focus-visible {
 }
 
 .landing-page .site-header {
-  background: rgb(12 25 48 / 58%);
+  background: var(--glass-shell);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  box-shadow: inset 0 -1px 0 rgb(255 255 255 / 8%);
 }
 
 .landing-page .hero-tag {
   border-color: rgb(123 185 255 / 38%);
   background: linear-gradient(120deg, rgb(92 155 255 / 20%), rgb(37 75 145 / 14%));
   color: #b9dbff;
+  box-shadow: var(--glass-inset-shadow);
 }
 
 .landing-page .xray-card {
@@ -1175,6 +1183,9 @@ textarea:focus-visible {
   border-radius: 16px;
   background: linear-gradient(135deg, rgb(43 65 105 / 78%), rgb(10 24 49 / 72%));
   color: #f2f6ff;
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  box-shadow: var(--glass-inset-shadow), 0 6px 18px rgb(0 4 18 / 18%);
 }
 
 .landing-page .workflow-callout--purple {
@@ -1209,6 +1220,7 @@ textarea:focus-visible {
   border-color: rgb(244 195 1 / 38%);
   background: rgb(38 33 18 / 78%);
   color: #ffe082;
+  box-shadow: inset 0 1px 0 rgb(244 195 1 / 8%);
 }
 
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
@@ -1619,10 +1631,10 @@ textarea:focus-visible {
   width: min(551px, 100%);
   border: 1px solid rgb(177 208 255 / 32%);
   border-radius: 22px;
-  background: linear-gradient(135deg, rgb(119 162 223 / 18%), rgb(12 25 51 / 52%));
+  background: var(--glass-surface);
   -webkit-backdrop-filter: blur(24px) saturate(140%);
   backdrop-filter: blur(24px) saturate(140%);
-  box-shadow: inset 0 1px 0 rgb(255 255 255 / 18%), 0 24px 64px rgb(0 4 18 / 38%);
+  box-shadow: var(--glass-shadow);
   padding: 31px 38px 40px;
 }
 
@@ -1823,8 +1835,8 @@ textarea:focus-visible {
   justify-content: center;
   border: 1px solid rgb(153 191 240 / 32%);
   border-radius: 10px;
-  background: linear-gradient(135deg, rgb(139 182 242 / 14%), rgb(8 24 50 / 38%));
-  box-shadow: inset 0 1px 0 rgb(255 255 255 / 10%);
+  background: var(--glass-inset);
+  box-shadow: var(--glass-inset-shadow);
   color: var(--text-primary);
   cursor: pointer;
   flex-direction: column;
@@ -2409,9 +2421,9 @@ textarea:focus-visible {
   flex-direction: column;
   border-right: 1px solid #33425c;
   padding: 24px 14px 20px;
-  background: rgb(8 19 42 / 72%);
-  -webkit-backdrop-filter: blur(18px);
-  backdrop-filter: blur(18px);
+  background: var(--glass-shell);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
 }
 
 .student-sidebar .student-brand {
@@ -2449,11 +2461,11 @@ textarea:focus-visible {
   gap: 9px;
   border: 1px solid var(--brand-blue);
   border-radius: 10px;
-  background: var(--glass-surface);
+  background: var(--glass-inset);
   padding: 10px 14px;
-  -webkit-backdrop-filter: blur(18px) saturate(135%);
-  backdrop-filter: blur(18px) saturate(135%);
-  box-shadow: var(--glass-shadow);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  box-shadow: var(--glass-inset-shadow);
 }
 
 .student-model-card span,
@@ -2583,9 +2595,9 @@ textarea:focus-visible {
   align-items: center;
   border-bottom: 1px solid #33425c;
   padding: 0 clamp(22px, 4vw, 54px);
-  background: rgb(8 19 42 / 72%);
-  -webkit-backdrop-filter: blur(18px);
-  backdrop-filter: blur(18px);
+  background: var(--glass-shell);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
 }
 
 .student-topbar div {
@@ -2771,11 +2783,11 @@ textarea:focus-visible {
   overflow: hidden;
   border: 1px solid #3d4c67;
   border-radius: 9px;
-  background: var(--glass-surface);
+  background: var(--glass-inset);
   padding: 20px;
-  -webkit-backdrop-filter: blur(18px) saturate(135%);
-  backdrop-filter: blur(18px) saturate(135%);
-  box-shadow: var(--glass-shadow);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  box-shadow: var(--glass-inset-shadow);
 }
 
 .student-workspace-card__icon {
@@ -2894,9 +2906,9 @@ textarea:focus-visible {
   border-top: 1px solid rgba(255, 255, 255, 0.12);
   font-size: 11px;
   padding: 10px clamp(22px, 4vw, 54px);
-  background: rgb(8 19 42 / 72%);
-  -webkit-backdrop-filter: blur(18px);
-  backdrop-filter: blur(18px);
+  background: var(--glass-shell);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
 }
 
 .student-footer span {
@@ -3121,11 +3133,11 @@ textarea:focus-visible {
   overflow: hidden;
   border: 1px solid #33425c;
   border-radius: 10px;
-  background: var(--glass-surface);
+  background: var(--glass-inset);
   padding: 18px 22px;
-  -webkit-backdrop-filter: blur(18px) saturate(135%);
-  backdrop-filter: blur(18px) saturate(135%);
-  box-shadow: var(--glass-shadow);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  box-shadow: var(--glass-inset-shadow);
 }
 
 .professor-stat-grid article > span {
@@ -3771,11 +3783,11 @@ textarea:focus-visible {
 .admin-application-card {
   border: 1px solid #33425c;
   border-radius: 9px;
-  background: var(--glass-surface);
+  background: var(--glass-inset);
   padding: 18px;
-  -webkit-backdrop-filter: blur(18px) saturate(135%);
-  backdrop-filter: blur(18px) saturate(135%);
-  box-shadow: var(--glass-shadow);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  box-shadow: var(--glass-inset-shadow);
 }
 
 .admin-application-card__identity {
@@ -4454,7 +4466,9 @@ textarea:focus-visible {
 
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
   :root {
+    --glass-shell: #081326;
     --glass-surface: #14243e;
+    --glass-inset: #101e33;
   }
 }
 
