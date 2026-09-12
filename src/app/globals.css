@@ -12,9 +12,9 @@
   --border-default: #6d6d6d;
   --border-strong: #838383;
   --text-primary: #fafafa;
-  --text-secondary: #a7a7a7;
-  --text-muted: #767676;
-  --text-disabled: #6b6b6b;
+  --text-secondary: #c7d4e8;
+  --text-muted: #aebbd0;
+  --text-disabled: #98a6bc;
   --brand-blue: #0077ff;
   --brand-blue-text: #51b6ff;
   --success-green: #24ff3d;
@@ -1259,6 +1259,32 @@ textarea:focus-visible {
   color: #c5cfdf;
   font-size: 13px;
   line-height: 1.5;
+}
+
+/* Keep supporting text readable over changing glass backgrounds. */
+.landing-page .hero-copy p,
+.auth-visual-copy p,
+.student-page-heading p,
+.activity-page-heading p,
+.student-topbar span,
+.student-footer span,
+.student-workspace-card > span,
+.professor-stat-grid small,
+.settings-page-heading p {
+  color: #c3d0e2;
+}
+
+.student-nav-label,
+.student-nav-link--disabled,
+.student-nav-link--disabled > span,
+.student-nav-link small {
+  color: #aebbd0;
+}
+
+.activity-card dt,
+.activity-card > p,
+.settings-profile-grid label > small:not(.settings-field-error) {
+  color: #b3c0d3;
 }
 
 :where(.student-section-kicker, .student-privacy-note, .student-form-status,
@@ -4431,3 +4457,9 @@ textarea:focus-visible {
     --glass-surface: #14243e;
   }
 }
+
+/* Final contrast overrides for glass surfaces. */
+.auth-visual-copy p, .hero-copy p { color: #d6e1f0; }
+.auth-card .auth-subtitle, .auth-card .auth-options, .auth-card .auth-switch, .auth-card .role-selector__description { color: #d6e1f0; }
+.student-nav-label, .student-nav-link--disabled, .student-nav-link--disabled > span, .student-nav-link small { color: #c1cee0; }
+.activity-card dt, .activity-card > p, .settings-profile-grid label > small:not(.settings-field-error) { color: #c4d0e0; }
