@@ -1773,8 +1773,8 @@ textarea:focus-visible {
 }
 
 .role-selector--login {
-  width: min(507px, calc(100% + 38px));
-  margin: 0 auto 22px;
+  width: 100%;
+  margin: 0 0 22px;
 }
 
 .role-selector--login .role-option__card {
@@ -1802,6 +1802,7 @@ textarea:focus-visible {
 
 .role-selector--login .role-selector__cards {
   grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
 }
 
 .role-selector__cards {
