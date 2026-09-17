@@ -283,6 +283,7 @@ async function validateBrowserProviders(
   try {
     const page = await browser.newPage();
     await page.goto(baseUrl);
+    await page.addScriptTag({ content: "globalThis.__name = (target) => target;" });
     await page.addScriptTag({ path: resolve(ortDistribution, "ort.webgpu.min.js") });
     const result = await page.evaluate(
       async ({ wasmBaseUrl, inputValues, referenceLogits }) => {
@@ -555,6 +556,12 @@ function publicArtifactUrl(supabaseUrl: string, path: string) {
 async function verifyRemoteObject(url: string, expected: Buffer) {
   const response = await fetch(url, { cache: "no-store" });
   if (response.status === 404) return false;
+  if (response.status === 400) {
+    const body = (await response.clone().json().catch(() => null)) as {
+      code?: unknown;
+    } | null;
+    if (body?.code === "NoSuchKey") return false;
+  }
   if (!response.ok) throw new Error(`Unable to verify ${url}: HTTP ${response.status}.`);
   const actual = Buffer.from(await response.arrayBuffer());
   if (actual.byteLength !== expected.byteLength || sha256(actual) !== sha256(expected)) {
@@ -693,6 +700,7 @@ async function smokeBrowserModel(manifest: ModelManifestV1) {
   try {
     const page = await browser.newPage();
     await page.goto(baseUrl);
+    await page.addScriptTag({ content: "globalThis.__name = (target) => target;" });
     await page.addScriptTag({ path: resolve(ortDistribution, "ort.min.js") });
     const result = await page.evaluate(
       async ({ artifactUrl, wasmBaseUrl }) => {
