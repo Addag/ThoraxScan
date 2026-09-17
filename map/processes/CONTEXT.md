@@ -1,8 +1,8 @@
 ---
 node_type: contract
 status: live
-audited: 2026-08-30
-snapshot: main @ 7aed17a + working tree
+audited: 2026-09-17
+snapshot: main @ a96a291
 ---
 
 # Processes contract

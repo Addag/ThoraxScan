@@ -2,8 +2,8 @@
 node_type: process
 universe: live
 status: verified
-audited: 2026-08-24
-snapshot: main @ 46c18c1 + working tree
+audited: 2026-09-17
+snapshot: main @ a96a291
 ---
 
 # Browser model conformance
@@ -12,9 +12,9 @@ Version 1 input/evidence → real Chromium and ONNX Runtime Web checks → pass 
 
 ## Steps
 
-1. Vitest Browser Mode runs the browser image decode and preprocessing path in Chromium.
-2. Release validation runs the supplied model and parity fixtures in ONNX Runtime Web WASM at the fixed tolerances.
-3. Activation runs the remote artifact in headless Chromium after pointer read-back.
+1. Vitest Browser Mode runs the browser image decode and preprocessing path in Chromium ([browser preprocessing test](../../src/lib/inference/preprocess.browser.test.ts#L17)).
+2. Release validation loads the ONNX Runtime Web browser bundle and runs the supplied model and parity fixtures in WASM at the fixed tolerances, attempting WebGPU only to determine whether that release may enable it ([browser provider validation](../../scripts/model-release.ts#L234)).
+3. Activation runs the remote artifact in headless Chromium before and after the pointer change, including after pointer read-back ([browser smoke](../../scripts/model-release.ts#L660), [activation flow](../../scripts/model-release.ts#L818)).
 
 ## Consumes
 
@@ -38,4 +38,4 @@ Version 1 input/evidence → real Chromium and ONNX Runtime Web checks → pass 
 
 ## See
 
-[Browser smoke implementation](../../scripts/model-release.ts#L653)
+[Browser provider validation](../../scripts/model-release.ts#L234)

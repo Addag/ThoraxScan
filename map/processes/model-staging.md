@@ -2,8 +2,8 @@
 node_type: process
 universe: live
 status: verified
-audited: 2026-08-24
-snapshot: main @ 46c18c1 + working tree
+audited: 2026-09-17
+snapshot: main @ a96a291
 ---
 
 # Model staging
@@ -12,9 +12,9 @@ Validated local bundle → immutable Storage upload and remote smoke → inactiv
 
 ## Steps
 
-1. `model:stage` runs full local validation before creating a registry client.
-2. It verifies existing content-addressed objects or uploads without upsert, using resumable upload for the ONNX artifact.
-3. It downloads and smoke-runs the remote model, then calls the service-role-only registration RPC; the active slot is untouched.
+1. `model:stage` runs full local validation before creating a registry client ([staging command](../../scripts/model-release.ts#L785)).
+2. It verifies each public content-addressed object, treating HTTP 404 or a structured HTTP 400 `NoSuchKey` response as absent; absent objects are uploaded without upsert and then reverified ([remote verification](../../scripts/model-release.ts#L556), [bundle upload](../../scripts/model-release.ts#L610)).
+3. It downloads and smoke-runs the remote model, then calls the service-role-only registration RPC; the active slot is untouched ([remote smoke](../../scripts/model-release.ts#L635), [registration](../../scripts/model-release.ts#L793)).
 
 ## Consumes
 
@@ -29,7 +29,7 @@ Validated local bundle → immutable Storage upload and remote smoke → inactiv
 
 ### Hits
 
-- Publisher credentials, Storage paths/cache metadata, resumable upload, remote validation, and registration RPC.
+- Publisher credentials, Storage paths/cache metadata, missing-object response handling, resumable upload, remote validation, and registration RPC.
 
 ### Does not hit
 
@@ -37,4 +37,4 @@ Validated local bundle → immutable Storage upload and remote smoke → inactiv
 
 ## See
 
-[Staging command](../../scripts/model-release.ts#L777)
+[Staging command](../../scripts/model-release.ts#L785)
