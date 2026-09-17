@@ -20,7 +20,7 @@ It attempts WebGPU and falls back to WASM on WebGPU load or execution failure, c
 
 ## Connected to
 
-Consumes [Active model slot](active-model-slot.md), [Model manifest and configuration](model-manifest-configuration.md), and [Preprocessing tensor](preprocessing-tensor.md); produces [Transient prediction result](prediction-result.md).
+Consumes [Active model slot](active-model-slot.md), [Model manifest and configuration](model-manifest-configuration.md), and [Preprocessing tensor](preprocessing-tensor.md); produces [Transient prediction result](prediction-result.md) for [Student Learning Mode](../ui/student-learning-mode-surface.md).
 
 ## If you change this
 
@@ -30,7 +30,7 @@ Consumes [Active model slot](active-model-slot.md), [Model manifest and configur
 
 ### Does not hit
 
-- A product-facing inference screen, because none calls this library in this milestone.
+- Activity AI feedback, saved analyses, submissions, or heatmaps.
 
 ## Surfaces
 

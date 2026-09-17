@@ -47,6 +47,11 @@ export interface InferenceResult extends PostprocessedPrediction {
 const sessions = new Map<string, CachedSession>();
 const webGpuDisabledBundles = new Set<string>();
 
+function configureOrt(ort: OrtModule) {
+  ort.env.wasm.wasmPaths = "/ort/1.27.0/";
+  ort.env.wasm.numThreads = 1;
+}
+
 function isSafeInteger(value: unknown): value is number {
   return typeof value === "number" && Number.isSafeInteger(value);
 }
@@ -149,6 +154,7 @@ export async function loadModelSession(
   try {
     if (provider === "webgpu") {
       const ort = (await import("onnxruntime-web/webgpu")) as OrtModule;
+      configureOrt(ort);
       const session = await ort.InferenceSession.create(bytes, {
         executionProviders: ["webgpu"],
       });
@@ -156,6 +162,7 @@ export async function loadModelSession(
     }
 
     const ort = await import("onnxruntime-web");
+    configureOrt(ort);
     const session = await ort.InferenceSession.create(bytes, {
       executionProviders: ["wasm"],
     });

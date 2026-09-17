@@ -2,7 +2,7 @@
 node_type: catalog
 subject: ThoraxScan repository
 status: live
-snapshot: main @ a96a291
+snapshot: main @ 98c37d2 + working tree
 audited: 2026-09-17
 ---
 
@@ -23,6 +23,7 @@ This is a source-backed map of the ThoraxScan application repository one level a
 | How are Professor accounts approved? | [Professor application](objects/identity/professor-application.md), then [application review](processes/professor-application-review.md) |
 | How are Student and Professor settings updated? | [Shared settings surface](objects/ui/shared-settings-surface.md), [Account settings](objects/runtime/account-settings.md), then [settings update](processes/account-settings-update.md) |
 | What protects the administrator dashboard? | [Platform administrator](objects/identity/platform-administrator.md) and [Administrator approval surface](objects/ui/administrator-approval-surface.md) |
+| How does a student practice with the active model? | [Student Learning Mode](objects/ui/student-learning-mode-surface.md), then [Learning Mode inference](processes/student-learning-mode-inference.md) |
 | What else moves if I change X? | [effects/CONTEXT.md](effects/CONTEXT.md) |
 | What is planned but not wired? | The ghost cards in [objects/_index.md](objects/_index.md) |
 | What are the product/design references? | The six original planning/design documents in this folder; they are references, not runtime source |
@@ -41,7 +42,7 @@ This is a source-backed map of the ThoraxScan application repository one level a
 - Role workspace surface covers the live Student and Professor workspace/activity routes; Workspace means the professor-owned tenant shared by both roles.
 - X-ray case means the live private activity object/audit row. X-ray sample means the unrelated static public presentation image.
 - Attention Heatmap is planned explanatory output; its current appearance in copy and design documents is not implementation evidence.
-- Browser inference runtime is live as a library and operator validation surface; no Student page calls it and no prediction is persisted.
+- Browser inference runtime is consumed by Student Learning Mode and operator validation; predictions remain transient and are not persisted.
 
 ## Source rule
 

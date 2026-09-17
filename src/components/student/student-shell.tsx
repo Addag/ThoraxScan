@@ -12,7 +12,7 @@ export function StudentShell({
   sectionDescription = "Student workspaces",
 }: {
   children: ReactNode;
-  activeItem?: "dashboard" | "activities" | "settings";
+  activeItem?: "dashboard" | "activities" | "learning" | "settings";
   sectionLabel?: string;
   sectionDescription?: string;
 }) {
@@ -20,8 +20,8 @@ export function StudentShell({
     <div className="student-app-shell">
       <AppSidebar>
         <div className="student-model-card">
-          <span>Future AI model</span>
-          <strong><i aria-hidden="true" /> SqueezeViT · inactive</strong>
+          <span>Model status</span>
+          <strong><i aria-hidden="true" /> AI model · resolved on analysis</strong>
         </div>
         <p className="student-nav-label">Main menu</p>
         <nav aria-label="Student navigation">
@@ -31,9 +31,9 @@ export function StudentShell({
           <Link aria-current={activeItem === "activities" ? "page" : undefined} className={`student-nav-link ${activeItem === "activities" ? "student-nav-link--active" : ""}`} href="/student/activities">
             <Image className="student-nav-icon" src="/images/menu-icons/activities.png" alt="" width={24} height={24} aria-hidden="true" /> Activities
           </Link>
-          <span className="student-nav-link student-nav-link--disabled">
-            <Image className="student-nav-icon" src="/images/menu-icons/learning.png" alt="" width={24} height={24} aria-hidden="true" /> Learning mode <small>Coming soon</small>
-          </span>
+          <Link aria-current={activeItem === "learning" ? "page" : undefined} className={`student-nav-link ${activeItem === "learning" ? "student-nav-link--active" : ""}`} href="/student/learning">
+            <Image className="student-nav-icon" src="/images/menu-icons/learning.png" alt="" width={24} height={24} aria-hidden="true" /> Learning mode
+          </Link>
           <Link aria-current={activeItem === "settings" ? "page" : undefined} className={`student-nav-link ${activeItem === "settings" ? "student-nav-link--active" : ""}`} href="/student/settings">
             <Image className="student-nav-icon" src="/images/menu-icons/settings.png" alt="" width={24} height={24} aria-hidden="true" /> Settings
           </Link>
@@ -50,7 +50,7 @@ export function StudentShell({
         <footer className="student-footer">
           <strong>ThoraxScan · v1.0.0 Prototype</strong>
           <span>Assistive tool — not a standalone diagnosis</span>
-          <span>AI inference · Future milestone</span>
+          <span>ONNX Runtime Web · in-browser inference</span>
         </footer>
       </div>
     </div>

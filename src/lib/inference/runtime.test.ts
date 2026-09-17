@@ -26,10 +26,12 @@ const ortMocks = vi.hoisted(() => {
 });
 
 vi.mock("onnxruntime-web", () => ({
+  env: { wasm: {} },
   InferenceSession: { create: ortMocks.create },
   Tensor: ortMocks.Tensor,
 }));
 vi.mock("onnxruntime-web/webgpu", () => ({
+  env: { wasm: {} },
   InferenceSession: { create: ortMocks.create },
   Tensor: ortMocks.Tensor,
 }));

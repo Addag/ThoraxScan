@@ -43,8 +43,9 @@ Record only movements that currently run in the repository. The process shelf co
 - [model-activation.md](model-activation.md)
 - [model-rollback.md](model-rollback.md)
 - [browser-model-conformance.md](browser-model-conformance.md)
+- [student-learning-mode-inference.md](student-learning-mode-inference.md)
 
-Student-facing inference, Student submission, AI feedback release, faculty evaluation, analytics, and notification movements remain ghost concepts; they do not receive live process cards.
+Student submission, AI feedback release, faculty evaluation, analytics, and notification movements remain ghost concepts; they do not receive live process cards.
 
 ## Human check
 

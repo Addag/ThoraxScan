@@ -46,7 +46,7 @@ One line per important noun. live cards are source-backed; ghost entries are doc
 | Image input and preprocessing tensor | live | [preprocessing-tensor.md](inference/preprocessing-tensor.md) | Browser decode and pure version 1 preprocessing transform |
 | Transient prediction result | live | [prediction-result.md](inference/prediction-result.md) | In-memory InferenceResult; not persisted or rendered by a product page |
 | Attention heatmap | ghost | stub | [technical design](../TECHNICAL_DESIGN_DOCUMENT.md#L250) |
-| Local Learning Mode image | ghost | stub | [product requirements](../PRODUCT_REQUIREMENTS_DOCUMENT.md#L84) |
+| Local Learning Mode image | live | [local-learning-mode-image.md](learning/local-learning-mode-image.md) | Student Learning Mode analyzer and transient browser state |
 
 ## UI
 
@@ -58,6 +58,7 @@ One line per important noun. live cards are source-backed; ghost entries are doc
 | Shared settings surface | live | [shared-settings-surface.md](ui/shared-settings-surface.md) | Shared role-gated settings wrapper, form, and navigation |
 | Design tokens | live | [design-tokens.md](ui/design-tokens.md) | src/app/globals.css |
 | X-ray sample asset | live | [xray-sample-asset.md](ui/xray-sample-asset.md) | public/images/xray-sample.png |
+| Student Learning Mode surface | live | [student-learning-mode-surface.md](ui/student-learning-mode-surface.md) | `/student/learning` route and analyzer component |
 
 ## Runtime and schemas
 

@@ -20,12 +20,13 @@ export default defineConfig({
         },
       },
       {
+        publicDir: fileURLToPath(new URL("./public", import.meta.url)),
         resolve: {
           alias: { "@": fileURLToPath(new URL("./src", import.meta.url)) },
         },
         test: {
           name: "browser",
-          include: ["src/**/*.browser.test.ts"],
+          include: ["src/**/*.browser.test.{ts,tsx}"],
           browser: {
             enabled: true,
             provider: playwright(),
