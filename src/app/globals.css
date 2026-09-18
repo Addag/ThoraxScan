@@ -1594,8 +1594,9 @@ textarea:focus-visible {
 .auth-visual-copy {
   position: absolute;
   top: 194px;
-  left: 7.64%;
+  left: 50%;
   width: min(610px, 85%);
+  transform: translateX(-50%);
 }
 
 .auth-visual-copy h1 {
@@ -1620,9 +1621,10 @@ textarea:focus-visible {
 .auth-xray {
   position: absolute;
   top: 558px;
-  left: 14.86%;
+  left: 50%;
   width: 507px;
   height: 378px;
+  transform: translateX(-50%);
 }
 
 .auth-xray-image {
@@ -2192,9 +2194,9 @@ textarea:focus-visible {
   }
 
   .auth-xray {
-    left: 9%;
-    transform: scale(0.82);
-    transform-origin: top left;
+    left: 50%;
+    transform: translateX(-50%) scale(0.82);
+    transform-origin: top center;
   }
 }
 
@@ -2363,6 +2365,7 @@ textarea:focus-visible {
   .auth-visual-copy {
     position: static;
     width: 100%;
+    transform: none;
   }
 
   .auth-visual-copy h1 {
