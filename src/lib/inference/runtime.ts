@@ -48,7 +48,13 @@ const sessions = new Map<string, CachedSession>();
 const webGpuDisabledBundles = new Set<string>();
 
 function configureOrt(ort: OrtModule) {
-  ort.env.wasm.wasmPaths = "/ort/1.27.0/";
+  // Avoid the proxy worker: its URL resolution is unreliable in bundled
+  // Next.js clients and it also requires cross-origin isolation for threads.
+  ort.env.wasm.proxy = false;
+  ort.env.wasm.wasmPaths = {
+    mjs: "/ort/1.27.0/ort-wasm-simd-threaded.mjs",
+    wasm: "/ort/1.27.0/ort-wasm-simd-threaded.wasm",
+  };
   ort.env.wasm.numThreads = 1;
 }
 
