@@ -26,4 +26,4 @@ Feeds [Learning Mode inference](../../processes/student-learning-mode-inference.
 
 ## See
 
-[Learning Mode analyzer](../../../src/components/student/learning-mode-analyzer.tsx)
+[Learning Mode analyzer](../../../src/components/learning/learning-mode-analyzer.tsx)

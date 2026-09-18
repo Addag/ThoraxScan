@@ -30,4 +30,4 @@ snapshot: working tree
 
 ## See
 
-[Analyzer component](../../src/components/student/learning-mode-analyzer.tsx)
+[Analyzer component](../../src/components/learning/learning-mode-analyzer.tsx)

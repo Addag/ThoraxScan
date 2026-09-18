@@ -12,17 +12,17 @@ The protected `/student/learning` Server Component rechecks the Student role and
 
 ## Connected to
 
-Uses [Browser inference runtime](../inference/browser-inference-runtime.md), [Local Learning Mode image](../learning/local-learning-mode-image.md), and the Student shell.
+Uses [Browser inference runtime](../inference/browser-inference-runtime.md), [Local Learning Mode image](../learning/local-learning-mode-image.md), and the Student or Professor shell.
 
 ## If you change this
 
 ### Hits
 
-- Student navigation, analyzer states, accessible result focus, responsive styles, and provenance presentation.
+- Student and Professor navigation, analyzer states, accessible result focus, responsive styles, and provenance presentation.
 
 ### Does not hit
 
-- Activity submissions, grading, uploads, heatmaps, saved results, or Professor workflows.
+- Activity submissions, grading, uploads, heatmaps, or saved results.
 
 ## See
 

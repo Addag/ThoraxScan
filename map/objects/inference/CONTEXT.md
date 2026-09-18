@@ -27,7 +27,7 @@ Separate the live replaceable-model foundation from planned product-facing analy
 - [preprocessing-tensor.md](preprocessing-tensor.md)
 - [prediction-result.md](prediction-result.md)
 
-Student AI analysis, saved records, Learning Mode, and heatmaps remain ghost in [../_index.md](../_index.md).
+Saved records and heatmaps remain ghost in [../_index.md](../_index.md); Learning Mode is live for Student and approved Professor roles.
 
 ## Human check
 

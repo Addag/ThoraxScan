@@ -1,7 +1,7 @@
 import { beforeEach, expect, test, vi } from "vitest";
 import { page } from "vitest/browser";
 import { render } from "vitest-browser-react";
-import { StudentLearningModeAnalyzer } from "./learning-mode-analyzer";
+import { LearningModeAnalyzer } from "./learning-mode-analyzer";
 import { InferenceError, type InferenceErrorCode } from "@/lib/inference/errors";
 import type { InferenceResult } from "@/lib/inference/runtime";
 import { createTestManifest } from "@/lib/inference/test-manifest";
@@ -17,13 +17,13 @@ function prediction(logits = manifest.labels.map((_, index) => index === 2 ? 2 :
     thresholdVersion: "thresholds-v1", manifestVersion: 1, executionProvider: "wasm", applicationBuild: "test-build" };
 }
 async function select(file = new File([new Uint8Array([1])], "practice.png", { type: "image/png" })) {
-  await page.getByLabelText("Chest X-ray image", { exact: false }).upload(file);
+  await page.getByLabelText("Image file", { exact: true }).upload(file);
 }
 async function start() { await select(); await page.getByRole("button", { name: "Analyze", exact: true }).click(); }
 beforeEach(() => { mocks.analyze.mockReset(); mocks.analyze.mockResolvedValue(prediction()); });
 
 test("valid selection previews locally and enables analysis only after selection", async () => {
-  await render(<StudentLearningModeAnalyzer />);
+  await render(<LearningModeAnalyzer />);
   await expect.element(page.getByRole("button", { name: "Analyze", exact: true })).toBeDisabled();
   await select();
   await expect.element(page.getByAltText("Selected chest X-ray preview")).toHaveAttribute("src", expect.stringMatching(/^blob:/));
@@ -36,7 +36,7 @@ test.each([
   ["image/png", 0, "The selected image is empty."],
   ["image/jpeg", 6 * 1024 * 1024 + 1, "Images must be 6 MiB or smaller."],
 ])("rejects invalid file %s (%i bytes)", async (type, size, copy) => {
-  await render(<StudentLearningModeAnalyzer />);
+  await render(<LearningModeAnalyzer />);
   await select(new File([new Uint8Array(size)], "input", { type }));
   await expect.element(page.getByRole("alert")).toHaveTextContent(copy);
   await expect.element(page.getByRole("button", { name: "Analyze", exact: true })).toBeDisabled();
@@ -44,7 +44,7 @@ test.each([
 });
 
 test("accepts the exact 6 MiB boundary", async () => {
-  await render(<StudentLearningModeAnalyzer />);
+  await render(<LearningModeAnalyzer />);
   await select(new File([new Uint8Array(6 * 1024 * 1024)], "input.jpg", { type: "image/jpeg" }));
   await expect.element(page.getByRole("button", { name: "Analyze", exact: true })).toBeEnabled();
 });
@@ -52,7 +52,7 @@ test("accepts the exact 6 MiB boundary", async () => {
 test("reset aborts the run and ignores a stale completion", async () => {
   let finish!: (result: InferenceResult) => void;
   mocks.analyze.mockImplementation(() => new Promise<InferenceResult>((resolve) => { finish = resolve; }));
-  await render(<StudentLearningModeAnalyzer />);
+  await render(<LearningModeAnalyzer />);
   await start();
   await expect.element(page.getByText("Analyzing in this browser…")).toBeVisible();
   await expect.poll(() => mocks.analyze.mock.calls.length).toBe(1);
@@ -66,7 +66,7 @@ test("reset aborts the run and ignores a stale completion", async () => {
 });
 
 test("findings, contract order, focus, and provenance", async () => {
-  await render(<StudentLearningModeAnalyzer />);
+  await render(<LearningModeAnalyzer />);
   await start();
   await expect.element(page.getByRole("heading", { name: "Analysis result" })).toHaveFocus();
   await expect.element(page.getByText("Cardiomegaly", { exact: true }).first()).toBeVisible();
@@ -81,13 +81,13 @@ test("findings, contract order, focus, and provenance", async () => {
 
 test("no label meets threshold", async () => {
   mocks.analyze.mockResolvedValue(prediction(manifest.labels.map(() => -2)));
-  await render(<StudentLearningModeAnalyzer />); await start();
+  await render(<LearningModeAnalyzer />); await start();
   await expect.element(page.getByText("No finding met its configured threshold.")).toBeVisible();
 });
 
 test("No Finding suppression uses postprocessing output", async () => {
   mocks.analyze.mockResolvedValue(prediction(manifest.labels.map((_, i) => i < 2 ? 2 : -2)));
-  await render(<StudentLearningModeAnalyzer />); await start();
+  await render(<LearningModeAnalyzer />); await start();
   await expect.element(page.getByText("No Finding: Suppressed by abnormal finding.")).toBeVisible();
   expect(document.querySelector(".learning-findings")?.textContent).not.toContain("No Finding");
   await page.getByText("All 14 labels", { exact: true }).click();
@@ -97,7 +97,7 @@ test("No Finding suppression uses postprocessing output", async () => {
 const errorCodes: InferenceErrorCode[] = ["NO_ACTIVE_MODEL", "UNSUPPORTED_MANIFEST", "ARTIFACT_INTEGRITY_FAILED", "PREPROCESSING_FAILED", "MODEL_LOAD_FAILED", "INVALID_OUTPUT"];
 test.each(errorCodes)("safe error and retry for %s", async (code) => {
   mocks.analyze.mockRejectedValue(new InferenceError(code, "private internal diagnostic"));
-  await render(<StudentLearningModeAnalyzer />); await start();
+  await render(<LearningModeAnalyzer />); await start();
   await expect.element(page.getByRole("alert")).toBeVisible();
   expect(document.body.textContent).not.toContain("private internal diagnostic");
   await expect.element(page.getByRole("button", { name: "Analyze", exact: true })).toBeEnabled();
@@ -105,7 +105,7 @@ test.each(errorCodes)("safe error and retry for %s", async (code) => {
 
 test("AbortError does not appear as a failure", async () => {
   mocks.analyze.mockRejectedValue(new DOMException("aborted", "AbortError"));
-  await render(<StudentLearningModeAnalyzer />); await start();
+  await render(<LearningModeAnalyzer />); await start();
   await expect.element(page.getByText("Image ready to analyze.")).toBeVisible();
   await expect.element(page.getByRole("alert")).not.toBeInTheDocument();
 });

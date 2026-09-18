@@ -58,7 +58,7 @@ One line per important noun. live cards are source-backed; ghost entries are doc
 | Shared settings surface | live | [shared-settings-surface.md](ui/shared-settings-surface.md) | Shared role-gated settings wrapper, form, and navigation |
 | Design tokens | live | [design-tokens.md](ui/design-tokens.md) | src/app/globals.css |
 | X-ray sample asset | live | [xray-sample-asset.md](ui/xray-sample-asset.md) | public/images/xray-sample.png |
-| Student Learning Mode surface | live | [student-learning-mode-surface.md](ui/student-learning-mode-surface.md) | `/student/learning` route and analyzer component |
+| Student and Professor Learning Mode surfaces | live | [student-learning-mode-surface.md](ui/student-learning-mode-surface.md) | `/student/learning`, `/professor/learning`, and shared analyzer component |
 
 ## Runtime and schemas
 
