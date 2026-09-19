@@ -1,3 +1,4 @@
+import type { StudentSubmission, SubmissionStatus } from "@/lib/submissions/types";
 export type ActivityStatus = "draft" | "published" | "archived";
 
 export type CaseUploadStatus = "pending" | "ready" | "failed";
@@ -26,6 +27,7 @@ export type ProfessorActivityDetails = ProfessorActivitySummary & {
 };
 
 export type StudentActivitySummary = {
+  submissionStatus: SubmissionStatus | null;
   id: string;
   workspaceId: string;
   workspaceName: string;
@@ -35,6 +37,7 @@ export type StudentActivitySummary = {
 };
 
 export type StudentActivityDetails = StudentActivitySummary & {
+  submission: StudentSubmission | null;
   instructions: string;
   imageUrl: string | null;
   imageError: boolean;

@@ -33,7 +33,7 @@ Owned by a [Workspace](workspace.md), attaches one [X-ray case](xray-case.md), i
 
 ### Does not hit
 
-- Student submissions, AI analysis, AI feedback release, faculty evaluation, or analytics, which remain ghost.
+- AI analysis, AI feedback release, faculty evaluation, or analytics, which remain ghost.
 
 ## Surfaces
 

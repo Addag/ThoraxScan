@@ -1,3 +1,6 @@
+import { saveStudentSubmission } from "../actions";
+import { StudentSubmissionForm } from "@/components/activities/student-submission-form";
+import { submissionLabel } from "@/lib/submissions/types";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
@@ -43,7 +46,7 @@ export default async function StudentActivityPage({
           description={`${activity.workspaceName} · ${formatDueDate(activity.dueAt)}`}
           backHref="/student/activities"
         />
-        <ActivityStepRail role="student" />
+        <ActivityStepRail role="student" submissionStatus={submissionLabel(activity.submissionStatus, activity.dueAt)} />
 
         <section className="student-assignment-panel" aria-labelledby="assignment-title">
           <div className="activity-panel-title">
@@ -69,28 +72,15 @@ export default async function StudentActivityPage({
             />
             <aside className="activity-future-panel">
               <span aria-hidden="true">➤</span>
-              <div><strong>Evaluation guide</strong><small>Submissions are not enabled in this milestone</small></div>
+              <div><strong>AI feedback</strong><small>AI feedback is not included in this milestone</small></div>
             </aside>
           </div>
-          <section className="student-evaluation-panel">
-            <div className="activity-form-heading">
-              <span aria-hidden="true">➤</span>
-              <div><p>Future functionality</p><h2>Your Evaluation</h2></div>
-            </div>
-            <label>
-              What visible findings do you observe?
-              <textarea rows={4} disabled placeholder="Student responses are coming in a future milestone." />
-            </label>
-            <label>
-              Normal or abnormal?
-              <input disabled />
-            </label>
-            <label>
-              Which region appears most relevant?
-              <input disabled />
-            </label>
-            <button className="activity-primary-button" type="button" disabled>Submit evaluation · Coming soon</button>
-          </section>
+          <StudentSubmissionForm
+            submission={activity.submission}
+            dueAt={activity.dueAt}
+            deadlinePassed={submissionLabel(null, activity.dueAt) === "Deadline passed"}
+            action={saveStudentSubmission.bind(null, activityId)}
+          />
         </div>
       </main>
     </StudentShell>

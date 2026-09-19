@@ -38,7 +38,7 @@ The [Profile](../identity/profile.md), [Account settings](../runtime/account-set
 
 ### Does not hit
 
-- Administrator review UI, model inference, submissions, grading, AI feedback, or analytics.
+- Administrator review UI, model inference, grading, AI feedback, or analytics.
 
 ## Surfaces
 

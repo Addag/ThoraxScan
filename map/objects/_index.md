@@ -30,7 +30,7 @@ One line per important noun. live cards are source-backed; ghost entries are doc
 | X-ray case | live | [xray-case.md](learning/xray-case.md) | public.xray_cases, private activity-cases bucket, and signed upload/read flow |
 | Activity | live | [activity.md](learning/activity.md) | public.activities, private reference evaluation, Server Actions, and role routes |
 | AI analysis | ghost | stub | [technical design](../TECHNICAL_DESIGN_DOCUMENT.md#L320) |
-| Student submission | ghost | stub | [technical design](../TECHNICAL_DESIGN_DOCUMENT.md#L321) |
+| [Student submission](learning/student-submission.md) | live | object | [submission workflow](../processes/student-submission.md) |
 | AI feedback release | ghost | stub | [technical design](../TECHNICAL_DESIGN_DOCUMENT.md#L322) |
 | Faculty evaluation | ghost | stub | [technical design](../TECHNICAL_DESIGN_DOCUMENT.md#L323) |
 | Analytics | ghost | stub | [application flow reference](../thoraxscan-app-flow.md#L48) |

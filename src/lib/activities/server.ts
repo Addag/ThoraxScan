@@ -1,3 +1,4 @@
+import type { StudentSubmission, SubmissionStatus } from "@/lib/submissions/types";
 import type {
   ActivityStatus,
   CaseUploadStatus,
@@ -121,18 +122,32 @@ export async function getProfessorActivity(activityId: string) {
   } satisfies ProfessorActivityDetails;
 }
 
+type SubmissionRow = {
+  id: string; visible_findings: string; classification: string | null; relevant_region: string;
+  status: SubmissionStatus; created_at: string; updated_at: string; submitted_at: string | null;
+};
+type StudentActivityRow = ActivityRow & { student_submissions: SubmissionRow[] };
+function projectSubmission(row?: SubmissionRow): StudentSubmission | null {
+  return row ? { id: row.id, visibleFindings: row.visible_findings, classification: row.classification ?? "",
+    relevantRegion: row.relevant_region, status: row.status, createdAt: row.created_at,
+    updatedAt: row.updated_at, submittedAt: row.submitted_at } : null;
+}
+
 export async function getStudentActivities(limit?: number) {
   const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { data: [] as StudentActivitySummary[], error: "Unauthorized" };
   let query = supabase
     .from("activities")
     .select(
-      "id, workspace_id, case_id, title, instructions, due_at, status, published_at, updated_at, workspaces!inner(name)",
+      "id, workspace_id, title, due_at, published_at, workspaces!inner(name), student_submissions(status)",
     )
     .eq("status", "published")
+    .eq("student_submissions.student_id", user.id)
     .order("published_at", { ascending: false });
 
   if (limit) query = query.limit(limit);
-  const { data, error } = await query.returns<ActivityRow[]>();
+  const { data, error } = await query.returns<(Pick<ActivityRow, "id" | "workspace_id" | "title" | "due_at" | "published_at" | "workspaces"> & { student_submissions: { status: SubmissionStatus }[] })[]>();
   if (error) return { data: [] as StudentActivitySummary[], error: error.message };
 
   return {
@@ -140,6 +155,7 @@ export async function getStudentActivities(limit?: number) {
       row.published_at
         ? [
             {
+              submissionStatus: row.student_submissions[0]?.status ?? null,
               id: row.id,
               workspaceId: row.workspace_id,
               workspaceName: row.workspaces.name,
@@ -156,14 +172,17 @@ export async function getStudentActivities(limit?: number) {
 
 export async function getStudentActivity(activityId: string) {
   const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return null;
   const { data: activity, error } = await supabase
     .from("activities")
     .select(
-      "id, workspace_id, case_id, title, instructions, due_at, status, published_at, updated_at, workspaces!inner(name)",
+      "id, workspace_id, case_id, title, instructions, due_at, status, published_at, updated_at, workspaces!inner(name), student_submissions(id, visible_findings, classification, relevant_region, status, created_at, updated_at, submitted_at)",
     )
     .eq("id", activityId)
     .eq("status", "published")
-    .maybeSingle<ActivityRow>();
+    .eq("student_submissions.student_id", user.id)
+    .maybeSingle<StudentActivityRow>();
 
   if (error || !activity?.case_id || !activity.published_at) return null;
 
@@ -173,6 +192,8 @@ export async function getStudentActivity(activityId: string) {
     .createSignedUrl(path, 600);
 
   return {
+    submissionStatus: activity.student_submissions[0]?.status ?? null,
+    submission: projectSubmission(activity.student_submissions[0]),
     id: activity.id,
     workspaceId: activity.workspace_id,
     workspaceName: activity.workspaces.name,

@@ -1,3 +1,4 @@
+import { submissionLabel } from "@/lib/submissions/types";
 import type { Metadata } from "next";
 import Link from "next/link";
 
@@ -43,7 +44,7 @@ export default async function StudentActivitiesPage() {
                   <p>{activity.workspaceName}</p>
                   <h2>{activity.title}</h2>
                   <span className={`student-due-state student-due-state--${dueState(activity.dueAt).toLowerCase()}`}>
-                    {dueState(activity.dueAt)} · {formatDueDate(activity.dueAt)}
+                    {submissionLabel(activity.submissionStatus, activity.dueAt)} · {formatDueDate(activity.dueAt)}
                   </span>
                 </div>
                 <Link href={`/student/activities/${activity.id}`}>Review activity <span aria-hidden="true">→</span></Link>

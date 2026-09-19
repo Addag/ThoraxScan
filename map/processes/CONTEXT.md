@@ -38,6 +38,7 @@ Record only movements that currently run in the repository. The process shelf co
 - [membership-exit.md](membership-exit.md)
 - [activity-authoring-publication.md](activity-authoring-publication.md)
 - [student-activity-view.md](student-activity-view.md)
+- [student-submission.md](student-submission.md)
 - [model-validation.md](model-validation.md)
 - [model-staging.md](model-staging.md)
 - [model-activation.md](model-activation.md)
@@ -45,7 +46,7 @@ Record only movements that currently run in the repository. The process shelf co
 - [browser-model-conformance.md](browser-model-conformance.md)
 - [student-learning-mode-inference.md](student-learning-mode-inference.md)
 
-Student submission, AI feedback release, faculty evaluation, analytics, and notification movements remain ghost concepts; they do not receive live process cards.
+AI feedback release, faculty evaluation, analytics, and notification movements remain ghost concepts; they do not receive live process cards.
 
 ## Human check
 

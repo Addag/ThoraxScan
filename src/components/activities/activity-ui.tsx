@@ -25,7 +25,7 @@ export function ActivityPageHeading({
   );
 }
 
-export function ActivityStepRail({ role }: { role: "professor" | "student" }) {
+export function ActivityStepRail({ role, submissionStatus = "Not started" }: { role: "professor" | "student"; submissionStatus?: string }) {
   const steps =
     role === "professor"
       ? [
@@ -35,7 +35,7 @@ export function ActivityStepRail({ role }: { role: "professor" | "student" }) {
         ]
       : [
           ["1", "Review activity", "active"],
-          ["2", "Submit evaluation", "future"],
+          ["2", `Evaluation · ${submissionStatus}`, submissionStatus === "Submitted" ? "complete" : "active"],
           ["3", "AI explanation", "future"],
         ];
 
