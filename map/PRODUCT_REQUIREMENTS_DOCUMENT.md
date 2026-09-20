@@ -105,7 +105,7 @@ Priority levels:
 | FR-008 | The system shall return 14 model outputs in the documented label order, convert logits with sigmoid, and apply configured per-label thresholds. | P0 | Completed for contract v1 |
 | FR-009 | The system shall avoid displaying `No Finding` together with abnormal thresholded predictions. | P0 | Completed in runtime and database derivation |
 | FR-010 | The system shall release AI-assisted learning feedback only after a student submits an activity response. | P0 | Completed with submission trigger and release RPC |
-| FR-011 | Professors shall review submissions and provide scores, remarks, or feedback visible only to the authorized student. | P0 | Planned |
+| FR-011 | Professors shall review final submissions, save drafts, and explicitly release immutable scores and Student feedback while keeping remarks private. | P0 | Implemented |
 | FR-012 | The system shall display the probability for each output label or a documented selected subset. | P1 | Completed for released activity results |
 | FR-013 | The system shall display an attention heatmap after attention extraction and heatmap generation are implemented. | P1 | Not implemented |
 | FR-014 | The system shall provide Learning Mode for non-graded practice. | P1 | Planned |

@@ -33,7 +33,7 @@ Owned by a [Workspace](workspace.md), attaches one [X-ray case](xray-case.md), i
 
 ### Does not hit
 
-- Faculty evaluation, analytics, notifications, and heatmaps remain deferred; activity publication is a prerequisite for AI analysis.
+- Faculty evaluation is a separate review record keyed by a final submission; analytics, notifications, and heatmaps remain deferred. Activity publication gates the Student projection.
 
 ## Surfaces
 

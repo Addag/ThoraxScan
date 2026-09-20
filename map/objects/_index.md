@@ -32,7 +32,7 @@ One line per important noun. live cards are source-backed; ghost entries are doc
 | AI analysis | live | [ai-analysis.md](learning/ai-analysis.md) | `public.ai_analyses`, analysis RPCs, and activity AI components |
 | [Student submission](learning/student-submission.md) | live | object | [submission workflow](../processes/student-submission.md) |
 | AI feedback release | live | [ai-feedback-release.md](learning/ai-feedback-release.md) | `public.ai_feedback_releases`, submission trigger, and authorized feedback RPC |
-| Faculty evaluation | ghost | stub | [technical design](../TECHNICAL_DESIGN_DOCUMENT.md#L323) |
+| Faculty evaluation | live | [faculty-evaluation.md](learning/faculty-evaluation.md) | immutable Professor review and Student projection |
 | Analytics | ghost | stub | [application flow reference](../thoraxscan-app-flow.md#L48) |
 
 ## Inference

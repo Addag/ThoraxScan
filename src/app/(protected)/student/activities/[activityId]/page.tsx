@@ -1,4 +1,6 @@
 import { saveStudentSubmission } from "../actions";
+import { getStudentActivityFacultyEvaluation } from "@/lib/evaluations/server";
+import { StudentFacultyEvaluationPanel } from "@/components/activities/student-faculty-evaluation";
 import { StudentSubmissionForm } from "@/components/activities/student-submission-form";
 import { submissionLabel } from "@/lib/submissions/types";
 import type { Metadata } from "next";
@@ -33,9 +35,10 @@ export default async function StudentActivityPage({
   const { activityId } = await params;
   if (!uuidPattern.test(activityId)) notFound();
 
-  const [activity, accountSettings] = await Promise.all([
+  const [activity, accountSettings, facultyEvaluation] = await Promise.all([
     getStudentActivity(activityId),
     getOwnAccountSettings(profile.id),
+    getStudentActivityFacultyEvaluation(activityId),
   ]);
   if (!activity) notFound();
 
@@ -80,6 +83,7 @@ export default async function StudentActivityPage({
             action={saveStudentSubmission.bind(null, activityId)}
           />
         </div>
+        <StudentFacultyEvaluationPanel evaluation={facultyEvaluation.data} error={facultyEvaluation.error} />
       </main>
     </StudentShell>
   );

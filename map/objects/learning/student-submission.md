@@ -27,4 +27,4 @@ The after-insert/update trigger creates one pending AI feedback-release row only
 
 ## Change impact
 
-Field changes affect SQL constraints/RPC, shared validation, action, form, projection, and tests. Deadline/lifecycle changes also affect status cards, the step rail, and the AI release prerequisite. This milestone does not implement grading, notifications, or faculty evaluation.
+Field changes affect SQL constraints/RPC, shared validation, action, form, projection, and tests. Deadline/lifecycle changes also affect status cards, the step rail, and the AI release prerequisite. Final rows are the immutable input to the separate faculty evaluation workflow; grading revisions, notifications, and appeals remain out of scope.

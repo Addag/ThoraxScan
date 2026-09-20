@@ -1,0 +1,17 @@
+begin;
+create extension if not exists pgtap with schema extensions;
+select no_plan();
+select has_table('public','faculty_evaluations','evaluation table exists');
+select col_is_pk('public','faculty_evaluations','id','UUID primary key');
+select has_index('public','faculty_evaluations','faculty_evaluations_submission_id_key','one evaluation per submission');
+select has_index('public','faculty_evaluations','faculty_evaluations_professor_id_idx','professor queue index');
+select has_index('public','faculty_evaluations','faculty_evaluations_status_updated_at_idx','status queue index');
+select ok((select relrowsecurity from pg_class where oid='public.faculty_evaluations'::regclass),'RLS enabled');
+select ok(not has_table_privilege('authenticated','public.faculty_evaluations','insert'),'direct insert denied');
+select ok(not has_table_privilege('authenticated','public.faculty_evaluations','update'),'direct update denied');
+select ok(not has_function_privilege('anon','public.save_faculty_evaluation(uuid,numeric,text,text,boolean)','execute'),'anonymous RPC denied');
+select ok(has_function_privilege('authenticated','public.save_faculty_evaluation(uuid,numeric,text,text,boolean)','execute'),'authenticated RPC available');
+select ok((select prosecdef and proconfig @> array['search_path=""'] from pg_proc where oid='public.save_faculty_evaluation(uuid,numeric,text,text,boolean)'::regprocedure),'secure definer configuration');
+select ok((select prosecdef and proconfig @> array['search_path=""'] from pg_proc where oid='public.get_student_activity_faculty_evaluation(uuid)'::regprocedure),'secure Student projection configuration');
+select * from finish();
+rollback;

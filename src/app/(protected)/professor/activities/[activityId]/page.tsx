@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import {
@@ -56,6 +57,7 @@ export default async function ProfessorActivityPage({
           <span>{activity.status === "published" ? "Visible to current and future workspace students" : activity.status === "archived" ? "No longer visible to students" : "Visible to teaching staff only"}</span>
         </div>
         <ActivityStepRail role="professor" />
+        <Link className="professor-activities-cta" href={`/professor/submissions?activity=${activity.id}`}>Review submissions</Link>
 
         <div className="activity-authoring-layout">
           <div className="activity-case-column">

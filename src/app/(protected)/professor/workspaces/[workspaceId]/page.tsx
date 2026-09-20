@@ -105,6 +105,9 @@ export default async function ProfessorWorkspacePage({
           <Link className="activity-secondary-button" href={`/professor/activities?workspace=${workspace.id}`}>
             View workspace activities
           </Link>
+          <Link className="activity-secondary-button" href={`/professor/submissions?workspace=${workspace.id}`}>
+            Review submissions
+          </Link>
         </section>
 
         <div className="professor-management-grid">

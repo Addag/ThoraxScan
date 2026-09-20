@@ -548,3 +548,7 @@ At minimum, the project should record these values in a reproducibility log even
 - Maurya et al. (2026), Efficient SqueezeViT: https://doi.org/10.1038/s41598-026-47918-4
 - Sloan et al. (2025), Clinically-aligned Multi-modal Chest X-ray Classification: https://arxiv.org/abs/2511.09581
 - van Dort et al. (2025), heuristic evaluation of explainable AI dashboards: https://doi.org/10.3233/SHTI250341
+
+## Faculty evaluation implementation
+
+FR-011 is implemented by `public.faculty_evaluations`, keyed uniquely to an immutable submitted `student_submissions` row. Approved workspace Professors use `save_faculty_evaluation` to save drafts or explicitly release a score and feedback; released rows are trigger-immutable. `get_student_activity_faculty_evaluation` returns only `locked`, `awaiting_review`, or published-activity `released` projections, excluding remarks and draft values. Review routes are `/professor/submissions` and `/professor/submissions/[submissionId]`.

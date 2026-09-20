@@ -12,7 +12,7 @@ export function ProfessorShell({
   sectionDescription = "Teaching workspaces",
 }: {
   children: ReactNode;
-  activeItem?: "dashboard" | "activities" | "learning" | "settings";
+  activeItem?: "dashboard" | "activities" | "submissions" | "learning" | "settings";
   sectionLabel?: string;
   sectionDescription?: string;
 }) {
@@ -25,6 +25,7 @@ export function ProfessorShell({
         </div>
         <p className="student-nav-label">Main menu</p>
         <nav aria-label="Professor navigation">
+          <Link aria-current={activeItem === "submissions" ? "page" : undefined} className={`student-nav-link ${activeItem === "submissions" ? "student-nav-link--active" : ""}`} href="/professor/submissions">Submissions</Link>
           <Link aria-current={activeItem === "dashboard" ? "page" : undefined} className={`student-nav-link ${activeItem === "dashboard" ? "student-nav-link--active" : ""}`} href="/professor">
             <Image className="student-nav-icon" src="/images/menu-icons/dashboard.png" alt="" width={24} height={24} aria-hidden="true" /> Dashboard
           </Link>
