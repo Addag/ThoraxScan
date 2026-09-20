@@ -29,9 +29,9 @@ One line per important noun. live cards are source-backed; ghost entries are doc
 | Invitation code | live | [invitation-code.md](learning/invitation-code.md) | public.invitation_codes and redemption RPC |
 | X-ray case | live | [xray-case.md](learning/xray-case.md) | public.xray_cases, private activity-cases bucket, and signed upload/read flow |
 | Activity | live | [activity.md](learning/activity.md) | public.activities, private reference evaluation, Server Actions, and role routes |
-| AI analysis | ghost | stub | [technical design](../TECHNICAL_DESIGN_DOCUMENT.md#L320) |
+| AI analysis | live | [ai-analysis.md](learning/ai-analysis.md) | `public.ai_analyses`, analysis RPCs, and activity AI components |
 | [Student submission](learning/student-submission.md) | live | object | [submission workflow](../processes/student-submission.md) |
-| AI feedback release | ghost | stub | [technical design](../TECHNICAL_DESIGN_DOCUMENT.md#L322) |
+| AI feedback release | live | [ai-feedback-release.md](learning/ai-feedback-release.md) | `public.ai_feedback_releases`, submission trigger, and authorized feedback RPC |
 | Faculty evaluation | ghost | stub | [technical design](../TECHNICAL_DESIGN_DOCUMENT.md#L323) |
 | Analytics | ghost | stub | [application flow reference](../thoraxscan-app-flow.md#L48) |
 
@@ -44,7 +44,7 @@ One line per important noun. live cards are source-backed; ghost entries are doc
 | Model manifest, labels, and thresholds | live | [model-manifest-configuration.md](inference/model-manifest-configuration.md) | ModelManifestV1 parser and publisher-generated manifest |
 | Browser inference runtime | live | [browser-inference-runtime.md](inference/browser-inference-runtime.md) | Active resolver, verified session cache, provider fallback, and analyzeImage library |
 | Image input and preprocessing tensor | live | [preprocessing-tensor.md](inference/preprocessing-tensor.md) | Browser decode and pure version 1 preprocessing transform |
-| Transient prediction result | live | [prediction-result.md](inference/prediction-result.md) | In-memory InferenceResult; not persisted or rendered by a product page |
+| Transient prediction result | live | [prediction-result.md](inference/prediction-result.md) | In-memory `InferenceResult`, adapted into immutable activity analysis payloads |
 | Attention heatmap | ghost | stub | [technical design](../TECHNICAL_DESIGN_DOCUMENT.md#L250) |
 | Local Learning Mode image | live | [local-learning-mode-image.md](learning/local-learning-mode-image.md) | Student Learning Mode analyzer and transient browser state |
 

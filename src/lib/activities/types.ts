@@ -1,4 +1,5 @@
 import type { StudentSubmission, SubmissionStatus } from "@/lib/submissions/types";
+import type { ActivityAIFeedback, ActivityAIStatusProjection } from "@/lib/activity-ai/types";
 export type ActivityStatus = "draft" | "published" | "archived";
 
 export type CaseUploadStatus = "pending" | "ready" | "failed";
@@ -24,10 +25,12 @@ export type ProfessorActivityDetails = ProfessorActivitySummary & {
   caseByteSize: number | null;
   imageUrl: string | null;
   imageError: boolean;
+  aiStatus: ActivityAIStatusProjection;
 };
 
 export type StudentActivitySummary = {
   submissionStatus: SubmissionStatus | null;
+  aiStatus: ActivityAIFeedback["status"];
   id: string;
   workspaceId: string;
   workspaceName: string;
@@ -41,6 +44,7 @@ export type StudentActivityDetails = StudentActivitySummary & {
   instructions: string;
   imageUrl: string | null;
   imageError: boolean;
+  aiFeedback: ActivityAIFeedback;
 };
 
 export type ActivityFormField =

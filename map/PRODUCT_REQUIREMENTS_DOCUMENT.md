@@ -100,17 +100,17 @@ Priority levels:
 | FR-003 | Professors shall create workspaces and invitation codes or links for student access. | P0 | Planned |
 | FR-004 | Professors shall create, configure, publish, and manage frontal chest X-ray learning activities using approved de-identified teaching cases. | P0 | Planned |
 | FR-005 | Students shall access only authorized assigned activities and submit their own interpretation. | P0 | Planned |
-| FR-006 | The system shall preprocess compatible frontal images as grayscale, 224 x 224, mean 0.5, standard deviation 0.25. | P0 | Python completed; browser planned |
-| FR-007 | The system shall load the ONNX model and run inference in the browser when ONNX Runtime Web is supported. | P0 | Planned |
-| FR-008 | The system shall return 14 model outputs in the documented label order, convert logits with sigmoid, and apply configured per-label thresholds. | P0 | Model and Python logic completed; browser planned |
-| FR-009 | The system shall avoid displaying `No Finding` together with abnormal thresholded predictions. | P0 | Logic designed; browser planned |
-| FR-010 | The system shall release AI-assisted learning feedback only after a student submits an activity response. | P0 | Planned |
+| FR-006 | The system shall preprocess compatible frontal images as grayscale, 224 x 224, mean 0.5, standard deviation 0.25. | P0 | Browser completed for contract v1 |
+| FR-007 | The system shall load the ONNX model and run inference in the browser when ONNX Runtime Web is supported. | P0 | Completed for activity and Learning Mode paths |
+| FR-008 | The system shall return 14 model outputs in the documented label order, convert logits with sigmoid, and apply configured per-label thresholds. | P0 | Completed for contract v1 |
+| FR-009 | The system shall avoid displaying `No Finding` together with abnormal thresholded predictions. | P0 | Completed in runtime and database derivation |
+| FR-010 | The system shall release AI-assisted learning feedback only after a student submits an activity response. | P0 | Completed with submission trigger and release RPC |
 | FR-011 | Professors shall review submissions and provide scores, remarks, or feedback visible only to the authorized student. | P0 | Planned |
-| FR-012 | The system shall display the probability for each output label or a documented selected subset. | P1 | Planned |
+| FR-012 | The system shall display the probability for each output label or a documented selected subset. | P1 | Completed for released activity results |
 | FR-013 | The system shall display an attention heatmap after attention extraction and heatmap generation are implemented. | P1 | Not implemented |
 | FR-014 | The system shall provide Learning Mode for non-graded practice. | P1 | Planned |
 | FR-015 | The system shall show clear loading, validation, failure, retry, reset, and non-diagnostic-disclaimer states. | P1 | Planned |
-| FR-016 | The system shall retain traceable model, threshold, preprocessing, and application-version metadata for recorded AI results. | P1 | Planned |
+| FR-016 | The system shall retain traceable model, threshold, preprocessing, and application-version metadata for recorded AI results. | P1 | Completed for immutable activity analyses |
 | FR-017 | The system shall store only approved de-identified teaching cases and authorized educational records, subject to the retention rule. | P0 | Planned |
 | FR-018 | The system shall display the authorized activity case or a preview of a readable Learning Mode image and allow a Learning Mode case to be reset. | P0 | Planned |
 

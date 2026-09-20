@@ -8,6 +8,7 @@ import type {
   StudentActivitySummary,
 } from "@/lib/activities/types";
 import { createClient } from "@/lib/supabase/server";
+import { getProfessorActivityAIStatus, getStudentActivityAIFeedback } from "@/lib/activity-ai/server";
 
 type ActivityRow = {
   id: string;
@@ -109,6 +110,7 @@ export async function getProfessorActivity(activityId: string) {
     imageError = Boolean(caseResult.error || signedUrlResult.error);
   }
 
+  const aiStatus = await getProfessorActivityAIStatus(activityId);
   return {
     ...professorSummary(activity),
     caseId: activity.case_id,
@@ -119,6 +121,7 @@ export async function getProfessorActivity(activityId: string) {
     caseByteSize: caseRow?.byte_size ?? null,
     imageUrl,
     imageError,
+    aiStatus,
   } satisfies ProfessorActivityDetails;
 }
 
@@ -150,22 +153,18 @@ export async function getStudentActivities(limit?: number) {
   const { data, error } = await query.returns<(Pick<ActivityRow, "id" | "workspace_id" | "title" | "due_at" | "published_at" | "workspaces"> & { student_submissions: { status: SubmissionStatus }[] })[]>();
   if (error) return { data: [] as StudentActivitySummary[], error: error.message };
 
+  const projected = await Promise.all(data.flatMap((row) => row.published_at ? [(row.student_submissions[0]?.status === "submitted" ? getStudentActivityAIFeedback(row.id) : Promise.resolve({ status: "locked" as const })).then((feedback) => ({
+    submissionStatus: row.student_submissions[0]?.status ?? null,
+    aiStatus: feedback.status,
+    id: row.id,
+    workspaceId: row.workspace_id,
+    workspaceName: row.workspaces.name,
+    title: row.title,
+    dueAt: row.due_at,
+    publishedAt: row.published_at!,
+  } satisfies StudentActivitySummary))] : []));
   return {
-    data: data.flatMap((row) =>
-      row.published_at
-        ? [
-            {
-              submissionStatus: row.student_submissions[0]?.status ?? null,
-              id: row.id,
-              workspaceId: row.workspace_id,
-              workspaceName: row.workspaces.name,
-              title: row.title,
-              dueAt: row.due_at,
-              publishedAt: row.published_at,
-            } satisfies StudentActivitySummary,
-          ]
-        : [],
-    ),
+    data: projected,
     error: null,
   };
 }
@@ -191,8 +190,12 @@ export async function getStudentActivity(activityId: string) {
     .from("activity-cases")
     .createSignedUrl(path, 600);
 
+  const aiFeedback = activity.student_submissions[0]?.status === "submitted"
+    ? await getStudentActivityAIFeedback(activityId)
+    : { status: "locked" as const, attemptCount: 0, safeErrorCode: null, attemptedAt: null, completedAt: null, result: null };
   return {
     submissionStatus: activity.student_submissions[0]?.status ?? null,
+    aiStatus: aiFeedback.status,
     submission: projectSubmission(activity.student_submissions[0]),
     id: activity.id,
     workspaceId: activity.workspace_id,
@@ -203,5 +206,6 @@ export async function getStudentActivity(activityId: string) {
     publishedAt: activity.published_at,
     imageUrl: signedUrlResult.data?.signedUrl ?? null,
     imageError: Boolean(signedUrlResult.error),
+    aiFeedback,
   } satisfies StudentActivityDetails;
 }

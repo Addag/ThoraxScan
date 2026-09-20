@@ -18,6 +18,7 @@ import { getProfessorActivity } from "@/lib/activities/server";
 import { requireRole } from "@/lib/auth/server";
 import { getOwnAccountSettings } from "@/lib/settings/server";
 import { getProfessorWorkspaces } from "@/lib/workspaces/server";
+import { ActivityAIStatus } from "@/components/activities/activity-ai-status";
 
 export const metadata: Metadata = {
   title: "Manage activity | ThoraxScan",
@@ -66,10 +67,7 @@ export default async function ProfessorActivityPage({
               darkImageBackground={accountSettings.settings.darkImageBackground}
             />
             {activity.status === "draft" ? <CaseUploadForm activityId={activity.id} /> : null}
-            <aside className="activity-future-panel">
-              <span aria-hidden="true">⌁</span>
-              <div><strong>AI analysis</strong><small>Deferred to a future milestone</small></div>
-            </aside>
+            <ActivityAIStatus activityId={activity.id} imageUrl={activity.imageUrl} activityStatus={activity.status} initial={activity.aiStatus} />
           </div>
           <div className="activity-config-column">
             <ActivityDetailsForm workspaces={workspaces.data} activity={activity} />

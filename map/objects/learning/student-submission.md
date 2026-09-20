@@ -21,6 +21,10 @@ One private editable draft or immutable final response per Student/activity. The
 
 Authenticated clients have SELECT only. RLS permits own rows through joined visible activities and permits approved workspace Professors to read only finalized rows. The only client write interface authenticates the Student, locks authorization and activity rows, serializes the Student/activity pair, checks database time after locking, and returns stable result strings. Final rows cannot be changed or deleted.
 
+## AI connection
+
+The after-insert/update trigger creates one pending AI feedback-release row only when this record becomes `submitted`. Finalization remains immutable; inference failure never reopens or changes the submission ([AI release migration](<../../../supabase/migrations/20260920100000_activity_ai_analysis.sql:126>)).
+
 ## Change impact
 
-Field changes affect SQL constraints/RPC, shared validation, action, form, projection, and tests. Deadline/lifecycle changes also affect status cards and the step rail. This milestone does not implement AI feedback, grading, notifications, or Professor review UI.
+Field changes affect SQL constraints/RPC, shared validation, action, form, projection, and tests. Deadline/lifecycle changes also affect status cards, the step rail, and the AI release prerequisite. This milestone does not implement grading, notifications, or faculty evaluation.

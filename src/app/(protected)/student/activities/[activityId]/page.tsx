@@ -15,6 +15,7 @@ import { StudentShell } from "@/components/student/student-shell";
 import { getStudentActivity } from "@/lib/activities/server";
 import { requireRole } from "@/lib/auth/server";
 import { getOwnAccountSettings } from "@/lib/settings/server";
+import { ActivityAIFeedback } from "@/components/activities/activity-ai-feedback";
 
 export const metadata: Metadata = {
   title: "Activity | ThoraxScan",
@@ -46,7 +47,7 @@ export default async function StudentActivityPage({
           description={`${activity.workspaceName} · ${formatDueDate(activity.dueAt)}`}
           backHref="/student/activities"
         />
-        <ActivityStepRail role="student" submissionStatus={submissionLabel(activity.submissionStatus, activity.dueAt)} />
+        <ActivityStepRail role="student" submissionStatus={submissionLabel(activity.submissionStatus, activity.dueAt)} aiStatus={activity.aiFeedback.status} />
 
         <section className="student-assignment-panel" aria-labelledby="assignment-title">
           <div className="activity-panel-title">
@@ -70,10 +71,7 @@ export default async function StudentActivityPage({
               title={activity.title}
               darkImageBackground={accountSettings.settings.darkImageBackground}
             />
-            <aside className="activity-future-panel">
-              <span aria-hidden="true">➤</span>
-              <div><strong>AI feedback</strong><small>AI feedback is not included in this milestone</small></div>
-            </aside>
+            <ActivityAIFeedback activityId={activity.id} imageUrl={activity.imageUrl} initial={activity.aiFeedback} />
           </div>
           <StudentSubmissionForm
             submission={activity.submission}

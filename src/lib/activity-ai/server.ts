@@ -1,0 +1,63 @@
+import { createClient } from "@/lib/supabase/server";
+import { ACTIVITY_AI_LABELS, isActivityAILabel, type ActivityAIFeedback, type ActivityAIProvenance, type ActivityAIStatusProjection } from "./types";
+
+type FeedbackRow = {
+  status: string;
+  attempt_count: number;
+  safe_error_code: ActivityAIFeedback["safeErrorCode"];
+  attempted_at: string | null;
+  completed_at: string | null;
+  probabilities: number[] | null;
+  thresholds: { label: string; threshold: number }[] | null;
+  findings: { label: string; probability: number; threshold: number }[] | null;
+  provenance: ActivityAIProvenance | null;
+  attention_status: "unavailable";
+};
+
+export async function getStudentActivityAIFeedback(activityId: string): Promise<ActivityAIFeedback> {
+  const supabase = await createClient();
+  const { data, error } = await supabase.rpc("get_student_activity_ai_feedback", { target_activity_id: activityId }).maybeSingle<FeedbackRow>();
+  if (error || !data) return { status: "locked", attemptCount: 0, safeErrorCode: null, attemptedAt: null, completedAt: null, result: null };
+  const status = data.status === "released" ? "ready" : data.status === "failed" ? "failed" : data.status === "pending_analysis" ? "pending" : "locked";
+  const result = status === "ready" && data.probabilities && data.thresholds && data.findings && data.provenance
+    ? {
+        state: data.findings.length ? ("predicted" as const) : ("no-threshold-match" as const),
+        labels: data.probabilities.map((probability, index) => {
+          const threshold = data.thresholds?.[index]?.threshold ?? 0;
+          const candidate = data.thresholds?.[index]?.label;
+          const label = isActivityAILabel(candidate) ? candidate : ACTIVITY_AI_LABELS[index];
+          return { label, probability, threshold, predicted: probability >= threshold };
+        }),
+        findings: data.findings.flatMap((finding) => {
+          const label = isActivityAILabel(finding.label) ? finding.label : null;
+          return label ? [{ label, probability: finding.probability, threshold: finding.threshold, predicted: true }] : [];
+        }),
+        provenance: data.provenance,
+        attentionStatus: "unavailable" as const,
+      }
+    : null;
+  return { status, attemptCount: data.attempt_count, safeErrorCode: data.safe_error_code, attemptedAt: data.attempted_at, completedAt: data.completed_at, result };
+}
+
+type StatusRow = {
+  status: string;
+  attempt_count: number;
+  safe_error_code: ActivityAIStatusProjection["safeErrorCode"];
+  attempted_at: string | null;
+  claim_expires_at: string | null;
+  completed_at: string | null;
+  release_id: string | null;
+  manifest_version: 1 | null;
+  preprocessing_version: string | null;
+  threshold_version: string | null;
+  execution_provider: ActivityAIStatusProjection["executionProvider"];
+  application_build: string | null;
+  attention_status: "unavailable";
+};
+
+export async function getProfessorActivityAIStatus(activityId: string): Promise<ActivityAIStatusProjection> {
+  const supabase = await createClient();
+  const { data, error } = await supabase.rpc("get_professor_activity_ai_status", { target_activity_id: activityId }).maybeSingle<StatusRow>();
+  if (error || !data) return { status: "not_started", attemptCount: 0, safeErrorCode: null, attemptedAt: null, claimExpiresAt: null, completedAt: null, releaseId: null, manifestVersion: null, preprocessingVersion: null, thresholdVersion: null, executionProvider: null, applicationBuild: null, attentionStatus: "unavailable" };
+  return { status: data.status === "ready" ? "ready" : data.status === "failed" ? "failed" : data.status === "pending" ? "pending" : "not_started", attemptCount: data.attempt_count, safeErrorCode: data.safe_error_code, attemptedAt: data.attempted_at, claimExpiresAt: data.claim_expires_at, completedAt: data.completed_at, releaseId: data.release_id, manifestVersion: data.manifest_version, preprocessingVersion: data.preprocessing_version, thresholdVersion: data.threshold_version, executionProvider: data.execution_provider, applicationBuild: data.application_build, attentionStatus: "unavailable" };
+}

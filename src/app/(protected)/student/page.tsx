@@ -107,7 +107,7 @@ export default async function StudentPage() {
                 <Link href={`/student/activities/${activity.id}`} key={activity.id}>
                   <span>{activity.workspaceName}</span>
                   <strong>{activity.title}</strong>
-                  <small>{submissionLabel(activity.submissionStatus, activity.dueAt)} · {formatDueDate(activity.dueAt)}</small>
+                  <small>{submissionLabel(activity.submissionStatus, activity.dueAt)} · {activity.aiStatus === "ready" ? "Feedback available" : activity.aiStatus === "pending" ? "Analysis pending" : activity.aiStatus === "failed" ? "Analysis failed" : "AI feedback locked"} · {formatDueDate(activity.dueAt)}</small>
                 </Link>
               ))}
             </div>

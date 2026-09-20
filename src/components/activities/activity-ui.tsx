@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import type { ActivityStatus } from "@/lib/activities/types";
+import type { ActivityAIStatus } from "@/lib/activity-ai/types";
 
 export function ActivityPageHeading({
   title = "Activities",
@@ -25,18 +26,18 @@ export function ActivityPageHeading({
   );
 }
 
-export function ActivityStepRail({ role, submissionStatus = "Not started" }: { role: "professor" | "student"; submissionStatus?: string }) {
+export function ActivityStepRail({ role, submissionStatus = "Not started", aiStatus }: { role: "professor" | "student"; submissionStatus?: string; aiStatus?: ActivityAIStatus }) {
   const steps =
     role === "professor"
       ? [
           ["1", "Upload case", "complete"],
           ["2", "Configure activity", "active"],
-          ["3", "AI analysis", "future"],
+          ["3", "AI analysis", "active"],
         ]
       : [
           ["1", "Review activity", "active"],
           ["2", `Evaluation · ${submissionStatus}`, submissionStatus === "Submitted" ? "complete" : "active"],
-          ["3", "AI explanation", "future"],
+          ["3", `AI feedback · ${aiStatus === "ready" ? "Available" : aiStatus === "pending" ? "Pending" : aiStatus === "failed" ? "Retry available" : "Locked"}`, submissionStatus === "Submitted" ? "active" : "future"],
         ];
 
   return (
@@ -45,7 +46,7 @@ export function ActivityStepRail({ role, submissionStatus = "Not started" }: { r
         <li className={`activity-step activity-step--${state}`} key={label}>
           <span aria-hidden="true">{number}</span>
           <strong>{label}</strong>
-          {state === "future" ? <small>Future milestone</small> : null}
+          {state === "future" ? <small>{role === "student" ? "Locked until final submission" : "Future milestone"}</small> : null}
         </li>
       ))}
     </ol>

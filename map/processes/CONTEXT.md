@@ -14,6 +14,7 @@ snapshot: main @ a96a291
 - Protected route actions and pages under ../../src/app/(protected)/.
 - Workspace data projections under ../../src/lib/workspaces/.
 - Activity data projections under ../../src/lib/activities/ and activity UI under ../../src/components/activities/.
+- Activity analysis actions/contracts under ../../src/lib/activity-ai/ and database movement under ../../supabase/migrations/20260920100000_activity_ai_analysis.sql.
 - Workspace schema, authorization helpers, triggers, and RPC under ../../supabase/migrations/.
 - Activity/case schema, lifecycle triggers, RLS, and Storage policies under ../../supabase/migrations/20260820101401_activities_case_publication.sql.
 - Auth confirmation route under ../../src/app/auth/confirm/route.ts.
@@ -45,8 +46,9 @@ Record only movements that currently run in the repository. The process shelf co
 - [model-rollback.md](model-rollback.md)
 - [browser-model-conformance.md](browser-model-conformance.md)
 - [student-learning-mode-inference.md](student-learning-mode-inference.md)
+- [activity-ai-analysis.md](activity-ai-analysis.md)
 
-AI feedback release, faculty evaluation, analytics, and notification movements remain ghost concepts; they do not receive live process cards.
+Faculty evaluation, analytics, and notification movements remain ghost concepts; prediction-only AI analysis and feedback release are live in [activity-ai-analysis.md](activity-ai-analysis.md).
 
 ## Human check
 

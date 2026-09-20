@@ -43,7 +43,7 @@ This is a source-backed map of the ThoraxScan application repository one level a
 - Role workspace surface covers the live Student and Professor workspace/activity routes; Workspace means the professor-owned tenant shared by both roles.
 - X-ray case means the live private activity object/audit row. X-ray sample means the unrelated static public presentation image.
 - Attention Heatmap is planned explanatory output; its current appearance in copy and design documents is not implementation evidence.
-- Browser inference runtime is consumed by Student Learning Mode and operator validation; predictions remain transient and are not persisted.
+- Browser inference runtime is consumed by Student Learning Mode and the activity analysis boundary; Learning Mode results remain transient while activity results persist only through the authorized analysis RPC.
 
 ## Source rule
 

@@ -19,7 +19,7 @@ Student-readable assignment text is separated from the private teaching referenc
 - Activities carry a workspace, one optional draft case, creator, constrained title/instructions, optional due date, and `draft | published | archived` lifecycle in [the activity migration](<../../../supabase/migrations/20260820101401_activities_case_publication.sql:31>).
 - One reference evaluation is keyed by activity and cascades only with draft deletion in [the private-reference table](<../../../supabase/migrations/20260820101401_activities_case_publication.sql:73>).
 - Database triggers enforce `draft → published → archived`, require a ready case and non-empty reference at publication, forbid published deletion/case replacement, and make archive terminal in [the lifecycle trigger](<../../../supabase/migrations/20260820101401_activities_case_publication.sql:148>).
-- TypeScript exposes separate Professor and Student projections so the Student data layer never serializes reference evaluations in [activity types](<../../../src/lib/activities/types.ts:5>).
+- TypeScript exposes separate Professor and Student projections so the Student data layer never serializes reference evaluations in [activity types](<../../../src/lib/activities/types.ts:5>). The projections also include the authorized AI status/feedback view.
 
 ## Connected to
 
@@ -33,7 +33,7 @@ Owned by a [Workspace](workspace.md), attaches one [X-ray case](xray-case.md), i
 
 ### Does not hit
 
-- AI analysis, AI feedback release, faculty evaluation, or analytics, which remain ghost.
+- Faculty evaluation, analytics, notifications, and heatmaps remain deferred; activity publication is a prerequisite for AI analysis.
 
 ## Surfaces
 

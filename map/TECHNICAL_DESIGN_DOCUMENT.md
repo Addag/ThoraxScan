@@ -317,9 +317,9 @@ The capstone ERD requires the following planned records. This is a conceptual sc
 | `invitation_codes` | `id`, `workspace_id`, `created_by`, `code_hash`, `expires_at`, `max_uses`, `uses_count`, `is_active`, `created_at` | Controls student entry without storing invitation codes in plaintext. |
 | `xray_cases` | `id`, `workspace_id`, `storage_path`, `title`, `view`, `uploaded_by`, `approved_by`, `approved_at`, `de_identified_at`, `retention_until`, `status`, timestamps | Registers only approved, de-identified teaching cases; no patient-record fields or public storage URL. |
 | `activities` | `id`, `workspace_id`, `case_id`, `created_by`, `title`, `instructions`, `reference_evaluation`, `status`, `published_at`, `due_at`, timestamps | Publishes a case as a learning activity and stores the reference evaluation. |
-| `ai_analyses` | `id`, `case_id`, `model_version`, `onnx_artifact_version`, `preprocessing_version`, `threshold_version`, `probabilities`, `thresholded_findings`, `attention_status`, `attention_artifact_path`, `created_at` | Captures reproducible AI output and heatmap status for an authorized case. |
+| `ai_analyses` | `activity_id` (unique), `pending | ready | failed`, leased attempt fields, active model release/provenance, fixed 14-probability vector, derived thresholds/findings, `attention_status = unavailable`, timestamps | Captures one immutable reproducible browser inference result per activity. **Implemented in `20260920100000_activity_ai_analysis.sql`.** |
 | `student_submissions` | `id`, `activity_id`, `student_id`, `interpretation`, `submitted_at`, `status`; one active submission per student/activity unless a future attempt policy changes it | Stores the student’s interpretation before AI feedback is released. |
-| `ai_feedback_releases` | `id`, `submission_id`, `ai_analysis_id`, `released_at`, `released_by`, `status`; unique release per submission | Records that the authorized student may view AI-assisted feedback after submission. |
+| `ai_feedback_releases` | `id`, `submission_id`, `activity_id`, `student_id`, `ai_analysis_id`, `released_at`, `status`; unique release per submission | Records database-enforced student visibility after final submission and successful analysis. **Implemented in `20260920100000_activity_ai_analysis.sql`.** |
 | `faculty_evaluations` | `id`, `submission_id`, `professor_id`, `score`, `remarks`, `feedback`, `status`, `released_at`, timestamps | Stores faculty scores, remarks, or feedback for the student submission. |
 
 All foreign-key columns must be indexed as part of the implementation, and uniqueness/check constraints must protect relationships and valid states. Row Level Security must be enabled on every user-, workspace-, case-, activity-, submission-, release-, and evaluation-facing table. Students may read only their membership, assigned published activities, their own submissions, and released feedback; professors may read/write only records in workspaces they manage; administrative access must be explicit and minimal.
@@ -519,11 +519,11 @@ At minimum, the project should record these values in a reproducibility log even
 3. Freeze the label order and threshold file.
 4. Create the Next.js application shell, authentication entry points, and student/professor routes.
 5. Implement Supabase Auth, roles, workspaces, membership, invitations, and RLS before exposing case data.
-6. Implement controlled case storage, activities, reference evaluations, submissions, feedback releases, and faculty evaluations.
+6. Implement controlled case storage, activities, reference evaluations, submissions, prediction-only feedback releases, and faculty evaluations.
 7. Implement JavaScript preprocessing and compare it with the Python reference.
 8. Load the ONNX model through ONNX Runtime Web and implement sigmoid, thresholds, and `No Finding` conflict handling.
 9. Add loading, error, reset, and non-diagnostic disclaimer states.
-10. Replace the logits-only export with the planned expanded ONNX artifact, then implement attention extraction and heatmap rendering.
+10. Replace the logits-only export with the planned expanded ONNX artifact, then implement attention extraction and heatmap rendering. **The current milestone intentionally leaves this deferred.**
 11. Compare browser outputs against the Python/ONNX reference and test the complete LMS workflow.
 12. Add deployment checks, network/persistence inspection, heuristic review, and usability evaluation.
 

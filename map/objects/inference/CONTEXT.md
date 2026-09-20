@@ -16,7 +16,7 @@ snapshot: main @ 46c18c1 + working tree
 
 ## Job
 
-Separate the live replaceable-model foundation from planned product-facing analysis and explanation behavior.
+Separate the live replaceable-model foundation and prediction-only activity analysis from planned explanation behavior.
 
 ## Outputs
 
@@ -26,8 +26,9 @@ Separate the live replaceable-model foundation from planned product-facing analy
 - [browser-inference-runtime.md](browser-inference-runtime.md)
 - [preprocessing-tensor.md](preprocessing-tensor.md)
 - [prediction-result.md](prediction-result.md)
+- [../learning/ai-analysis.md](../learning/ai-analysis.md)
 
-Saved records and heatmaps remain ghost in [../_index.md](../_index.md); Learning Mode is live for Student and approved Professor roles.
+Activity analysis records are live; attention heatmaps remain ghost in [../_index.md](../_index.md). Learning Mode remains transient and live for Student and approved Professor roles.
 
 ## Human check
 

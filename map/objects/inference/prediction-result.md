@@ -8,7 +8,7 @@ snapshot: main @ 46c18c1 + working tree
 
 # Transient prediction result
 
-`InferenceResult` is an in-memory prediction with label decisions and enough release provenance to identify the model that produced it.
+`InferenceResult` is an in-memory prediction with label decisions and enough release provenance to identify the model that produced it. Activity analysis adapts it to a fixed probability vector before the database independently derives thresholded findings.
 
 ## Why this shape
 
@@ -30,11 +30,11 @@ Produced by [Browser inference runtime](browser-inference-runtime.md) using [Mod
 
 ### Does not hit
 
-- Saved AI analysis records; none are implemented and this object is not persisted.
+- Immutable saved activity analysis records; the result remains transient until the persistence adapter submits its probabilities and provenance.
 
 ## Surfaces
 
-Returned by the exported `analyzeImage` library function; no live page consumes it.
+Returned by the exported `analyzeImage` library function and consumed by the Student/Professor activity analysis components through the persistence adapter.
 
 ## See
 

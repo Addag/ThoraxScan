@@ -44,7 +44,7 @@ export default async function StudentActivitiesPage() {
                   <p>{activity.workspaceName}</p>
                   <h2>{activity.title}</h2>
                   <span className={`student-due-state student-due-state--${dueState(activity.dueAt).toLowerCase()}`}>
-                    {submissionLabel(activity.submissionStatus, activity.dueAt)} · {formatDueDate(activity.dueAt)}
+                    {submissionLabel(activity.submissionStatus, activity.dueAt)} · {activity.aiStatus === "ready" ? "Feedback available" : activity.aiStatus === "pending" ? "Analysis pending" : activity.aiStatus === "failed" ? "Analysis failed · retry available" : "AI feedback locked"} · {formatDueDate(activity.dueAt)}
                   </span>
                 </div>
                 <Link href={`/student/activities/${activity.id}`}>Review activity <span aria-hidden="true">→</span></Link>
