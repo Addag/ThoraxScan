@@ -12,6 +12,8 @@ import { InferenceError, asInferenceError } from "./errors";
 import { postprocessLogits, type PostprocessedPrediction } from "./postprocess";
 import { preprocessImage } from "./preprocess";
 
+import { readyAttention, UNAVAILABLE_ATTENTION, type AttentionHeatmap } from "./attention";
+
 type ExecutionProvider = "webgpu" | "wasm";
 type OrtModule = typeof Ort;
 
@@ -39,7 +41,8 @@ export interface InferenceResult extends PostprocessedPrediction {
   bundleSha256: string;
   preprocessingVersion: string;
   thresholdVersion: string;
-  manifestVersion: 1;
+  manifestVersion: 1 | 2;
+  attention?: AttentionHeatmap;
   executionProvider: ExecutionProvider;
   applicationBuild: string;
 }
@@ -282,17 +285,26 @@ export async function runModelInference(
     try {
       outputs = await handle.session.run(
         { [release.manifest.input.name]: tensor },
-        [release.manifest.output.name],
+        release.manifest.schemaVersion === 2 ? ["logits", "attention_map"] : ["logits"],
       );
     } catch (error) {
       if (handle.provider === "webgpu") throw new WebGpuExecutionError(error);
       throw asInferenceError(error, "MODEL_LOAD_FAILED", "Model execution failed.");
     }
     const output = outputs[release.manifest.output.name];
-    if (!output || output.size !== release.manifest.labels.length) {
+    if (!output || output.type !== "float32" || output.dims.join(",") !== "1,14" || output.size !== release.manifest.labels.length || Array.from(output.data as ArrayLike<number>).some(value => !Number.isFinite(value))) {
       throw new InferenceError("INVALID_OUTPUT", "The model returned an invalid logits tensor.");
     }
+    let attention: AttentionHeatmap = UNAVAILABLE_ATTENTION;
+    if (release.manifest.schemaVersion === 2) {
+      const map = outputs.attention_map;
+      if (!map || map.type !== "float32" || map.dims.join(",") !== "1,1,7,7") {
+        throw new InferenceError("INVALID_OUTPUT", "The model returned invalid attention dimensions.");
+      }
+      attention = readyAttention(Array.from(map.data as ArrayLike<number>));
+    }
     return {
+      attention,
       logits: Array.from(output.data as ArrayLike<number>),
       provider: handle.provider,
     };
@@ -332,7 +344,8 @@ export async function analyzeImage(
     bundleSha256: release.bundleSha256,
     preprocessingVersion: release.manifest.release.preprocessingVersion,
     thresholdVersion: release.manifest.release.thresholdVersion,
-    manifestVersion: 1,
+    manifestVersion: release.manifest.schemaVersion,
+    attention: inference.attention,
     executionProvider: inference.provider,
     applicationBuild: process.env.NEXT_PUBLIC_APP_BUILD ?? "development",
   };

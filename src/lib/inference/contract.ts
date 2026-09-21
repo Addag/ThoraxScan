@@ -106,6 +106,25 @@ export interface ModelManifestV1 {
   };
 }
 
+export const ATTENTION_DESCRIPTOR = {
+  output: { name: "attention_map", dtype: "float32", shape: ["batch", 1, 7, 7] },
+  attribution: "global-self-attention",
+  aggregation: "attention-rollout-mean-query-v1",
+  normalization: "per-image-min-max-v1",
+  grid: { width: 7, height: 7 },
+} as const;
+
+export interface ModelManifestV2 extends Omit<ModelManifestV1, "schemaVersion" | "validation"> {
+  schemaVersion: 2;
+  attention: typeof ATTENTION_DESCRIPTOR;
+  validation: ModelManifestV1["validation"] & {
+    expectedAttentionSha256: string;
+    maxAbsoluteAttentionError: number;
+    webGpuMaxAbsoluteAttentionDifference: number | null;
+  };
+}
+export type ModelManifest = ModelManifestV1 | ModelManifestV2;
+
 export interface ActiveModelRelease {
   modelReleaseId: number;
   releaseId: string;
@@ -113,7 +132,7 @@ export interface ActiveModelRelease {
   manifestPath: string;
   artifactUrl: string;
   revision: number;
-  manifest: ModelManifestV1;
+  manifest: ModelManifest;
 }
 
 const SHA256_PATTERN = /^[0-9a-f]{64}$/;
@@ -199,7 +218,30 @@ export function parseThresholds(value: unknown) {
   });
 }
 
-export function parseModelManifest(value: unknown): ModelManifestV1 {
+export function parseModelManifest(value: unknown): ModelManifest {
+  const source = objectValue(value, "manifest");
+  if (source.schemaVersion === 1) return parseV1(source);
+  if (source.schemaVersion !== 2) fail("Only manifest schemaVersion 1 or 2 is supported.");
+  const base = parseV1({ ...source, schemaVersion: 1 });
+  const attention = objectValue(source.attention, "attention");
+  const output = objectValue(attention.output, "attention.output");
+  const grid = objectValue(attention.grid, "attention.grid");
+  if (output.name !== "attention_map" || output.dtype !== "float32" || grid.width !== 7 || grid.height !== 7 ||
+      attention.attribution !== ATTENTION_DESCRIPTOR.attribution || attention.aggregation !== ATTENTION_DESCRIPTOR.aggregation ||
+      attention.normalization !== ATTENTION_DESCRIPTOR.normalization) fail("Invalid attention descriptor.");
+  exactArray(output.shape, ["batch", 1, 7, 7], "attention.output.shape");
+  const validation = objectValue(source.validation, "validation");
+  const error = finiteNumber(validation.maxAbsoluteAttentionError, "validation.maxAbsoluteAttentionError");
+  const gpu = validation.webGpuMaxAbsoluteAttentionDifference;
+  if (error < 0 || error > 1e-4) fail("Attention parity exceeds 1e-4.");
+  if (base.validation.webGpuEnabled ? typeof gpu !== "number" || !Number.isFinite(gpu) || gpu < 0 || gpu > 1e-3 : gpu !== null) fail("Invalid attention provider parity.");
+  return { ...base, schemaVersion: 2, attention: ATTENTION_DESCRIPTOR, validation: {
+    ...base.validation, expectedAttentionSha256: sha256Value(validation.expectedAttentionSha256, "validation.expectedAttentionSha256"),
+    maxAbsoluteAttentionError: error, webGpuMaxAbsoluteAttentionDifference: gpu as number | null,
+  } };
+}
+
+function parseV1(value: unknown): ModelManifestV1 {
   const manifest = objectValue(value, "manifest");
   if (manifest.schemaVersion !== 1) fail("Only manifest schemaVersion 1 is supported.");
 

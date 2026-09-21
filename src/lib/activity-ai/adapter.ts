@@ -1,8 +1,10 @@
+import { readyAttention } from "@/lib/inference/attention";
 import type { InferenceResult } from "@/lib/inference/runtime";
 import { ACTIVITY_AI_LABELS, type ActivityAIProvenance } from "./types";
 
 export type ActivityAIPersistencePayload = {
   probabilities: number[];
+  attentionMap: number[] | null;
   releaseProvenance: ActivityAIProvenance;
   provider: "webgpu" | "wasm";
   applicationBuild: string;
@@ -18,7 +20,11 @@ export function toActivityAIPersistencePayload(result: InferenceResult): Activit
       throw new Error("Activity AI labels or probabilities do not match the persistence contract.");
     }
   });
+  const attention = result.attention ?? { status: "unavailable", reason: "legacy-model-release" as const };
+  if ((result.manifestVersion === 2) !== (attention.status === "ready")) throw new Error("Attention does not match the release contract.");
+  const attentionMap = attention.status === "ready" ? readyAttention(attention.values) : null;
   return {
+    attentionMap: attentionMap?.status === "ready" ? attentionMap.values : null,
     probabilities: result.labels.map((item) => item.probability),
     releaseProvenance: {
       releaseId: result.releaseId,
@@ -34,4 +40,3 @@ export function toActivityAIPersistencePayload(result: InferenceResult): Activit
     applicationBuild: result.applicationBuild,
   };
 }
-

@@ -21,6 +21,7 @@ export async function completeActivityAIAnalysis(activityId: string, attemptId: 
     target_activity_id: activityId,
     target_attempt_id: attemptId,
     input_probabilities: payload.probabilities,
+    input_attention_map: payload.attentionMap,
     release_provenance: payload.releaseProvenance,
     provider: payload.provider,
     application_build: payload.applicationBuild,

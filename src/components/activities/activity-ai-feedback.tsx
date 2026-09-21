@@ -6,6 +6,7 @@ import { InferenceError } from "@/lib/inference/errors";
 import { toActivityAIPersistencePayload } from "@/lib/activity-ai/adapter";
 import { claimActivityAIAnalysis, completeActivityAIAnalysis, failActivityAIAnalysis, refreshActivityCaseUrl } from "@/lib/activity-ai/actions";
 import type { ActivityAIFeedback } from "@/lib/activity-ai/types";
+import { AttentionHeatmap } from "@/components/attention-heatmap";
 
 function safeCode(error: unknown) {
   if (error instanceof InferenceError) return error.code.toLowerCase();
@@ -83,7 +84,7 @@ export function ActivityAIFeedback({ activityId, imageUrl, initial }: { activity
       {result.labels.some((item) => item.predicted && !result.findings.some((finding) => finding.label === item.label)) ? <p className="activity-ai-suppressed">No Finding is suppressed when an abnormal finding is present.</p> : null}
       <details><summary>All 14 probabilities and thresholds</summary><ul>{result.labels.map((item) => <li key={item.label}><strong>{item.label}</strong>: {(item.probability * 100).toFixed(2)}% · threshold {item.threshold}</li>)}</ul></details>
       <details><summary>Release and execution provenance</summary><dl><dt>Model release</dt><dd>{result.provenance.releaseId}</dd><dt>Preprocessing</dt><dd>{result.provenance.preprocessingVersion}</dd><dt>Thresholds</dt><dd>{result.provenance.thresholdVersion}</dd><dt>Provider</dt><dd>{result.provenance.executionProvider.toUpperCase()}</dd><dt>Model SHA-256</dt><dd>{result.provenance.modelSha256}</dd><dt>Bundle SHA-256</dt><dd>{result.provenance.bundleSha256}</dd><dt>Application build</dt><dd>{result.provenance.applicationBuild}</dd></dl></details>
-      <p className="activity-ai-copy">Attention heatmap unavailable for this model release.</p>
+      <AttentionHeatmap imageUrl={imageUrl} attention={result.attention ?? { status: "unavailable", reason: "legacy-model-release" }} title="Model attention" />
     </div> : null}
   </section>;
 }

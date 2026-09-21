@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { InferenceError, type InferenceErrorCode } from "@/lib/inference/errors";
 import type { InferenceResult } from "@/lib/inference/runtime";
+import { AttentionHeatmap } from "@/components/attention-heatmap";
 
 const MAX_BYTES = 6 * 1024 * 1024;
 type AnalyzerState = "idle" | "selected" | "running" | "success" | "error";
@@ -110,6 +111,7 @@ export function LearningModeAnalyzer() {
       {suppressedLabels.map((item) => <p className="learning-suppressed" key={item.label}>{item.label}: Suppressed by abnormal finding.</p>)}
       <details className="learning-labels"><summary>All {result.labels.length} labels</summary><ul>{result.labels.map((item) => <li key={item.label}><div><strong>{item.label}</strong><span>{item.predicted ? "Matched" : "Not matched"}{suppressedLabels.includes(item) ? " · Suppressed by abnormal finding" : ""}</span></div><span>Probability {(item.probability * 100).toFixed(2)}% · Release-supplied threshold {item.threshold}</span></li>)}</ul></details>
       <details className="learning-provenance"><summary>Release and execution provenance</summary><dl><dt>Release ID</dt><dd>{result.releaseId}</dd><dt>Execution provider</dt><dd>{result.executionProvider.toUpperCase()}</dd><dt>Manifest version</dt><dd>{result.manifestVersion}</dd><dt>Preprocessing version</dt><dd>{result.preprocessingVersion}</dd><dt>Threshold version</dt><dd>{result.thresholdVersion}</dd><dt>Application build</dt><dd>{result.applicationBuild}</dd><dt>Model SHA-256</dt><dd>{result.modelSha256}</dd><dt>Bundle SHA-256</dt><dd>{result.bundleSha256}</dd></dl></details>
+      <AttentionHeatmap imageUrl={previewUrl} attention={result.attention ?? { status: "unavailable", reason: "legacy-model-release" }} title="Model attention" />
       <p className="learning-disclaimer">Educational use only. This result is not a diagnosis and should not guide medical decisions.</p>
     </div> : <section className="learning-empty" aria-labelledby="learning-empty-title">
       <div className="learning-scan-icon"><img src="/images/learning/scan.svg" alt="" width="36" height="36" /></div>

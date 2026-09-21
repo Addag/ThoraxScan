@@ -1,4 +1,4 @@
-import type { ModelManifestV1, ThoraxScanLabel } from "./contract";
+import type { ModelManifest, ThoraxScanLabel } from "./contract";
 import { InferenceError } from "./errors";
 
 export interface LabelPrediction {
@@ -25,7 +25,7 @@ export function sigmoid(logit: number) {
 
 export function postprocessLogits(
   logits: readonly number[],
-  manifest: ModelManifestV1,
+  manifest: ModelManifest,
 ): PostprocessedPrediction {
   if (logits.length !== manifest.labels.length) {
     throw new InferenceError(

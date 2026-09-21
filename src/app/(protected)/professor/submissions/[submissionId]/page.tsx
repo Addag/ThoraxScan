@@ -6,6 +6,8 @@ import { XrayCasePreview } from "@/components/activities/activity-ui";
 import { requireRole } from "@/lib/auth/server";
 import { getProfessorSubmission } from "@/lib/evaluations/server";
 import { saveFacultyEvaluationAction, releaseFacultyEvaluationAction } from "../actions";
+import { getProfessorActivityAIHeatmap } from "@/lib/activity-ai/server";
+import { AttentionHeatmap } from "@/components/attention-heatmap";
 
 export const metadata = { title: "Review submission | ThoraxScan" };
 export default async function SubmissionPage({ params }: { params: Promise<{ submissionId: string }> }) {
@@ -15,6 +17,7 @@ export default async function SubmissionPage({ params }: { params: Promise<{ sub
   if (!submission) notFound();
   const { activity } = submission;
   const ai = activity.aiStatus;
+  const attention = await getProfessorActivityAIHeatmap(activity.id);
   return <ProfessorShell activeItem="submissions" sectionLabel="Review submission" sectionDescription={activity.workspaceName}>
     <main className="student-dashboard activity-dashboard">
       <Link href="/professor/submissions">← Back to submissions</Link>
@@ -31,6 +34,7 @@ export default async function SubmissionPage({ params }: { params: Promise<{ sub
           </dl></section>
           <XrayCasePreview imageUrl={activity.imageUrl} imageError={activity.imageError} title={activity.title} />
           <section className="faculty-evaluation-panel"><h2>Private reference evaluation</h2><p className="evaluation-text">{activity.referenceEvaluation || "No reference available."}</p></section>
+          <AttentionHeatmap imageUrl={activity.imageUrl} attention={attention} title="Model attention" />
           <section className="faculty-evaluation-panel"><h2>AI status and provenance</h2><dl>
             <dt>Status</dt><dd>{ai.status}</dd><dt>Attempts</dt><dd>{ai.attemptCount}</dd>
             <dt>Model release</dt><dd>{ai.releaseId ?? "Unavailable"}</dd>

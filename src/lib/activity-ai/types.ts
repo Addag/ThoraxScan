@@ -1,3 +1,4 @@
+import type { AttentionHeatmap } from "@/lib/inference/attention";
 import type { ThoraxScanLabel } from "@/lib/inference/contract";
 
 export const ACTIVITY_AI_LABELS = [
@@ -43,7 +44,7 @@ export type ActivityAIProvenance = {
   releaseId: string;
   modelSha256: string;
   bundleSha256: string;
-  manifestVersion: 1;
+  manifestVersion: 1 | 2;
   preprocessingVersion: string;
   thresholdVersion: string;
   executionProvider: ActivityAIProvider;
@@ -55,7 +56,8 @@ export type ActivityAIResult = {
   labels: ActivityAIProbability[];
   findings: ActivityAIProbability[];
   provenance: ActivityAIProvenance;
-  attentionStatus: "unavailable";
+  attention?: AttentionHeatmap;
+  attentionStatus: "ready" | "unavailable";
 };
 
 export type ActivityAIFeedback = {
@@ -75,12 +77,12 @@ export type ActivityAIStatusProjection = {
   claimExpiresAt: string | null;
   completedAt: string | null;
   releaseId: string | null;
-  manifestVersion: 1 | null;
+  manifestVersion: 1 | 2 | null;
   preprocessingVersion: string | null;
   thresholdVersion: string | null;
   executionProvider: ActivityAIProvider | null;
   applicationBuild: string | null;
-  attentionStatus: "unavailable";
+  attentionStatus: "ready" | "unavailable";
 };
 
 export function isActivityAILabel(value: unknown): value is ActivityAILabel {

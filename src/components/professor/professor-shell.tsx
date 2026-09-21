@@ -35,9 +35,6 @@ export function ProfessorShell({
           <Link aria-current={activeItem === "learning" ? "page" : undefined} className={`student-nav-link ${activeItem === "learning" ? "student-nav-link--active" : ""}`} href="/professor/learning">
             <Image className="student-nav-icon" src="/images/menu-icons/learning.png" alt="" width={24} height={24} aria-hidden="true" /> Learning mode
           </Link>
-          <span className="student-nav-link student-nav-link--disabled">
-            <Image className="student-nav-icon" src="/images/menu-icons/learning.png" alt="" width={24} height={24} aria-hidden="true" /> Attention maps <small>Coming soon</small>
-          </span>
           <Link aria-current={activeItem === "settings" ? "page" : undefined} className={`student-nav-link ${activeItem === "settings" ? "student-nav-link--active" : ""}`} href="/professor/settings">
             <Image className="student-nav-icon" src="/images/menu-icons/settings.png" alt="" width={24} height={24} aria-hidden="true" /> Settings
           </Link>

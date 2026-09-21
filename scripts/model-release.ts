@@ -17,7 +17,7 @@ import {
   parseModelManifest,
   parseReleaseSource,
   parseThresholds,
-  type ModelManifestV1,
+  type ModelManifest,
 } from "../src/lib/inference/contract";
 import { sigmoid } from "../src/lib/inference/postprocess";
 import { preprocessRgba } from "../src/lib/inference/preprocess";
@@ -32,7 +32,7 @@ interface ValidatedBundle {
   directory: string;
   model: Buffer;
   modelInput: Float32Array;
-  manifest: ModelManifestV1;
+  manifest: ModelManifest;
   manifestJson: string;
   bundleSha256: string;
   manifestPath: string;
@@ -198,16 +198,22 @@ async function validateOnnx(
     if (session.inputNames.length !== 1 || session.inputNames[0] !== "input") {
       throw new Error("The ONNX model must expose only the input tensor named input.");
     }
-    if (session.outputNames.length !== 1 || session.outputNames[0] !== "logits") {
-      throw new Error("The ONNX model must expose only the output tensor named logits.");
+    if (session.outputNames.length < 1 || session.outputNames.length > 2 || session.outputNames[0] !== "logits" || (session.outputNames.length === 2 && session.outputNames[1] !== "attention_map")) {
+      throw new Error("The ONNX model must expose logits and optionally attention_map as named outputs.");
     }
     const tensor = new ort.Tensor("float32", modelInput, [1, 1, 224, 224]);
-    const outputs = await session.run({ input: tensor }, ["logits"]);
+    const outputs = await session.run({ input: tensor }, session.outputNames);
     const logits = Array.from(outputs.logits.data as ArrayLike<number>);
     if (logits.length !== THORAXSCAN_LABELS.length || logits.some((value) => !Number.isFinite(value))) {
       throw new Error("The ONNX model did not return 14 finite logits.");
     }
 
+    if (session.outputNames.length === 2) {
+      const attention = outputs.attention_map;
+      if (!attention || attention.dims.join(",") !== "1,1,7,7" || Array.from(attention.data as ArrayLike<number>).some((value) => !Number.isFinite(value) || value < 0 || value > 1)) {
+        throw new Error("The ONNX attention_map must be [1,1,7,7] with normalized finite values.");
+      }
+    }
     const logitError = compare(logits, expectedLogits);
     const probabilities = logits.map(sigmoid);
     const probabilityError = compare(probabilities, expectedProbabilities);
@@ -632,7 +638,7 @@ async function ensureRemoteBundle(supabase: SupabaseClient, bundle: ValidatedBun
   }
 }
 
-async function smokeRemoteModel(manifest: ModelManifestV1) {
+async function smokeRemoteModel(manifest: ModelManifest) {
   const url = publicArtifactUrl(
     process.env.MODEL_REGISTRY_SUPABASE_URL!,
     manifest.artifact.path,
@@ -657,7 +663,7 @@ async function smokeRemoteModel(manifest: ModelManifestV1) {
   }
 }
 
-async function smokeBrowserModel(manifest: ModelManifestV1) {
+async function smokeBrowserModel(manifest: ModelManifest) {
   const { chromium } = await import("playwright");
   const ortDistribution = resolve("node_modules/onnxruntime-web/dist");
   const server = createServer(async (request, response) => {
