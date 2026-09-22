@@ -2624,7 +2624,7 @@ textarea:focus-visible {
 /* Put actionable learning work ahead of workspace administration. */
 .student-dashboard > .student-page-heading { order: 1; }
 .student-dashboard > .student-recent-activities { order: 2; }
-.student-dashboard > .student-join-panel { order: 3; }
+.student-dashboard > .student-join-panel { order: 3; margin-top: 24px;}
 .student-dashboard > .student-workspaces { order: 4; }
 .student-dashboard > .student-privacy-note { order: 5; }
 
