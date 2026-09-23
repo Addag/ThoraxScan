@@ -47,3 +47,9 @@ next-env.d.ts
 
 # Obsidian workspace layout
 /.obsidian/
+
+# Model export caches and generated weights
+model-export/__pycache__/
+model-export/*.onnx
+model-export/*.pth
+.local-supabase-env.txt

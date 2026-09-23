@@ -1,8 +1,10 @@
+import { ATTENTION_DESCRIPTOR } from "./contract";
 import type { ActiveModelRelease } from "./contract";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   acquireModelSession,
+  runModelInference,
   fetchVerifiedModel,
   resetInferenceCachesForTests,
   resolveActiveModel,
@@ -176,5 +178,47 @@ describe("model session loading", () => {
     expect((await resolveActiveModel(supabase)).releaseId).toBe("test-release");
     expect((await resolveActiveModel(supabase)).releaseId).toBe("test-release-2");
     expect(maybeSingle).toHaveBeenCalledTimes(2);
+  });
+});
+
+describe("V2 inference outputs", () => {
+  afterEach(() => { resetInferenceCachesForTests(); vi.unstubAllGlobals(); });
+  async function setup(v2 = true) {
+    const bytes = new Uint8Array([1, 7, 9]);
+    const release: ActiveModelRelease = await releaseFor(bytes);
+    if (v2) release.manifest = { ...release.manifest, schemaVersion: 2, attention: ATTENTION_DESCRIPTOR,
+      validation: { ...release.manifest.validation, expectedAttentionSha256: "a".repeat(64), maxAbsoluteAttentionError: 0, webGpuMaxAbsoluteAttentionDifference: null } };
+    vi.stubGlobal("fetch", vi.fn(async () => new Response(bytes)));
+    ortMocks.create.mockImplementation(async () => ({ run: ortMocks.run, release: ortMocks.release }));
+    return release;
+  }
+  const output = () => ({ logits: { type: "float32", dims: [1,14], size: 14, data: new Float32Array(14) }, attention_map: { type: "float32", dims: [1,1,7,7], size: 49, data: new Float32Array(49).fill(0.5) } });
+  it("fetches both outputs and retains the map", async () => {
+    const release = await setup(); ortMocks.run.mockResolvedValue(output());
+    const result = await runModelInference(release, new Float32Array(224*224), true);
+    expect(ortMocks.run).toHaveBeenLastCalledWith(expect.anything(), ["logits", "attention_map"]);
+    expect(result.attention).toMatchObject({ status: "ready", width: 7, height: 7 });
+  });
+  it("requests logits only for V1", async () => {
+    const release = await setup(false); ortMocks.run.mockResolvedValue(output());
+    expect((await runModelInference(release,new Float32Array(224*224),true)).attention.status).toBe("unavailable");
+    expect(ortMocks.run).toHaveBeenLastCalledWith(expect.anything(), ["logits"]);
+  });
+  it.each(["shape", "nan", "range", "missing"])("fails safely for invalid attention %s", async kind => {
+    const release = await setup(); const outputs = output();
+    if (kind === "shape") outputs.attention_map.dims = [1,49];
+    if (kind === "nan") outputs.attention_map.data[0] = NaN;
+    if (kind === "range") outputs.attention_map.data[0] = 2;
+    ortMocks.run.mockResolvedValue(kind === "missing" ? { logits: outputs.logits } : outputs);
+    await expect(runModelInference(release,new Float32Array(224*224),true)).rejects.toMatchObject({ code: "INVALID_OUTPUT" });
+  });
+  it("preserves the map after WebGPU session creation falls back", async () => {
+    const release = await setup();
+    release.manifest.validation.webGpuEnabled = true;
+    vi.stubGlobal("navigator", { gpu: {} });
+    ortMocks.create.mockRejectedValueOnce(new Error("GPU unavailable"));
+    ortMocks.run.mockResolvedValue(output());
+    const result = await runModelInference(release,new Float32Array(224*224));
+    expect(result.provider).toBe("wasm"); expect(result.attention.status).toBe("ready");
   });
 });

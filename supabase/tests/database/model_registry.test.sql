@@ -2,6 +2,7 @@ begin;
 
 create extension if not exists pgtap with schema extensions;
 select plan(22);
+create temporary table registry_baseline as select revision, (select count(*) from public.model_activation_events) as events from public.model_slots where slot = 'thoraxscan-classifier';
 
 select has_table('public', 'model_releases', 'model release registry exists');
 select has_table('public', 'model_slots', 'active model slot exists');
@@ -80,8 +81,9 @@ select is(
 
 select lives_ok(
   format(
-    'select public.activate_model_release(%s, 0, %L, %L)',
+    'select public.activate_model_release(%s, %s, %L, %L)',
     (select id from public.model_releases where release_id = 'release-a'),
+    (select revision from registry_baseline),
     'database-test',
     'initial activation'
   ),
@@ -89,12 +91,12 @@ select lives_ok(
 );
 select is(
   (select revision from public.model_slots where slot = 'thoraxscan-classifier'),
-  1::bigint,
+  (select revision + 1 from registry_baseline),
   'activation increments the slot revision'
 );
 select is(
   (select count(*) from public.model_activation_events),
-  1::bigint,
+  (select events + 1 from registry_baseline),
   'activation appends one history event'
 );
 set local request.jwt.claim.sub = '00000000-0000-0000-0000-000000000001';
@@ -106,8 +108,9 @@ select is(
 set local request.jwt.claim.sub = '';
 select throws_ok(
   format(
-    'select public.activate_model_release(%s, 0, %L, %L)',
+    'select public.activate_model_release(%s, %s, %L, %L)',
     (select id from public.model_releases where release_id = 'release-a'),
+    (select revision from registry_baseline),
     'database-test',
     'stale activation'
   ),
@@ -116,11 +119,11 @@ select throws_ok(
   'a stale expected revision is rejected'
 );
 select lives_ok(
-  $$select public.activate_model_release(null, 1, 'database-test', 'failed initial activation compensation')$$,
+  $$select public.activate_model_release(null, (select revision + 1 from registry_baseline), 'database-test', 'failed initial activation compensation')$$,
   'a compensating activation can restore an initially empty slot'
 );
 select ok(
-  (select active_model_release_id is null and revision = 2 from public.model_slots where slot = 'thoraxscan-classifier'),
+  (select active_model_release_id is null and revision = (select revision + 2 from registry_baseline) from public.model_slots where slot = 'thoraxscan-classifier'),
   'initial activation compensation clears the pointer and advances history'
 );
 select throws_ok(

@@ -25,6 +25,7 @@ import { preprocessRgba } from "../src/lib/inference/preprocess";
 const MAX_ABSOLUTE_LOGIT_ERROR = 1e-4;
 const MAX_RELATIVE_LOGIT_ERROR = 1e-3;
 const MAX_ABSOLUTE_PROBABILITY_ERROR = 1e-4;
+const MAX_ABSOLUTE_ATTENTION_ERROR = 1e-4;
 const FLOAT_COUNT = 224 * 224;
 const requireFromScript = createRequire(import.meta.url);
 
@@ -42,6 +43,8 @@ interface ValidatedBundle {
     maxAbsoluteLogitError: number;
     maxRelativeLogitError: number;
     maxAbsoluteProbabilityError: number;
+    maxAbsoluteAttentionError?: number;
+    webGpuMaxAbsoluteAttentionDifference?: number | null;
   };
 }
 
@@ -130,6 +133,9 @@ function numberArray(value: unknown, name: string, expectedLength: number) {
 }
 
 function compare(actual: readonly number[], expected: readonly number[]) {
+  if (actual.length !== expected.length || actual.some(value => !Number.isFinite(value)) || expected.some(value => !Number.isFinite(value))) {
+    throw new Error("Parity comparison requires equal-length finite vectors.");
+  }
   let maxAbsolute = 0;
   let maxRelative = 0;
   for (let index = 0; index < actual.length; index += 1) {
@@ -185,11 +191,21 @@ function assertOnnxEnvelope(model: Buffer) {
   }
 }
 
+function validateOutputs(outputs: Record<string, { type: string; dims: readonly number[]; data: unknown }>, v2: boolean) {
+  for (const [name, shape, length] of (v2 ? [["logits", "1,14", 14], ["attention_map", "1,1,7,7", 49]] : [["logits", "1,14", 14]]) as [string, string, number][]) {
+    const output = outputs[name];
+    if (!output || output.type !== "float32" || output.dims.join(",") !== shape) throw new Error(`Invalid ${name} tensor.`);
+    const values = Array.from(output.data as ArrayLike<number>);
+    if (values.length !== length || values.some(v => !Number.isFinite(v) || (name === "attention_map" && (v < 0 || v > 1)))) throw new Error(`Invalid ${name} values.`);
+  }
+}
+
 async function validateOnnx(
   model: Buffer,
   modelInput: Float32Array,
   expectedLogits: number[],
   expectedProbabilities: number[],
+  expectedAttention: number[] | null,
 ) {
   assertOnnxEnvelope(model);
   const ort = await import("onnxruntime-web");
@@ -198,21 +214,27 @@ async function validateOnnx(
     if (session.inputNames.length !== 1 || session.inputNames[0] !== "input") {
       throw new Error("The ONNX model must expose only the input tensor named input.");
     }
-    if (session.outputNames.length < 1 || session.outputNames.length > 2 || session.outputNames[0] !== "logits" || (session.outputNames.length === 2 && session.outputNames[1] !== "attention_map")) {
-      throw new Error("The ONNX model must expose logits and optionally attention_map as named outputs.");
+    if (session.outputNames.length !== (expectedAttention ? 2 : 1) || session.outputNames[0] !== "logits" || (session.outputNames.length === 2 && session.outputNames[1] !== "attention_map")) {
+      throw new Error("The ONNX output names do not match the V1/V2 bundle evidence.");
     }
     const tensor = new ort.Tensor("float32", modelInput, [1, 1, 224, 224]);
     const outputs = await session.run({ input: tensor }, session.outputNames);
+    validateOutputs(outputs, Boolean(expectedAttention));
     const logits = Array.from(outputs.logits.data as ArrayLike<number>);
     if (logits.length !== THORAXSCAN_LABELS.length || logits.some((value) => !Number.isFinite(value))) {
       throw new Error("The ONNX model did not return 14 finite logits.");
     }
 
+    let attentionParity = { maxAbsolute: 0 };
     if (session.outputNames.length === 2) {
       const attention = outputs.attention_map;
       if (!attention || attention.dims.join(",") !== "1,1,7,7" || Array.from(attention.data as ArrayLike<number>).some((value) => !Number.isFinite(value) || value < 0 || value > 1)) {
         throw new Error("The ONNX attention_map must be [1,1,7,7] with normalized finite values.");
       }
+      const repeated = await session.run({ input: tensor }, session.outputNames);
+      if (Array.from(repeated.attention_map.data as ArrayLike<number>).some((value, index) => value !== (attention.data as ArrayLike<number>)[index])) throw new Error("Attention is not deterministic.");
+      attentionParity = compare(Array.from(attention.data as ArrayLike<number>), expectedAttention ?? []);
+      if (attentionParity.maxAbsolute > MAX_ABSOLUTE_ATTENTION_ERROR) throw new Error(`Attention fixture parity failed: abs=${attentionParity.maxAbsolute}.`);
     }
     const logitError = compare(logits, expectedLogits);
     const probabilities = logits.map(sigmoid);
@@ -231,6 +253,7 @@ async function validateOnnx(
       maxAbsoluteLogitError: logitError.maxAbsolute,
       maxRelativeLogitError: logitError.maxRelative,
       maxAbsoluteProbabilityError: probabilityError.maxAbsolute,
+      maxAbsoluteAttentionError: attentionParity.maxAbsolute,
     };
   } finally {
     session.release();
@@ -241,6 +264,7 @@ async function validateBrowserProviders(
   model: Buffer,
   modelInput: Float32Array,
   expectedLogits: number[],
+  expectedAttention: number[] | null,
 ) {
   const { chromium } = await import("playwright");
   const ortDistribution = resolve("node_modules/onnxruntime-web/dist");
@@ -292,14 +316,14 @@ async function validateBrowserProviders(
     await page.addScriptTag({ content: "globalThis.__name = (target) => target;" });
     await page.addScriptTag({ path: resolve(ortDistribution, "ort.webgpu.min.js") });
     const result = await page.evaluate(
-      async ({ wasmBaseUrl, inputValues, referenceLogits }) => {
+      async ({ wasmBaseUrl, inputValues, referenceLogits, expectedAttention }) => {
         const browserWindow = window as typeof window & {
           ort: {
             env: { wasm: { wasmPaths: string; numThreads: number } };
             Tensor: new (type: "float32", data: Float32Array, dimensions: number[]) => unknown;
             InferenceSession: {
               create(model: ArrayBuffer, options: { executionProviders: string[] }): Promise<{
-                run(feeds: Record<string, unknown>): Promise<Record<string, { data: ArrayLike<number> }>>;
+                run(feeds: Record<string, unknown>): Promise<Record<string, { data: ArrayLike<number>; dims: number[]; type: string }>>;
                 release(): Promise<void>;
               }>;
             };
@@ -331,36 +355,49 @@ async function validateBrowserProviders(
               new Float32Array(inputValues),
               [1, 1, 224, 224],
             );
-            return Array.from((await session.run({ input: tensor })).logits?.data ?? []);
+            const outputs = await session.run({ input: tensor });
+            const logits = outputs.logits;
+            const attention = outputs.attention_map;
+            if (!logits || logits.type !== "float32" || logits.dims.join(",") !== "1,14" || Array.from(logits.data).some(v => !Number.isFinite(v))) throw new Error("Invalid provider logits.");
+            if (expectedAttention && (!attention || attention.type !== "float32" || attention.dims.join(",") !== "1,1,7,7" || attention.data.length !== 49 || Array.from(attention.data).some(v => !Number.isFinite(v) || v < 0 || v > 1))) throw new Error("Invalid provider attention.");
+            return { logits: Array.from(logits.data), attention: Array.from(attention?.data ?? []) };
           } finally {
             await session.release();
           }
         };
         const wasm = await run("wasm");
-        if (wasm.length !== 14 || wasm.some((value) => !Number.isFinite(value))) {
+        if (wasm.logits.length !== 14 || wasm.logits.some((value) => !Number.isFinite(value))) {
           throw new Error("Browser WASM returned invalid logits.");
         }
-        const wasmError = compareOutputs(wasm, referenceLogits);
+        const wasmError = compareOutputs(wasm.logits, referenceLogits);
         if (wasmError.maxAbsolute > 1e-4 || wasmError.maxRelative > 1e-3) {
           throw new Error("Browser WASM did not satisfy reference parity.");
         }
+        if (expectedAttention && (wasm.attention.length !== 49 || wasm.attention.some((value) => !Number.isFinite(value) || value < 0 || value > 1))) {
+          throw new Error("Browser WASM returned invalid attention.");
+        }
+        const wasmAttentionError = expectedAttention ? compareOutputs(wasm.attention, expectedAttention).maxAbsolute : 0;
+        if (wasmAttentionError > 1e-4) throw new Error("Browser WASM attention did not satisfy fixture parity.");
         if (!("gpu" in navigator)) {
-          return { webGpuEnabled: false, webGpuMaxAbsoluteDifference: null };
+          return { webGpuEnabled: false, webGpuMaxAbsoluteDifference: null, webGpuMaxAbsoluteAttentionDifference: null };
         }
         try {
           const webGpu = await run("webgpu");
-          const providerDifference = compareOutputs(webGpu, wasm).maxAbsolute;
+          const providerDifference = compareOutputs(webGpu.logits, wasm.logits).maxAbsolute;
+          const attentionDifference = expectedAttention ? compareOutputs(webGpu.attention, wasm.attention).maxAbsolute : null;
           return providerDifference <= 1e-3
-            ? { webGpuEnabled: true, webGpuMaxAbsoluteDifference: providerDifference }
-            : { webGpuEnabled: false, webGpuMaxAbsoluteDifference: null };
+            && (attentionDifference === null || attentionDifference <= 1e-3)
+            ? { webGpuEnabled: true, webGpuMaxAbsoluteDifference: providerDifference, webGpuMaxAbsoluteAttentionDifference: attentionDifference }
+            : { webGpuEnabled: false, webGpuMaxAbsoluteDifference: null, webGpuMaxAbsoluteAttentionDifference: null };
         } catch {
-          return { webGpuEnabled: false, webGpuMaxAbsoluteDifference: null };
+          return { webGpuEnabled: false, webGpuMaxAbsoluteDifference: null, webGpuMaxAbsoluteAttentionDifference: null };
         }
       },
       {
         wasmBaseUrl: baseUrl,
         inputValues: Array.from(modelInput),
         referenceLogits: expectedLogits,
+        expectedAttention,
       },
     );
     return result;
@@ -382,6 +419,7 @@ async function validateBundle(directoryOption: string): Promise<ValidatedBundle>
     modelInput: resolve(directory, "fixtures", "model-input.f32"),
     expectedLogits: resolve(directory, "fixtures", "expected-logits.json"),
     expectedProbabilities: resolve(directory, "fixtures", "expected-probabilities.json"),
+    expectedAttention: resolve(directory, "fixtures", "expected-attention.json"),
   };
 
   const directoryFiles = await readdir(directory);
@@ -399,6 +437,7 @@ async function validateBundle(directoryOption: string): Promise<ValidatedBundle>
     modelInputBuffer,
     expectedLogitsValue,
     expectedProbabilitiesValue,
+    expectedAttentionValue,
   ] = await Promise.all([
     readFile(paths.model),
     jsonFile(paths.release),
@@ -409,6 +448,7 @@ async function validateBundle(directoryOption: string): Promise<ValidatedBundle>
     readFile(paths.modelInput),
     readFile(paths.expectedLogits),
     readFile(paths.expectedProbabilities),
+    readFile(paths.expectedAttention).catch((error: NodeJS.ErrnoException) => { if (error.code === "ENOENT") return null; throw error; }),
   ]);
 
   if (model.byteLength < 1 || model.byteLength > MODEL_MAX_BYTES) {
@@ -432,7 +472,20 @@ async function validateBundle(directoryOption: string): Promise<ValidatedBundle>
     "expected-probabilities.json",
     THORAXSCAN_LABELS.length,
   );
+  const expectedAttention = expectedAttentionValue ? numberArray(jsonBuffer(expectedAttentionValue, paths.expectedAttention), "expected-attention.json", 49) : null;
 
+  if (expectedAttention?.some(value => value < 0 || value > 1)) throw new Error("Invalid attention fixture range.");
+  if (expectedAttention) {
+    const evidence = await jsonFile(resolve(directory, "export-validation.json")) as Record<string, unknown>;
+    if (evidence.onnxCheckerPassed !== true || evidence.deterministic !== true ||
+        evidence.checkpointSha256 !== release.checkpoint.sha256 ||
+        evidence.modelSha256 !== sha256(model) ||
+        evidence.attentionFixtureSha256 !== sha256(expectedAttentionValue!) ||
+        typeof evidence.maxAbsoluteLogitError !== "number" || !Number.isFinite(evidence.maxAbsoluteLogitError) || evidence.maxAbsoluteLogitError > MAX_ABSOLUTE_LOGIT_ERROR ||
+        typeof evidence.maxRelativeLogitError !== "number" || !Number.isFinite(evidence.maxRelativeLogitError) || evidence.maxRelativeLogitError > MAX_RELATIVE_LOGIT_ERROR) {
+      throw new Error("V2 requires matching successful export, checker, and deterministic fixture evidence.");
+    }
+  }
   const metadata = await sharp(preprocessingInput).metadata();
   if (metadata.format !== "png" || metadata.hasAlpha) {
     throw new Error("preprocessing-input.png must be a non-alpha PNG fixture.");
@@ -466,12 +519,12 @@ async function validateBundle(directoryOption: string): Promise<ValidatedBundle>
     throw new Error("Browser-contract preprocessing does not match expected-tensor.f32.");
   }
 
-  const parity = await validateOnnx(model, modelInput, expectedLogits, expectedProbabilities);
-  const browserProviders = await validateBrowserProviders(model, modelInput, expectedLogits);
+  const parity = await validateOnnx(model, modelInput, expectedLogits, expectedProbabilities, expectedAttention);
+  const browserProviders = await validateBrowserProviders(model, modelInput, expectedLogits, expectedAttention);
   const modelSha256 = sha256(model);
   const modelPath = modelPathForSha256(modelSha256);
   const manifest = parseModelManifest({
-    schemaVersion: 1,
+    schemaVersion: expectedAttention ? 2 : 1,
     release: {
       id: release.releaseId,
       modelFamily: release.modelFamily,
@@ -490,6 +543,7 @@ async function validateBundle(directoryOption: string): Promise<ValidatedBundle>
     },
     input: { name: "input", dtype: "float32", shape: ["batch", 1, 224, 224] },
     output: { name: "logits", dtype: "float32", shape: ["batch", 14] },
+    ...(expectedAttention ? { attention: { output: { name: "attention_map", dtype: "float32", shape: ["batch", 1, 7, 7] }, attribution: "global-self-attention", aggregation: "attention-rollout-mean-query-v1", normalization: "per-image-min-max-v1", grid: { width: 7, height: 7 } } } : {}),
     preprocessing: {
       colorSpace: "grayscale",
       colorConversion: "rec601-luma",
@@ -516,6 +570,7 @@ async function validateBundle(directoryOption: string): Promise<ValidatedBundle>
       preprocessingReferenceSha256: sha256(preprocessingReference),
       ...parity,
       ...browserProviders,
+      ...(expectedAttention ? { expectedAttentionSha256: sha256(expectedAttentionValue!), maxAbsoluteAttentionError: parity.maxAbsoluteAttentionError ?? 0, webGpuMaxAbsoluteAttentionDifference: browserProviders.webGpuMaxAbsoluteAttentionDifference } : {}),
     },
   });
   const manifestJson = canonicalJson(manifest);
@@ -653,7 +708,8 @@ async function smokeRemoteModel(manifest: ModelManifest) {
   const session = await ort.InferenceSession.create(model, { executionProviders: ["wasm"] });
   try {
     const tensor = new ort.Tensor("float32", new Float32Array(FLOAT_COUNT), [1, 1, 224, 224]);
-    const outputs = await session.run({ input: tensor }, ["logits"]);
+    const outputs = await session.run({ input: tensor }, manifest.schemaVersion === 2 ? ["logits", "attention_map"] : ["logits"]);
+    validateOutputs(outputs, manifest.schemaVersion === 2);
     const logits = Array.from(outputs.logits.data as ArrayLike<number>);
     if (logits.length !== 14 || logits.some((value) => !Number.isFinite(value))) {
       throw new Error("Remote model smoke inference returned invalid logits.");
@@ -709,7 +765,7 @@ async function smokeBrowserModel(manifest: ModelManifest) {
     await page.addScriptTag({ content: "globalThis.__name = (target) => target;" });
     await page.addScriptTag({ path: resolve(ortDistribution, "ort.min.js") });
     const result = await page.evaluate(
-      async ({ artifactUrl, wasmBaseUrl }) => {
+      async ({ artifactUrl, wasmBaseUrl, v2 }) => {
         const browserWindow = window as typeof window & {
           ort: {
             env: { wasm: { wasmPaths: string; numThreads: number } };
@@ -723,7 +779,7 @@ async function smokeBrowserModel(manifest: ModelManifest) {
                 model: ArrayBuffer,
                 options: { executionProviders: string[] },
               ): Promise<{
-                run(feeds: Record<string, unknown>): Promise<Record<string, { data: ArrayLike<number> }>>;
+                run(feeds: Record<string, unknown>): Promise<Record<string, { data: ArrayLike<number>; dims: number[]; type: string }>>;
                 release(): Promise<void>;
               }>;
             };
@@ -744,6 +800,10 @@ async function smokeBrowserModel(manifest: ModelManifest) {
             [1, 1, 224, 224],
           );
           const outputs = await session.run({ input });
+          if (v2) {
+            const attention = outputs.attention_map;
+            if (!attention || attention.type !== "float32" || attention.dims.join(",") !== "1,1,7,7" || attention.data.length !== 49 || Array.from(attention.data).some(v => !Number.isFinite(v) || v < 0 || v > 1)) throw new Error("Invalid remote browser attention.");
+          }
           const logits = Array.from(outputs.logits?.data ?? []);
           return { count: logits.length, finite: logits.every(Number.isFinite) };
         } finally {
@@ -751,6 +811,7 @@ async function smokeBrowserModel(manifest: ModelManifest) {
         }
       },
       {
+        v2: manifest.schemaVersion === 2,
         artifactUrl: publicArtifactUrl(
           process.env.MODEL_REGISTRY_SUPABASE_URL!,
           manifest.artifact.path,
@@ -901,7 +962,16 @@ async function main() {
 }
 
 main().catch((error: unknown) => {
-  const message = error instanceof Error ? error.message : String(error);
+  const message = error instanceof Error
+    ? error.message
+    : error && typeof error === "object"
+      ? [
+          "message" in error ? String(error.message) : "",
+          "code" in error ? `code=${String(error.code)}` : "",
+          "details" in error ? `details=${String(error.details)}` : "",
+          "hint" in error ? `hint=${String(error.hint)}` : "",
+        ].filter(Boolean).join("; ") || JSON.stringify(error)
+      : String(error);
   process.stderr.write(`Model release command failed: ${message}\n`);
   process.exitCode = 1;
 });

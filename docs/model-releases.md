@@ -6,8 +6,14 @@ project is production and has its own independent `thoraxscan-classifier`
 pointer. A staged release is inactive until an explicit compare-and-swap
 activation succeeds.
 
-This foundation does not expose a model administration UI or connect inference
-to a student page. It also does not save predictions.
+Learning Mode runs inference in browser memory. Activity analyses persist through authorized RPCs; Students see maps only after submission and feedback release. Approved Professors with workspace access use a separate heatmap RPC. Direct analysis table reads remain revoked.
+
+## Contract version 2
+
+- Retains the V1 `logits` output and adds `attention_map` as float32 `[batch, 1, 7, 7]`.
+- Attention is global and class-agnostic: four averaged self-attention matrices receive identity, are row-normalized, multiplied in layer order, averaged across queries, and normalized per image to `[0,1]`.
+- V2 bundles include `fixtures/expected-attention.json`; the validator checks its checksum, dimensions, range, determinism, WASM parity, and WebGPU/WASM parity.
+- V2 activity analyses persist the normalized 49-value row-major map. Learning Mode keeps maps transient. Existing V1 analyses remain heatmap-unavailable.
 
 ## Contract version 1
 
@@ -73,7 +79,7 @@ are `1e-4` absolute logit error, `1e-3` relative logit error, and `1e-4`
 absolute probability error. Validation also runs the model in Chromium WASM and
 attempts WebGPU when the validation browser exposes it. A release enables WebGPU
 only when its logits are within `1e-3` absolute difference of WASM; otherwise
-the manifest pins that release to WASM.
+the manifest pins that release to WASM. For V2, WebGPU must also meet the attention parity limit of `1e-3`; WASM attention must match the PyTorch fixture within `1e-4`. Unavailable WebGPU is recorded as disabled, never as a successful parity measurement.
 
 ## Local workflow
 
@@ -81,7 +87,7 @@ Docker Desktop or Podman must be installed and available on `PATH` for the local
 Supabase commands.
 
 ```bash
-npx supabase db reset
+npx supabase db push --local
 npx supabase test db
 npm test
 npm run test:model:browser
@@ -144,7 +150,10 @@ For a deliberate rollback:
 npm run model:rollback -- --to <previous-release-id> --expected-revision <revision> --reason "<incident reference>"
 ```
 
-Never activate a bundle with missing evidence, failed parity, an unsupported
-manifest, or an artifact over 50 MiB. The CLI cannot confirm the absent initial
-model's size, interpolation parity, hashes, or output parity until that bundle is
-supplied.
+Never activate a bundle with missing evidence, failed parity, an unsupported manifest, or an artifact over 50 MiB. Keep V1 artifacts registered for rollback. Rollback changes only the active pointer; existing immutable V1/V2 analyses and their maps remain unchanged.
+
+## V2 export and migration
+
+Follow [the exporter instructions](../model-export/README.md). V2 additionally requires `export-validation.json` with successful ONNX checker, deterministic PyTorch attention fixture checksum, official checkpoint hash, and logit parity evidence. Keep checkpoints, synthetic fixtures and generated artifacts in ignored directories.
+
+`20260922163225_attention_contract_hardening.sql` is the additive repair for both empty and partially applied earlier attention migrations. It requires valid maps for V2, rejects maps for V1, preserves the six-argument completion wrapper, and removes the obsolete renamed implementation. Run all pgTAP tests and database advisors before promotion. Production migration and activation are separate operator actions; local verification never authorizes production automatically.

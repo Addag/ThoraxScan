@@ -41,11 +41,11 @@ One line per important noun. live cards are source-backed; ghost entries are doc
 |---|---|---|---|
 | Model release / ONNX artifact | live | [model-release.md](inference/model-release.md) | Immutable registry row and content-addressed Storage objects |
 | Active model slot | live | [active-model-slot.md](inference/active-model-slot.md) | One seeded pointer and append-only activation history per Supabase instance |
-| Model manifest, labels, and thresholds | live | [model-manifest-configuration.md](inference/model-manifest-configuration.md) | ModelManifestV1 parser and publisher-generated manifest |
+| Model manifest, labels, and thresholds | live | [model-manifest-configuration.md](inference/model-manifest-configuration.md) | V1/V2 manifest parser and publisher-generated manifest |
 | Browser inference runtime | live | [browser-inference-runtime.md](inference/browser-inference-runtime.md) | Active resolver, verified session cache, provider fallback, and analyzeImage library |
 | Image input and preprocessing tensor | live | [preprocessing-tensor.md](inference/preprocessing-tensor.md) | Browser decode and pure version 1 preprocessing transform |
 | Transient prediction result | live | [prediction-result.md](inference/prediction-result.md) | In-memory `InferenceResult`, adapted into immutable activity analysis payloads |
-| Attention heatmap | ghost | stub | [technical design](../TECHNICAL_DESIGN_DOCUMENT.md#L250) |
+| Attention heatmap | live | V2 global attention output, persisted for released activity analyses and transient in Learning Mode | [runtime](../../src/components/attention-heatmap.tsx), [migration](../../supabase/migrations/20260922163225_attention_contract_hardening.sql) |
 | Local Learning Mode image | live | [local-learning-mode-image.md](learning/local-learning-mode-image.md) | Student Learning Mode analyzer and transient browser state |
 
 ## UI
