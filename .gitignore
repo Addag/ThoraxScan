@@ -53,3 +53,5 @@ model-export/__pycache__/
 model-export/*.onnx
 model-export/*.pth
 .local-supabase-env.txt
+
+.agents\skills
