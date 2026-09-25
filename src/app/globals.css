@@ -1696,6 +1696,41 @@ textarea:focus-visible {
   padding: 0 14px;
 }
 
+.auth-password-control {
+  position: relative;
+}
+
+.auth-password-control input {
+  padding-right: 54px;
+}
+
+.auth-password-toggle {
+  position: absolute;
+  top: 50%;
+  right: 8px;
+  display: inline-flex;
+  width: 40px;
+  height: 40px;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transform: translateY(-50%);
+}
+
+.auth-password-toggle:hover {
+  background: rgb(153 191 240 / 12%);
+  color: var(--text-primary);
+}
+
+.auth-password-toggle svg {
+  width: 21px;
+  height: 21px;
+}
+
 .auth-field-group input[aria-invalid="true"] {
   border-color: #ff6b6b;
 }

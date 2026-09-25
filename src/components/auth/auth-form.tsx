@@ -40,12 +40,13 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
     initialAuthState,
   );
   const showEmail = mode !== "reset";
-  const showPassword = mode !== "forgot";
+  const showPasswordField = mode !== "forgot";
   const showConfirmation = mode === "register" || mode === "reset";
   const requiresCaptcha = mode !== "reset";
   const turnstileRef = useRef<TurnstileInstance | null>(null);
   const [captchaToken, setCaptchaToken] = useState("");
   const [captchaError, setCaptchaError] = useState("");
+  const [passwordVisible, setPasswordVisible] = useState(false);
 
   useEffect(() => {
     if (!requiresCaptcha || state.status === "idle") return;
@@ -122,22 +123,57 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
         </div>
       )}
 
-      {showPassword && (
+      {showPasswordField && (
         <div className="auth-field-group">
           <label htmlFor={`${mode}-password`}>
             {mode === "reset" ? "New password" : "Password"}
           </label>
-          <input
-            id={`${mode}-password`}
-            name="password"
-            type="password"
-            autoComplete={mode === "login" ? "current-password" : "new-password"}
-            minLength={mode === "login" ? undefined : 8}
-            aria-invalid={Boolean(state.fieldErrors?.password)}
-            aria-describedby={
-              state.fieldErrors?.password ? `${mode}-password-error` : undefined
-            }
-          />
+          <div className="auth-password-control">
+            <input
+              id={`${mode}-password`}
+              name="password"
+              type={mode === "login" && passwordVisible ? "text" : "password"}
+              autoComplete={mode === "login" ? "current-password" : "new-password"}
+              minLength={mode === "login" ? undefined : 8}
+              aria-invalid={Boolean(state.fieldErrors?.password)}
+              aria-describedby={
+                state.fieldErrors?.password ? `${mode}-password-error` : undefined
+              }
+            />
+            {mode === "login" && (
+              <button
+                className="auth-password-toggle"
+                type="button"
+                aria-label={passwordVisible ? "Hide password" : "Show password"}
+                aria-pressed={passwordVisible}
+                onClick={() => setPasswordVisible((visible) => !visible)}
+              >
+                <svg
+                  aria-hidden="true"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  {passwordVisible ? (
+                    <>
+                      <path d="M3 3l18 18" />
+                      <path d="M10.6 10.6a2 2 0 0 0 2.8 2.8" />
+                      <path d="M9.9 4.2A10.8 10.8 0 0 1 12 4c5 0 8.7 4 10 8a12.8 12.8 0 0 1-3.1 5.1" />
+                      <path d="M6.6 6.6C4.3 8.1 2.8 10.4 2 12c1.3 4 5 8 10 8a10.8 10.8 0 0 0 2.1-.2" />
+                    </>
+                  ) : (
+                    <>
+                      <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z" />
+                      <circle cx="12" cy="12" r="3" />
+                    </>
+                  )}
+                </svg>
+              </button>
+            )}
+          </div>
           {state.fieldErrors?.password && (
             <p
               className="field-error"
