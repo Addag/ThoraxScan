@@ -1,0 +1,8 @@
+{
+  "enabledPlugins": {
+    "andrej-karpathy-skills@karpathy-skills": true,
+    "ponytail@ponytail": true,
+    "agent-skills@addy-agent-skills": true,
+    "mattpocock-skills@claude-plugins-official": true
+  }
+}

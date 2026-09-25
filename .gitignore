@@ -54,4 +54,7 @@ model-export/*.onnx
 model-export/*.pth
 .local-supabase-env.txt
 
-.agents\skills
+# npx skills installs (symlinks use absolute local paths)
+.agents/skills/
+.claude/skills/*
+!.claude/skills/icm-architect-main/
