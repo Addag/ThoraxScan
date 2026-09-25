@@ -1807,6 +1807,10 @@ textarea:focus-visible {
   margin: 0 0 22px;
 }
 
+.role-selector--register {
+  margin: 0 0 22px;
+}
+
 .role-selector--login .role-option__card {
   height: 128px;
 }
