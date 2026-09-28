@@ -1,6 +1,6 @@
 # Built-in CheXpert library
 
-24 unmodified JPEG images copied from the supplied CheXpert-v1.0-small `valid` directory. `cases.json` retains the original CSV paths, all 14 label values, projection, and SHA-256 hashes. Patient age and sex are not shown or copied into the manifest.
+All 234 unmodified JPEG images from the supplied CheXpert-v1.0-small `valid` directory: 202 frontal and 32 lateral. `cases.json` retains the original CSV paths, all 14 label values, view, projection, and SHA-256 hashes. Patient age and sex are not shown or copied into the manifest.
 
 Rebuild from the original dataset with PowerShell:
 
@@ -8,7 +8,7 @@ Rebuild from the original dataset with PowerShell:
 ./scripts/import-chexpert-library.ps1 -DatasetRoot 'C:/Users/MSI/Downloads/cheXpert-v1.0-small'
 ```
 
-Selection iterates the CSV labels in order, chooses up to two previously unused patients with a positive label, and sorts candidates by positive-label count then source path. All images are frontal. Lung Lesion and Pleural Other have only one positive frontal example each; Fracture has none. This is deterministic metadata curation, not clinical review or a balanced evaluation set. Do not use this educational subset to report model performance.
+The importer recursively includes every `.jpg` and `.jpeg` file in `valid` and requires matching CSV metadata. Existing case numbers are preserved; additional images are appended in source-path order. Multiple views from the same patient are included. The gallery supports view and positive-label filters. This is a dataset import, not clinical review. Frontal images remain recommended for the existing AI practice workflow; including lateral images does not establish model support for that view.
 
 Learning Mode loads the selected JPEG into a browser File and uses the existing analysis flow. Professor activities use the same File with the existing signed upload, verification, authorization, and publication flow. No database migration is required. Reference labels are not automatically written into the professor's private evaluation. Cases are shared learning material, so they are not suitable as unseen assessment images.
 

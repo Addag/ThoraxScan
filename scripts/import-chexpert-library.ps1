@@ -3,32 +3,39 @@ $ErrorActionPreference = 'Stop'
 $appRoot = Split-Path $PSScriptRoot -Parent
 $rows = @(Import-Csv (Join-Path $DatasetRoot 'valid.csv'))
 $labels = @($rows[0].PSObject.Properties.Name | Select-Object -Skip 5)
-$frontal = @($rows | Where-Object { $_.'Frontal/Lateral' -eq 'Frontal' })
-$selected = [System.Collections.Generic.List[object]]::new()
-$patients = [System.Collections.Generic.HashSet[string]]::new()
-# Two distinct patients per available label, prioritizing fewer co-occurring labels.
-# This is metadata curation, not clinical review or a representative evaluation set.
-foreach ($label in $labels) {
-  $candidates = @($frontal | Where-Object { $_.$label -eq '1.0' } | Sort-Object @{ Expression = { $row = $_; @($labels | Where-Object { $row.$_ -eq '1.0' }).Count } }, Path)
-  $count = 0
-  foreach ($row in $candidates) {
-    $patient = ($row.Path -split '/')[2]
-    if (-not $patients.Add($patient)) { continue }
-    $selected.Add([pscustomobject]@{ Row = $row; Focus = $label })
-    $count++
-    if ($count -eq 2) { break }
-  }
-}
 $imageDir = Join-Path $appRoot 'public/images/chexpert'
 $dataDir = Join-Path $appRoot 'src/lib/xray-library'
+$manifestPath = Join-Path $dataDir 'cases.json'
+$validRoot = (Resolve-Path (Join-Path $DatasetRoot 'valid')).Path
+$files = @(Get-ChildItem -LiteralPath $validRoot -Recurse -File | Where-Object { $_.Extension -in '.jpg', '.jpeg' })
+$byPath = @{}
+foreach ($row in $rows) { $byPath[($row.Path -replace '^[^/]+/', '')] = $row }
+$sourceFiles = @{}
+foreach ($file in $files) {
+  $relative = 'valid/' + [System.IO.Path]::GetRelativePath($validRoot, $file.FullName).Replace('\', '/')
+  if (-not $byPath.ContainsKey($relative)) { throw "No CSV metadata for $relative" }
+  $sourceFiles[$relative] = $file.FullName
+}
+# Keep existing case numbers stable, then append every remaining JPEG.
+$orderedPaths = [System.Collections.Generic.List[string]]::new()
+$seen = [System.Collections.Generic.HashSet[string]]::new()
+if (Test-Path -LiteralPath $manifestPath) {
+  foreach ($entry in (Get-Content -LiteralPath $manifestPath -Raw | ConvertFrom-Json)) {
+    $relative = $entry.sourcePath -replace '^[^/]+/', ''
+    if (-not $sourceFiles.ContainsKey($relative)) { throw "Existing case missing: $relative" }
+    if ($seen.Add($relative)) { $orderedPaths.Add($relative) }
+  }
+}
+foreach ($relative in ($sourceFiles.Keys | Sort-Object)) {
+  if ($seen.Add($relative)) { $orderedPaths.Add($relative) }
+}
 New-Item -ItemType Directory -Force $imageDir, $dataDir | Out-Null
 $index = 0
-$entries = @(foreach ($selection in $selected) {
+$entries = @(foreach ($relative in $orderedPaths) {
   $index++
-  $row = $selection.Row
+  $row = $byPath[$relative]
   $id = 'cxp-{0:d3}' -f $index
-  $relative = $row.Path -replace '^[^/]+/', ''
-  $source = Join-Path $DatasetRoot $relative
+  $source = $sourceFiles[$relative]
   Copy-Item -LiteralPath $source -Destination (Join-Path $imageDir "$id.jpg")
   $values = [ordered]@{}
   foreach ($label in $labels) {
@@ -37,7 +44,7 @@ $entries = @(foreach ($selection in $selected) {
   [pscustomobject]@{
     id = $id
     title = 'Case {0:d2}' -f $index
-    focus = $selection.Focus
+    view = $row.'Frontal/Lateral'
     projection = $row.'AP/PA'
     imageUrl = "/images/chexpert/$id.jpg"
     sourcePath = $row.Path
@@ -46,4 +53,4 @@ $entries = @(foreach ($selection in $selected) {
   }
 })
 ConvertTo-Json -InputObject $entries -Depth 5 | Set-Content -Encoding utf8 (Join-Path $dataDir 'cases.json')
-Write-Output "Imported $($entries.Count) frontal images from valid.csv."
+Write-Output "Imported all $($entries.Count) JPEG images from valid with CSV metadata."

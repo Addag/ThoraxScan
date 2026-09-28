@@ -207,7 +207,7 @@ export function CaseUploadForm({ activityId }: { activityId: string }) {
       }} />
       <label className="activity-file-drop">
         <span aria-hidden="true">＋</span>
-        <strong>{file ? file.name : "Choose a frontal chest X-ray"}</strong>
+        <strong>{file ? file.name : "Choose a chest X-ray"}</strong>
         <small>JPEG or PNG · maximum 6 MB · private storage</small>
         <input
           ref={fileInputRef}
@@ -224,7 +224,7 @@ export function CaseUploadForm({ activityId }: { activityId: string }) {
       <FieldError>{prepareState.fieldErrors?.file}</FieldError>
       <label className="activity-attestation">
         <input type="checkbox" name="attestation" required />
-        <span>I attest this is a de-identified frontal-view image approved for this class activity.</span>
+        <span>I attest this is a de-identified image approved for this class activity.</span>
       </label>
       <FieldError>{prepareState.fieldErrors?.attestation}</FieldError>
       <button className="activity-secondary-button" type="submit" disabled={!file || busy}>

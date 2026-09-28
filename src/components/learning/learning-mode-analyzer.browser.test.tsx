@@ -38,10 +38,20 @@ test("built-in case loads real JPEG bytes and can be analyzed and reset", async 
 
 test("library filters by a positive dataset label", async () => {
   await render(<LearningModeAnalyzer />);
+  await page.getByLabelText("Filter by view").selectOptions("Frontal");
   await page.getByLabelText("Filter by dataset label").selectOptions("Lung Lesion");
   expect(document.querySelectorAll(".xray-library-case").length).toBe(1);
   await page.getByText("Dataset reference labels", { exact: true }).click();
   expect(document.querySelector(".xray-library-case details p")?.textContent).toContain("Lung Lesion");
+});
+
+test("library includes lateral cases with accurate view labels", async () => {
+  await render(<LearningModeAnalyzer />);
+  await page.getByLabelText("Filter by view").selectOptions("Lateral");
+  expect(document.querySelectorAll(".xray-library-case").length).toBe(32);
+  for (const card of document.querySelectorAll(".xray-library-case")) {
+    expect(card.querySelector("img")?.getAttribute("alt")).toContain("Lateral");
+  }
 });
 
 test("valid selection previews locally and enables analysis only after selection", async () => {

@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
 import cases from "@/lib/xray-library/cases.json";
 
 const findings = [...new Set(cases.flatMap((item) => Object.entries(item.labels).filter(([, value]) => value === 1).map(([label]) => label)))];
@@ -11,10 +10,11 @@ export function XrayLibrary({ onSelect, disabled = false }: {
   disabled?: boolean;
 }) {
   const [filter, setFilter] = useState("");
+  const [view, setView] = useState("");
   const [loading, setLoading] = useState<string | null>(null);
   const [selected, setSelected] = useState<string | null>(null);
   const [error, setError] = useState("");
-  const visible = cases.filter((item) => !filter || Object.entries(item.labels).some(([label, value]) => label === filter && value === 1));
+  const visible = cases.filter((item) => (!view || item.view === view) && (!filter || Object.entries(item.labels).some(([label, value]) => label === filter && value === 1)));
 
   async function select(item: typeof cases[number]) {
     setLoading(item.id);
@@ -35,7 +35,14 @@ export function XrayLibrary({ onSelect, disabled = false }: {
 
   return <section className="xray-library" aria-label="Built-in X-ray library">
     <h3>Built-in X-ray library</h3>
-    <p>Frontal images selected from CheXpert Small’s validation set. Choose a case to use it.</p>
+    <p>All JPEG images from CheXpert Small’s validation folder, including frontal and lateral views. Choose a case to use it. Use frontal views for the existing AI practice workflow.</p>
+    <label className="xray-library-filter">Filter by view
+      <select value={view} onChange={(event) => setView(event.target.value)}>
+        <option value="">All views</option>
+        <option value="Frontal">Frontal</option>
+        <option value="Lateral">Lateral</option>
+      </select>
+    </label>
     <label className="xray-library-filter">Filter by dataset label
       <select value={filter} onChange={(event) => setFilter(event.target.value)}>
         <option value="">All findings</option>
@@ -45,8 +52,10 @@ export function XrayLibrary({ onSelect, disabled = false }: {
     <p className="xray-library-count">{visible.length} of {cases.length} cases</p>
     <div className="xray-library-grid">
       {visible.map((item) => <article className="xray-library-case" key={item.id}>
-        <Image src={item.imageUrl} alt={`${item.title}, frontal ${item.projection} chest X-ray`} width={320} height={320} unoptimized />
-        <div><strong>{item.title}</strong><span>Frontal · {item.projection}</span></div>
+        {/* Serve the original small dataset JPEG without image transformation. */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={item.imageUrl} alt={`${item.title}, ${item.view}${item.projection ? ` ${item.projection}` : ""} chest X-ray`} width={320} height={320} loading="lazy" />
+        <div><strong>{item.title}</strong><span>{item.view}{item.projection ? ` · ${item.projection}` : ""}</span></div>
         <details><summary>Dataset reference labels</summary>
           <p>{Object.entries(item.labels).filter(([, value]) => value === 1).map(([label]) => label).join(", ") || "No positive labels recorded"}</p>
         </details>
@@ -57,6 +66,6 @@ export function XrayLibrary({ onSelect, disabled = false }: {
     </div>
     <p role="status">{loading ? "Loading library image…" : selected ? `${cases.find((item) => item.id === selected)?.title} loaded.` : ""}</p>
     {error ? <p role="alert">{error}</p> : null}
-    <p className="xray-library-source">Source: <a href="https://stanfordmlgroup.github.io/competitions/chexpert/" target="_blank" rel="noreferrer">CheXpert · Stanford</a>. Labels are dataset references, not model predictions. Selection is based on labels, not clinical review. No fracture-positive frontal image is present in the supplied validation CSV.</p>
+    <p className="xray-library-source">Source: <a href="https://stanfordmlgroup.github.io/competitions/chexpert/" target="_blank" rel="noreferrer">CheXpert · Stanford</a>. Labels and views come from the dataset, not model predictions or clinical review.</p>
   </section>;
 }
