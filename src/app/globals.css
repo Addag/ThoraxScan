@@ -48,6 +48,7 @@ body {
   margin: 0;
   background: var(--canvas);
   color: var(--text-primary);
+  cursor: default;
   font-family: var(--font-funnel), Arial, sans-serif;
 }
 
