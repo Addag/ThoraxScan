@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { InferenceError, type InferenceErrorCode } from "@/lib/inference/errors";
 import type { InferenceResult } from "@/lib/inference/runtime";
 import { AttentionHeatmap } from "@/components/attention-heatmap";
+import { XrayLibrary } from "./xray-library";
 
 const MAX_BYTES = 6 * 1024 * 1024;
 type AnalyzerState = "idle" | "selected" | "running" | "success" | "error";
@@ -116,11 +117,11 @@ export function LearningModeAnalyzer() {
     </div> : <section className="learning-empty" aria-labelledby="learning-empty-title">
       <div className="learning-scan-icon"><img src="/images/learning/scan.svg" alt="" width="36" height="36" /></div>
       <h2 id="learning-empty-title">{state === "running" ? "Analyzing your X-ray" : "Select an X-ray to begin"}</h2>
-      <p>{state === "running" ? "Resolving the active release, verifying the model, and analyzing in your browser. You can reset at any time." : "Choose a local JPEG or PNG image, review the preview, then select Analyze to explore the model’s findings."}</p>
+      <p>{state === "running" ? "Resolving the active release, verifying the model, and analyzing in your browser. You can reset at any time." : "Choose a built-in case or a local JPEG or PNG image, review the preview, then select Analyze to explore the model’s findings."}</p>
     </section>}
     <section className="learning-gallery" aria-labelledby="learning-gallery-title">
       <h2 id="learning-gallery-title"><img src="/images/learning/book.svg" alt="" width="28" height="28" /> Sample Gallery</h2>
-      <p>Sample images are not available yet. Use a local image to practice.</p>
+      <XrayLibrary onSelect={(next) => { if (inputRef.current) inputRef.current.value = ""; choose(next); }} />
     </section>
     </div>
   </section>;

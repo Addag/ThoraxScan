@@ -18,6 +18,7 @@ import {
 } from "@/lib/activities/types";
 import { createClient } from "@/lib/supabase/client";
 import type { ProfessorWorkspace } from "@/lib/workspaces/types";
+import { XrayLibrary } from "@/components/learning/xray-library";
 
 function FieldError({ children }: { children?: string }) {
   return children ? <small className="activity-field-error">{children}</small> : null;
@@ -137,12 +138,13 @@ export function CaseUploadForm({ activityId }: { activityId: string }) {
     prepareCaseUploadAction,
     initialCaseUploadFormState,
   );
-  const [confirmState, confirmAction] = useActionState(
+  const [confirmState, confirmAction, confirming] = useActionState(
     confirmCaseUploadAction,
     initialCaseUploadFormState,
   );
   const [, startConfirmation] = useTransition();
   const processedCaseId = useRef<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (
@@ -191,24 +193,32 @@ export function CaseUploadForm({ activityId }: { activityId: string }) {
   }, [confirmAction, file, prepareState, startConfirmation]);
 
   const visibleState = confirmState.status !== "idle" ? confirmState : prepareState;
+  const busy = preparing || uploading || confirming;
 
   return (
     <form className="activity-upload-form" action={prepareAction}>
       <input type="hidden" name="activityId" value={activityId} />
       <input type="hidden" name="mimeType" value={file?.type ?? ""} />
       <input type="hidden" name="byteSize" value={file?.size ?? ""} />
+      <XrayLibrary disabled={busy} onSelect={(next) => {
+        if (fileInputRef.current) fileInputRef.current.value = "";
+        setFile(next);
+        setClientError("");
+      }} />
       <label className="activity-file-drop">
         <span aria-hidden="true">＋</span>
         <strong>{file ? file.name : "Choose a frontal chest X-ray"}</strong>
         <small>JPEG or PNG · maximum 6 MB · private storage</small>
         <input
+          ref={fileInputRef}
           type="file"
           accept="image/jpeg,image/png"
+          disabled={busy}
           onChange={(event) => {
             setFile(event.target.files?.[0] ?? null);
             setClientError("");
           }}
-          required
+          required={!file}
         />
       </label>
       <FieldError>{prepareState.fieldErrors?.file}</FieldError>
@@ -217,8 +227,8 @@ export function CaseUploadForm({ activityId }: { activityId: string }) {
         <span>I attest this is a de-identified frontal-view image approved for this class activity.</span>
       </label>
       <FieldError>{prepareState.fieldErrors?.attestation}</FieldError>
-      <button className="activity-secondary-button" type="submit" disabled={!file || preparing || uploading}>
-        {preparing ? "Authorizing…" : uploading ? "Uploading directly…" : "Upload and verify case"}
+      <button className="activity-secondary-button" type="submit" disabled={!file || busy}>
+        {preparing ? "Authorizing…" : uploading ? "Uploading directly…" : confirming ? "Verifying…" : "Upload and verify case"}
       </button>
       {clientError ? <p className="activity-form-message activity-form-message--error" role="alert">{clientError}</p> : null}
       {visibleState.message ? <p className={`activity-form-message activity-form-message--${visibleState.status}`} role="status">{visibleState.message}</p> : null}

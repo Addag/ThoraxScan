@@ -22,6 +22,28 @@ async function select(file = new File([new Uint8Array([1])], "practice.png", { t
 async function start() { await select(); await page.getByRole("button", { name: "Analyze", exact: true }).click(); }
 beforeEach(() => { mocks.analyze.mockReset(); mocks.analyze.mockResolvedValue(prediction()); });
 
+test("built-in case loads real JPEG bytes and can be analyzed and reset", async () => {
+  await render(<LearningModeAnalyzer />);
+  await page.getByRole("button", { name: "Use case 01", exact: true }).click();
+  await expect.element(page.getByAltText("Selected chest X-ray preview")).toHaveAttribute("src", expect.stringMatching(/^blob:/));
+  await page.getByRole("button", { name: "Analyze", exact: true }).click();
+  await expect.poll(() => mocks.analyze.mock.calls.length).toBe(1);
+  const file = mocks.analyze.mock.calls[0][0] as File;
+  expect(file.name).toBe("cxp-001.jpg");
+  expect(file.type).toBe("image/jpeg");
+  expect(Array.from(new Uint8Array(await file.arrayBuffer()).slice(0, 2))).toEqual([255, 216]);
+  await page.getByRole("button", { name: "Reset", exact: true }).click();
+  await expect.element(page.getByRole("button", { name: "Analyze", exact: true })).toBeDisabled();
+});
+
+test("library filters by a positive dataset label", async () => {
+  await render(<LearningModeAnalyzer />);
+  await page.getByLabelText("Filter by dataset label").selectOptions("Lung Lesion");
+  expect(document.querySelectorAll(".xray-library-case").length).toBe(1);
+  await page.getByText("Dataset reference labels", { exact: true }).click();
+  expect(document.querySelector(".xray-library-case details p")?.textContent).toContain("Lung Lesion");
+});
+
 test("valid selection previews locally and enables analysis only after selection", async () => {
   await render(<LearningModeAnalyzer />);
   await expect.element(page.getByRole("button", { name: "Analyze", exact: true })).toBeDisabled();

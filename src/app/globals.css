@@ -4563,6 +4563,23 @@ textarea:focus-visible {
 .learning-empty p, .learning-gallery p { color: var(--text-muted); font-size: 14px; line-height: 1.6; margin: 0; }
 .learning-gallery { padding: 28px; margin-top: 28px; min-height: 220px; }
 .learning-gallery h2 { display: flex; gap: 18px; align-items: center; margin: 0 0 24px; font-size: 20px; font-weight: 700; }
+
+.xray-library { min-width: 0; display: grid; gap: 14px; }
+.xray-library h3 { margin: 0; font-size: 18px; }
+.xray-library p { margin: 0; color: var(--text-muted); font-size: 13px; line-height: 1.6; }
+.xray-library-filter { display: grid; gap: 8px; font-size: 13px; }
+.xray-library-filter select { width: 100%; min-width: 0; border: 1px solid #344158; border-radius: 8px; padding: 10px; background: var(--surface-field); color: inherit; }
+.xray-library-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 180px), 1fr)); gap: 12px; max-height: 560px; overflow-y: auto; padding: 2px; }
+.xray-library-case { display: flex; flex-direction: column; gap: 10px; padding: 12px; border: 1px solid #344158; border-radius: 8px; min-width: 0; }
+.xray-library-case > img { width: 100%; height: 160px; object-fit: contain; background: #080b10; border-radius: 5px; }
+.xray-library-case > div { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px; font-size: 13px; }
+.xray-library-case > div span { color: var(--text-muted); }
+.xray-library-case details { font-size: 12px; }
+.xray-library-case summary { cursor: pointer; }
+.xray-library-case button { margin-top: auto; border: 1px solid #477daa; border-radius: 6px; padding: 9px; color: inherit; background: #20354b; cursor: pointer; }
+.xray-library-case button:disabled { opacity: .5; cursor: wait; }
+.xray-library-case button:focus-visible, .xray-library-filter select:focus-visible { outline: 2px solid #80caff; outline-offset: 2px; }
+.xray-library-source a { color: inherit; text-decoration: underline; }
 .learning-result { padding: 24px; }
 .learning-result h2 { margin: 0 0 20px; font-size: 24px; font-weight: 800; }
 .learning-findings h3 { margin: 0 0 12px; }
