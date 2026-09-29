@@ -8,7 +8,7 @@ Rebuild from the original dataset with PowerShell:
 ./scripts/import-chexpert-library.ps1 -DatasetRoot 'C:/Users/MSI/Downloads/cheXpert-v1.0-small'
 ```
 
-The importer recursively includes every `.jpg` and `.jpeg` file in `valid` and requires matching CSV metadata. Existing case numbers are preserved; additional images are appended in source-path order. Multiple views from the same patient are included. The gallery supports view and positive-label filters. This is a dataset import, not clinical review. Frontal images remain recommended for the existing AI practice workflow; including lateral images does not establish model support for that view.
+The importer recursively includes every `.jpg` and `.jpeg` file in `valid` and requires matching CSV metadata. Gallery cases follow the row order in `valid.csv`, with case numbers assigned sequentially from that order. Multiple views from the same patient are included. The gallery supports view and positive-label filters. This is a dataset import, not clinical review. Frontal images remain recommended for the existing AI practice workflow; including lateral images does not establish model support for that view.
 
 Learning Mode loads the selected JPEG into a browser File and uses the existing analysis flow. Professor activities use the same File with the existing signed upload, verification, authorization, and publication flow. No database migration is required. Reference labels are not automatically written into the professor's private evaluation. Cases are shared learning material, so they are not suitable as unseen assessment images.
 

@@ -5,7 +5,6 @@ $rows = @(Import-Csv (Join-Path $DatasetRoot 'valid.csv'))
 $labels = @($rows[0].PSObject.Properties.Name | Select-Object -Skip 5)
 $imageDir = Join-Path $appRoot 'public/images/chexpert'
 $dataDir = Join-Path $appRoot 'src/lib/xray-library'
-$manifestPath = Join-Path $dataDir 'cases.json'
 $validRoot = (Resolve-Path (Join-Path $DatasetRoot 'valid')).Path
 $files = @(Get-ChildItem -LiteralPath $validRoot -Recurse -File | Where-Object { $_.Extension -in '.jpg', '.jpeg' })
 $byPath = @{}
@@ -16,17 +15,13 @@ foreach ($file in $files) {
   if (-not $byPath.ContainsKey($relative)) { throw "No CSV metadata for $relative" }
   $sourceFiles[$relative] = $file.FullName
 }
-# Keep existing case numbers stable, then append every remaining JPEG.
+# Preserve the row order from valid.csv. This is the dataset's canonical
+# presentation order and keeps gallery case numbers aligned with CSV rows.
 $orderedPaths = [System.Collections.Generic.List[string]]::new()
 $seen = [System.Collections.Generic.HashSet[string]]::new()
-if (Test-Path -LiteralPath $manifestPath) {
-  foreach ($entry in (Get-Content -LiteralPath $manifestPath -Raw | ConvertFrom-Json)) {
-    $relative = $entry.sourcePath -replace '^[^/]+/', ''
-    if (-not $sourceFiles.ContainsKey($relative)) { throw "Existing case missing: $relative" }
-    if ($seen.Add($relative)) { $orderedPaths.Add($relative) }
-  }
-}
-foreach ($relative in ($sourceFiles.Keys | Sort-Object)) {
+foreach ($row in $rows) {
+  $relative = $row.Path -replace '^[^/]+/', ''
+  if (-not $sourceFiles.ContainsKey($relative)) { throw "CSV image missing: $relative" }
   if ($seen.Add($relative)) { $orderedPaths.Add($relative) }
 }
 New-Item -ItemType Directory -Force $imageDir, $dataDir | Out-Null
