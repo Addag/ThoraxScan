@@ -2,8 +2,8 @@
 node_type: object
 universe: live
 status: verified
-audited: 2026-08-24
-snapshot: main @ 46c18c1 + working tree
+audited: 2026-09-29
+snapshot: main @ 6af6c16
 ---
 
 # Model release
@@ -16,7 +16,7 @@ Registration separates validated candidates from activation so publishing cannot
 
 ## Shape
 
-The row fixes one classifier slot, contract version 1, release/model/bundle identifiers, sizes and paths, manifest, passing validation summary, actor, and timestamp. Update and delete triggers make registered rows immutable. The public `model-artifacts` bucket holds the content-addressed objects.
+The row fixes one classifier slot, contract version 1 or 2, release/model/bundle identifiers, sizes and paths, manifest, passing validation summary, actor, and timestamp. V2 bundles include the validated attention output descriptor and parity evidence. Update and delete triggers make registered rows immutable. The public `model-artifacts` bucket holds the content-addressed objects.
 
 ## Connected to
 
@@ -30,7 +30,7 @@ May be selected by [Active model slot](active-model-slot.md); its manifest is [M
 
 ### Does not hit
 
-- Student AI analysis, saved analysis records, heatmaps, or feedback release.
+- Student AI analysis, saved analysis records, or feedback release. V2 heatmap output is validated at release time and persisted by the separate activity-analysis contract.
 
 ## Surfaces
 
@@ -38,4 +38,4 @@ Written only by service-role publisher operations; candidate rows are not readab
 
 ## See
 
-[Registry migration](../../../supabase/migrations/20260824081329_replaceable_model_foundation.sql#L1)
+[Registry migration](<../../../supabase/migrations/20260824081329_replaceable_model_foundation.sql:1>) and [V2 contract migration](<../../../supabase/migrations/20260922163225_attention_contract_hardening.sql:1>)

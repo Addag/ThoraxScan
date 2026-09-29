@@ -2,13 +2,13 @@
 node_type: object
 universe: live
 status: verified
-audited: 2026-08-24
-snapshot: main @ 46c18c1 + working tree
+audited: 2026-09-29
+snapshot: main @ 6af6c16
 ---
 
 # Transient prediction result
 
-`InferenceResult` is an in-memory prediction with label decisions and enough release provenance to identify the model that produced it. Activity analysis adapts it to a fixed probability vector before the database independently derives thresholded findings.
+`InferenceResult` is an in-memory prediction with label decisions, release provenance, and an optional validated V2 attention map. Activity analysis adapts its fixed probability vector and optional map before the database independently derives thresholded findings.
 
 ## Why this shape
 
@@ -16,7 +16,7 @@ An analysis remains attributable even if the environment's active pointer change
 
 ## Shape
 
-It contains all label probabilities and thresholds, selected findings or explicit no-match state, release and model identifiers/hashes, preprocessing and threshold versions, provider, manifest version, and application build.
+It contains all label probabilities and thresholds, selected findings or explicit no-match state, release and model identifiers/hashes, preprocessing and threshold versions, provider, manifest version, application build, and either a transient 7 x 7 attention map or an unavailable status.
 
 ## Connected to
 

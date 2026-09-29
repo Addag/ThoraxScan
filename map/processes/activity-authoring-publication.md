@@ -2,8 +2,8 @@
 node_type: process
 universe: live
 status: verified
-audited: 2026-08-20
-snapshot: main @ ed26b07 + working tree
+audited: 2026-09-29
+snapshot: main @ 6af6c16
 ---
 
 # Activity authoring and publication

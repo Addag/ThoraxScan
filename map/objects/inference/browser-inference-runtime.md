@@ -2,13 +2,13 @@
 node_type: object
 universe: live
 status: verified
-audited: 2026-08-24
-snapshot: main @ 46c18c1 + working tree
+audited: 2026-09-29
+snapshot: main @ 6af6c16
 ---
 
 # Browser inference runtime
 
-The inference library resolves the active release for each run, verifies model bytes, dynamically loads ONNX Runtime Web, and pins the selected release through that run.
+The inference library resolves the active release for each run, verifies model bytes, dynamically loads ONNX Runtime Web, and pins the selected release through that run. Validated V2 releases also return a normalized 7 x 7 global attention map; V1 returns an unavailable attention status.
 
 ## Why this shape
 
@@ -30,7 +30,7 @@ Consumes [Active model slot](active-model-slot.md), [Model manifest and configur
 
 ### Does not hit
 
-- Server-side image inference, saved analysis mutation, submissions, or heatmaps; only result metadata crosses the application write boundary.
+- Server-side image inference, direct analysis-table mutation, or submissions; the browser result, including an optional V2 attention map, crosses the application write boundary only through the activity analysis adapter.
 
 ## Surfaces
 

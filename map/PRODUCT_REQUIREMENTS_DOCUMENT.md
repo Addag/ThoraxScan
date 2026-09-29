@@ -107,7 +107,7 @@ Priority levels:
 | FR-010 | The system shall release AI-assisted learning feedback only after a student submits an activity response. | P0 | Completed with submission trigger and release RPC |
 | FR-011 | Professors shall review final submissions, save drafts, and explicitly release immutable scores and Student feedback while keeping remarks private. | P0 | Implemented |
 | FR-012 | The system shall display the probability for each output label or a documented selected subset. | P1 | Completed for released activity results |
-| FR-013 | The system shall display an attention heatmap after attention extraction and heatmap generation are implemented. | P1 | Not implemented |
+| FR-013 | The system shall display an attention heatmap after attention extraction and heatmap generation are implemented. | P1 | Implemented for validated V2 releases; V1 remains unavailable |
 | FR-014 | The system shall provide Learning Mode for non-graded practice. | P1 | Planned |
 | FR-015 | The system shall show clear loading, validation, failure, retry, reset, and non-diagnostic-disclaimer states. | P1 | Planned |
 | FR-016 | The system shall retain traceable model, threshold, preprocessing, and application-version metadata for recorded AI results. | P1 | Completed for immutable activity analyses |

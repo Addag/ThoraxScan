@@ -2,7 +2,7 @@
 node_type: catalog
 status: live
 audited: 2026-09-29
-snapshot: main @ 784649f
+snapshot: main @ 6af6c16
 ---
 
 # Object index
@@ -33,6 +33,7 @@ One line per important noun. live cards are source-backed; ghost entries are doc
 | [Student submission](learning/student-submission.md) | live | object | [submission workflow](../processes/student-submission.md) |
 | AI feedback release | live | [ai-feedback-release.md](learning/ai-feedback-release.md) | `public.ai_feedback_releases`, submission trigger, and authorized feedback RPC |
 | Faculty evaluation | live | [faculty-evaluation.md](learning/faculty-evaluation.md) | immutable Professor review and Student projection |
+| Built-in X-ray library | live | [built-in-xray-library.md](learning/built-in-xray-library.md) | Bundled CheXpert `valid` JPEGs, `cases.json` manifest, and shared gallery component |
 | Analytics | ghost | stub | [application flow reference](../thoraxscan-app-flow.md#L48) |
 
 ## Inference
@@ -45,8 +46,7 @@ One line per important noun. live cards are source-backed; ghost entries are doc
 | Browser inference runtime | live | [browser-inference-runtime.md](inference/browser-inference-runtime.md) | Active resolver, verified session cache, provider fallback, and analyzeImage library |
 | Image input and preprocessing tensor | live | [preprocessing-tensor.md](inference/preprocessing-tensor.md) | Browser decode and pure version 1 preprocessing transform |
 | Transient prediction result | live | [prediction-result.md](inference/prediction-result.md) | In-memory `InferenceResult`, adapted into immutable activity analysis payloads |
-| Attention heatmap | live | V2 global attention output, persisted for released activity analyses and transient in Learning Mode | [runtime](../../src/components/attention-heatmap.tsx), [migration](../../supabase/migrations/20260922163225_attention_contract_hardening.sql) |
-| Built-in X-ray library | live | [built-in-xray-library.md](learning/built-in-xray-library.md) | Bundled CheXpert `valid` JPEGs, `cases.json` manifest, and shared gallery component |
+| Attention heatmap | live | [attention-heatmap.md](inference/attention-heatmap.md) | V2 global attention output, persisted for released activity analyses and transient in Learning Mode |
 | Local Learning Mode image | live | [local-learning-mode-image.md](learning/local-learning-mode-image.md) | Student Learning Mode analyzer and transient browser state |
 
 ## UI

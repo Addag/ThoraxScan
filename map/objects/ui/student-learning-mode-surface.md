@@ -2,13 +2,13 @@
 node_type: surface
 universe: live
 status: verified
-audited: 2026-09-17
-snapshot: working tree
+audited: 2026-09-29
+snapshot: main @ 6af6c16
 ---
 
-# Student Learning Mode surface
+# Student and Professor Learning Mode surfaces
 
-The protected `/student/learning` Server Component rechecks the Student role and renders the focused Learning Mode analyzer. It presents browser-only practice results, all manifest labels, and release/execution provenance.
+The protected `/student/learning` and `/professor/learning` Server Components recheck their respective roles and render the focused Learning Mode analyzer. It presents browser-only practice results, all manifest labels, release/execution provenance, and a V2 attention map when the active release supplies one.
 
 ## Connected to
 
@@ -22,8 +22,8 @@ Uses [Built-in X-ray library](../learning/built-in-xray-library.md) as its sampl
 
 ### Does not hit
 
-- Activity submissions, grading, uploads, heatmaps, or saved results.
+- Activity submissions, grading, uploads, or saved results. Learning Mode heatmaps remain transient in browser memory.
 
 ## See
 
-[Learning route](../../../src/app/(protected)/student/learning/page.tsx)
+[Student route](<../../../src/app/(protected)/student/learning/page.tsx>), [Professor route](<../../../src/app/(protected)/professor/learning/page.tsx>), and [shared analyzer](<../../../src/components/learning/learning-mode-analyzer.tsx>)

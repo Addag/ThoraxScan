@@ -2,8 +2,8 @@
 node_type: object
 universe: live
 status: verified
-audited: 2026-08-20
-snapshot: main @ ed26b07 + working tree
+audited: 2026-09-29
+snapshot: main @ 6af6c16
 ---
 
 # Activity
@@ -33,7 +33,7 @@ Owned by a [Workspace](workspace.md), attaches one [X-ray case](xray-case.md), i
 
 ### Does not hit
 
-- Faculty evaluation is a separate review record keyed by a final submission; analytics, notifications, and heatmaps remain deferred. Activity publication gates the Student projection.
+- Faculty evaluation is a separate review record keyed by a final submission; analytics and notifications remain deferred. Published activities expose authorized AI analysis and V2 heatmap feedback through their activity projections. Activity publication gates the Student projection.
 
 ## Surfaces
 

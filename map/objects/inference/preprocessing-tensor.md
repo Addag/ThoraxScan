@@ -2,8 +2,8 @@
 node_type: object
 universe: live
 status: verified
-audited: 2026-08-24
-snapshot: main @ 46c18c1 + working tree
+audited: 2026-09-29
+snapshot: main @ 6af6c16
 ---
 
 # Preprocessing tensor
@@ -30,7 +30,7 @@ Configured by [Model manifest and configuration](model-manifest-configuration.md
 
 ### Does not hit
 
-- The private activity-case Storage image, which is not wired into inference.
+- Direct database writes and Storage persistence; the tensor is produced in the browser from a local, built-in-library, or signed private activity-case image supplied by a caller.
 
 ## Surfaces
 

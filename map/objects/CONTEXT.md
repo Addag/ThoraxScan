@@ -24,7 +24,7 @@ Maintain one source-backed card or stub line per important noun. Cluster by the 
 
 ## Status rule
 
-Live cards cite code, SQL, or configuration. The model registry, manifest, preprocessing, runtime, activity AI analysis, controlled feedback-release records, and faculty evaluation are live foundation objects. Attention heatmaps, analytics, and notifications remain ghost. A UI label or planning paragraph is not enough to promote a noun to live.
+Live cards cite code, SQL, or configuration. The model registry, manifest, preprocessing, runtime, activity AI analysis, V2 attention heatmaps, controlled feedback-release records, and faculty evaluation are live foundation objects. Analytics and notifications remain ghost. A UI label or planning paragraph is not enough to promote a noun to live.
 
 ## Human check
 

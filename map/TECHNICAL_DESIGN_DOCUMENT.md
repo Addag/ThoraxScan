@@ -249,21 +249,21 @@ The final provider selection and browser support matrix are still open implement
 
 ## 7. Attention Heatmap Design
 
-### 7.1 Current limitation
+### 7.1 Version 1 limitation
 
-The existing transformer block does not retain attention weights. It currently uses an attention call equivalent to:
+The legacy V1 transformer export does not retain attention weights. Its attention call is equivalent to:
 
 ```python
 attn_out, _ = self.attn(x, x, x)
 ```
 
-As a result, the current logits-only ONNX model does not provide enough information for an attention heatmap.
+As a result, V1 ONNX releases do not provide enough information for an attention heatmap.
 
-### 7.2 Planned model and export change
+### 7.2 Implemented V2 model and export
 
-The planned implementation direction is to replace the current logits-only ONNX artifact with one expanded ONNX artifact that returns both logits and the attention data required for heatmap generation. The current artifact has not yet been replaced.
+The V2 exporter retains the attention weights, returns the existing logits plus `attention_map`, and publishes a versioned manifest with the fixed attention descriptor. V1 artifacts remain registered for rollback and continue to report heatmap-unavailable.
 
-The model implementation must request and retain attention weights, preserve the existing 14-logit output, expose the attention data through ONNX export, aggregate the relevant 49-token representation into a 7 x 7 map, and upscale it to the displayed image dimensions. The artifact contract, model source, label order, preprocessing, and threshold file must be versioned together.
+The V2 implementation requests and retains attention weights, preserves the existing 14-logit output, exposes `attention_map` through ONNX export, aggregates the relevant 49-token representation into a 7 x 7 map, and normalizes it per image. The artifact contract, model source, label order, preprocessing, threshold file, and attention fixture are versioned together.
 
 ### 7.3 UI and wording constraints
 
@@ -317,7 +317,7 @@ The capstone ERD requires the following planned records. This is a conceptual sc
 | `invitation_codes` | `id`, `workspace_id`, `created_by`, `code_hash`, `expires_at`, `max_uses`, `uses_count`, `is_active`, `created_at` | Controls student entry without storing invitation codes in plaintext. |
 | `xray_cases` | `id`, `workspace_id`, `storage_path`, `title`, `view`, `uploaded_by`, `approved_by`, `approved_at`, `de_identified_at`, `retention_until`, `status`, timestamps | Registers only approved, de-identified teaching cases; no patient-record fields or public storage URL. |
 | `activities` | `id`, `workspace_id`, `case_id`, `created_by`, `title`, `instructions`, `reference_evaluation`, `status`, `published_at`, `due_at`, timestamps | Publishes a case as a learning activity and stores the reference evaluation. |
-| `ai_analyses` | `activity_id` (unique), `pending | ready | failed`, leased attempt fields, active model release/provenance, fixed 14-probability vector, derived thresholds/findings, `attention_status = unavailable`, timestamps | Captures one immutable reproducible browser inference result per activity. **Implemented in `20260920100000_activity_ai_analysis.sql`.** |
+| `ai_analyses` | `activity_id` (unique), `pending | ready | failed`, leased attempt fields, active model release/provenance, fixed 14-probability vector, derived thresholds/findings, V1 `attention_status = unavailable` or V2-ready 49-value map, timestamps | Captures one immutable reproducible browser inference result per activity. **Implemented in `20260920100000_activity_ai_analysis.sql` plus the V2 contract migration.** |
 | `student_submissions` | `id`, `activity_id`, `student_id`, `interpretation`, `submitted_at`, `status`; one active submission per student/activity unless a future attempt policy changes it | Stores the student’s interpretation before AI feedback is released. |
 | `ai_feedback_releases` | `id`, `submission_id`, `activity_id`, `student_id`, `ai_analysis_id`, `released_at`, `status`; unique release per submission | Records database-enforced student visibility after final submission and successful analysis. **Implemented in `20260920100000_activity_ai_analysis.sql`.** |
 | `faculty_evaluations` | `id`, `submission_id`, `professor_id`, `score`, `remarks`, `feedback`, `status`, `released_at`, timestamps | Stores faculty scores, remarks, or feedback for the student submission. |
@@ -523,13 +523,13 @@ At minimum, the project should record these values in a reproducibility log even
 7. Implement JavaScript preprocessing and compare it with the Python reference.
 8. Load the ONNX model through ONNX Runtime Web and implement sigmoid, thresholds, and `No Finding` conflict handling.
 9. Add loading, error, reset, and non-diagnostic disclaimer states.
-10. Replace the logits-only export with the planned expanded ONNX artifact, then implement attention extraction and heatmap rendering. **The current milestone intentionally leaves this deferred.**
+10. Validate the expanded V2 ONNX artifact, attention extraction, and heatmap rendering. **Implemented for validated V2 releases; V1 remains heatmap-unavailable.**
 11. Compare browser outputs against the Python/ONNX reference and test the complete LMS workflow.
 12. Add deployment checks, network/persistence inspection, heuristic review, and usability evaluation.
 
 ## 16. Open Technical Decisions
 
-1. The exact attention-output names and tensor shape of the planned expanded ONNX artifact.
+1. The final V1 or V2 model artifact and evidence bundle selected for paper claims.
 2. Whether WebGPU will be the preferred provider with WASM fallback in the first release.
 3. Whether the ONNX model is self-contained or requires an external `.onnx.data` file.
 4. The exact faculty-feedback release/editing lifecycle after a professor records an evaluation.

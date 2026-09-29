@@ -2,8 +2,8 @@
 node_type: object
 universe: live
 status: verified
-audited: 2026-08-30
-snapshot: main @ 7aed17a + working tree
+audited: 2026-09-29
+snapshot: main @ 6af6c16
 ---
 
 # X-ray case

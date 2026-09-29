@@ -1,8 +1,8 @@
 ---
 node_type: contract
 status: live
-audited: 2026-09-17
-snapshot: main @ a96a291
+audited: 2026-09-29
+snapshot: main @ 6af6c16
 ---
 
 # Processes contract
@@ -22,7 +22,7 @@ snapshot: main @ a96a291
 
 ## Job
 
-Record only movements that currently run in the repository. The process shelf covers authentication, shared account-settings updates, Professor approval, workspace membership/rosters, activity publication/viewing, and operator-run model validation, staging, activation, rollback, and browser conformance.
+Record only movements that currently run in the repository. The process shelf covers authentication, shared account-settings updates, Professor approval, workspace membership/rosters, activity publication/viewing, Student submissions, browser AI analysis and controlled feedback release, faculty evaluation, both-role Learning Mode inference, and operator-run model validation, staging, activation, rollback, and browser conformance.
 
 ## Outputs
 

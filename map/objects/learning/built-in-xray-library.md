@@ -3,7 +3,7 @@ node_type: object
 universe: live
 status: verified
 audited: 2026-09-29
-snapshot: main @ 784649f
+snapshot: main @ 6af6c16
 ---
 
 # Built-in X-ray library

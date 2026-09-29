@@ -36,7 +36,7 @@ Joined Student â†’ published activity query and short-lived private image URL â†
 
 ### Does not hit
 
-- Professor reference evaluations, Professor draft authoring, faculty evaluation, or heatmap processing.
+- Professor reference evaluations, Professor draft authoring, or faculty evaluation. Released activity AI feedback, including an available V2 heatmap, is rendered by the activity detail view.
 
 ## See
 

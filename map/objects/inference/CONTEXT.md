@@ -1,8 +1,8 @@
 ---
 node_type: contract
 status: live
-audited: 2026-08-24
-snapshot: main @ 46c18c1 + working tree
+audited: 2026-09-29
+snapshot: main @ 6af6c16
 ---
 
 # Inference objects
@@ -16,7 +16,7 @@ snapshot: main @ 46c18c1 + working tree
 
 ## Job
 
-Separate the live replaceable-model foundation and prediction-only activity analysis from planned explanation behavior.
+Separate the live replaceable-model foundation, prediction-only activity analysis, and validated V2 attention behavior from the remaining planned concepts.
 
 ## Outputs
 
@@ -26,10 +26,11 @@ Separate the live replaceable-model foundation and prediction-only activity anal
 - [browser-inference-runtime.md](browser-inference-runtime.md)
 - [preprocessing-tensor.md](preprocessing-tensor.md)
 - [prediction-result.md](prediction-result.md)
+- [attention-heatmap.md](attention-heatmap.md)
 - [../learning/ai-analysis.md](../learning/ai-analysis.md)
 
-Activity analysis records are live; attention heatmaps remain ghost in [../_index.md](../_index.md). Learning Mode remains transient and live for Student and approved Professor roles.
+Activity analysis records and validated V2 attention heatmaps are live; V1 releases remain heatmap-unavailable. Learning Mode remains transient and live for Student and approved Professor roles.
 
 ## Human check
 
-The static xray-sample.png and private activity case images are not wired to the live inference library. A runtime library is not evidence of a live Student inference workflow.
+The static `xray-sample.png` landing asset is not wired to inference. Private activity-case images are fetched by the browser activity-analysis boundary, and the Student and approved Professor Learning Mode routes call the same runtime. The project owner reports V2 is deployed as of 2026-09-29; the production release ID and activation revision are not independently verified in this repository. See [attention-heatmap.md](attention-heatmap.md).

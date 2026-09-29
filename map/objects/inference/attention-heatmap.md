@@ -1,7 +1,8 @@
 ---
 node_type: object
 status: live
-audited: 2026-09-23
+audited: 2026-09-29
+snapshot: main @ 6af6c16
 ---
 
 # Attention heatmap
@@ -9,6 +10,10 @@ audited: 2026-09-23
 Validated V2 releases expose global, class-agnostic 7x7 attention rollout.
 V1 remains unavailable. Relative attention does not localize disease or provide
 diagnostic evidence.
+
+Deployment status (2026-09-29): the project owner reports that V2 is currently
+deployed. The repository does not contain a production registry snapshot, so the
+active release ID and activation revision are not independently verified here.
 
 Learning Mode keeps the map and object URL in browser memory and revokes the URL
 on replacement/unmount. Activity completion persists exactly 49 normalized values
