@@ -2,8 +2,8 @@
 node_type: effect
 universe: live
 status: live
-audited: 2026-08-30
-snapshot: main @ 7aed17a + working tree
+audited: 2026-09-29
+snapshot: main @ 784649f
 ---
 
 # Change-impact index
@@ -31,6 +31,7 @@ Use this catalog before editing. Open the named cards and their source files; do
 | Activity AI analysis or feedback release | [AI analysis](../objects/learning/ai-analysis.md), [AI feedback release](../objects/learning/ai-feedback-release.md), [Student submission](../objects/learning/student-submission.md), [browser runtime](../objects/inference/browser-inference-runtime.md) | Analysis/release migration and RPC grants, final-submission trigger, active model provenance, signed case URL, Student feedback component, Professor status/retry component, activity projections and status rail | Heatmaps, analytics, notifications, and deployed network/privacy verification until separately tested |
 | Faculty evaluation | [Faculty evaluation](../objects/learning/faculty-evaluation.md), [evaluation workflow](../processes/faculty-evaluation.md) | Evaluation migration/RPC grants, Professor queue/detail/actions/forms, Student activity panel, activity/workspace links | AI prediction arrays, heatmaps, appeals, notifications |
 | X-ray case upload, metadata, storage policy, or preview frame | [X-ray case](../objects/learning/xray-case.md), [Account settings](../objects/runtime/account-settings.md), [Activity](../objects/learning/activity.md), [authoring/publication](../processes/activity-authoring-publication.md) | Case schema/trigger, private bucket, Storage RLS, signed upload/read flow, `sharp` dependency and server decode validation, saved dark/light frame, preview errors, draft cleanup, publication prerequisites | Static sample image, model preprocessing, heatmaps |
+| Built-in X-ray library manifest, images, or gallery | [Built-in X-ray library](../objects/learning/built-in-xray-library.md), [Local image](../objects/learning/local-learning-mode-image.md), [X-ray case](../objects/learning/xray-case.md) | `cases.json`, importer script, `public/images/chexpert/`, hash test, gallery CSS, Learning Mode and Professor upload browser tests | Migrations, Storage policies, model registry, preprocessing |
 | Submission fields, finalization, or deadlines | [Student submission](../objects/learning/student-submission.md), [submission workflow](../processes/student-submission.md) | Submission migration/RPC/RLS, validation, action/form, Student projections, status cards, unit/browser/database tests | AI analysis, grading, Professor review UI |
 | Planned AI feedback, faculty evaluation, or analytics rule | Ghost entries in [object index](../objects/_index.md), then [technical design](../TECHNICAL_DESIGN_DOCUMENT.md) | Future migrations, RLS, server routes, role surfaces, and workflow cards after implementation | Current Activity/Case publication and auth behavior unless the new feature changes their contracts |
 | Model contract, labels, thresholds, or preprocessing | [Manifest/configuration](../objects/inference/model-manifest-configuration.md), [preprocessing tensor](../objects/inference/preprocessing-tensor.md), [validation](../processes/model-validation.md), [browser conformance](../processes/browser-model-conformance.md) | Manifest parser, publisher bundle/evidence, ONNX compatibility, preprocessing/postprocessing, parity tests, and application redeploy for a new manifest version | Training weights/internal architecture that preserve version 1; current auth/profile |

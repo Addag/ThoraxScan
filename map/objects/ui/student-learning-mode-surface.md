@@ -12,7 +12,7 @@ The protected `/student/learning` Server Component rechecks the Student role and
 
 ## Connected to
 
-Uses [Browser inference runtime](../inference/browser-inference-runtime.md), [Local Learning Mode image](../learning/local-learning-mode-image.md), and the Student or Professor shell.
+Uses [Built-in X-ray library](../learning/built-in-xray-library.md) as its sample gallery, [Browser inference runtime](../inference/browser-inference-runtime.md), [Local Learning Mode image](../learning/local-learning-mode-image.md), and the Student or Professor shell.
 
 ## If you change this
 

@@ -9,7 +9,7 @@ snapshot: working tree
 # Student Learning Mode inference
 
 1. The Student-only route is protected with `requireRole("student")`.
-2. The analyzer validates a selected JPEG or PNG, previews it locally, and retains it only in browser memory.
+2. The analyzer validates a selected JPEG or PNG (local file or [built-in library](../objects/learning/built-in-xray-library.md) case), previews it locally, and retains it only in browser memory.
 3. Analyze dynamically loads the inference runtime, resolves the active release through Supabase, verifies the model artifact, preprocesses the image, and runs WASM with one thread.
 4. The client renders thresholded findings, all manifest labels, suppression state, provenance, and a non-diagnostic disclaimer.
 5. Reset aborts the active run and invalidates stale completions; no database, Storage, submission, or saved-analysis write occurs.

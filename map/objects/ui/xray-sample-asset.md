@@ -30,7 +30,8 @@ The [landing surface](landing-surface.md) and [authentication surface](auth-surf
 
 ### Does not hit
 
-- Future image input, preprocessing, model inference, or clinical data storage.
+- Image input, preprocessing, model inference, or clinical data storage.
+- The [Built-in X-ray library](../learning/built-in-xray-library.md), which uses its own `public/images/chexpert/` files.
 
 ## Surfaces
 

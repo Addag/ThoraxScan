@@ -8,7 +8,7 @@ snapshot: working tree
 
 # Local Learning Mode image
 
-A student-selected JPEG or PNG held in browser memory for one transient analysis. It is validated for non-empty content and a maximum size of 6 MiB, previewed with a revocable object URL, and never uploaded or persisted.
+A student-selected JPEG or PNG (a local file, or a case from the [Built-in X-ray library](built-in-xray-library.md)) held in browser memory for one transient analysis. It is validated for non-empty content and a maximum size of 6 MiB, previewed with a revocable object URL, and never uploaded or persisted.
 
 ## Connected to
 

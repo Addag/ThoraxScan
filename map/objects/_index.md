@@ -1,8 +1,8 @@
 ---
 node_type: catalog
 status: live
-audited: 2026-08-30
-snapshot: main @ 7aed17a + working tree
+audited: 2026-09-29
+snapshot: main @ 784649f
 ---
 
 # Object index
@@ -46,6 +46,7 @@ One line per important noun. live cards are source-backed; ghost entries are doc
 | Image input and preprocessing tensor | live | [preprocessing-tensor.md](inference/preprocessing-tensor.md) | Browser decode and pure version 1 preprocessing transform |
 | Transient prediction result | live | [prediction-result.md](inference/prediction-result.md) | In-memory `InferenceResult`, adapted into immutable activity analysis payloads |
 | Attention heatmap | live | V2 global attention output, persisted for released activity analyses and transient in Learning Mode | [runtime](../../src/components/attention-heatmap.tsx), [migration](../../supabase/migrations/20260922163225_attention_contract_hardening.sql) |
+| Built-in X-ray library | live | [built-in-xray-library.md](learning/built-in-xray-library.md) | Bundled CheXpert `valid` JPEGs, `cases.json` manifest, and shared gallery component |
 | Local Learning Mode image | live | [local-learning-mode-image.md](learning/local-learning-mode-image.md) | Student Learning Mode analyzer and transient browser state |
 
 ## UI
