@@ -31,6 +31,7 @@
 @theme inline {
   --color-background: var(--canvas);
   --color-foreground: var(--text-primary);
+  --color-brand: var(--brand-blue);
   --font-sans: var(--font-funnel);
   --font-brand: var(--font-inter);
 }
@@ -2392,216 +2393,6 @@ textarea:focus-visible {
 }
 
 /* Student workspace MVP */
-.student-app-shell {
-  display: grid;
-  min-height: 100svh;
-  grid-template-columns: 230px minmax(0, 1fr);
-  background: var(--app-background);
-  color: var(--text-primary);
-}
-
-.student-sidebar {
-  position: sticky;
-  top: 0;
-  display: flex;
-  height: 100svh;
-  flex-direction: column;
-  border-right: 1px solid #33425c;
-  padding: 24px 14px 20px;
-  background: var(--glass-shell);
-  -webkit-backdrop-filter: blur(12px);
-  backdrop-filter: blur(12px);
-}
-
-.student-sidebar .student-brand {
-  position: static;
-  gap: 10px;
-  margin: 0 4px 28px;
-}
-
-.sidebar-menu-toggle {
-  display: none;
-}
-
-.sidebar-content {
-  display: flex;
-  flex: 1;
-  min-height: 0;
-  flex-direction: column;
-}
-
-.student-sidebar .brand-mark {
-  width: 42px;
-  height: 42px;
-}
-
-.student-sidebar .brand-name {
-  font-size: 23px;
-  letter-spacing: -1px;
-}
-
-.student-model-card {
-  display: flex;
-  min-height: 68px;
-  flex-direction: column;
-  justify-content: center;
-  gap: 9px;
-  border: 1px solid var(--brand-blue);
-  border-radius: 10px;
-  background: var(--glass-inset);
-  padding: 10px 14px;
-  -webkit-backdrop-filter: none;
-  backdrop-filter: none;
-  box-shadow: var(--glass-inset-shadow);
-}
-
-.student-model-card span,
-.student-nav-label {
-  margin: 0;
-  color: #5fa8fb;
-  font-size: 10px;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  line-height: 1.4;
-  text-transform: uppercase;
-}
-
-.student-model-card strong {
-  font-size: 13px;
-}
-
-.student-model-card i {
-  display: inline-block;
-  width: 7px;
-  height: 7px;
-  margin-right: 6px;
-  border-radius: 50%;
-  background: #46ff2d;
-  box-shadow: 0 0 10px rgba(70, 255, 45, 0.75);
-}
-
-.student-nav-label {
-  margin: 22px 6px 8px;
-  color: #c1cee0;
-}
-
-.student-sidebar nav {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.student-nav-icon {
-  display: block;
-  width: 24px;
-  height: 24px;
-  flex: 0 0 24px;
-  object-fit: contain;
-}
-
-.student-nav-link {
-  position: relative;
-  display: grid;
-  min-height: 46px;
-  grid-template-columns: 25px minmax(0, 1fr);
-  align-items: center;
-  border: 1px solid transparent;
-  border-radius: 8px;
-  color: #fff;
-  font-size: 13px;
-  text-decoration: none;
-  padding: 8px 10px;
-}
-
-.student-nav-link > span {
-  color: #fff;
-  font-size: 20px;
-}
-
-.student-nav-link small {
-  grid-column: 2;
-  color: #c1cee0;
-  font-size: 9px;
-  line-height: 1.4;
-}
-
-.student-nav-link--active {
-  border-color: var(--brand-blue);
-  background: rgba(44, 174, 255, 0.21);
-}
-
-.student-nav-link--active::before {
-  position: absolute;
-  top: 10px;
-  bottom: 10px;
-  left: -7px;
-  width: 3px;
-  border-radius: 8px;
-  background: var(--brand-blue);
-  content: "";
-}
-
-.student-nav-link--disabled,
-.student-nav-link--disabled > span {
-  color: #c1cee0;
-}
-
-.student-logout {
-  padding-top: 18px;
-  margin-top: auto;
-  border-top: 1px solid rgba(114, 112, 112, 0.64);
-}
-
-.student-logout button {
-  width: 100%;
-  border: 0;
-  background: transparent;
-  color: #ff5457;
-  cursor: pointer;
-  font-weight: 600;
-  padding: 10px;
-  text-align: left;
-}
-
-.student-logout button span {
-  margin-right: 8px;
-  font-size: 20px;
-}
-
-.student-main-column {
-  display: flex;
-  min-width: 0;
-  min-height: 100svh;
-  flex-direction: column;
-}
-
-.student-topbar {
-  display: flex;
-  min-height: 80px;
-  align-items: center;
-  border-bottom: 1px solid #33425c;
-  padding: 0 clamp(22px, 4vw, 54px);
-  background: var(--glass-shell);
-  -webkit-backdrop-filter: blur(12px);
-  backdrop-filter: blur(12px);
-}
-
-.student-topbar div {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.student-topbar strong {
-  font-size: 13px;
-}
-
-.student-topbar span {
-  color: #b7b7b7;
-  font-size: 12px;
-  line-height: 1.4;
-}
-
 .student-dashboard {
   display: flex;
   flex-direction: column;
@@ -2898,26 +2689,6 @@ textarea:focus-visible {
   font-size: 12px;
 }
 
-.student-footer {
-  display: flex;
-  min-height: 42px;
-  align-items: center;
-  justify-content: space-between;
-  gap: 20px;
-  border-top: 1px solid rgba(255, 255, 255, 0.12);
-  font-size: 11px;
-  padding: 10px clamp(22px, 4vw, 54px);
-  background: var(--glass-shell);
-  -webkit-backdrop-filter: blur(12px);
-  backdrop-filter: blur(12px);
-}
-
-.student-footer span {
-  color: #b8b8b8;
-  font-size: 12px;
-  line-height: 1.4;
-}
-
 .student-workspace-detail {
   padding-top: 38px;
 }
@@ -2989,88 +2760,9 @@ textarea:focus-visible {
 }
 
 @media (max-width: 850px) {
-  .student-app-shell {
-    display: block;
-  }
-
-  .student-sidebar {
-    position: relative;
-    height: auto;
-    border-right: 0;
-    border-bottom: 1px solid #33425c;
-    padding: 14px 18px;
-  }
-
-  .student-sidebar .student-brand {
-    margin: 0;
-    align-self: flex-start;
-  }
-
-  .student-sidebar .brand-name {
-    font-size: clamp(19px, 5vw, 23px);
-  }
-
-  .student-sidebar .brand-mark {
-    width: 36px;
-    height: 36px;
-  }
-
-  .sidebar-menu-toggle {
-    position: absolute;
-    top: 10px;
-    right: 14px;
-    display: inline-flex;
-    min-height: 44px;
-    align-items: center;
-    gap: 6px;
-    border: 1px solid rgb(153 191 240 / 38%);
-    border-radius: 10px;
-    background: var(--glass-surface);
-    color: var(--text-primary);
-    font-size: 14px;
-    padding: 10px;
-    cursor: pointer;
-  }
-
-  .sidebar-content {
-    display: none;
-  }
-
-  .student-sidebar[data-expanded="true"] .sidebar-content {
-    display: flex;
-    margin-top: 20px;
-  }
-
-  .student-sidebar .student-nav-link {
-    min-height: 48px;
-    column-gap: 10px;
-    font-size: 15px;
-  }
-
-  .student-sidebar .student-nav-link small {
-    font-size: 12px;
-  }
-
-  .student-logout {
-    padding-top: 12px;
-    margin-top: 16px;
-  }
-
-  .student-logout button {
-    min-height: 48px;
-  }
-
-  .student-topbar {
-    display: none;
-  }
-
   .student-join-panel {
     grid-template-columns: 1fr;
     gap: 20px;
-  }
-
-  .student-footer {
-    flex-wrap: wrap;
   }
 }
 
@@ -3112,10 +2804,6 @@ textarea:focus-visible {
   .student-future-panel {
     align-items: flex-start;
     flex-direction: column;
-  }
-
-  .student-footer {
-    display: none;
   }
 }
 
@@ -3693,12 +3381,6 @@ textarea:focus-visible {
 .admin-dashboard,
 .professor-application-page {
   padding-bottom: 60px;
-}
-
-.admin-access-card i,
-.professor-application-access-card i {
-  background: #ffce4b;
-  box-shadow: 0 0 10px rgba(255, 206, 75, 0.7);
 }
 
 .admin-applications-panel,
