@@ -115,8 +115,9 @@ textarea:focus-visible {
 
 .activity-page-heading p {
   margin: 6px 0 0;
-  color: var(--text-muted);
+  color: #c3d0e2;
   font-size: 13px;
+  line-height: 1.4;
 }
 
 .activity-page-heading time {
@@ -372,8 +373,9 @@ textarea:focus-visible {
 
 .activity-card__topline > span:last-child,
 .activity-card > p {
-  color: #8992a1;
+  color: #c4d0e0;
   font-size: 11px;
+  line-height: 1.4;
 }
 
 .activity-card > p {
@@ -401,14 +403,17 @@ textarea:focus-visible {
 }
 
 .activity-card dt {
-  color: #737d8c;
+  color: #c4d0e0;
   font-size: 9px;
+  letter-spacing: 0.06em;
+  line-height: 1.4;
   text-transform: uppercase;
 }
 
 .activity-card dd {
   margin: 4px 0 0;
   font-size: 11px;
+  line-height: 1.4;
 }
 
 .activity-card > a {
@@ -1232,72 +1237,14 @@ textarea:focus-visible {
   }
 }
 
-/* Readability pass: supporting copy stays compact but remains legible. */
-:where(.activity-card > p, .activity-card dt, .activity-card dd,
-  .activity-page-heading p, .student-model-card span, .student-nav-label,
-  .student-nav-link small, .student-topbar span, .student-footer span,
-  .student-workspace-card > p, .student-workspace-card > span,
-  .professor-stat-grid small, .settings-profile-grid label > small:not(.settings-field-error),
-  .settings-tab, .settings-page-heading p) {
-  font-size: 12px;
-  line-height: 1.4;
-}
-
-:where(.activity-card dt, .student-model-card span, .student-nav-label) {
-  font-size: 11px;
-  letter-spacing: 0.06em;
-}
-
-:where(.activity-card > p, .activity-page-heading p, .student-topbar span,
-  .student-footer span, .student-workspace-card > span, .professor-stat-grid small,
-  .settings-profile-grid label > small:not(.settings-field-error), .settings-page-heading p) {
-  color: #aeb9cc;
-}
-
-:where(.auth-subtitle, .auth-options, .auth-switch, .role-selector__description,
-  .auth-status, .auth-captcha__error) {
-  font-size: 13px;
-  line-height: 1.5;
-}
-
+/* Auth card supporting copy is larger and brighter than the shared defaults. */
 .auth-card .auth-subtitle,
 .auth-card .auth-options,
 .auth-card .auth-switch,
 .auth-card .role-selector__description {
-  color: #c5cfdf;
+  color: #d6e1f0;
   font-size: 13px;
   line-height: 1.5;
-}
-
-/* Keep supporting text readable over changing glass backgrounds. */
-.landing-page .hero-copy p,
-.auth-visual-copy p,
-.student-page-heading p,
-.activity-page-heading p,
-.student-topbar span,
-.student-footer span,
-.student-workspace-card > span,
-.professor-stat-grid small,
-.settings-page-heading p {
-  color: #c3d0e2;
-}
-
-.student-nav-label,
-.student-nav-link--disabled,
-.student-nav-link--disabled > span,
-.student-nav-link small {
-  color: #aebbd0;
-}
-
-.activity-card dt,
-.activity-card > p,
-.settings-profile-grid label > small:not(.settings-field-error) {
-  color: #b3c0d3;
-}
-
-:where(.student-section-kicker, .student-privacy-note, .student-form-status,
-  .professor-form-status, .admin-status-badge) {
-  line-height: 1.4;
 }
 
 .site-header {
@@ -1366,7 +1313,7 @@ textarea:focus-visible {
 .hero-copy p {
   width: 390px;
   margin: 22px 0 0;
-  color: var(--text-secondary);
+  color: #c3d0e2;
   font-size: 16px;
   font-weight: 600;
   line-height: 1.35;
@@ -1579,7 +1526,7 @@ textarea:focus-visible {
 .auth-visual-copy p {
   width: 340px;
   margin: 28px 0 0 -5px;
-  color: var(--text-secondary);
+  color: #d6e1f0;
   font-size: 16px;
   font-weight: 600;
   line-height: 1.25;
@@ -2515,6 +2462,7 @@ textarea:focus-visible {
   font-size: 10px;
   font-weight: 800;
   letter-spacing: 0.08em;
+  line-height: 1.4;
   text-transform: uppercase;
 }
 
@@ -2534,7 +2482,7 @@ textarea:focus-visible {
 
 .student-nav-label {
   margin: 22px 6px 8px;
-  color: #848484;
+  color: #c1cee0;
 }
 
 .student-sidebar nav {
@@ -2572,8 +2520,9 @@ textarea:focus-visible {
 
 .student-nav-link small {
   grid-column: 2;
-  color: #6f7694;
+  color: #c1cee0;
   font-size: 9px;
+  line-height: 1.4;
 }
 
 .student-nav-link--active {
@@ -2592,12 +2541,9 @@ textarea:focus-visible {
   content: "";
 }
 
-.student-nav-link--disabled {
-  color: #8d93a8;
-}
-
+.student-nav-link--disabled,
 .student-nav-link--disabled > span {
-  color: #8d93a8;
+  color: #c1cee0;
 }
 
 .student-logout {
@@ -2653,6 +2599,7 @@ textarea:focus-visible {
 .student-topbar span {
   color: #b7b7b7;
   font-size: 12px;
+  line-height: 1.4;
 }
 
 .student-dashboard {
@@ -2726,6 +2673,7 @@ textarea:focus-visible {
   font-size: 10px;
   font-weight: 800;
   letter-spacing: 0.08em;
+  line-height: 1.4;
   text-transform: uppercase;
 }
 
@@ -2786,6 +2734,7 @@ textarea:focus-visible {
   margin: 9px 0 0;
   color: #ffb4b4;
   font-size: 12px;
+  line-height: 1.4;
 }
 
 .student-form-status--success {
@@ -2853,6 +2802,7 @@ textarea:focus-visible {
 
 .student-workspace-card p {
   margin: 18px 0 3px;
+  line-height: 1.4;
   color: #6faef7;
   font-size: 10px;
   font-weight: 800;
@@ -2871,6 +2821,7 @@ textarea:focus-visible {
 .student-workspace-card > span {
   color: #8992a8;
   font-size: 11px;
+  line-height: 1.4;
 }
 
 .student-workspace-card a {
@@ -2932,6 +2883,7 @@ textarea:focus-visible {
   border-radius: 10px;
   background: rgba(0, 119, 255, 0.18);
   padding: 18px 22px;
+  line-height: 1.4;
 }
 
 .student-privacy-note strong {
@@ -2962,6 +2914,8 @@ textarea:focus-visible {
 
 .student-footer span {
   color: #b8b8b8;
+  font-size: 12px;
+  line-height: 1.4;
 }
 
 .student-workspace-detail {
@@ -3219,6 +3173,7 @@ textarea:focus-visible {
 .professor-stat-grid small {
   color: rgba(167, 167, 167, 0.72);
   font-size: 11px;
+  line-height: 1.4;
 }
 
 .professor-dashboard-actions {
@@ -3873,6 +3828,7 @@ textarea:focus-visible {
   border-radius: 999px;
   font-size: 10px;
   letter-spacing: 0.06em;
+  line-height: 1.4;
   padding: 6px 9px;
   text-transform: uppercase;
 }
@@ -4120,6 +4076,7 @@ textarea:focus-visible {
   margin: 6px 0 0;
   color: var(--text-muted);
   font-size: 13px;
+  line-height: 1.4;
 }
 
 .settings-page-heading time {
@@ -4268,8 +4225,9 @@ textarea:focus-visible {
 }
 
 .settings-profile-grid label > small:not(.settings-field-error) {
-  color: #777f8f;
+  color: #c4d0e0;
   font-size: 10px;
+  line-height: 1.4;
 }
 
 .settings-field-error {
@@ -4520,12 +4478,6 @@ textarea:focus-visible {
     --glass-inset: #101e33;
   }
 }
-
-/* Final contrast overrides for glass surfaces. */
-.auth-visual-copy p, .hero-copy p { color: #d6e1f0; }
-.auth-card .auth-subtitle, .auth-card .auth-options, .auth-card .auth-switch, .auth-card .role-selector__description { color: #d6e1f0; }
-.student-nav-label, .student-nav-link--disabled, .student-nav-link--disabled > span, .student-nav-link small { color: #c1cee0; }
-.activity-card dt, .activity-card > p, .settings-profile-grid label > small:not(.settings-field-error) { color: #c4d0e0; }
 
 /* Shared Student and Professor Learning Mode */
 .learning-page { width: min(1090px, calc(100% - 64px)); margin: 0 auto; padding: 30px 0 48px; flex: 1; }
