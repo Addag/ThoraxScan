@@ -35,6 +35,9 @@
   --font-brand: var(--font-inter);
 }
 
+/* Hand-written styles live in the components layer so Tailwind utilities can override them.
+   Unlayered CSS would beat every utility regardless of specificity. */
+@layer components {
 
 * {
   box-sizing: border-box;
@@ -4644,3 +4647,5 @@ textarea:focus-visible {
 .activity-ai-disclaimer { border-left: 3px solid var(--disclaimer-yellow); color: #ffe28a; padding-left: 10px; }
 .activity-ai-suppressed { color: #ffd98b; }
 .activity-ai-status .activity-primary-button, .activity-ai-feedback .activity-primary-button { margin: 0 16px 16px; }
+
+} /* @layer components */
