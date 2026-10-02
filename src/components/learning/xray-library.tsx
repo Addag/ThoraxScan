@@ -4,6 +4,7 @@ import { useState } from "react";
 import cases from "@/lib/xray-library/cases.json";
 
 const findings = [...new Set(cases.flatMap((item) => Object.entries(item.labels).filter(([, value]) => value === 1).map(([label]) => label)))];
+const focusRing = "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#80caff]";
 
 export function XrayLibrary({ onSelect, disabled = false }: {
   onSelect: (file: File) => void;
@@ -33,39 +34,39 @@ export function XrayLibrary({ onSelect, disabled = false }: {
     }
   }
 
-  return <section className="xray-library" aria-label="Built-in X-ray library">
-    <h3>Built-in X-ray library</h3>
+  return <section className="grid min-w-0 gap-3.5 [&_p]:m-0 [&_p]:text-[13px] [&_p]:leading-[1.6] [&_p]:text-(--text-muted)" aria-label="Built-in X-ray library">
+    <h3 className="m-0 text-[18px]">Built-in X-ray library</h3>
     <p>All JPEG images from CheXpert Small’s validation folder, including frontal and lateral views. Choose a case to use it. Use frontal views for the existing AI practice workflow.</p>
-    <label className="xray-library-filter">Filter by view
-      <select value={view} onChange={(event) => setView(event.target.value)}>
+    <label className="grid gap-2 text-[13px]">Filter by view
+      <select className={`w-full min-w-0 rounded-lg border border-[#344158] bg-(--surface-field) p-2.5 text-inherit ${focusRing}`} value={view} onChange={(event) => setView(event.target.value)}>
         <option value="">All views</option>
         <option value="Frontal">Frontal</option>
         <option value="Lateral">Lateral</option>
       </select>
     </label>
-    <label className="xray-library-filter">Filter by dataset label
-      <select value={filter} onChange={(event) => setFilter(event.target.value)}>
+    <label className="grid gap-2 text-[13px]">Filter by dataset label
+      <select className={`w-full min-w-0 rounded-lg border border-[#344158] bg-(--surface-field) p-2.5 text-inherit ${focusRing}`} value={filter} onChange={(event) => setFilter(event.target.value)}>
         <option value="">All findings</option>
         {findings.map((finding) => <option key={finding}>{finding}</option>)}
       </select>
     </label>
-    <p className="xray-library-count">{visible.length} of {cases.length} cases</p>
-    <div className="xray-library-grid">
-      {visible.map((item) => <article className="xray-library-case" key={item.id}>
+    <p>{visible.length} of {cases.length} cases</p>
+    <div className="grid max-h-[560px] grid-cols-[repeat(auto-fit,minmax(min(100%,180px),1fr))] gap-3 overflow-y-auto p-0.5">
+      {visible.map((item) => <article className="flex min-w-0 flex-col gap-2.5 rounded-lg border border-[#344158] p-3" key={item.id}>
         {/* Serve the original small dataset JPEG without image transformation. */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={item.imageUrl} alt={`${item.title}, ${item.view}${item.projection ? ` ${item.projection}` : ""} chest X-ray`} width={320} height={320} loading="lazy" />
-        <div><strong>{item.title}</strong><span>{item.view}{item.projection ? ` · ${item.projection}` : ""}</span></div>
-        <details><summary>Dataset reference labels</summary>
+        <img className="h-40 w-full rounded-[5px] bg-[#080b10] object-contain" src={item.imageUrl} alt={`${item.title}, ${item.view}${item.projection ? ` ${item.projection}` : ""} chest X-ray`} width={320} height={320} loading="lazy" />
+        <div className="flex flex-wrap justify-between gap-1.5 text-[13px]"><strong>{item.title}</strong><span className="text-(--text-muted)">{item.view}{item.projection ? ` · ${item.projection}` : ""}</span></div>
+        <details className="text-[12px]"><summary className="cursor-pointer">Dataset reference labels</summary>
           <p>{Object.entries(item.labels).filter(([, value]) => value === 1).map(([label]) => label).join(", ") || "No positive labels recorded"}</p>
         </details>
-        <button type="button" disabled={disabled || loading !== null} onClick={() => void select(item)}>
+        <button className={`mt-auto cursor-pointer rounded-md border border-[#477daa] bg-[#20354b] p-[9px] text-inherit disabled:cursor-wait disabled:opacity-50 ${focusRing}`} type="button" disabled={disabled || loading !== null} onClick={() => void select(item)}>
           {loading === item.id ? "Loading…" : `Use ${item.title.toLowerCase()}`}
         </button>
       </article>)}
     </div>
     <p role="status">{loading ? "Loading library image…" : selected ? `${cases.find((item) => item.id === selected)?.title} loaded.` : ""}</p>
     {error ? <p role="alert">{error}</p> : null}
-    <p className="xray-library-source">Source: <a href="https://stanfordmlgroup.github.io/competitions/chexpert/" target="_blank" rel="noreferrer">CheXpert · Stanford</a>. Labels and views come from the dataset, not model predictions or clinical review.</p>
+    <p>Source: <a className="text-inherit underline" href="https://stanfordmlgroup.github.io/competitions/chexpert/" target="_blank" rel="noreferrer">CheXpert · Stanford</a>. Labels and views come from the dataset, not model predictions or clinical review.</p>
   </section>;
 }

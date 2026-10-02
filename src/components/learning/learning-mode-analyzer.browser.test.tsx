@@ -40,16 +40,16 @@ test("library filters by a positive dataset label", async () => {
   await render(<LearningModeAnalyzer />);
   await page.getByLabelText("Filter by view").selectOptions("Frontal");
   await page.getByLabelText("Filter by dataset label").selectOptions("Lung Lesion");
-  expect(document.querySelectorAll(".xray-library-case").length).toBe(1);
+  expect(document.querySelectorAll("article").length).toBe(1);
   await page.getByText("Dataset reference labels", { exact: true }).click();
-  expect(document.querySelector(".xray-library-case details p")?.textContent).toContain("Lung Lesion");
+  expect(document.querySelector("article details p")?.textContent).toContain("Lung Lesion");
 });
 
 test("library includes lateral cases with accurate view labels", async () => {
   await render(<LearningModeAnalyzer />);
   await page.getByLabelText("Filter by view").selectOptions("Lateral");
-  expect(document.querySelectorAll(".xray-library-case").length).toBe(32);
-  for (const card of document.querySelectorAll(".xray-library-case")) {
+  expect(document.querySelectorAll("article").length).toBe(32);
+  for (const card of document.querySelectorAll("article")) {
     expect(card.querySelector("img")?.getAttribute("alt")).toContain("Lateral");
   }
 });
@@ -103,12 +103,13 @@ test("findings, contract order, focus, and provenance", async () => {
   await expect.element(page.getByRole("heading", { name: "Analysis result" })).toHaveFocus();
   await expect.element(page.getByText("Cardiomegaly", { exact: true }).first()).toBeVisible();
   await page.getByText("All 14 labels", { exact: true }).click();
-  expect(Array.from(document.querySelectorAll(".learning-labels li strong"), (node) => node.textContent)).toEqual(manifest.labels.map((item) => item.name));
+  const labels = page.getByText("All 14 labels", { exact: true }).element().closest("details")!;
+  expect(Array.from(labels.querySelectorAll("li strong"), (node) => node.textContent)).toEqual(manifest.labels.map((item) => item.name));
   await page.getByText("Release and execution provenance", { exact: true }).click();
   for (const value of ["test-release", "WASM", "preprocessing-v1", "thresholds-v1", "test-build", "a".repeat(64), "b".repeat(64)]) {
     await expect.element(page.getByText(value, { exact: true })).toBeVisible();
   }
-  expect(document.querySelector(".learning-provenance")?.textContent).toContain("Manifest version1");
+  expect(page.getByText("Release and execution provenance", { exact: true }).element().closest("details")?.textContent).toContain("Manifest version1");
 });
 
 test("no label meets threshold", async () => {
@@ -121,7 +122,7 @@ test("No Finding suppression uses postprocessing output", async () => {
   mocks.analyze.mockResolvedValue(prediction(manifest.labels.map((_, i) => i < 2 ? 2 : -2)));
   await render(<LearningModeAnalyzer />); await start();
   await expect.element(page.getByText("No Finding: Suppressed by abnormal finding.")).toBeVisible();
-  expect(document.querySelector(".learning-findings")?.textContent).not.toContain("No Finding");
+  expect(page.getByRole("region", { name: "Thresholded findings" }).element().textContent).not.toContain("No Finding");
   await page.getByText("All 14 labels", { exact: true }).click();
   await expect.element(page.getByText("Matched · Suppressed by abnormal finding", { exact: true })).toBeVisible();
 });
