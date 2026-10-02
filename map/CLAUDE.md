@@ -18,6 +18,7 @@ This is a source-backed map of the ThoraxScan application repository one level a
 | What is X? | [objects/_index.md](objects/_index.md), then the linked card |
 | What actually runs? | [processes/CONTEXT.md](processes/CONTEXT.md) |
 | What schema is live? | [Profile schema](objects/runtime/supabase-profile-schema.md), [Account settings](objects/runtime/account-settings.md), [Platform administrator](objects/identity/platform-administrator.md), [Professor application](objects/identity/professor-application.md), [Workspace](objects/learning/workspace.md), [Membership](objects/learning/workspace-membership.md), [Invitation Code](objects/learning/invitation-code.md), [Activity](objects/learning/activity.md), [X-ray case](objects/learning/xray-case.md), [Model release](objects/inference/model-release.md), and [Active model slot](objects/inference/active-model-slot.md) |
+| How was the model trained, and on which views? | [Model training](objects/inference/model-training.md) |
 | How is a model replaced? | [Model validation](processes/model-validation.md), [staging](processes/model-staging.md), [activation](processes/model-activation.md), and [rollback](processes/model-rollback.md) |
 | How do Students save and finalize responses? | [Student submission](objects/learning/student-submission.md), then [submission workflow](processes/student-submission.md) |
 | How are activities published and viewed? | [Activity authoring/publication](processes/activity-authoring-publication.md), then [Student activity viewing](processes/student-activity-view.md) |

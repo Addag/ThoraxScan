@@ -24,7 +24,8 @@ A static manifest plus public JPEGs gives Learning Mode and Professor activity a
 
 ## Known gaps
 
-- Lateral images can be picked for activities, but the [X-ray case](xray-case.md) row is always written with `view_position = 'frontal'` and publication requires frontal. The attestation copy no longer says "frontal"; the server error text still does. Model support for lateral views is unverified.
+- Lateral images can be picked for activities, but the [X-ray case](xray-case.md) row is always written with `view_position = 'frontal'` and publication requires frontal. The attestation copy no longer says "frontal"; the server error text still does. Training included about 14.5% lateral images, but lateral accuracy has never been evaluated; see [Model training](../inference/model-training.md).
+- All 234 cases are the `valid.csv` images used to pick the checkpoint, so AI results on them look better than they would on unseen images.
 - Dataset labels are reference data only; they are not written into the Professor's private reference evaluation.
 - Images are public static assets once deployed; the [README](<../../../src/lib/xray-library/README.md>) flags that redistribution permission under the CheXpert agreement is unconfirmed.
 

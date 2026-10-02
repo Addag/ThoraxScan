@@ -40,6 +40,7 @@ One line per important noun. live cards are source-backed; ghost entries are doc
 
 | Noun | Universe | Card or source stub | Source |
 |---|---|---|---|
+| Model training (official retrain v1) | live | [model-training.md](inference/model-training.md) | External `Official_retrain_v1` scripts, checkpoint, and CheXpert CSVs |
 | Model release / ONNX artifact | live | [model-release.md](inference/model-release.md) | Immutable registry row and content-addressed Storage objects |
 | Active model slot | live | [active-model-slot.md](inference/active-model-slot.md) | One seeded pointer and append-only activation history per Supabase instance |
 | Model manifest, labels, and thresholds | live | [model-manifest-configuration.md](inference/model-manifest-configuration.md) | V1/V2 manifest parser and publisher-generated manifest |
