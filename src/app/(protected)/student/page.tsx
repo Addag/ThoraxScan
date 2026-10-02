@@ -5,6 +5,7 @@ import Link from "next/link";
 import { InvitationForm } from "@/components/student/invitation-form";
 import { StudentShell } from "@/components/student/student-shell";
 import { formatDueDate } from "@/components/activities/activity-ui";
+import { EmptyState } from "@/components/empty-state";
 import { getStudentActivities } from "@/lib/activities/server";
 import { requireRole } from "@/lib/auth/server";
 import { getStudentWorkspaces } from "@/lib/workspaces/server";
@@ -56,16 +57,9 @@ export default async function StudentPage() {
           </div>
 
           {workspaces.error ? (
-            <div className="student-empty-state student-empty-state--error" role="alert">
-              <h3>Workspaces are unavailable</h3>
-              <p>Refresh the page or try again later.</p>
-            </div>
+            <EmptyState error role="alert" title="Workspaces are unavailable">Refresh the page or try again later.</EmptyState>
           ) : workspaces.data.length === 0 ? (
-            <div className="student-empty-state">
-              <span aria-hidden="true">＋</span>
-              <h3>No workspaces yet</h3>
-              <p>Use a Student invitation code to join your first workspace.</p>
-            </div>
+            <EmptyState icon="＋" title="No workspaces yet">Use a Student invitation code to join your first workspace.</EmptyState>
           ) : (
             <div className="student-workspace-grid">
               {workspaces.data.map((workspace) => (

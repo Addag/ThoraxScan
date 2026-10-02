@@ -6,6 +6,7 @@ import {
   ProfessorRedeemForm,
 } from "@/components/professor/professor-forms";
 import { ProfessorShell } from "@/components/professor/professor-shell";
+import { EmptyState } from "@/components/empty-state";
 import { getProfessorActivities } from "@/lib/activities/server";
 import { requireRole } from "@/lib/auth/server";
 import { getProfessorWorkspaces } from "@/lib/workspaces/server";
@@ -96,16 +97,9 @@ export default async function ProfessorPage() {
           </div>
 
           {workspaces.error ? (
-            <div className="student-empty-state student-empty-state--error" role="alert">
-              <h3>Workspaces are unavailable</h3>
-              <p>Refresh the page or try again later.</p>
-            </div>
+            <EmptyState error role="alert" title="Workspaces are unavailable">Refresh the page or try again later.</EmptyState>
           ) : workspaces.data.length === 0 ? (
-            <div className="student-empty-state">
-              <span aria-hidden="true">＋</span>
-              <h3>No teaching workspaces yet</h3>
-              <p>Create a workspace or redeem a Professor invitation.</p>
-            </div>
+            <EmptyState icon="＋" title="No teaching workspaces yet">Create a workspace or redeem a Professor invitation.</EmptyState>
           ) : (
             <div className="student-workspace-grid">
               {workspaces.data.map((workspace) => (

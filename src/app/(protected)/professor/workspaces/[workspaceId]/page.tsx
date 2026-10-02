@@ -13,6 +13,7 @@ import { ProfessorShell } from "@/components/professor/professor-shell";
 import { requireRole } from "@/lib/auth/server";
 import type { InvitationCode } from "@/lib/workspaces/types";
 import { getProfessorWorkspace } from "@/lib/workspaces/server";
+import { activityButton } from "@/components/activities/activity-button";
 
 export const metadata: Metadata = {
   title: "Manage workspace | ThoraxScan",
@@ -102,10 +103,10 @@ export default async function ProfessorWorkspacePage({
               currentName={workspace.name}
             />
           )}
-          <Link className="activity-secondary-button" href={`/professor/activities?workspace=${workspace.id}`}>
+          <Link className={activityButton.secondary} href={`/professor/activities?workspace=${workspace.id}`}>
             View workspace activities
           </Link>
-          <Link className="activity-secondary-button" href={`/professor/submissions?workspace=${workspace.id}`}>
+          <Link className={activityButton.secondary} href={`/professor/submissions?workspace=${workspace.id}`}>
             Review submissions
           </Link>
         </section>

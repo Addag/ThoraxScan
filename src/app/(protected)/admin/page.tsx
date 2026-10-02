@@ -3,6 +3,7 @@ import Link from "next/link";
 
 import { AdminShell } from "@/components/admin/admin-shell";
 import { ApplicationReviewForm } from "@/components/admin/application-review-form";
+import { EmptyState } from "@/components/empty-state";
 import { getProfessorApplications } from "@/lib/admin/server";
 import type { ProfessorApplicationProjection } from "@/lib/admin/types";
 import type { ProfessorApplicationStatus } from "@/lib/auth/types";
@@ -13,6 +14,12 @@ export const metadata: Metadata = {
 };
 
 const filters = ["pending", "approved", "rejected", "all"] as const;
+
+const statusBadgeColor: Record<ProfessorApplicationStatus, string> = {
+  pending: "text-[#ffd166]",
+  approved: "text-[#63e6a4]",
+  rejected: "text-[#ff8585]",
+};
 type ApplicationFilter = (typeof filters)[number];
 
 function isFilter(value: string | undefined): value is ApplicationFilter {
@@ -118,16 +125,9 @@ export default async function AdminPage({
           </nav>
 
           {applications.error ? (
-            <div className="student-empty-state student-empty-state--error" role="alert">
-              <h3>Applications are unavailable</h3>
-              <p>Refresh the page or try again later.</p>
-            </div>
+            <EmptyState error role="alert" title="Applications are unavailable">Refresh the page or try again later.</EmptyState>
           ) : visibleApplications.length === 0 ? (
-            <div className="student-empty-state">
-              <span aria-hidden="true">✓</span>
-              <h3>No matching applications</h3>
-              <p>There are no Professor applications in this view.</p>
-            </div>
+            <EmptyState icon="✓" title="No matching applications">There are no Professor applications in this view.</EmptyState>
           ) : (
             <div className="admin-application-list">
               {visibleApplications.map((application) => (
@@ -175,7 +175,7 @@ function ApplicationCard({
           <h3>{application.display_name}</h3>
           <p>{application.email}</p>
         </div>
-        <strong className={`admin-status-badge admin-status-badge--${application.status}`}>
+        <strong className={`rounded-[999px] border border-current px-[9px] py-1.5 text-[10px] leading-[1.4] tracking-[0.06em] uppercase max-[560px]:w-fit ${statusBadgeColor[application.status]}`}>
           {application.status}
         </strong>
       </div>

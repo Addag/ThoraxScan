@@ -8,6 +8,7 @@ import {
   formatDueDate,
 } from "@/components/activities/activity-ui";
 import { StudentShell } from "@/components/student/student-shell";
+import { EmptyState } from "@/components/empty-state";
 import { getStudentActivities } from "@/lib/activities/server";
 import { requireRole } from "@/lib/auth/server";
 
@@ -25,16 +26,9 @@ export default async function StudentActivitiesPage() {
         <ActivityPageHeading description="Review published chest X-ray assignments from your workspaces" />
 
         {activities.error ? (
-          <div className="activity-empty-state activity-empty-state--error" role="alert">
-            <h2>Activities are unavailable</h2>
-            <p>Refresh the page or try again later.</p>
-          </div>
+          <EmptyState variant="card" error role="alert" title="Activities are unavailable">Refresh the page or try again later.</EmptyState>
         ) : activities.data.length === 0 ? (
-          <div className="activity-empty-state">
-            <span aria-hidden="true">▣</span>
-            <h2>No published activities yet</h2>
-            <p>Activities will appear here as soon as teaching staff publish them.</p>
-          </div>
+          <EmptyState variant="card" icon="▣" title="No published activities yet">Activities will appear here as soon as teaching staff publish them.</EmptyState>
         ) : (
           <div className="student-activity-list">
             {activities.data.map((activity) => (
