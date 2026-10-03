@@ -22,7 +22,7 @@ type SettingsTab = (typeof tabOrder)[number];
 const panelClass = "border border-[#8d9199] rounded-[10px] [background:var(--glass-surface)] backdrop-blur-[18px] backdrop-saturate-[135%] shadow-(--glass-shadow)";
 const panelHeadingClass = "mb-[26px] [&_h2]:m-0 [&_h2]:text-[20px] [&_h2]:capitalize [&_p]:m-0 [&_p]:mt-[3px] [&_p]:text-[13px] [&_p]:text-[#b4bac6]";
 const fieldClass = "grid gap-[7px] text-[13px] text-[#f5f5f5] [&>span>small]:ml-[5px] [&>span>small]:text-[#8f96a3] [&>small:not([data-error])]:text-[10px] [&>small:not([data-error])]:leading-[1.4] [&>small:not([data-error])]:text-[#c4d0e0]";
-const inputClass = "min-h-[38px] w-full rounded-[7px] border border-[rgba(255,255,255,0.49)] bg-[#05070c] px-[11px] py-[7px] text-white read-only:bg-[#11151d] read-only:text-[#b8beca]";
+const inputClass = "min-h-[38px] w-full rounded-[7px] border border-[rgba(255,255,255,0.49)] bg-[#05070c] px-[11px] py-[7px] text-white [&[readonly]]:bg-[#11151d] [&[readonly]]:text-[#b8beca]";
 const iconClass = "size-6 fill-none stroke-current stroke-[1.6] [stroke-linecap:round] [stroke-linejoin:round]";
 const messageBaseClass = "-mt-[9px] rounded-[6px] px-3 py-2.5 text-[12px]";
 
@@ -127,7 +127,7 @@ export function SettingsForm({
             <button
               aria-controls={`settings-panel-${tab}`}
               aria-selected={activeTab === tab}
-              className={`grid min-h-[67px] w-full cursor-pointer grid-cols-[36px_minmax(0,1fr)] items-center rounded-[10px] border border-transparent bg-transparent px-[22px] text-left text-[20px] font-semibold text-white max-[600px]:min-h-[58px] max-[600px]:px-[14px] max-[600px]:text-[17px] ${activeTab === tab ? "border-[#21aaff] bg-[rgba(70,193,255,0.49)]" : ""}`}
+              className={`grid min-h-[67px] w-full cursor-pointer grid-cols-[36px_minmax(0,1fr)] items-center rounded-[10px] border px-[22px] text-left text-[20px] font-semibold text-white max-[600px]:min-h-[58px] max-[600px]:px-[14px] max-[600px]:text-[17px] ${activeTab === tab ? "border-[#21aaff] bg-[rgba(70,193,255,0.49)]" : "border-transparent bg-transparent"}`}
               id={`settings-tab-${tab}`}
               key={tab}
               onClick={() => setActiveTab(tab)}
