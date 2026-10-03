@@ -2702,6 +2702,13 @@ textarea:focus-visible {
   padding-bottom: 60px;
 }
 
+/* Keep the professor dashboard heading above its cards and actions. */
+.professor-dashboard > .student-page-heading { order: 1; }
+.professor-dashboard > .professor-stat-grid { order: 2; }
+.professor-dashboard > .professor-activities-cta { order: 3; }
+.professor-dashboard > .professor-dashboard-actions { order: 4; }
+.professor-dashboard > .professor-workspaces { order: 5; }
+
 .professor-stat-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
