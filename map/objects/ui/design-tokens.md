@@ -3,7 +3,7 @@ node_type: schema
 universe: live
 status: verified
 audited: 2026-10-03
-snapshot: Convert_to_Tailwind @ 0958975
+snapshot: main @ 2210fa5 + working tree
 ---
 
 # Design tokens
@@ -18,9 +18,9 @@ The landing, authentication, administration, role dashboards, and activity surfa
 
 Glass hierarchy uses three shared surface tokens in [globals.css](<../../../src/app/globals.css:3>): `--glass-shell` for darker navigation, `--glass-surface` with `--glass-shadow` for primary panels, and `--glass-inset` with an inset highlight for nested cards. Workspace cards, administrator application cards, model status cards, and statistic tiles omit additional backdrop blur; primary panels retain it. Selected navigation/role colors and image-frame backgrounds remain separate. Verified against the working tree on 2026-09-12.
 
-Core variables include canvas, app background, surfaces, borders, text, brand blue, success green, warning yellow, and purple accent in [globals.css](<../../../src/app/globals.css:3>). The shared Settings surface adds responsive category rows, panels, status treatments, a switch, action gradient, and dark/light activity-image frames in [the settings styles](<../../../src/app/globals.css:3609>).
+Core variables include canvas, app background, surfaces, borders, text, brand blue, success green, warning yellow, and purple accent in [globals.css](<../../../src/app/globals.css:3>). The shared Settings surface styles its category rows, panels, status treatments, switch, and action gradient with Tailwind utilities in [settings-form.tsx](<../../../src/components/settings/settings-form.tsx>); the dark/light activity-image frames it toggles remain in [globals.css](<../../../src/app/globals.css:3616>).
 
-Hand-written rules sit inside `@layer components` in [globals.css](<../../../src/app/globals.css:41>) so Tailwind utilities override them; unlayered CSS would beat every utility. `@theme inline` exposes `background`, `foreground`, and `brand` colors to utilities in [globals.css](<../../../src/app/globals.css:31>); other tokens are used as `bg-(--name)` / `text-(--name)`. Utility-styled surfaces: the shared role shell in [app-shell.tsx](<../../../src/components/app-shell.tsx>) and [app-sidebar.tsx](<../../../src/components/app-sidebar.tsx>), [EmptyState](<../../../src/components/empty-state.tsx>), the [activity button classes](<../../../src/components/activities/activity-button.ts>), the administrator status badge, and Learning Mode with the built-in X-ray library. Utilities use `max-[Npx]:` variants, which exclude the boundary pixel that the legacy `max-width` queries include. `.primary-button` and the landing, auth, settings, workspace, and activity-page styles remain in globals.css.
+Hand-written rules sit inside `@layer components` in [globals.css](<../../../src/app/globals.css:41>) so Tailwind utilities override them; unlayered CSS would beat every utility. `@theme inline` exposes `background`, `foreground`, and `brand` colors to utilities in [globals.css](<../../../src/app/globals.css:31>); other tokens are used as `bg-(--name)` / `text-(--name)`. Utility-styled surfaces: the shared role shell in [app-shell.tsx](<../../../src/components/app-shell.tsx>) and [app-sidebar.tsx](<../../../src/components/app-sidebar.tsx>), [EmptyState](<../../../src/components/empty-state.tsx>), the [activity button classes](<../../../src/components/activities/activity-button.ts>), the administrator status badge, Learning Mode with the built-in X-ray library, and the shared Settings surface. Utilities use `max-[Npx]:` variants, which exclude the boundary pixel that the legacy `max-width` queries include. `.primary-button` and the landing, auth, workspace, and activity-page styles remain in globals.css.
 
 ## Connected to
 

@@ -3,7 +3,7 @@ node_type: object
 universe: live
 status: verified
 audited: 2026-10-03
-snapshot: Convert_to_Tailwind @ 0958975
+snapshot: main @ 2210fa5 + working tree
 ---
 
 # Shared settings surface
@@ -19,7 +19,7 @@ Student and Professor accounts share one settings contract and visual structure,
 - Both thin route pages render one role-aware Server Component that rechecks access, reads Auth email plus self-private settings, and retains the existing Student or Professor shell in [the page wrapper](<../../../src/components/settings/settings-page.tsx:8>).
 - One Client Component owns the accessible tablist, retained drafts, pending state, validation messages, and Save Changes action across every tab in [the settings form](<../../../src/components/settings/settings-form.tsx:46>).
 - Profile exposes editable display name, read-only sign-in email, and Professor-only optional work phone; Display exposes the persisted teaching-image frame switch; Privacy presents implemented Storage and inference-foundation status without editable controls.
-- Responsive category rows, bordered panels, status treatments, switch, gradient action, and image-frame variants live in [global settings styles](<../../../src/app/globals.css:3609>).
+- Responsive category rows, bordered panels, status treatments, switch, and gradient action are Tailwind utilities in [the settings form](<../../../src/components/settings/settings-form.tsx>) and [the page wrapper](<../../../src/components/settings/settings-page.tsx>); the dark/light image-frame variants live in [globals.css](<../../../src/app/globals.css:3616>).
 
 ## Connected to
 
