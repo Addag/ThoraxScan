@@ -19,7 +19,7 @@ The page reuses the established dashboard visual system while keeping review dat
 - The page calls `requirePlatformAdmin` before loading the administrator-only application projection in [admin/page.tsx](<../../../src/app/(protected)/admin/page.tsx:35>).
 - Counts, status filters, and name/email filtering are derived from the returned projection in [admin/page.tsx](<../../../src/app/(protected)/admin/page.tsx:39>).
 - The review Server Action validates form fields, re-derives the caller capability, invokes the RPC, and revalidates affected routes in [admin/actions.ts](<../../../src/app/(protected)/admin/actions.ts:22>).
-- Administrator-specific responsive rules are owned by [globals.css](<../../../src/app/globals.css:3270>); the status badge carries its own Tailwind utilities in [admin/page.tsx](<../../../src/app/(protected)/admin/page.tsx:18>), and the sidebar comes from the shared [AppShell](<../../../src/components/app-shell.tsx>).
+- Administrator-specific layout and responsive rules are owned by Tailwind utilities in [admin/page.tsx](<../../../src/app/(protected)/admin/page.tsx:35>), [application-review-form.tsx](<../../../src/components/admin/application-review-form.tsx:16>), and [review-styles.ts](<../../../src/components/admin/review-styles.ts:1>); the sidebar comes from the shared [AppShell](<../../../src/components/app-shell.tsx>).
 
 ## Connected to
 

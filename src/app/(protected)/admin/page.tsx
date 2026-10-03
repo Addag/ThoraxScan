@@ -4,6 +4,7 @@ import Link from "next/link";
 import { AdminShell } from "@/components/admin/admin-shell";
 import { ApplicationReviewForm } from "@/components/admin/application-review-form";
 import { EmptyState } from "@/components/empty-state";
+import { rejectionReasonClass, reviewFieldClass, reviewPanelClass } from "@/components/admin/review-styles";
 import { getProfessorApplications } from "@/lib/admin/server";
 import type { ProfessorApplicationProjection } from "@/lib/admin/types";
 import type { ProfessorApplicationStatus } from "@/lib/auth/types";
@@ -65,7 +66,7 @@ export default async function AdminPage({
 
   return (
     <AdminShell>
-      <main className="student-dashboard admin-dashboard">
+      <main className="student-dashboard pb-[60px]">
         <div className="student-page-heading">
           <div>
             <h1>Administrator dashboard</h1>
@@ -81,15 +82,15 @@ export default async function AdminPage({
           </time>
         </div>
 
-        <section className="professor-stat-grid admin-stat-grid" aria-label="Professor application overview">
+        <section className="professor-stat-grid" aria-label="Professor application overview">
           <StatCard symbol="…" value={counts.pending} label="Pending" detail="Awaiting review" />
           <StatCard symbol="✓" value={counts.approved} label="Approved" detail="Professor access granted" />
           <StatCard symbol="×" value={counts.rejected} label="Rejected" detail="May be reconsidered" />
           <StatCard symbol="Σ" value={applications.data.length} label="Total applications" detail="All review states" />
         </section>
 
-        <section className="admin-applications-panel" aria-labelledby="applications-title">
-          <div className="student-section-heading admin-applications-heading">
+        <section className={`${reviewPanelClass} p-6 max-[560px]:p-[18px]`} aria-labelledby="applications-title">
+          <div className="student-section-heading mb-5">
             <div>
               <p className="student-section-kicker">Account provisioning</p>
               <h2 id="applications-title">Professor applications</h2>
@@ -97,14 +98,15 @@ export default async function AdminPage({
             <span>{visibleApplications.length} shown</span>
           </div>
 
-          <form className="admin-application-tools" method="get">
-            <label htmlFor="application-search">Search applicants</label>
-            <div>
+          <form className="grid grid-cols-[minmax(0,1fr)_auto] items-end gap-3" method="get">
+            <label className="col-span-full text-[12px] font-extrabold text-white" htmlFor="application-search">Search applicants</label>
+            <div className="col-span-full grid grid-cols-[minmax(0,1fr)_auto] gap-2.5 max-[560px]:grid-cols-1">
               <input
                 id="application-search"
                 name="q"
                 type="search"
                 defaultValue={q}
+                className={`${reviewFieldClass} h-[43px]`}
                 placeholder="Name or email"
               />
               <input type="hidden" name="status" value={selectedFilter} />
@@ -112,11 +114,11 @@ export default async function AdminPage({
             </div>
           </form>
 
-          <nav className="admin-application-filters" aria-label="Application status filters">
+          <nav className="my-[18px] flex gap-2 overflow-x-auto pb-0.5" aria-label="Application status filters">
             {filters.map((filter) => (
               <Link
                 key={filter}
-                className={selectedFilter === filter ? "is-active" : undefined}
+                className={`rounded-[999px] border px-[14px] py-2 text-[12px] font-bold no-underline ${selectedFilter === filter ? "border-[#2caeff] bg-[rgba(44,174,255,0.18)] text-white" : "border-[#526078] text-[#c7ccda]"}`}
                 href={{ pathname: "/admin", query: { status: filter, ...(q ? { q } : {}) } }}
               >
                 {filter[0].toUpperCase() + filter.slice(1)}
@@ -129,7 +131,7 @@ export default async function AdminPage({
           ) : visibleApplications.length === 0 ? (
             <EmptyState icon="✓" title="No matching applications">There are no Professor applications in this view.</EmptyState>
           ) : (
-            <div className="admin-application-list">
+            <div className="grid gap-[14px]">
               {visibleApplications.map((application) => (
                 <ApplicationCard key={application.user_id} application={application} />
               ))}
@@ -168,32 +170,32 @@ function ApplicationCard({
   application: ProfessorApplicationProjection;
 }) {
   return (
-    <article className="admin-application-card">
-      <div className="admin-application-card__identity">
-        <span aria-hidden="true">{application.display_name.slice(0, 1).toUpperCase()}</span>
+    <article className="rounded-[9px] border border-[#33425c] bg-(--glass-inset) p-[18px] shadow-(--glass-inset-shadow) [&_h3]:m-0">
+      <div className="grid grid-cols-[44px_minmax(0,1fr)_auto] items-center gap-3 max-[560px]:grid-cols-1">
+        <span className="grid size-11 place-items-center rounded-full bg-[rgba(44,174,255,0.19)] font-black text-[#75c5ff] max-[560px]:hidden" aria-hidden="true">{application.display_name.slice(0, 1).toUpperCase()}</span>
         <div>
           <h3>{application.display_name}</h3>
-          <p>{application.email}</p>
+          <p className="mt-[3px] text-[12px] text-[#9da6b8]">{application.email}</p>
         </div>
         <strong className={`rounded-[999px] border border-current px-[9px] py-1.5 text-[10px] leading-[1.4] tracking-[0.06em] uppercase max-[560px]:w-fit ${statusBadgeColor[application.status]}`}>
           {application.status}
         </strong>
       </div>
-      <dl className="admin-application-card__facts">
-        <div><dt>Requested</dt><dd>{formatDate(application.requested_at)}</dd></div>
-        <div>
-          <dt>Email</dt>
-          <dd>{application.email_confirmed ? "Confirmed" : "Unconfirmed"}</dd>
+      <dl className="mt-4 grid grid-cols-3 gap-2.5 max-[760px]:grid-cols-1">
+        <div className="rounded-[6px] bg-[rgba(52,65,85,0.45)] p-2.5"><dt className="text-[10px] text-[#8f99ad] uppercase">Requested</dt><dd className="mt-1 text-[12px] font-extrabold">{formatDate(application.requested_at)}</dd></div>
+        <div className="rounded-[6px] bg-[rgba(52,65,85,0.45)] p-2.5">
+          <dt className="text-[10px] text-[#8f99ad] uppercase">Email</dt>
+          <dd className="mt-1 text-[12px] font-extrabold">{application.email_confirmed ? "Confirmed" : "Unconfirmed"}</dd>
         </div>
-        <div>
-          <dt>Memberships</dt>
-          <dd>{application.membership_count}</dd>
+        <div className="rounded-[6px] bg-[rgba(52,65,85,0.45)] p-2.5">
+          <dt className="text-[10px] text-[#8f99ad] uppercase">Memberships</dt>
+          <dd className="mt-1 text-[12px] font-extrabold">{application.membership_count}</dd>
         </div>
       </dl>
       {application.status === "rejected" && application.rejection_reason && (
-        <div className="admin-application-card__reason">
+        <div className={rejectionReasonClass}>
           <strong>Rejection reason</strong>
-          <p>{application.rejection_reason}</p>
+          <p className="mt-[5px]">{application.rejection_reason}</p>
         </div>
       )}
       {application.status !== "approved" && (

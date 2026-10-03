@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 
 import { ProfessorApplicationShell } from "@/components/professor/professor-application-shell";
+import { rejectionReasonClass, reviewPanelClass } from "@/components/admin/review-styles";
 import { getOwnProfessorApplication } from "@/lib/admin/server";
 import { getCurrentProfile } from "@/lib/auth/server";
 
@@ -24,7 +25,7 @@ export default async function ProfessorApplicationPage() {
 
   return (
     <ProfessorApplicationShell>
-      <main className="student-dashboard professor-application-page">
+      <main className="student-dashboard pb-[60px]">
         <div className="student-page-heading">
           <div>
             <h1>Professor application</h1>
@@ -32,37 +33,37 @@ export default async function ProfessorApplicationPage() {
           </div>
         </div>
 
-        <section className={`professor-application-card professor-application-card--${application.status}`}>
-          <div className="professor-application-card__icon" aria-hidden="true">
+        <section className={`${reviewPanelClass} max-w-[790px] p-[clamp(24px,5vw,42px)]`}>
+          <div className={`mb-[18px] grid size-[58px] place-items-center rounded-[12px] text-[30px] ${isPending ? "bg-[rgba(255,193,7,0.15)] text-[#ffd166]" : "bg-[rgba(207,54,64,0.17)] text-[#ff8585]"}`} aria-hidden="true">
             {isPending ? "◷" : "!"}
           </div>
           <p className="student-section-kicker">Application status</p>
-          <h2>{isPending ? "Review pending" : "Application not approved"}</h2>
-          <p>
+          <h2 className="m-0 text-[clamp(25px,4vw,34px)]">{isPending ? "Review pending" : "Application not approved"}</h2>
+          <p className="max-w-[650px] text-[14px] leading-[1.65] text-[#aeb6c5]">
             {isPending
               ? "An administrator must approve your Professor application before you can create or join teaching workspaces."
               : "Your Professor application was reviewed and rejected. Contact an administrator if your eligibility has changed."}
           </p>
 
           {application.rejection_reason && (
-            <div className="professor-application-reason">
+            <div className={rejectionReasonClass}>
               <strong>Administrator reason</strong>
-              <p>{application.rejection_reason}</p>
+              <p className="mt-[5px]">{application.rejection_reason}</p>
             </div>
           )}
 
-          <dl>
-            <div>
-              <dt>Submitted</dt>
-              <dd>{new Intl.DateTimeFormat("en-US", { dateStyle: "long" }).format(new Date(application.requested_at))}</dd>
+          <dl className="mt-6 grid gap-2.5">
+            <div className="grid grid-cols-[130px_minmax(0,1fr)] gap-4 border-t border-[#33425c] pt-2.5 max-[560px]:grid-cols-1">
+              <dt className="text-[11px] text-[#8893a8] uppercase">Submitted</dt>
+              <dd className="m-0 text-[12px] font-bold">{new Intl.DateTimeFormat("en-US", { dateStyle: "long" }).format(new Date(application.requested_at))}</dd>
             </div>
-            <div>
-              <dt>Access</dt>
-              <dd>Professor workspace features locked</dd>
+            <div className="grid grid-cols-[130px_minmax(0,1fr)] gap-4 border-t border-[#33425c] pt-2.5 max-[560px]:grid-cols-1">
+              <dt className="text-[11px] text-[#8893a8] uppercase">Access</dt>
+              <dd className="m-0 text-[12px] font-bold">Professor workspace features locked</dd>
             </div>
-            <div>
-              <dt>Notification</dt>
-              <dd>Return to this page to see the review result</dd>
+            <div className="grid grid-cols-[130px_minmax(0,1fr)] gap-4 border-t border-[#33425c] pt-2.5 max-[560px]:grid-cols-1">
+              <dt className="text-[11px] text-[#8893a8] uppercase">Notification</dt>
+              <dd className="m-0 text-[12px] font-bold">Return to this page to see the review result</dd>
             </div>
           </dl>
         </section>
