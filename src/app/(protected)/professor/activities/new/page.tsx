@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { ActivityPageHeading, ActivityStepRail } from "@/components/activities/activity-ui";
 import { ActivityDetailsForm } from "@/components/professor/activity-forms";
 import { ProfessorShell } from "@/components/professor/professor-shell";
+import { EmptyState } from "@/components/empty-state";
 import { requireRole } from "@/lib/auth/server";
 import { getProfessorWorkspaces } from "@/lib/workspaces/server";
 
@@ -24,10 +25,7 @@ export default async function NewProfessorActivityPage() {
         />
         <ActivityStepRail role="professor" />
         {workspaces.error || workspaces.data.length === 0 ? (
-          <div className="activity-empty-state activity-empty-state--error">
-            <h2>A teaching workspace is required</h2>
-            <p>Create or join a workspace before authoring an activity.</p>
-          </div>
+          <EmptyState variant="card" error title="A teaching workspace is required">Create or join a workspace before authoring an activity.</EmptyState>
         ) : (
           <div className="activity-authoring-layout activity-authoring-layout--new">
             <aside className="activity-authoring-note">

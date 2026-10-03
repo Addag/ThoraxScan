@@ -7,10 +7,12 @@ import {
   formatDueDate,
 } from "@/components/activities/activity-ui";
 import { ProfessorShell } from "@/components/professor/professor-shell";
+import { EmptyState } from "@/components/empty-state";
 import type { ActivityStatus } from "@/lib/activities/types";
 import { getProfessorActivities } from "@/lib/activities/server";
 import { requireRole } from "@/lib/auth/server";
 import { getProfessorWorkspaces } from "@/lib/workspaces/server";
+import { activityButton } from "@/components/activities/activity-button";
 
 export const metadata: Metadata = {
   title: "Activities | ThoraxScan",
@@ -72,7 +74,7 @@ export default async function ProfessorActivitiesPage({
             </label>
             <button type="submit">Apply filter</button>
           </form>
-          <Link className="activity-primary-button" href="/professor/activities/new">＋ New activity</Link>
+          <Link className={activityButton.primary} href="/professor/activities/new">＋ New activity</Link>
         </section>
 
         <nav className="activity-status-tabs" aria-label="Activity status">
@@ -85,16 +87,9 @@ export default async function ProfessorActivitiesPage({
         </nav>
 
         {activitiesResult.error || workspacesResult.error ? (
-          <div className="activity-empty-state activity-empty-state--error" role="alert">
-            <h2>Activities are unavailable</h2>
-            <p>Refresh the page or try again later.</p>
-          </div>
+          <EmptyState variant="card" error role="alert" title="Activities are unavailable">Refresh the page or try again later.</EmptyState>
         ) : filteredActivities.length === 0 ? (
-          <div className="activity-empty-state">
-            <span aria-hidden="true">▣</span>
-            <h2>No matching activities</h2>
-            <p>Create a draft or change the current workspace and status filters.</p>
-          </div>
+          <EmptyState variant="card" icon="▣" title="No matching activities">Create a draft or change the current workspace and status filters.</EmptyState>
         ) : (
           <div className="activity-card-grid">
             {filteredActivities.map((activity) => (

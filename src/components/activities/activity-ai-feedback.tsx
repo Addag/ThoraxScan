@@ -7,6 +7,7 @@ import { toActivityAIPersistencePayload } from "@/lib/activity-ai/adapter";
 import { claimActivityAIAnalysis, completeActivityAIAnalysis, failActivityAIAnalysis, refreshActivityCaseUrl } from "@/lib/activity-ai/actions";
 import type { ActivityAIFeedback } from "@/lib/activity-ai/types";
 import { AttentionHeatmap } from "@/components/attention-heatmap";
+import { activityButton } from "@/components/activities/activity-button";
 
 function safeCode(error: unknown) {
   if (error instanceof InferenceError) return error.code.toLowerCase();
@@ -76,7 +77,7 @@ export function ActivityAIFeedback({ activityId, imageUrl, initial }: { activity
     <div className="activity-panel-title"><span aria-hidden="true">✦</span><h2 id="activity-ai-feedback-title">AI feedback</h2></div>
     {feedback.status === "locked" ? <p className="activity-ai-copy">Submit your final evaluation to unlock controlled AI feedback.</p> : null}
     {feedback.status === "pending" || running ? <p role="status" className="activity-ai-copy">{message || "Analysis is pending…"}</p> : null}
-    {feedback.status === "failed" && !running ? <div className="activity-ai-copy"><p role="alert">{message || "Analysis failed. No prediction was released."}</p><button className="activity-primary-button" type="button" onClick={() => { startedRef.current = false; void runAnalysis(); }}>Retry analysis</button></div> : null}
+    {feedback.status === "failed" && !running ? <div className="activity-ai-copy"><p role="alert">{message || "Analysis failed. No prediction was released."}</p><button className={`${activityButton.primary} mx-4 mt-0 mb-4`} type="button" onClick={() => { startedRef.current = false; void runAnalysis(); }}>Retry analysis</button></div> : null}
     {feedback.status === "ready" && result ? <div className="activity-ai-result">
       <p className="activity-ai-disclaimer">Educational use only. This result is not a diagnosis and should not guide medical decisions.</p>
       <h3>Thresholded findings</h3>

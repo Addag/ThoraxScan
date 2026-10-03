@@ -2,6 +2,7 @@
 
 import { useActionState, useEffect, useState } from "react";
 import { initialSubmissionState, type StudentSubmission, type SubmissionActionState } from "@/lib/submissions/types";
+import { activityButton } from "@/components/activities/activity-button";
 
 export function StudentSubmissionForm({ submission, dueAt, deadlinePassed, action }: {
   submission: StudentSubmission | null;
@@ -54,15 +55,15 @@ export function StudentSubmissionForm({ submission, dueAt, deadlinePassed, actio
         <small id="region-hint">Required for a final abnormal response. Maximum 200 characters.</small>
         {fieldError("relevantRegion")}
         <div className="submission-actions">
-          <button className="activity-secondary-button" type="submit" name="intent" value="draft" onClick={() => setConfirming(false)}>Save draft</button>
-          <button className="activity-primary-button" type="button" onClick={() => setConfirming(true)}>Submit final evaluation</button>
+          <button className={activityButton.secondary} type="submit" name="intent" value="draft" onClick={() => setConfirming(false)}>Save draft</button>
+          <button className={activityButton.primary} type="button" onClick={() => setConfirming(true)}>Submit final evaluation</button>
         </div>
         {confirming ? <div className="submission-confirmation" role="group" aria-labelledby="confirmation-title">
           <strong id="confirmation-title">Confirm final submission</strong>
           <p>Your final evaluation cannot be edited. Review your response before confirming.</p>
           <input type="hidden" name="confirmed" value="yes" />
-          <button className="activity-primary-button" type="submit" name="intent" value="final">Confirm and submit</button>
-          <button className="activity-secondary-button" type="button" onClick={() => setConfirming(false)}>Keep editing</button>
+          <button className={activityButton.primary} type="submit" name="intent" value="final">Confirm and submit</button>
+          <button className={activityButton.secondary} type="button" onClick={() => setConfirming(false)}>Keep editing</button>
         </div> : null}
       </fieldset>
     </form>}

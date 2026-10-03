@@ -19,6 +19,7 @@ import {
 import { createClient } from "@/lib/supabase/client";
 import type { ProfessorWorkspace } from "@/lib/workspaces/types";
 import { XrayLibrary } from "@/components/learning/xray-library";
+import { activityButton } from "@/components/activities/activity-button";
 
 function FieldError({ children }: { children?: string }) {
   return children ? <small className="activity-field-error">{children}</small> : null;
@@ -121,7 +122,7 @@ export function ActivityDetailsForm({
       </label>
 
       {!isArchived ? (
-        <button className="activity-primary-button" type="submit" disabled={pending}>
+        <button className={activityButton.primary} type="submit" disabled={pending}>
           {pending ? "Saving…" : isEditing ? "Save changes" : "Create draft"}
         </button>
       ) : null}
@@ -227,7 +228,7 @@ export function CaseUploadForm({ activityId }: { activityId: string }) {
         <span>I attest this is a de-identified image approved for this class activity.</span>
       </label>
       <FieldError>{prepareState.fieldErrors?.attestation}</FieldError>
-      <button className="activity-secondary-button" type="submit" disabled={!file || busy}>
+      <button className={activityButton.secondary} type="submit" disabled={!file || busy}>
         {preparing ? "Authorizing…" : uploading ? "Uploading directly…" : confirming ? "Verifying…" : "Upload and verify case"}
       </button>
       {clientError ? <p className="activity-form-message activity-form-message--error" role="alert">{clientError}</p> : null}
@@ -259,7 +260,7 @@ function LifecycleForm({
       }}
     >
       <input type="hidden" name="activityId" value={activityId} />
-      <button className={danger ? "activity-danger-button" : "activity-primary-button"} type="submit" disabled={pending}>
+      <button className={danger ? activityButton.danger : activityButton.primary} type="submit" disabled={pending}>
         {pending ? "Working…" : label}
       </button>
       {state.message ? <p className={`activity-form-message activity-form-message--${state.status}`} role="status">{state.message}</p> : null}
