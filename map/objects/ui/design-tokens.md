@@ -44,3 +44,5 @@ Global CSS, browser rendering, and visual QA.
 ## See
 
 [globals.css](<../../../src/app/globals.css:3>)
+
+Authentication screens now use Tailwind utilities in [auth-layout.tsx](<../../../src/components/auth/auth-layout.tsx>) and [auth-form.tsx](<../../../src/components/auth/auth-form.tsx>); the shared auth-eyebrow, field-error, primary-button, and role-page rules remain in globals.css.
