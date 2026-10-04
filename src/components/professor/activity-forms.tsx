@@ -20,7 +20,7 @@ import { createClient } from "@/lib/supabase/client";
 import type { ProfessorWorkspace } from "@/lib/workspaces/types";
 import { XrayLibrary } from "@/components/learning/xray-library";
 import { activityButton } from "@/components/activities/activity-button";
-import { activityFormHeadingClass, activityFormHeadingIconClass, activityFormHeadingKickerClass, activityFormHeadingTitleClass, activityFormMessageClass } from "@/components/activities/activity-ui";
+import { activityFormHeadingClass, activityFormHeadingIconClass, activityFormHeadingKickerClass, activityFormHeadingTitleClass, activityFormMessageClass } from "@/components/activities/activity-form-styles";
 
 function FieldError({ children }: { children?: string }) {
   return children ? <small className="text-[10px] text-[#ff7c85]">{children}</small> : null;

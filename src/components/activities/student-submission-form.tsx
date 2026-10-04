@@ -3,7 +3,7 @@
 import { useActionState, useEffect, useState } from "react";
 import { initialSubmissionState, type StudentSubmission, type SubmissionActionState } from "@/lib/submissions/types";
 import { activityButton } from "@/components/activities/activity-button";
-import { activityFormHeadingClass, activityFormHeadingIconClass, activityFormHeadingKickerClass, activityFormHeadingTitleClass } from "@/components/activities/activity-ui";
+import { activityFormHeadingClass, activityFormHeadingIconClass, activityFormHeadingKickerClass, activityFormHeadingTitleClass } from "@/components/activities/activity-form-styles";
 
 export function StudentSubmissionForm({ submission, dueAt, deadlinePassed, action }: {
   submission: StudentSubmission | null;
