@@ -3,7 +3,7 @@ node_type: object
 universe: live
 status: verified
 audited: 2026-08-30
-snapshot: main @ 7aed17a + working tree
+snapshot: main @ working tree
 ---
 
 # Role workspace surfaces
@@ -42,7 +42,7 @@ The [Profile](../identity/profile.md), [Account settings](../runtime/account-set
 
 ## Surfaces
 
-Authenticated server-rendered pages and the current user.
+Authenticated server-rendered pages and the current user. Professor workspace detail layout and Professor workspace forms use Tailwind utilities in [the workspace page](<../../../src/app/(protected)/professor/workspaces/[workspaceId]/page.tsx>) and [professor forms](<../../../src/components/professor/professor-forms.tsx>); shared status classes remain in globals.css.
 
 ## See
 

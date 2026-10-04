@@ -19,6 +19,17 @@ export const metadata: Metadata = {
   title: "Manage workspace | ThoraxScan",
 };
 
+const panelBase = "rounded-[10px] border [background:var(--glass-surface)] backdrop-blur-[18px] backdrop-saturate-[135%] shadow-(--glass-shadow)";
+const panelHeadingClass = "flex items-center justify-between gap-5 border-b border-[rgba(172,172,172,0.45)] pb-4";
+const sectionTitleClass = "m-0 text-[19px]";
+const columnHeadingClass = "mx-0 mt-0 mb-2.5 text-[12px] text-[#b9c2d6] uppercase";
+const listResetClass = "m-0 list-none p-0";
+const avatarClass = "grid size-[34px] place-items-center rounded-full border border-[#5177a4] bg-[rgba(0,119,255,0.2)] font-extrabold text-[#b8ddff]";
+const memberRowClass = "grid min-h-[58px] grid-cols-[34px_minmax(0,1fr)_auto] items-center gap-2.5 border-b border-[rgba(93,107,133,0.35)] py-2";
+const memberNameClass = "overflow-hidden text-[12px] text-ellipsis whitespace-nowrap";
+const memberDetailClass = "flex min-w-0 flex-col gap-[3px]";
+const accessItemClass = "relative pl-[18px] text-[11px] leading-[1.45] text-[#aeb6c8] before:absolute before:top-[3px] before:left-0 before:text-[#45aaff] before:content-['✓']";
+
 const uuidPattern =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
@@ -41,14 +52,14 @@ function InvitationList({
   }
 
   return (
-    <ul className="professor-invitation-list">
+    <ul className={`${listResetClass} flex max-h-[300px] flex-col gap-2 overflow-y-auto`}>
       {invitations.map((invitation) => {
         const status = invitationStatus(invitation);
         return (
-          <li key={invitation.id}>
-            <div>
-              <strong>{status}</strong>
-              <span>
+          <li className="flex min-h-[55px] items-center justify-between gap-4 rounded-[7px] border border-[#3d4c67] bg-[rgba(4,8,40,0.3)] p-[10px_12px]" key={invitation.id}>
+            <div className={memberDetailClass}>
+              <strong className="text-[11px] text-[#b7ddff]">{status}</strong>
+              <span className="text-[10px] text-[#8f99ad]">
                 {invitation.uses_count}/{invitation.max_uses} uses · expires{" "}
                 {new Intl.DateTimeFormat("en-US", { dateStyle: "medium" }).format(
                   new Date(invitation.expires_at),
@@ -86,16 +97,16 @@ export default async function ProfessorWorkspacePage({
 
   return (
     <ProfessorShell>
-      <main className="student-dashboard professor-workspace-detail">
+      <main className="student-dashboard pt-9">
         <Link className="student-back-link" href="/professor">← Back to dashboard</Link>
 
-        <section className="professor-workspace-hero">
+        <section className={`${panelBase} flex items-start justify-between gap-10 border-[#33425c] p-[28px_30px] max-[1000px]:flex-col max-[700px]:p-5`}>
           <div>
             <p className="student-section-kicker">
               {workspace.is_owner ? "Owned workspace" : "Co-professor workspace"}
             </p>
-            <h1>{workspace.name}</h1>
-            <p>{students.length} students · {professors.length} teaching staff</p>
+            <h1 className="m-0 text-[clamp(27px,4vw,38px)] leading-[1.12]">{workspace.name}</h1>
+            <p className="mt-2 mb-0 text-[12px] text-[#98a2b7]">{students.length} students · {professors.length} teaching staff</p>
           </div>
           {workspace.is_owner && (
             <RenameWorkspaceForm
@@ -111,25 +122,25 @@ export default async function ProfessorWorkspacePage({
           </Link>
         </section>
 
-        <div className="professor-management-grid">
-          <section className="professor-roster-panel" aria-labelledby="roster-title">
-            <div className="professor-panel-heading">
+        <div className="mt-5 grid grid-cols-[minmax(0,2.1fr)_minmax(260px,0.9fr)] items-start gap-5 max-[1000px]:grid-cols-1">
+          <section className={`${panelBase} border-[#33425c] p-[24px_26px_26px] max-[700px]:p-5`} aria-labelledby="roster-title">
+            <div className={panelHeadingClass}>
               <div>
                 <p className="student-section-kicker">Membership</p>
-                <h2 id="roster-title">Workspace roster</h2>
+                <h2 className={sectionTitleClass} id="roster-title">Workspace roster</h2>
               </div>
-              <span>{workspace.members.length} members</span>
+              <span className="rounded-full border border-[#4d5b74] px-2.5 py-1.5 text-[10px] text-[#b9c2d6]">{workspace.members.length} members</span>
             </div>
-            <div className="professor-roster-groups">
+            <div className="grid grid-cols-2 gap-6 pt-[18px] max-[700px]:grid-cols-1">
               <div>
-                <h3>Teaching staff</h3>
-                <ul>
+                <h3 className={columnHeadingClass}>Teaching staff</h3>
+                <ul className={listResetClass}>
                   {professors.map((member) => (
-                    <li key={member.user_id}>
-                      <span className="professor-avatar" aria-hidden="true">
+                    <li className={memberRowClass} key={member.user_id}>
+                      <span className={avatarClass} aria-hidden="true">
                         {member.display_name.slice(0, 1).toUpperCase()}
                       </span>
-                      <div><strong>{member.display_name}</strong><small>{member.is_owner ? "Owner" : "Co-professor"}</small></div>
+                      <div className={memberDetailClass}><strong className={memberNameClass}>{member.display_name}</strong><small className="text-[10px] text-[#8490a6]">{member.is_owner ? "Owner" : "Co-professor"}</small></div>
                       {workspace.is_owner &&
                         !member.is_owner &&
                         member.user_id !== profile.id && (
@@ -140,17 +151,17 @@ export default async function ProfessorWorkspacePage({
                 </ul>
               </div>
               <div>
-                <h3>Students</h3>
+                <h3 className={columnHeadingClass}>Students</h3>
                 {students.length === 0 ? (
                   <p className="professor-list-empty">No students have joined yet.</p>
                 ) : (
-                  <ul>
+                  <ul className={listResetClass}>
                     {students.map((member) => (
-                      <li key={member.user_id}>
-                        <span className="professor-avatar" aria-hidden="true">
+                      <li className={memberRowClass} key={member.user_id}>
+                        <span className={avatarClass} aria-hidden="true">
                           {member.display_name.slice(0, 1).toUpperCase()}
                         </span>
-                        <div><strong>{member.display_name}</strong><small>Student</small></div>
+                        <div className={memberDetailClass}><strong className={memberNameClass}>{member.display_name}</strong><small className="text-[10px] text-[#8490a6]">Student</small></div>
                         <RemoveMemberButton workspaceId={workspace.id} memberUserId={member.user_id} />
                       </li>
                     ))}
@@ -160,45 +171,45 @@ export default async function ProfessorWorkspacePage({
             </div>
           </section>
 
-          <aside className="professor-access-summary">
+          <aside className={`${panelBase} border-[#33425c] p-6`}>
             <p className="student-section-kicker">Your access</p>
-            <h2>{workspace.is_owner ? "Workspace owner" : "Co-professor"}</h2>
-            <ul>
-              <li>View the complete roster</li>
-              <li>Manage students and Student invitations</li>
-              <li>{workspace.is_owner ? "Rename and manage professors" : "Owner-only settings are read only"}</li>
+            <h2 className={sectionTitleClass}>{workspace.is_owner ? "Workspace owner" : "Co-professor"}</h2>
+            <ul className="mt-[18px] mb-0 flex list-none flex-col gap-3 p-0">
+              <li className={accessItemClass}>View the complete roster</li>
+              <li className={accessItemClass}>Manage students and Student invitations</li>
+              <li className={accessItemClass}>{workspace.is_owner ? "Rename and manage professors" : "Owner-only settings are read only"}</li>
             </ul>
           </aside>
         </div>
 
-        <section className="professor-invitations-panel" aria-labelledby="student-invitations-title">
-          <div className="professor-panel-heading">
+        <section className={`${panelBase} mt-5 border-[#33425c] p-[24px_26px_26px] max-[700px]:p-5`} aria-labelledby="student-invitations-title">
+          <div className={panelHeadingClass}>
             <div>
               <p className="student-section-kicker">Invitation management</p>
-              <h2 id="student-invitations-title">Student invitations</h2>
+              <h2 className={sectionTitleClass} id="student-invitations-title">Student invitations</h2>
             </div>
           </div>
-          <div className="professor-invitation-columns">
+          <div className="grid grid-cols-[minmax(280px,0.9fr)_minmax(0,1.1fr)] gap-7 pt-5 max-[1000px]:grid-cols-1">
             <InvitationCreateForm workspaceId={workspace.id} invitedRole="student" />
             <div>
-              <h3>Invitation history</h3>
+              <h3 className={columnHeadingClass}>Invitation history</h3>
               <InvitationList invitations={studentInvitations} canRevoke />
             </div>
           </div>
         </section>
 
         {workspace.is_owner && (
-          <section className="professor-invitations-panel" aria-labelledby="professor-invitations-title">
-            <div className="professor-panel-heading">
+          <section className={`${panelBase} mt-5 border-[#33425c] p-[24px_26px_26px] max-[700px]:p-5`} aria-labelledby="professor-invitations-title">
+            <div className={panelHeadingClass}>
               <div>
                 <p className="student-section-kicker">Owner controls</p>
-                <h2 id="professor-invitations-title">Professor invitations</h2>
+                <h2 className={sectionTitleClass} id="professor-invitations-title">Professor invitations</h2>
               </div>
             </div>
-            <div className="professor-invitation-columns">
+            <div className="grid grid-cols-[minmax(280px,0.9fr)_minmax(0,1.1fr)] gap-7 pt-5 max-[1000px]:grid-cols-1">
               <InvitationCreateForm workspaceId={workspace.id} invitedRole="professor" />
               <div>
-                <h3>Invitation history</h3>
+                <h3 className={columnHeadingClass}>Invitation history</h3>
                 <InvitationList invitations={professorInvitations} canRevoke />
               </div>
             </div>
