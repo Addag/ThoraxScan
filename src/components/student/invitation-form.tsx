@@ -3,6 +3,7 @@
 import { useActionState } from "react";
 
 import { redeemInvitationAction } from "@/app/(protected)/student/actions";
+import { primaryButton } from "@/components/primary-button";
 import { initialInvitationState } from "@/lib/workspaces/types";
 
 export function InvitationForm() {
@@ -28,7 +29,7 @@ export function InvitationForm() {
           aria-invalid={Boolean(state.fieldErrors?.code)}
           aria-describedby={state.message ? "student-invitation-status" : undefined}
         />
-        <button className="primary-button" type="submit" disabled={pending}>
+        <button className={`${primaryButton} min-h-[45px] px-[18px] disabled:cursor-wait disabled:opacity-70 max-[600px]:w-full`} type="submit" disabled={pending}>
           {pending ? "Joining…" : "Join workspace"}
         </button>
       </div>
@@ -44,3 +45,4 @@ export function InvitationForm() {
     </form>
   );
 }
+

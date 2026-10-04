@@ -3,6 +3,7 @@
 import { useActionState } from "react";
 
 import { reviewProfessorApplicationAction } from "@/app/(protected)/admin/actions";
+import { primaryButton } from "@/components/primary-button";
 import { reviewFieldClass } from "@/components/admin/review-styles";
 import {
   initialAdminReviewState,
@@ -29,7 +30,7 @@ export function ApplicationReviewForm({
           name="decision"
           value="approve"
           disabled={pending || !canApprove}
-          className="primary-button disabled:cursor-not-allowed disabled:opacity-[0.58]"
+          className={`${primaryButton} disabled:cursor-not-allowed disabled:opacity-[0.58]`}
         >
           {pending ? "Reviewing…" : application.status === "rejected" ? "Approve after review" : "Approve"}
         </button>
@@ -83,3 +84,4 @@ export function ApplicationReviewForm({
     </form>
   );
 }
+

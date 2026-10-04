@@ -14,6 +14,7 @@ import {
   registerAction,
   resetPasswordAction,
 } from "@/app/(auth)/actions";
+import { primaryButtonBase, primaryButtonSkin } from "@/components/primary-button";
 import { initialAuthState } from "@/lib/auth/types";
 
 export type AuthMode = "login" | "register" | "forgot" | "reset";
@@ -293,7 +294,7 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
       )}
 
       <button
-        className={`primary-button mt-[22px] h-[71px] w-full rounded-full text-[27px] leading-[34px] disabled:opacity-[0.72] ${pending ? "cursor-wait" : "disabled:cursor-not-allowed"}`}
+        className={`${primaryButtonBase} ${primaryButtonSkin} mt-[22px] h-[71px] w-full rounded-full text-[27px] leading-[34px] disabled:opacity-[0.72] ${pending ? "cursor-wait" : "disabled:cursor-not-allowed"}`}
         type="submit"
         disabled={pending || !captchaReady}
         aria-busy={pending}
@@ -435,3 +436,4 @@ function AuthSwitch({ mode }: { mode: AuthMode }) {
     </p>
   );
 }
+

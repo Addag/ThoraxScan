@@ -11,6 +11,7 @@ import {
   renameWorkspaceAction,
   revokeInvitationAction,
 } from "@/app/(protected)/professor/actions";
+import { primaryButton } from "@/components/primary-button";
 import type { AppRole } from "@/lib/auth/types";
 import {
   initialWorkspaceActionState,
@@ -48,7 +49,7 @@ export function CreateWorkspaceForm() {
           placeholder="e.g. RAD 302 — Section A"
           aria-invalid={Boolean(state.fieldErrors?.name)}
         />
-        <button className="primary-button" type="submit" disabled={pending}>
+        <button className={`${primaryButton} min-h-[43px] px-[17px] max-[700px]:w-full`} type="submit" disabled={pending}>
           {pending ? "Creating…" : "Create workspace"}
         </button>
       </div>
@@ -78,7 +79,7 @@ export function ProfessorRedeemForm() {
           placeholder="Paste your 22-character code"
           aria-invalid={Boolean(state.fieldErrors?.code)}
         />
-        <button className="primary-button" type="submit" disabled={pending}>
+        <button className={`${primaryButton} min-h-[43px] px-[17px] max-[700px]:w-full`} type="submit" disabled={pending}>
           {pending ? "Joining…" : "Join workspace"}
         </button>
       </div>
@@ -175,7 +176,7 @@ export function InvitationCreateForm({
           <input type="hidden" name="maxUses" value="1" />
         )}
       </div>
-      <button className="primary-button" type="submit" disabled={pending}>
+      <button className={`${primaryButton} min-h-[43px] px-[17px] max-[700px]:w-full`} type="submit" disabled={pending}>
         {pending
           ? "Generating…"
           : `Generate ${isStudent ? "Student" : "Professor"} code`}
@@ -256,3 +257,4 @@ export function LeaveWorkspaceForm({ workspaceId }: { workspaceId: string }) {
     </form>
   );
 }
+

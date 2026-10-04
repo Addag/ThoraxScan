@@ -1236,29 +1236,6 @@ textarea:focus-visible {
   line-height: 1.35;
 }
 
-.primary-button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border: 0;
-  border-radius: 7px;
-  background: var(--brand-blue);
-  box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
-  color: var(--text-primary);
-  cursor: pointer;
-  font-weight: 800;
-  text-decoration: none;
-  transition: background-color 160ms ease, transform 160ms ease;
-}
-
-.primary-button:hover {
-  background: #1684ff;
-}
-
-.primary-button:active {
-  transform: translateY(1px);
-}
-
 .landing-login {
   width: 206px;
   height: 53px;
@@ -1429,12 +1406,6 @@ textarea:focus-visible {
 .role-card p:not(.auth-eyebrow) {
   color: var(--text-secondary);
   line-height: 1.6;
-}
-
-.role-card .primary-button {
-  min-width: 150px;
-  min-height: 48px;
-  margin-top: 18px;
 }
 
 @media (max-width: 1320px) and (min-width: 1025px) {
@@ -1833,16 +1804,6 @@ textarea:focus-visible {
   border-color: #ff6b6b;
 }
 
-.student-invite-form .primary-button {
-  min-height: 45px;
-  padding: 0 18px;
-}
-
-.student-invite-form .primary-button:disabled {
-  cursor: wait;
-  opacity: 0.7;
-}
-
 .student-form-status {
   margin: 9px 0 0;
   color: #ffb4b4;
@@ -2078,10 +2039,6 @@ textarea:focus-visible {
     grid-template-columns: 1fr;
   }
 
-  .student-invite-form .primary-button {
-    width: 100%;
-  }
-
   .student-section-heading {
     align-items: flex-start;
   }
@@ -2232,12 +2189,6 @@ textarea:focus-visible {
 .professor-rename-form input[aria-invalid="true"],
 .professor-invitation-form input[aria-invalid="true"] {
   border-color: #ff6b6b;
-}
-
-.professor-action-form .primary-button,
-.professor-invitation-form > .primary-button {
-  min-height: 43px;
-  padding: 0 17px;
 }
 
 .professor-action-form button:disabled,
@@ -2653,9 +2604,7 @@ textarea:focus-visible {
     grid-template-columns: 1fr;
   }
 
-  .professor-action-form .primary-button,
-  .professor-rename-form .secondary-button,
-  .professor-invitation-form > .primary-button {
+  .professor-rename-form .secondary-button {
     width: 100%;
   }
 
@@ -2717,3 +2666,4 @@ textarea:focus-visible {
 .activity-ai-suppressed { color: #ffd98b; }
 
 } /* @layer components */
+

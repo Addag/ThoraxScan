@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 
 import { logoutAction } from "@/app/(protected)/actions";
+import { primaryButton } from "@/components/primary-button";
 import { getCurrentProfile } from "@/lib/auth/server";
 
 export default async function DashboardPage() {
@@ -18,7 +19,7 @@ export default async function DashboardPage() {
           <h1>Profile setup failed</h1>
           <p>{result.error}</p>
           <form action={logoutAction}>
-            <button className="primary-button" type="submit">
+            <button className={`${primaryButton} mt-[18px] min-h-12 min-w-[150px]`} type="submit">
               Log out
             </button>
           </form>
@@ -36,3 +37,4 @@ export default async function DashboardPage() {
 
   redirect(`/${result.profile.role}`);
 }
+

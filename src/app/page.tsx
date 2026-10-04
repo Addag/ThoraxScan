@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 
+import { primaryButtonBase } from "@/components/primary-button";
 import { Brand } from "@/components/brand";
 
 const workflowCallouts = [
@@ -31,7 +32,7 @@ export default function Home() {
           <p>
             ThoraxScan is an educational LMS for Radiologic Technology students. Practice chest X-ray interpretation through professor-guided activities, with AI-powered Attention Heatmap feedback after submission.
           </p>
-          <Link className="primary-button landing-login" href="/login">
+          <Link className={`${primaryButtonBase} landing-login`} href="/login">
             Log in <span aria-hidden="true">→</span>
           </Link>
         </section>
@@ -75,3 +76,4 @@ export default function Home() {
     </div>
   );
 }
+
