@@ -8,6 +8,7 @@ import {
   ActivityStepRail,
   XrayCasePreview,
   formatDueDate,
+  activitiesCtaClass,
 } from "@/components/activities/activity-ui";
 import {
   ActivityDetailsForm,
@@ -46,7 +47,7 @@ export default async function ProfessorActivityPage({
 
   return (
     <ProfessorShell activeItem="activities" sectionLabel="Activities" sectionDescription={activity.workspaceName}>
-      <main className="student-dashboard activity-dashboard">
+      <main className="student-dashboard">
         <ActivityPageHeading
           title={activity.title}
           description={`${activity.workspaceName} · ${formatDueDate(activity.dueAt)}`}
@@ -57,7 +58,7 @@ export default async function ProfessorActivityPage({
           <span>{activity.status === "published" ? "Visible to current and future workspace students" : activity.status === "archived" ? "No longer visible to students" : "Visible to teaching staff only"}</span>
         </div>
         <ActivityStepRail role="professor" />
-        <Link className="professor-activities-cta" href={`/professor/submissions?activity=${activity.id}`}>Review submissions</Link>
+        <Link className={activitiesCtaClass} href={`/professor/submissions?activity=${activity.id}`}>Review submissions</Link>
 
         <div className="activity-authoring-layout">
           <div className="activity-case-column">

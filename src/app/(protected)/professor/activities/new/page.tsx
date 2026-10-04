@@ -17,7 +17,7 @@ export default async function NewProfessorActivityPage() {
 
   return (
     <ProfessorShell activeItem="activities" sectionLabel="Activities" sectionDescription="Create activity">
-      <main className="student-dashboard activity-dashboard">
+      <main className="student-dashboard">
         <ActivityPageHeading
           title="New activity"
           description="Start with the assignment details, then attach a private X-ray case"

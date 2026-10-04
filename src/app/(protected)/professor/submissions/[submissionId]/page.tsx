@@ -19,7 +19,7 @@ export default async function SubmissionPage({ params }: { params: Promise<{ sub
   const ai = activity.aiStatus;
   const attention = await getProfessorActivityAIHeatmap(activity.id);
   return <ProfessorShell activeItem="submissions" sectionLabel="Review submission" sectionDescription={activity.workspaceName}>
-    <main className="student-dashboard activity-dashboard">
+    <main className="student-dashboard">
       <Link href="/professor/submissions">← Back to submissions</Link>
       <h1>{submission.profiles?.display_name ?? "Student"} · {activity.title}</h1>
       <p>Submitted <time dateTime={submission.submitted_at}>{new Date(submission.submitted_at).toLocaleString()}</time> · {activity.status}</p>

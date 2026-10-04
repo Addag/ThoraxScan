@@ -11,6 +11,7 @@ import { getProfessorActivities } from "@/lib/activities/server";
 import { requireRole } from "@/lib/auth/server";
 import { getProfessorWorkspaces } from "@/lib/workspaces/server";
 import { PageHeading, SectionHeading, StatCard, StatGrid, WorkspaceCard, countBadgeClass, sectionKickerClass } from "@/components/dashboard-ui";
+import { activitiesCtaClass } from "@/components/activities/activity-ui";
 
 export const metadata: Metadata = {
   title: "Professor workspace | ThoraxScan",
@@ -37,9 +38,9 @@ export default async function ProfessorPage() {
           <StatCard symbol="＋" value={activities.data.length} label="Activities" detail={`${activities.data.filter((activity) => activity.status === "published").length} published · ${activities.data.filter((activity) => activity.status === "draft").length} drafts`} />
         </StatGrid>
 
-        <Link className="professor-activities-cta" href="/professor/activities">
-          <span><strong>Manage activities</strong><small>Author, publish, and archive case-backed assignments</small></span>
-          <span aria-hidden="true">→</span>
+        <Link className={activitiesCtaClass} href="/professor/activities">
+          <span className="grid gap-1"><strong>Manage activities</strong><small className="text-[11px] text-[#9fcfff]">Author, publish, and archive case-backed assignments</small></span>
+          <span className="text-[24px] text-[#70bdff]" aria-hidden="true">→</span>
         </Link>
 
         <section className="mt-[22px] grid grid-cols-2 gap-[18px] max-[1000px]:grid-cols-1" aria-label="Workspace actions">

@@ -17,7 +17,7 @@ export default async function SubmissionsPage({ searchParams }: { searchParams: 
     getProfessorSubmissions({ workspaceId, activityId, status }), getProfessorWorkspaces(profile.id), getProfessorActivities(),
   ]);
   return <ProfessorShell activeItem="submissions" sectionLabel="Submissions" sectionDescription="Review final Student responses">
-    <main className="student-dashboard activity-dashboard">
+    <main className="student-dashboard">
       <h1>Submissions</h1><p>Final responses, newest first. Archived activities remain available for review.</p>
       <form className="evaluation-filters" method="get">
         <label>Workspace<select name="workspace" defaultValue={workspaceId}><option value="">All workspaces</option>{workspaces.data.map(workspace => <option key={workspace.id} value={workspace.id}>{workspace.name}</option>)}</select></label>

@@ -44,7 +44,7 @@ export default async function StudentActivityPage({
 
   return (
     <StudentShell activeItem="activities" sectionLabel="Activities" sectionDescription={activity.workspaceName}>
-      <main className="student-dashboard activity-dashboard student-activity-detail">
+      <main className="student-dashboard student-activity-detail">
         <ActivityPageHeading
           title={activity.title}
           description={`${activity.workspaceName} · ${formatDueDate(activity.dueAt)}`}
