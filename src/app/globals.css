@@ -36,54 +36,46 @@
   --font-brand: var(--font-inter);
 }
 
-/* Hand-written styles live in the components layer so Tailwind utilities can override them.
-   Unlayered CSS would beat every utility regardless of specificity. */
+/* App-wide defaults on top of Tailwind's preflight (box-sizing, margins, form fonts and link colour come from preflight). */
+@layer base {
+  html {
+    background: var(--canvas);
+  }
+
+  body {
+    background: var(--canvas);
+    color: var(--text-primary);
+    cursor: default;
+    font-family: var(--font-funnel), Arial, sans-serif;
+  }
+
+  :is(a, button, input, select, textarea):focus-visible {
+    outline: 3px solid #ffffff;
+    outline-offset: 4px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      scroll-behavior: auto !important;
+      transition-duration: 0.01ms !important;
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+    }
+  }
+
+  @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    :root {
+      --glass-shell: #081326;
+      --glass-surface: #14243e;
+      --glass-inset: #101e33;
+    }
+  }
+}
+
+/* The landing page's hand-written styles. They stay in the components layer so Tailwind utilities can override them. */
 @layer components {
-
-* {
-  box-sizing: border-box;
-}
-
-html {
-  background: var(--canvas);
-}
-
-body {
-  margin: 0;
-  background: var(--canvas);
-  color: var(--text-primary);
-  cursor: default;
-  font-family: var(--font-funnel), Arial, sans-serif;
-}
-
-a {
-  color: inherit;
-}
-
-button,
-input,
-select,
-textarea {
-  font: inherit;
-}
-
-button,
-a {
-  -webkit-tap-highlight-color: transparent;
-}
-
-button:focus-visible,
-a:focus-visible,
-input:focus-visible {
-  outline: 3px solid #ffffff;
-  outline-offset: 4px;
-}
-
-select:focus-visible,
-textarea:focus-visible {
-  outline: 3px solid #ffffff;
-  outline-offset: 4px;
-}
 
 .landing-page {
   position: relative;
@@ -645,27 +637,6 @@ textarea:focus-visible {
     margin: 5px 13px 0 0;
   }
 }
-
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    scroll-behavior: auto !important;
-    transition-duration: 0.01ms !important;
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-  }
-}
-
-
-@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-  :root {
-    --glass-shell: #081326;
-    --glass-surface: #14243e;
-    --glass-inset: #101e33;
-  }
-}
-
 
 } /* @layer components */
 
