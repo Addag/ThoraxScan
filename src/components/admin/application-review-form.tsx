@@ -9,6 +9,7 @@ import {
   initialAdminReviewState,
   type ProfessorApplicationProjection,
 } from "@/lib/admin/types";
+import { formStatusColor } from "@/components/dashboard-ui";
 
 export function ApplicationReviewForm({
   application,
@@ -75,7 +76,7 @@ export function ApplicationReviewForm({
 
       {state.message && (
         <p
-          className={`professor-form-status professor-form-status--${state.status} col-span-full m-0`}
+          className={`col-span-full m-0 text-[11px] leading-[1.35] ${formStatusColor(state.status)}`}
           role={state.status === "success" ? "status" : "alert"}
         >
           {state.message}

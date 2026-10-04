@@ -14,6 +14,7 @@ import { requireRole } from "@/lib/auth/server";
 import type { InvitationCode } from "@/lib/workspaces/types";
 import { getProfessorWorkspace } from "@/lib/workspaces/server";
 import { activityButton } from "@/components/activities/activity-button";
+import { backLinkClass, listEmptyClass, sectionKickerClass } from "@/components/dashboard-ui";
 
 export const metadata: Metadata = {
   title: "Manage workspace | ThoraxScan",
@@ -48,7 +49,7 @@ function InvitationList({
   canRevoke: boolean;
 }) {
   if (invitations.length === 0) {
-    return <p className="professor-list-empty">No invitation history yet.</p>;
+    return <p className={listEmptyClass}>No invitation history yet.</p>;
   }
 
   return (
@@ -98,11 +99,11 @@ export default async function ProfessorWorkspacePage({
   return (
     <ProfessorShell>
       <main className="student-dashboard pt-9">
-        <Link className="student-back-link" href="/professor">← Back to dashboard</Link>
+        <Link className={backLinkClass} href="/professor">← Back to dashboard</Link>
 
         <section className={`${panelBase} flex items-start justify-between gap-10 border-[#33425c] p-[28px_30px] max-[1000px]:flex-col max-[700px]:p-5`}>
           <div>
-            <p className="student-section-kicker">
+            <p className={sectionKickerClass}>
               {workspace.is_owner ? "Owned workspace" : "Co-professor workspace"}
             </p>
             <h1 className="m-0 text-[clamp(27px,4vw,38px)] leading-[1.12]">{workspace.name}</h1>
@@ -126,7 +127,7 @@ export default async function ProfessorWorkspacePage({
           <section className={`${panelBase} border-[#33425c] p-[24px_26px_26px] max-[700px]:p-5`} aria-labelledby="roster-title">
             <div className={panelHeadingClass}>
               <div>
-                <p className="student-section-kicker">Membership</p>
+                <p className={sectionKickerClass}>Membership</p>
                 <h2 className={sectionTitleClass} id="roster-title">Workspace roster</h2>
               </div>
               <span className="rounded-full border border-[#4d5b74] px-2.5 py-1.5 text-[10px] text-[#b9c2d6]">{workspace.members.length} members</span>
@@ -153,7 +154,7 @@ export default async function ProfessorWorkspacePage({
               <div>
                 <h3 className={columnHeadingClass}>Students</h3>
                 {students.length === 0 ? (
-                  <p className="professor-list-empty">No students have joined yet.</p>
+                  <p className={listEmptyClass}>No students have joined yet.</p>
                 ) : (
                   <ul className={listResetClass}>
                     {students.map((member) => (
@@ -172,7 +173,7 @@ export default async function ProfessorWorkspacePage({
           </section>
 
           <aside className={`${panelBase} border-[#33425c] p-6`}>
-            <p className="student-section-kicker">Your access</p>
+            <p className={sectionKickerClass}>Your access</p>
             <h2 className={sectionTitleClass}>{workspace.is_owner ? "Workspace owner" : "Co-professor"}</h2>
             <ul className="mt-[18px] mb-0 flex list-none flex-col gap-3 p-0">
               <li className={accessItemClass}>View the complete roster</li>
@@ -185,7 +186,7 @@ export default async function ProfessorWorkspacePage({
         <section className={`${panelBase} mt-5 border-[#33425c] p-[24px_26px_26px] max-[700px]:p-5`} aria-labelledby="student-invitations-title">
           <div className={panelHeadingClass}>
             <div>
-              <p className="student-section-kicker">Invitation management</p>
+              <p className={sectionKickerClass}>Invitation management</p>
               <h2 className={sectionTitleClass} id="student-invitations-title">Student invitations</h2>
             </div>
           </div>
@@ -202,7 +203,7 @@ export default async function ProfessorWorkspacePage({
           <section className={`${panelBase} mt-5 border-[#33425c] p-[24px_26px_26px] max-[700px]:p-5`} aria-labelledby="professor-invitations-title">
             <div className={panelHeadingClass}>
               <div>
-                <p className="student-section-kicker">Owner controls</p>
+                <p className={sectionKickerClass}>Owner controls</p>
                 <h2 className={sectionTitleClass} id="professor-invitations-title">Professor invitations</h2>
               </div>
             </div>

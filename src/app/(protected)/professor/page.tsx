@@ -10,6 +10,7 @@ import { EmptyState } from "@/components/empty-state";
 import { getProfessorActivities } from "@/lib/activities/server";
 import { requireRole } from "@/lib/auth/server";
 import { getProfessorWorkspaces } from "@/lib/workspaces/server";
+import { PageHeading, SectionHeading, StatCard, StatGrid, WorkspaceCard, countBadgeClass, sectionKickerClass } from "@/components/dashboard-ui";
 
 export const metadata: Metadata = {
   title: "Professor workspace | ThoraxScan",
@@ -26,94 +27,45 @@ export default async function ProfessorPage() {
 
   return (
     <ProfessorShell>
-      <main className="student-dashboard professor-dashboard">
-        <div className="student-page-heading">
-          <div>
-            <h1>Dashboard</h1>
-            <p>Welcome back, {profile.display_name}!</p>
-          </div>
-          <time dateTime={new Date().toISOString().slice(0, 10)}>
-            {new Intl.DateTimeFormat("en-US", {
-              weekday: "long",
-              month: "long",
-              day: "numeric",
-              year: "numeric",
-            }).format(new Date())}
-          </time>
-        </div>
+      <main className="student-dashboard pb-[60px]">
+        <PageHeading title="Dashboard" subtitle={`Welcome back, ${profile.display_name}!`} />
 
-        <section className="professor-stat-grid" aria-label="Workspace overview">
-          <article>
-            <span aria-hidden="true">W</span>
-            <strong>{workspaces.data.length}</strong>
-            <p>Total workspaces</p>
-            <small>Owned and joined</small>
-          </article>
-          <article>
-            <span aria-hidden="true">★</span>
-            <strong>{ownedCount}</strong>
-            <p>Owned workspaces</p>
-            <small>Full management access</small>
-          </article>
-          <article>
-            <span aria-hidden="true">◎</span>
-            <strong>{joinedCount}</strong>
-            <p>Co-professor roles</p>
-            <small>Teaching access</small>
-          </article>
-          <article>
-            <span aria-hidden="true">＋</span>
-            <strong>{activities.data.length}</strong>
-            <p>Activities</p>
-            <small>{activities.data.filter((activity) => activity.status === "published").length} published · {activities.data.filter((activity) => activity.status === "draft").length} drafts</small>
-          </article>
-        </section>
+        <StatGrid>
+          <StatCard symbol="W" value={workspaces.data.length} label="Total workspaces" detail="Owned and joined" />
+          <StatCard symbol="★" value={ownedCount} label="Owned workspaces" detail="Full management access" />
+          <StatCard symbol="◎" value={joinedCount} label="Co-professor roles" detail="Teaching access" />
+          <StatCard symbol="＋" value={activities.data.length} label="Activities" detail={`${activities.data.filter((activity) => activity.status === "published").length} published · ${activities.data.filter((activity) => activity.status === "draft").length} drafts`} />
+        </StatGrid>
 
         <Link className="professor-activities-cta" href="/professor/activities">
           <span><strong>Manage activities</strong><small>Author, publish, and archive case-backed assignments</small></span>
           <span aria-hidden="true">→</span>
         </Link>
 
-        <section className="professor-dashboard-actions" aria-label="Workspace actions">
-          <article>
-            <p className="student-section-kicker">New class space</p>
-            <h2>Create a workspace</h2>
+        <section className="mt-[22px] grid grid-cols-2 gap-[18px] max-[1000px]:grid-cols-1" aria-label="Workspace actions">
+          <article className="rounded-[10px] border border-[#33425c] [background:var(--glass-surface)] p-[22px] backdrop-blur-[18px] backdrop-saturate-[135%] shadow-(--glass-shadow)">
+            <p className={sectionKickerClass}>New class space</p>
+            <h2 className="m-0 mb-[18px] text-[19px]">Create a workspace</h2>
             <CreateWorkspaceForm />
           </article>
-          <article>
-            <p className="student-section-kicker">Teaching access</p>
-            <h2>Join as co-professor</h2>
+          <article className="rounded-[10px] border border-[#33425c] [background:var(--glass-surface)] p-[22px] backdrop-blur-[18px] backdrop-saturate-[135%] shadow-(--glass-shadow)">
+            <p className={sectionKickerClass}>Teaching access</p>
+            <h2 className="m-0 mb-[18px] text-[19px]">Join as co-professor</h2>
             <ProfessorRedeemForm />
           </article>
         </section>
 
-        <section className="student-workspaces professor-workspaces" aria-labelledby="professor-workspaces-title">
-          <div className="student-section-heading">
-            <div>
-              <p className="student-section-kicker">Class management</p>
-              <h2 id="professor-workspaces-title">Teaching workspaces</h2>
-            </div>
-            <span>{workspaces.data.length} total</span>
-          </div>
+        <section className="mt-[22px] rounded-[10px] border border-[#33425c] [background:var(--glass-surface)] p-[24px_28px_28px] backdrop-blur-[18px] backdrop-saturate-[135%] shadow-(--glass-shadow) max-[600px]:p-5" aria-labelledby="professor-workspaces-title">
+          <SectionHeading kicker="Class management" title="Teaching workspaces" titleId="professor-workspaces-title" aside={<span className={countBadgeClass}>{workspaces.data.length} total</span>} />
 
           {workspaces.error ? (
             <EmptyState error role="alert" title="Workspaces are unavailable">Refresh the page or try again later.</EmptyState>
           ) : workspaces.data.length === 0 ? (
             <EmptyState icon="＋" title="No teaching workspaces yet">Create a workspace or redeem a Professor invitation.</EmptyState>
           ) : (
-            <div className="student-workspace-grid">
+            <div className="grid grid-cols-2 gap-[18px] pt-[22px] max-[600px]:grid-cols-1">
               {workspaces.data.map((workspace) => (
-                <article className="student-workspace-card professor-workspace-card" key={workspace.id}>
-                  <div className="student-workspace-card__icon" aria-hidden="true">W</div>
-                  <p>{workspace.is_owner ? "Owner" : "Co-professor"}</p>
-                  <h3>{workspace.name}</h3>
-                  <span>
-                    {workspace.is_owner ? "Full management access" : "Student and roster access"}
-                  </span>
-                  <Link href={`/professor/workspaces/${workspace.id}`}>
-                    Manage workspace <span aria-hidden="true">→</span>
-                  </Link>
-                </article>
+                <WorkspaceCard key={workspace.id} minHeight={205} role={workspace.is_owner ? "Owner" : "Co-professor"} name={workspace.name} detail={workspace.is_owner ? "Full management access" : "Student and roster access"} href={`/professor/workspaces/${workspace.id}`} linkLabel="Manage workspace" />
               ))}
             </div>
           )}

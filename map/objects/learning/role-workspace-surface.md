@@ -16,9 +16,9 @@ The role surfaces share one responsive shell while keeping Professor activity au
 
 ## Shape
 
-- Student page requires the Student role, reads joined workspaces, renders invitation redemption, and links to read-only details in [student/page.tsx](<../../../src/app/(protected)/student/page.tsx:15>).
+- Student page requires the Student role, reads joined workspaces, renders invitation redemption, and links to read-only details in [student/page.tsx](<../../../src/app/(protected)/student/page.tsx:15>). Shared dashboard presentation is supplied by [dashboard-ui.tsx](<../../../src/components/dashboard-ui.tsx>).
 - Student workspace detail re-checks the role and membership-derived workspace access in [workspaces/[workspaceId]/page.tsx](<../../../src/app/(protected)/student/workspaces/[workspaceId]/page.tsx:15>).
-- Professor page reads owned/joined workspaces and renders creation and Professor-code redemption in [professor/page.tsx](<../../../src/app/(protected)/professor/page.tsx:17>).
+- Professor page reads owned/joined workspaces and renders creation and Professor-code redemption in [professor/page.tsx](<../../../src/app/(protected)/professor/page.tsx:17>), using the shared dashboard heading, statistic, section, and workspace-card primitives.
 - `requireRole("professor")` redirects pending or rejected Professors to their application page in [auth server guards](<../../../src/lib/auth/server.ts:65>).
 - Professor workspace detail derives owner/co-professor capabilities and renders roster, invitation, rename, removal, and exit controls in [workspaces/[workspaceId]/page.tsx](<../../../src/app/(protected)/professor/workspaces/[workspaceId]/page.tsx:67>).
 - Professor activity routes expose filtered lifecycle lists, draft authoring, direct case upload, publishing, and archive controls in [activities/page.tsx](<../../../src/app/(protected)/professor/activities/page.tsx:21>).

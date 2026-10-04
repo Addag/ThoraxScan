@@ -18,7 +18,7 @@ Administrator authority is stored separately from `Profile.role`, preserving the
 
 - `public.platform_admins.user_id` is a profile-backed primary key; `created_by` is an optional self-reference and deletion of the profile cascades to the capability in [the approval migration](<../../../supabase/migrations/20260817124643_professor_approval_administration.sql:1>).
 - RLS exposes only the authenticated caller's capability row in [the approval migration](<../../../supabase/migrations/20260817124643_professor_approval_administration.sql:54>).
-- Administrator login and protected-page access each re-check that row in [auth actions](<../../../src/app/(auth)/actions.ts:151>) and [auth server guards](<../../../src/lib/auth/server.ts:86>).
+- Administrator login and protected-page access each re-check that row in [auth actions](<../../../src/app/(auth)/actions.ts:151>) and [auth server guards](<../../../src/lib/auth/server.ts:86>). The dashboard uses the shared Tailwind primitives in [dashboard-ui.tsx](<../../../src/components/dashboard-ui.tsx>).
 - The first capability is inserted by an operator using the documented bootstrap statement in [README.md](<../../../README.md:20>); no public self-provisioning path exists.
 
 ## Connected to

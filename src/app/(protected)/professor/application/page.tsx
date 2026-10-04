@@ -5,6 +5,7 @@ import { ProfessorApplicationShell } from "@/components/professor/professor-appl
 import { rejectionReasonClass, reviewPanelClass } from "@/components/admin/review-styles";
 import { getOwnProfessorApplication } from "@/lib/admin/server";
 import { getCurrentProfile } from "@/lib/auth/server";
+import { PageHeading, sectionKickerClass } from "@/components/dashboard-ui";
 
 export const metadata: Metadata = {
   title: "Professor application | ThoraxScan",
@@ -26,18 +27,13 @@ export default async function ProfessorApplicationPage() {
   return (
     <ProfessorApplicationShell>
       <main className="student-dashboard pb-[60px]">
-        <div className="student-page-heading">
-          <div>
-            <h1>Professor application</h1>
-            <p>{result.profile.display_name}, your account is awaiting workspace access.</p>
-          </div>
-        </div>
+        <PageHeading title="Professor application" subtitle={`${result.profile.display_name}, your account is awaiting workspace access.`} showDate={false} />
 
         <section className={`${reviewPanelClass} max-w-[790px] p-[clamp(24px,5vw,42px)]`}>
           <div className={`mb-[18px] grid size-[58px] place-items-center rounded-[12px] text-[30px] ${isPending ? "bg-[rgba(255,193,7,0.15)] text-[#ffd166]" : "bg-[rgba(207,54,64,0.17)] text-[#ff8585]"}`} aria-hidden="true">
             {isPending ? "◷" : "!"}
           </div>
-          <p className="student-section-kicker">Application status</p>
+          <p className={sectionKickerClass}>Application status</p>
           <h2 className="m-0 text-[clamp(25px,4vw,34px)]">{isPending ? "Review pending" : "Application not approved"}</h2>
           <p className="max-w-[650px] text-[14px] leading-[1.65] text-[#aeb6c5]">
             {isPending

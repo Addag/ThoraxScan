@@ -9,6 +9,7 @@ import { getProfessorApplications } from "@/lib/admin/server";
 import type { ProfessorApplicationProjection } from "@/lib/admin/types";
 import type { ProfessorApplicationStatus } from "@/lib/auth/types";
 import { requirePlatformAdmin } from "@/lib/auth/server";
+import { PageHeading, SectionHeading, StatCard, StatGrid, countBadgeClass } from "@/components/dashboard-ui";
 
 export const metadata: Metadata = {
   title: "Professor approvals | ThoraxScan",
@@ -67,36 +68,17 @@ export default async function AdminPage({
   return (
     <AdminShell>
       <main className="student-dashboard pb-[60px]">
-        <div className="student-page-heading">
-          <div>
-            <h1>Administrator dashboard</h1>
-            <p>Welcome back, {profile.display_name}.</p>
-          </div>
-          <time dateTime={new Date().toISOString().slice(0, 10)}>
-            {new Intl.DateTimeFormat("en-US", {
-              weekday: "long",
-              month: "long",
-              day: "numeric",
-              year: "numeric",
-            }).format(new Date())}
-          </time>
-        </div>
+        <PageHeading title="Administrator dashboard" subtitle={`Welcome back, ${profile.display_name}.`} />
 
-        <section className="professor-stat-grid" aria-label="Professor application overview">
+        <StatGrid>
           <StatCard symbol="…" value={counts.pending} label="Pending" detail="Awaiting review" />
           <StatCard symbol="✓" value={counts.approved} label="Approved" detail="Professor access granted" />
           <StatCard symbol="×" value={counts.rejected} label="Rejected" detail="May be reconsidered" />
           <StatCard symbol="Σ" value={applications.data.length} label="Total applications" detail="All review states" />
-        </section>
+        </StatGrid>
 
         <section className={`${reviewPanelClass} p-6 max-[560px]:p-[18px]`} aria-labelledby="applications-title">
-          <div className="student-section-heading mb-5">
-            <div>
-              <p className="student-section-kicker">Account provisioning</p>
-              <h2 id="applications-title">Professor applications</h2>
-            </div>
-            <span>{visibleApplications.length} shown</span>
-          </div>
+          <div className="mb-5"><SectionHeading kicker="Account provisioning" title="Professor applications" titleId="applications-title" aside={<span className={countBadgeClass}>{visibleApplications.length} shown</span>} /></div>
 
           <form className="grid grid-cols-[minmax(0,1fr)_auto] items-end gap-3" method="get">
             <label className="col-span-full text-[12px] font-extrabold text-white" htmlFor="application-search">Search applicants</label>
@@ -140,27 +122,6 @@ export default async function AdminPage({
         </section>
       </main>
     </AdminShell>
-  );
-}
-
-function StatCard({
-  symbol,
-  value,
-  label,
-  detail,
-}: {
-  symbol: string;
-  value: number;
-  label: string;
-  detail: string;
-}) {
-  return (
-    <article>
-      <span aria-hidden="true">{symbol}</span>
-      <strong>{value}</strong>
-      <p>{label}</p>
-      <small>{detail}</small>
-    </article>
   );
 }
 

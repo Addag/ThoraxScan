@@ -5,6 +5,7 @@ import { useActionState } from "react";
 import { redeemInvitationAction } from "@/app/(protected)/student/actions";
 import { primaryButton } from "@/components/primary-button";
 import { initialInvitationState } from "@/lib/workspaces/types";
+import { formStatusColor } from "@/components/dashboard-ui";
 
 export function InvitationForm() {
   const [state, formAction, pending] = useActionState(
@@ -13,10 +14,10 @@ export function InvitationForm() {
   );
 
   return (
-    <form className="student-invite-form" action={formAction} noValidate>
-      <label htmlFor="student-invitation-code">Student invitation code</label>
-      <p>Enter the private code shared by your professor.</p>
-      <div className="student-invite-form__controls">
+    <form action={formAction} noValidate>
+      <label className="block text-[13px] font-extrabold" htmlFor="student-invitation-code">Student invitation code</label>
+      <p className="mt-[3px] mb-[9px] text-[11px] text-[#9ba2b8]">Enter the private code shared by your professor.</p>
+      <div className="grid grid-cols-[minmax(0,1fr)_auto] gap-2.5 max-[600px]:grid-cols-1">
         <input
           id="student-invitation-code"
           name="code"
@@ -26,6 +27,7 @@ export function InvitationForm() {
           spellCheck={false}
           maxLength={22}
           placeholder="Paste your 22-character code"
+          className="min-h-[45px] w-full rounded-[6px] border border-[#66718b] bg-[#0c1320] px-[13px] text-white placeholder:text-[#777f93] aria-invalid:border-[#ff6b6b]"
           aria-invalid={Boolean(state.fieldErrors?.code)}
           aria-describedby={state.message ? "student-invitation-status" : undefined}
         />
@@ -36,7 +38,7 @@ export function InvitationForm() {
       {state.message && (
         <p
           id="student-invitation-status"
-          className={`student-form-status student-form-status--${state.status}`}
+          className={`mt-[9px] text-[12px] leading-[1.4] ${formStatusColor(state.status)}`}
           role={state.status === "success" ? "status" : "alert"}
         >
           {state.message}

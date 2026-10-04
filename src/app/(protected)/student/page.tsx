@@ -6,6 +6,7 @@ import { InvitationForm } from "@/components/student/invitation-form";
 import { StudentShell } from "@/components/student/student-shell";
 import { formatDueDate } from "@/components/activities/activity-ui";
 import { EmptyState } from "@/components/empty-state";
+import { PageHeading, SectionHeading, WorkspaceCard, countBadgeClass, listEmptyClass, sectionKickerClass } from "@/components/dashboard-ui";
 import { getStudentActivities } from "@/lib/activities/server";
 import { requireRole } from "@/lib/auth/server";
 import { getStudentWorkspaces } from "@/lib/workspaces/server";
@@ -24,93 +25,54 @@ export default async function StudentPage() {
   return (
     <StudentShell>
       <main className="student-dashboard">
-        <div className="student-page-heading">
-          <div>
-            <h1>Dashboard</h1>
-            <p>Welcome back, {profile.display_name}!</p>
-          </div>
-          <time dateTime={new Date().toISOString().slice(0, 10)}>
-            {new Intl.DateTimeFormat("en-US", {
-              weekday: "long",
-              month: "long",
-              day: "numeric",
-              year: "numeric",
-            }).format(new Date())}
-          </time>
-        </div>
+        <PageHeading title="Dashboard" subtitle={`Welcome back, ${profile.display_name}!`} />
 
-        <section className="student-join-panel" aria-labelledby="join-workspace-title">
-          <div>
-            <p className="student-section-kicker">Workspace access</p>
-            <h2 id="join-workspace-title">Join your class workspace</h2>
-          </div>
-          <InvitationForm />
-        </section>
-
-        <section className="student-workspaces" aria-labelledby="joined-workspaces-title">
-          <div className="student-section-heading">
-            <div>
-              <p className="student-section-kicker">Learning spaces</p>
-              <h2 id="joined-workspaces-title">Joined workspaces</h2>
-            </div>
-            <span>{workspaces.data.length} joined</span>
-          </div>
-
-          {workspaces.error ? (
-            <EmptyState error role="alert" title="Workspaces are unavailable">Refresh the page or try again later.</EmptyState>
-          ) : workspaces.data.length === 0 ? (
-            <EmptyState icon="＋" title="No workspaces yet">Use a Student invitation code to join your first workspace.</EmptyState>
-          ) : (
-            <div className="student-workspace-grid">
-              {workspaces.data.map((workspace) => (
-                <article className="student-workspace-card" key={workspace.id}>
-                  <div className="student-workspace-card__icon" aria-hidden="true">W</div>
-                  <p>Student workspace</p>
-                  <h3>{workspace.name}</h3>
-                  <span>
-                    Joined {new Intl.DateTimeFormat("en-US", {
-                      month: "short",
-                      day: "numeric",
-                      year: "numeric",
-                    }).format(new Date(workspace.joined_at))}
-                  </span>
-                  <Link href={`/student/workspaces/${workspace.id}`}>
-                    Open workspace <span aria-hidden="true">→</span>
-                  </Link>
-                </article>
-              ))}
-            </div>
-          )}
-        </section>
-
-        <section className="student-recent-activities" aria-labelledby="recent-activities-title">
-          <div className="student-section-heading">
-            <div>
-              <p className="student-section-kicker">Published assignments</p>
-              <h2 id="recent-activities-title">Recent activities</h2>
-            </div>
-            <Link href="/student/activities">View all</Link>
-          </div>
+        <section className="mt-6 rounded-[10px] border border-[#33425c] bg-[#18202d] p-6 max-[600px]:p-5" aria-labelledby="recent-activities-title">
+          <SectionHeading kicker="Published assignments" title="Recent activities" titleId="recent-activities-title" aside={<Link className="text-[12px] font-extrabold text-[#9fcfff] no-underline" href="/student/activities">View all</Link>} />
           {recentActivities.error ? (
-            <p className="professor-list-empty">Recent activities are unavailable.</p>
+            <p className={listEmptyClass}>Recent activities are unavailable.</p>
           ) : recentActivities.data.length === 0 ? (
-            <p className="professor-list-empty">No activities have been published to your workspaces yet.</p>
+            <p className={listEmptyClass}>No activities have been published to your workspaces yet.</p>
           ) : (
-            <div className="student-recent-activity-grid">
+            <div className="grid grid-cols-3 gap-3.5 pt-[18px] max-[760px]:grid-cols-1">
               {recentActivities.data.map((activity) => (
-                <Link href={`/student/activities/${activity.id}`} key={activity.id}>
-                  <span>{activity.workspaceName}</span>
-                  <strong>{activity.title}</strong>
-                  <small>{submissionLabel(activity.submissionStatus, activity.dueAt)} · {activity.aiStatus === "ready" ? "Feedback available" : activity.aiStatus === "pending" ? "Analysis pending" : activity.aiStatus === "failed" ? "Analysis failed" : "AI feedback locked"} · {formatDueDate(activity.dueAt)}</small>
+                <Link className="flex min-h-[130px] flex-col justify-between rounded-[8px] border border-[#3d4c67] bg-(--glass-inset) p-4 no-underline shadow-(--glass-inset-shadow)" href={`/student/activities/${activity.id}`} key={activity.id}>
+                  <span className="text-[10px] font-extrabold uppercase tracking-[0.06em] text-[#6faef7]">{activity.workspaceName}</span>
+                  <strong className="mt-2 text-[15px] leading-[1.25] text-white">{activity.title}</strong>
+                  <small className="mt-3 text-[10px] leading-[1.4] text-[#8992a8]">{submissionLabel(activity.submissionStatus, activity.dueAt)} · {activity.aiStatus === "ready" ? "Feedback available" : activity.aiStatus === "pending" ? "Analysis pending" : activity.aiStatus === "failed" ? "Analysis failed" : "AI feedback locked"} · {formatDueDate(activity.dueAt)}</small>
                 </Link>
               ))}
             </div>
           )}
         </section>
 
-        <aside className="student-privacy-note">
-          <strong>Privacy notice</strong>
-          <p>Published case images use private storage and short-lived signed access.</p>
+        <section className="mt-6 grid grid-cols-[minmax(210px,0.75fr)_minmax(320px,1.25fr)] items-center gap-9 rounded-[10px] border border-[#33425c] [background:var(--glass-surface)] p-[25px_28px] backdrop-blur-[18px] backdrop-saturate-[135%] shadow-(--glass-shadow) max-[850px]:grid-cols-1 max-[850px]:gap-5" aria-labelledby="join-workspace-title">
+          <div>
+            <p className={sectionKickerClass}>Workspace access</p>
+            <h2 id="join-workspace-title">Join your class workspace</h2>
+          </div>
+          <InvitationForm />
+        </section>
+
+        <section className="mt-6 rounded-[10px] border border-[#33425c] [background:var(--glass-surface)] p-[24px_28px_28px] backdrop-blur-[18px] backdrop-saturate-[135%] shadow-(--glass-shadow) max-[600px]:p-5" aria-labelledby="joined-workspaces-title">
+          <SectionHeading kicker="Learning spaces" title="Joined workspaces" titleId="joined-workspaces-title" aside={<span className={countBadgeClass}>{workspaces.data.length} joined</span>} />
+
+          {workspaces.error ? (
+            <EmptyState error role="alert" title="Workspaces are unavailable">Refresh the page or try again later.</EmptyState>
+          ) : workspaces.data.length === 0 ? (
+            <EmptyState icon="＋" title="No workspaces yet">Use a Student invitation code to join your first workspace.</EmptyState>
+          ) : (
+            <div className="grid grid-cols-2 gap-[18px] pt-[22px] max-[600px]:grid-cols-1">
+              {workspaces.data.map((workspace) => (
+                <WorkspaceCard key={workspace.id} role="Student workspace" name={workspace.name} detail={`Joined ${new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", year: "numeric" }).format(new Date(workspace.joined_at))}`} href={`/student/workspaces/${workspace.id}`} linkLabel="Open workspace" />
+              ))}
+            </div>
+          )}
+        </section>
+
+        <aside className="mt-6 flex items-baseline gap-4 rounded-[10px] border border-(--brand-blue) bg-[rgba(0,119,255,0.18)] p-[18px_22px] leading-[1.4] max-[600px]:flex-col max-[600px]:items-start">
+          <strong className="shrink-0 text-[14px] uppercase">Privacy notice</strong>
+          <p className="m-0 text-[12px] text-[#d7e8ff]">Published case images use private storage and short-lived signed access.</p>
         </aside>
       </main>
     </StudentShell>

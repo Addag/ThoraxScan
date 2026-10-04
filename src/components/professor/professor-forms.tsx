@@ -17,6 +17,7 @@ import {
   initialWorkspaceActionState,
   type WorkspaceActionState,
 } from "@/lib/workspaces/types";
+import { formStatusColor } from "@/components/dashboard-ui";
 
 const fieldLabelClass = "block text-[12px] font-extrabold text-white";
 const fieldInputClass = "min-h-[43px] w-full min-w-0 rounded-[6px] border border-[#66718b] bg-[#0c1320] px-3 text-white aria-invalid:border-[#ff6b6b]";
@@ -30,7 +31,7 @@ function FormStatus({ state, className = "" }: { state: WorkspaceActionState; cl
   if (!state.message) return null;
   return (
     <p
-      className={`professor-form-status professor-form-status--${state.status} ${className}`}
+      className={`mt-[9px] text-[11px] leading-[1.35] ${formStatusColor(state.status)} ${className}`}
       role={state.status === "success" ? "status" : "alert"}
     >
       {state.message}
