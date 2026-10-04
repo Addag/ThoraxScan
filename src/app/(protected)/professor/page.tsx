@@ -10,7 +10,7 @@ import { EmptyState } from "@/components/empty-state";
 import { getProfessorActivities } from "@/lib/activities/server";
 import { requireRole } from "@/lib/auth/server";
 import { getProfessorWorkspaces } from "@/lib/workspaces/server";
-import { PageHeading, SectionHeading, StatCard, StatGrid, WorkspaceCard, countBadgeClass, sectionKickerClass } from "@/components/dashboard-ui";
+import { PageHeading, SectionHeading, StatCard, StatGrid, WorkspaceCard, countBadgeClass, sectionKickerClass , PageMain} from "@/components/dashboard-ui";
 import { activitiesCtaClass } from "@/components/activities/activity-ui";
 
 export const metadata: Metadata = {
@@ -28,7 +28,7 @@ export default async function ProfessorPage() {
 
   return (
     <ProfessorShell>
-      <main className="student-dashboard pb-[60px]">
+      <PageMain bottom="pb-[60px]">
         <PageHeading title="Dashboard" subtitle={`Welcome back, ${profile.display_name}!`} />
 
         <StatGrid>
@@ -71,7 +71,7 @@ export default async function ProfessorPage() {
             </div>
           )}
         </section>
-      </main>
+      </PageMain>
     </ProfessorShell>
   );
 }

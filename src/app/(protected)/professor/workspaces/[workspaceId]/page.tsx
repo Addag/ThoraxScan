@@ -14,7 +14,7 @@ import { requireRole } from "@/lib/auth/server";
 import type { InvitationCode } from "@/lib/workspaces/types";
 import { getProfessorWorkspace } from "@/lib/workspaces/server";
 import { activityButton } from "@/components/activities/activity-button";
-import { backLinkClass, listEmptyClass, sectionKickerClass } from "@/components/dashboard-ui";
+import { backLinkClass, listEmptyClass, sectionKickerClass , PageMain} from "@/components/dashboard-ui";
 
 export const metadata: Metadata = {
   title: "Manage workspace | ThoraxScan",
@@ -98,7 +98,7 @@ export default async function ProfessorWorkspacePage({
 
   return (
     <ProfessorShell>
-      <main className="student-dashboard pt-9">
+      <PageMain top="pt-9">
         <Link className={backLinkClass} href="/professor">← Back to dashboard</Link>
 
         <section className={`${panelBase} flex items-start justify-between gap-10 border-[#33425c] p-[28px_30px] max-[1000px]:flex-col max-[700px]:p-5`}>
@@ -218,7 +218,7 @@ export default async function ProfessorWorkspacePage({
         )}
 
         {!workspace.is_owner && <LeaveWorkspaceForm workspaceId={workspace.id} />}
-      </main>
+      </PageMain>
     </ProfessorShell>
   );
 }

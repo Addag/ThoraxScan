@@ -11,6 +11,20 @@ export const backLinkClass =
   "mb-5 inline-block text-[13px] font-extrabold text-[#9fcfff] no-underline";
 export const listEmptyClass = "mx-0 mt-3.5 mb-0 text-[11px] text-[#8993a8]";
 
+export function PageMain({
+  children,
+  width = "w-[min(1120px,calc(100%-44px))] max-[600px]:w-[min(100%-28px,1120px)]",
+  top = "pt-7 max-[600px]:pt-[22px]",
+  bottom = "pb-[52px]",
+}: {
+  children: ReactNode;
+  width?: string;
+  top?: string;
+  bottom?: string;
+}) {
+  return <main className={`mx-auto flex flex-1 flex-col ${width} ${top} ${bottom}`}>{children}</main>;
+}
+
 export function formStatusColor(status: string) {
   if (status === "success") return "text-[#b8f3ce]";
   if (status === "expired" || status === "revoked") return "text-[#ffd59a]";

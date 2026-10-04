@@ -9,6 +9,7 @@ import {
   XrayCasePreview,
   formatDueDate,
   activitiesCtaClass,
+  activityLayoutClass, activityCaseColumnClass, activityConfigColumnClass,
 } from "@/components/activities/activity-ui";
 import {
   ActivityDetailsForm,
@@ -21,6 +22,7 @@ import { requireRole } from "@/lib/auth/server";
 import { getOwnAccountSettings } from "@/lib/settings/server";
 import { getProfessorWorkspaces } from "@/lib/workspaces/server";
 import { ActivityAIStatus } from "@/components/activities/activity-ai-status";
+import { PageMain } from "@/components/dashboard-ui";
 
 export const metadata: Metadata = {
   title: "Manage activity | ThoraxScan",
@@ -47,21 +49,21 @@ export default async function ProfessorActivityPage({
 
   return (
     <ProfessorShell activeItem="activities" sectionLabel="Activities" sectionDescription={activity.workspaceName}>
-      <main className="student-dashboard">
+      <PageMain>
         <ActivityPageHeading
           title={activity.title}
           description={`${activity.workspaceName} · ${formatDueDate(activity.dueAt)}`}
           backHref="/professor/activities"
         />
-        <div className="activity-detail-statusline">
+        <div className="-mt-2 mb-[18px] flex items-center gap-3 text-[12px] text-[#aab1bf]">
           <ActivityStatusBadge status={activity.status} />
           <span>{activity.status === "published" ? "Visible to current and future workspace students" : activity.status === "archived" ? "No longer visible to students" : "Visible to teaching staff only"}</span>
         </div>
         <ActivityStepRail role="professor" />
         <Link className={activitiesCtaClass} href={`/professor/submissions?activity=${activity.id}`}>Review submissions</Link>
 
-        <div className="activity-authoring-layout">
-          <div className="activity-case-column">
+        <div className={activityLayoutClass("default")}>
+          <div className={activityCaseColumnClass}>
             <XrayCasePreview
               imageUrl={activity.imageUrl}
               imageError={activity.imageError}
@@ -72,12 +74,12 @@ export default async function ProfessorActivityPage({
             {activity.status === "draft" ? <CaseUploadForm activityId={activity.id} /> : null}
             <ActivityAIStatus activityId={activity.id} imageUrl={activity.imageUrl} activityStatus={activity.status} initial={activity.aiStatus} />
           </div>
-          <div className="activity-config-column">
+          <div className={activityConfigColumnClass}>
             <ActivityDetailsForm workspaces={workspaces.data} activity={activity} />
             <ActivityLifecycleControls activity={activity} />
           </div>
         </div>
-      </main>
+      </PageMain>
     </ProfessorShell>
   );
 }

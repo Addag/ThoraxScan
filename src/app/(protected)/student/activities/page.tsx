@@ -11,6 +11,7 @@ import { StudentShell } from "@/components/student/student-shell";
 import { EmptyState } from "@/components/empty-state";
 import { getStudentActivities } from "@/lib/activities/server";
 import { requireRole } from "@/lib/auth/server";
+import { PageMain } from "@/components/dashboard-ui";
 
 export const metadata: Metadata = {
   title: "Activities | ThoraxScan",
@@ -22,7 +23,7 @@ export default async function StudentActivitiesPage() {
 
   return (
     <StudentShell activeItem="activities" sectionLabel="Activities" sectionDescription="Published class activities">
-      <main className="student-dashboard">
+      <PageMain>
         <ActivityPageHeading description="Review published chest X-ray assignments from your workspaces" />
 
         {activities.error ? (
@@ -46,7 +47,7 @@ export default async function StudentActivitiesPage() {
             ))}
           </div>
         )}
-      </main>
+      </PageMain>
     </StudentShell>
   );
 }

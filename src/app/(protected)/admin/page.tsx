@@ -9,7 +9,7 @@ import { getProfessorApplications } from "@/lib/admin/server";
 import type { ProfessorApplicationProjection } from "@/lib/admin/types";
 import type { ProfessorApplicationStatus } from "@/lib/auth/types";
 import { requirePlatformAdmin } from "@/lib/auth/server";
-import { PageHeading, SectionHeading, StatCard, StatGrid, countBadgeClass } from "@/components/dashboard-ui";
+import { PageHeading, SectionHeading, StatCard, StatGrid, countBadgeClass , PageMain} from "@/components/dashboard-ui";
 
 export const metadata: Metadata = {
   title: "Professor approvals | ThoraxScan",
@@ -67,7 +67,7 @@ export default async function AdminPage({
 
   return (
     <AdminShell>
-      <main className="student-dashboard pb-[60px]">
+      <PageMain bottom="pb-[60px]">
         <PageHeading title="Administrator dashboard" subtitle={`Welcome back, ${profile.display_name}.`} />
 
         <StatGrid>
@@ -120,7 +120,7 @@ export default async function AdminPage({
             </div>
           )}
         </section>
-      </main>
+      </PageMain>
     </AdminShell>
   );
 }

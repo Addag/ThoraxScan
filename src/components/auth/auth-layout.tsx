@@ -3,6 +3,7 @@ import Link from "next/link";
 
 import { Brand } from "@/components/brand";
 import { AuthForm, AuthMode } from "@/components/auth/auth-form";
+import { authEyebrowClass } from "@/components/field-error";
 
 const authCopy = {
   login: {
@@ -44,11 +45,11 @@ export function AuthLayout({
     <main className="grid min-h-svh grid-cols-2 overflow-x-hidden [background:radial-gradient(ellipse_at_72%_28%,rgb(48_112_255/32%),transparent_42%),radial-gradient(ellipse_at_96%_70%,rgb(143_77_213/25%),transparent_38%),radial-gradient(ellipse_at_16%_55%,rgb(0_135_220/22%),transparent_46%),#030b1d] max-[1024px]:block">
       <section className="relative min-h-[1024px] overflow-hidden [background:linear-gradient(145deg,rgb(24_58_113/18%),rgb(3_8_39/32%))] max-[1024px]:min-h-0 max-[1024px]:px-6 max-[1024px]:pt-20 max-[1024px]:pb-[42px] max-[420px]:px-[18px]" aria-label="ThoraxScan introduction">
         <Link className="absolute top-5 left-[-20px] z-2 w-[215px] text-center text-[13px] font-extrabold leading-4 text-[#737373] no-underline max-[1024px]:top-[18px] max-[1024px]:left-[18px] max-[1024px]:w-auto" href="/">← Back to home</Link>
-        <Brand className="top-[65px] max-[1024px]:static max-[1024px]:mb-12" />
+        <Brand variant="auth" />
 
         <div className="absolute top-[194px] left-1/2 w-[min(610px,85%)] [transform:translateX(-50%)] max-[1024px]:static max-[1024px]:w-full max-[1024px]:[transform:none]">
           <h1 className="m-0 font-(--font-inter) text-[48px] font-extrabold tracking-[-1.5px] leading-[1.2] max-[1200px]:text-[clamp(38px,4vw,48px)] max-[1024px]:text-[clamp(36px,10vw,48px)] max-[1024px]:leading-[1.12]">
-            AI-Assisted <span className="accent-text">Chest X-Ray</span> Learning Platform
+            AI-Assisted <span className="text-brand">Chest X-Ray</span> Learning Platform
           </h1>
           <p className="w-[340px] mt-7 mb-0 ml-[-5px] text-[16px] font-semibold leading-[1.25] text-[#d6e1f0] max-[1024px]:w-[min(100%,390px)] max-[1024px]:mt-6 max-[1024px]:ml-0">
             ThoraxScan is an educational LMS for Radiologic Technology students. Practice chest X-ray interpretation through professor-guided activities, with AI-powered Attention Heatmap feedback after submission.
@@ -72,7 +73,7 @@ export function AuthLayout({
         <div className={cardClass}>
           <h2 className="m-0 text-[32px] font-extrabold leading-[1.25]" id={`${mode}-title`}>{copy.title}</h2>
           <p className="mt-px mb-[31px] text-[13px] leading-[1.5] text-[#d6e1f0]">{copy.subtitle}</p>
-          <p className="auth-eyebrow">{copy.eyebrow}</p>
+          <p className={authEyebrowClass}>{copy.eyebrow}</p>
           {message && (
             <p
               className={`mt-4 border px-3 py-2.5 text-[13px] leading-[1.4] ${statusClass}`}

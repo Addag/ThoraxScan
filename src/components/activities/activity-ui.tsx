@@ -4,6 +4,27 @@ import type { ActivityStatus } from "@/lib/activities/types";
 import type { ActivityAIStatus } from "@/lib/activity-ai/types";
 import { glassPanelClass } from "@/components/dashboard-ui";
 
+export function ActivityPanelTitle({ icon, title, titleId }: { icon: string; title: string; titleId: string }) {
+  return <div className="flex min-h-[45px] items-center gap-2.5 border-b border-[#566071] px-[13px]"><span className="text-[20px]" aria-hidden="true">{icon}</span><h2 className="m-0 text-[14px]" id={titleId}>{title}</h2></div>;
+}
+
+export function activityLayoutClass(variant: "default" | "new") {
+  return `grid items-start gap-12 max-[1050px]:grid-cols-1 max-[1050px]:gap-5 ${variant === "new" ? "grid-cols-[minmax(240px,0.55fr)_minmax(0,1.45fr)]" : "grid-cols-[minmax(310px,0.72fr)_minmax(0,1.28fr)]"}`;
+}
+
+export const activityCaseColumnClass = "grid gap-3.5 max-[1050px]:grid-cols-2 max-[1050px]:items-start max-[760px]:grid-cols-1";
+export const activityConfigColumnClass = "grid gap-3.5";
+
+export function activityFormMessageClass(status: string) {
+  const tone = status === "error" || status === "unauthorized" ? "bg-[rgba(255,55,69,0.1)] text-[#ff9299]" : status === "success" ? "bg-[rgba(36,255,61,0.09)] text-[#7dff8c]" : "bg-[rgba(0,119,255,0.12)] text-[#9fcfff]";
+  return `mx-0 mt-3 mb-0 rounded-[4px] px-[11px] py-[9px] text-[11px] leading-[1.4] ${tone}`;
+}
+
+export const activityFormHeadingClass = "mb-[17px] flex items-center gap-[13px]";
+export const activityFormHeadingIconClass = "text-[31px] text-brand";
+export const activityFormHeadingKickerClass = "mx-0 mt-0 mb-0.5 text-[10px] font-extrabold uppercase tracking-[0.08em] text-[#8e96a4]";
+export const activityFormHeadingTitleClass = "m-0 text-[30px] max-[520px]:text-[25px]";
+
 export const activitiesCtaClass =
   "mt-5 flex min-h-[74px] items-center justify-between gap-5 rounded-[9px] border border-brand bg-[rgba(0,119,255,0.12)] px-5 py-4 text-white no-underline";
 
@@ -81,10 +102,7 @@ export function XrayCasePreview({
 }) {
   return (
     <section className={`${glassPanelClass} border-[#33425c]`} aria-labelledby="xray-preview-title">
-      <div className="activity-panel-title">
-        <span aria-hidden="true">◉</span>
-        <h2 id="xray-preview-title">Chest X-Ray Image</h2>
-      </div>
+      <ActivityPanelTitle icon="◉" title="Chest X-Ray Image" titleId="xray-preview-title" />
       <div className={`m-[9px] aspect-[1.48/1] overflow-hidden border-[5px] ${darkImageBackground ? "border-[#080a0e] bg-[#0f1622]" : "border-[#c4cad4] bg-[#e5e9ef]"}`}>
         {imageUrl ? (
           // Signed URLs are short-lived and intentionally bypass the image optimizer.

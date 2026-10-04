@@ -6,7 +6,7 @@ import { InvitationForm } from "@/components/student/invitation-form";
 import { StudentShell } from "@/components/student/student-shell";
 import { formatDueDate } from "@/components/activities/activity-ui";
 import { EmptyState } from "@/components/empty-state";
-import { PageHeading, SectionHeading, WorkspaceCard, countBadgeClass, listEmptyClass, sectionKickerClass } from "@/components/dashboard-ui";
+import { PageHeading, SectionHeading, WorkspaceCard, countBadgeClass, listEmptyClass, sectionKickerClass , PageMain} from "@/components/dashboard-ui";
 import { getStudentActivities } from "@/lib/activities/server";
 import { requireRole } from "@/lib/auth/server";
 import { getStudentWorkspaces } from "@/lib/workspaces/server";
@@ -24,7 +24,7 @@ export default async function StudentPage() {
 
   return (
     <StudentShell>
-      <main className="student-dashboard">
+      <PageMain>
         <PageHeading title="Dashboard" subtitle={`Welcome back, ${profile.display_name}!`} />
 
         <section className="mt-6 rounded-[10px] border border-[#33425c] bg-[#18202d] p-6 max-[600px]:p-5" aria-labelledby="recent-activities-title">
@@ -74,7 +74,7 @@ export default async function StudentPage() {
           <strong className="shrink-0 text-[14px] uppercase">Privacy notice</strong>
           <p className="m-0 text-[12px] text-[#d7e8ff]">Published case images use private storage and short-lived signed access.</p>
         </aside>
-      </main>
+      </PageMain>
     </StudentShell>
   );
 }

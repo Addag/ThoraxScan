@@ -10,6 +10,7 @@ import {
   type ProfessorApplicationProjection,
 } from "@/lib/admin/types";
 import { formStatusColor } from "@/components/dashboard-ui";
+import { fieldErrorClass } from "@/components/field-error";
 
 export function ApplicationReviewForm({
   application,
@@ -60,7 +61,7 @@ export function ApplicationReviewForm({
             placeholder="Explain what the applicant should do next."
           />
           {state.fieldErrors?.rejectionReason && (
-            <small className="field-error">{state.fieldErrors.rejectionReason}</small>
+            <small className={fieldErrorClass}>{state.fieldErrors.rejectionReason}</small>
           )}
           <button
             className="mt-[9px] rounded-[6px] border border-[#d45b60] bg-[rgba(160,32,32,0.2)] px-3 py-[9px] font-extrabold text-[#ffb4b4] disabled:cursor-not-allowed disabled:opacity-[0.58]"

@@ -14,7 +14,7 @@ export default function Home() {
   return (
     <div className="landing-page">
       <header className="site-header">
-        <Brand />
+        <Brand variant="landing" />
         <span className="header-divider" aria-hidden="true" />
       </header>
 
@@ -26,7 +26,7 @@ export default function Home() {
         <section className="hero-copy" aria-labelledby="landing-title">
           <h1 id="landing-title">
             <span>AI-Assisted</span>
-            <span className="accent-text">Chest X-Ray</span>
+            <span className="text-brand">Chest X-Ray</span>
             <span>Learning Platform</span>
           </h1>
           <p>

@@ -5,7 +5,7 @@ import { notFound } from "next/navigation";
 import { StudentShell } from "@/components/student/student-shell";
 import { requireRole } from "@/lib/auth/server";
 import { getStudentWorkspace } from "@/lib/workspaces/server";
-import { backLinkClass, glassPanelClass, sectionKickerClass } from "@/components/dashboard-ui";
+import { backLinkClass, glassPanelClass, sectionKickerClass , PageMain} from "@/components/dashboard-ui";
 
 export const metadata: Metadata = {
   title: "Workspace | ThoraxScan",
@@ -26,7 +26,7 @@ export default async function StudentWorkspacePage({
 
   return (
     <StudentShell>
-      <main className="student-dashboard pt-[38px]">
+      <PageMain top="pt-[38px]">
         <Link className={backLinkClass} href="/student">← Back to dashboard</Link>
         <section className={`${glassPanelClass} border-[#33425c] p-[clamp(28px,5vw,52px)]`}>
           <p className={sectionKickerClass}>Student workspace</p>
@@ -50,7 +50,7 @@ export default async function StudentWorkspacePage({
             <Link href="/student/activities">Browse activities →</Link>
           </div>
         </section>
-      </main>
+      </PageMain>
     </StudentShell>
   );
 }

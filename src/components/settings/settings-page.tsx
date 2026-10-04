@@ -4,12 +4,16 @@ import { getSettingsPageData } from "@/lib/settings/server";
 import { ProfessorShell } from "@/components/professor/professor-shell";
 import { SettingsForm } from "@/components/settings/settings-form";
 import { StudentShell } from "@/components/student/student-shell";
+import { PageMain } from "@/components/dashboard-ui";
 
 export async function RoleSettingsPage({ role }: { role: AppRole }) {
   const profile = await requireRole(role);
   const pageData = await getSettingsPageData(profile.id);
   const content = (
-    <main className="student-dashboard w-[min(1110px,calc(100%-44px))] pb-[34px] max-[850px]:w-[min(1110px,calc(100%-36px))] max-[600px]:w-[min(1110px,calc(100%-28px))]">
+    <PageMain
+      width="w-[min(1110px,calc(100%-44px))] max-[850px]:w-[min(1110px,calc(100%-36px))] max-[600px]:w-[min(1110px,calc(100%-28px))]"
+      bottom="pb-[34px]"
+    >
       <header className="mb-[34px] flex items-end justify-between gap-6 max-[600px]:mb-6 max-[600px]:items-start max-[600px]:flex-col">
         <div>
           <h1 className="m-0 text-[clamp(28px,4vw,38px)] leading-[1.1]">Settings</h1>
@@ -26,7 +30,7 @@ export async function RoleSettingsPage({ role }: { role: AppRole }) {
         loadError={pageData.error}
         role={role}
       />
-    </main>
+    </PageMain>
   );
 
   if (role === "professor") {

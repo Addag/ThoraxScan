@@ -8,6 +8,7 @@ import { getProfessorSubmission } from "@/lib/evaluations/server";
 import { saveFacultyEvaluationAction, releaseFacultyEvaluationAction } from "../actions";
 import { getProfessorActivityAIHeatmap } from "@/lib/activity-ai/server";
 import { AttentionHeatmap } from "@/components/attention-heatmap";
+import { PageMain } from "@/components/dashboard-ui";
 
 export const metadata = { title: "Review submission | ThoraxScan" };
 export default async function SubmissionPage({ params }: { params: Promise<{ submissionId: string }> }) {
@@ -19,7 +20,7 @@ export default async function SubmissionPage({ params }: { params: Promise<{ sub
   const ai = activity.aiStatus;
   const attention = await getProfessorActivityAIHeatmap(activity.id);
   return <ProfessorShell activeItem="submissions" sectionLabel="Review submission" sectionDescription={activity.workspaceName}>
-    <main className="student-dashboard">
+    <PageMain>
       <Link href="/professor/submissions">← Back to submissions</Link>
       <h1>{submission.profiles?.display_name ?? "Student"} · {activity.title}</h1>
       <p>Submitted <time dateTime={submission.submitted_at}>{new Date(submission.submitted_at).toLocaleString()}</time> · {activity.status}</p>
@@ -49,6 +50,6 @@ export default async function SubmissionPage({ params }: { params: Promise<{ sub
         <FacultyEvaluationForm key={submission.faculty_evaluations?.updated_at ?? submission.id} evaluation={submission.faculty_evaluations}
           saveAction={saveFacultyEvaluationAction.bind(null, submissionId)} releaseAction={releaseFacultyEvaluationAction.bind(null, submissionId)} />
       </div>
-    </main>
+    </PageMain>
   </ProfessorShell>;
 }

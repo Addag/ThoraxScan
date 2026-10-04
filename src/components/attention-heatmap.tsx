@@ -7,7 +7,7 @@ export function AttentionHeatmap({ imageUrl, attention, title = "Attention overl
   const titleId = useId();
   const [enabled, setEnabled] = useState(true);
   const [opacity, setOpacity] = useState(0.55);
-  if (attention.status !== "ready") return <p className="activity-ai-copy">This model release does not export attention data. Prediction results are still available.</p>;
+  if (attention.status !== "ready") return <p className="m-0 px-4 py-3.5 text-[12px] leading-[1.55] text-[#c7d4e8]">This model release does not export attention data. Prediction results are still available.</p>;
   return <section aria-labelledby={titleId} className="attention-heatmap">
     <h3 id={titleId}>{title}</h3>
     <p>This global, class-agnostic overlay shows the relative internal attention the model assigned across the image during this inference. Warmer colors indicate higher relative attention within this image. It does not identify a lesion, explain a specific finding, or confirm disease location.</p>

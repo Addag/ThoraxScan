@@ -12,12 +12,14 @@ import {
   XrayCasePreview,
   dueState,
   formatDueDate,
+  ActivityPanelTitle, activityLayoutClass, activityCaseColumnClass,
 } from "@/components/activities/activity-ui";
 import { StudentShell } from "@/components/student/student-shell";
 import { getStudentActivity } from "@/lib/activities/server";
 import { requireRole } from "@/lib/auth/server";
 import { getOwnAccountSettings } from "@/lib/settings/server";
 import { ActivityAIFeedback } from "@/components/activities/activity-ai-feedback";
+import { PageMain } from "@/components/dashboard-ui";
 
 export const metadata: Metadata = {
   title: "Activity | ThoraxScan",
@@ -44,7 +46,7 @@ export default async function StudentActivityPage({
 
   return (
     <StudentShell activeItem="activities" sectionLabel="Activities" sectionDescription={activity.workspaceName}>
-      <main className="student-dashboard student-activity-detail">
+      <PageMain>
         <ActivityPageHeading
           title={activity.title}
           description={`${activity.workspaceName} · ${formatDueDate(activity.dueAt)}`}
@@ -52,12 +54,9 @@ export default async function StudentActivityPage({
         />
         <ActivityStepRail role="student" submissionStatus={submissionLabel(activity.submissionStatus, activity.dueAt)} aiStatus={activity.aiFeedback.status} />
 
-        <section className="student-assignment-panel" aria-labelledby="assignment-title">
-          <div className="activity-panel-title">
-            <span aria-hidden="true">▤</span>
-            <h2 id="assignment-title">Activity Assignment</h2>
-          </div>
-          <div className="student-assignment-copy">
+        <section className="rounded-[10px] border border-[#33425c] [background:var(--glass-surface)] backdrop-blur-[18px] backdrop-saturate-[135%] shadow-(--glass-shadow) mb-7 pb-[22px]" aria-labelledby="assignment-title">
+          <ActivityPanelTitle icon="▤" title="Activity Assignment" titleId="assignment-title" />
+          <div className="mx-[25px] mt-[22px] mb-0 rounded-[9px] border border-brand bg-[rgba(0,119,255,0.24)] p-[17px] [&>p]:m-0 [&>p]:whitespace-pre-wrap [&>p]:leading-[1.55] [&_dl]:mx-0 [&_dl]:mt-[18px] [&_dl]:mb-0 [&_dl]:grid [&_dl]:grid-cols-2 [&_dl]:gap-3 max-[520px]:[&_dl]:grid-cols-1 [&_dl_div]:rounded-[5px] [&_dl_div]:bg-[rgba(0,0,0,0.18)] [&_dl_div]:p-2.5 [&_dt]:text-[9px] [&_dt]:uppercase [&_dt]:text-[#9fcfff] [&_dd]:mx-0 [&_dd]:mt-1 [&_dd]:mb-0 [&_dd]:text-[11px]">
             <p>{activity.instructions}</p>
             <dl>
               <div><dt>Workspace</dt><dd>{activity.workspaceName}</dd></div>
@@ -66,8 +65,8 @@ export default async function StudentActivityPage({
           </div>
         </section>
 
-        <div className="student-activity-workspace">
-          <div className="activity-case-column">
+        <div className={activityLayoutClass("default")}>
+          <div className={activityCaseColumnClass}>
             <XrayCasePreview
               imageUrl={activity.imageUrl}
               imageError={activity.imageError}
@@ -84,7 +83,7 @@ export default async function StudentActivityPage({
           />
         </div>
         <StudentFacultyEvaluationPanel evaluation={facultyEvaluation.data} error={facultyEvaluation.error} />
-      </main>
+      </PageMain>
     </StudentShell>
   );
 }

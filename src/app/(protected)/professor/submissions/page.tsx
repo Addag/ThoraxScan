@@ -5,6 +5,7 @@ import { getProfessorSubmissions } from "@/lib/evaluations/server";
 import { getProfessorWorkspaces } from "@/lib/workspaces/server";
 import { getProfessorActivities } from "@/lib/activities/server";
 import type { ReviewStatus } from "@/lib/evaluations/types";
+import { PageMain } from "@/components/dashboard-ui";
 
 export const metadata = { title: "Submissions | ThoraxScan" };
 export default async function SubmissionsPage({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
@@ -17,7 +18,7 @@ export default async function SubmissionsPage({ searchParams }: { searchParams: 
     getProfessorSubmissions({ workspaceId, activityId, status }), getProfessorWorkspaces(profile.id), getProfessorActivities(),
   ]);
   return <ProfessorShell activeItem="submissions" sectionLabel="Submissions" sectionDescription="Review final Student responses">
-    <main className="student-dashboard">
+    <PageMain>
       <h1>Submissions</h1><p>Final responses, newest first. Archived activities remain available for review.</p>
       <form className="evaluation-filters" method="get">
         <label>Workspace<select name="workspace" defaultValue={workspaceId}><option value="">All workspaces</option>{workspaces.data.map(workspace => <option key={workspace.id} value={workspace.id}>{workspace.name}</option>)}</select></label>
@@ -32,6 +33,6 @@ export default async function SubmissionsPage({ searchParams }: { searchParams: 
           <p>{submission.activities.workspaces.name} · <time dateTime={submission.submitted_at}>{new Date(submission.submitted_at).toLocaleString()}</time></p></div>
         <span className="evaluation-status">{submission.faculty_evaluations?.status ?? "unreviewed"}</span>
       </li>)}</ul>
-    </main>
+    </PageMain>
   </ProfessorShell>;
 }

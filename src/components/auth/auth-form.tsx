@@ -15,6 +15,7 @@ import {
   resetPasswordAction,
 } from "@/app/(auth)/actions";
 import { primaryButtonBase, primaryButtonSkin } from "@/components/primary-button";
+import { fieldErrorClass, fieldErrorText } from "@/components/field-error";
 import { initialAuthState } from "@/lib/auth/types";
 
 export type AuthMode = "login" | "register" | "forgot" | "reset";
@@ -99,7 +100,7 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
           />
           {state.fieldErrors?.displayName && (
             <p
-              className="field-error"
+              className={fieldErrorClass}
               id="register-display-name-error"
               role="alert"
             >
@@ -125,7 +126,7 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
           />
           {state.fieldErrors?.email && (
             <p
-              className="field-error"
+              className={fieldErrorClass}
               id={`${mode}-email-error`}
               role="alert"
             >
@@ -189,7 +190,7 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
           </div>
           {state.fieldErrors?.password && (
             <p
-              className="field-error"
+              className={fieldErrorClass}
               id={`${mode}-password-error`}
               role="alert"
             >
@@ -218,7 +219,7 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
           />
           {state.fieldErrors?.confirmPassword && (
             <p
-              className="field-error"
+              className={fieldErrorClass}
               id={`${mode}-confirm-password-error`}
               role="alert"
             >
@@ -283,7 +284,7 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
           )}
           {captchaMessage && (
             <p
-              className="field-error mb-0 text-center"
+              className={`${fieldErrorText} mt-1.5 mb-0 text-center`}
               id={`${mode}-captcha-error`}
               role="alert"
             >
@@ -405,7 +406,7 @@ function RoleSelector({
           : "Choose the portal assigned to your ThoraxScan account."}
       </p>
       {error && (
-        <p className="field-error mx-1 mt-2 mb-0 text-center" id={errorId} role="alert">
+        <p className={`${fieldErrorText} mx-1 mt-2 mb-0 text-center`} id={errorId} role="alert">
           {error}
         </p>
       )}

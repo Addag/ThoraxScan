@@ -5,7 +5,7 @@ import { ProfessorApplicationShell } from "@/components/professor/professor-appl
 import { rejectionReasonClass, reviewPanelClass } from "@/components/admin/review-styles";
 import { getOwnProfessorApplication } from "@/lib/admin/server";
 import { getCurrentProfile } from "@/lib/auth/server";
-import { PageHeading, sectionKickerClass } from "@/components/dashboard-ui";
+import { PageHeading, sectionKickerClass , PageMain} from "@/components/dashboard-ui";
 
 export const metadata: Metadata = {
   title: "Professor application | ThoraxScan",
@@ -26,7 +26,7 @@ export default async function ProfessorApplicationPage() {
 
   return (
     <ProfessorApplicationShell>
-      <main className="student-dashboard pb-[60px]">
+      <PageMain bottom="pb-[60px]">
         <PageHeading title="Professor application" subtitle={`${result.profile.display_name}, your account is awaiting workspace access.`} showDate={false} />
 
         <section className={`${reviewPanelClass} max-w-[790px] p-[clamp(24px,5vw,42px)]`}>
@@ -63,7 +63,7 @@ export default async function ProfessorApplicationPage() {
             </div>
           </dl>
         </section>
-      </main>
+      </PageMain>
     </ProfessorApplicationShell>
   );
 }

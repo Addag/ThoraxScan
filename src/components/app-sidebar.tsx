@@ -20,7 +20,7 @@ export function AppSidebar({ children }: { children: ReactNode }) {
         }
       }}
     >
-      <Brand className="static mx-1 mt-0 mb-7 gap-2.5 max-[850px]:m-0 max-[850px]:self-start [&_.brand-mark]:size-[42px] max-[850px]:[&_.brand-mark]:size-9 [&_.brand-name]:text-[23px] [&_.brand-name]:tracking-[-1px] max-[850px]:[&_.brand-name]:text-[clamp(19px,5vw,23px)]" />
+      <Brand variant="sidebar" />
       <button
         aria-controls={contentId}
         aria-expanded={expanded}

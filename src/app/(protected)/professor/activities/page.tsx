@@ -13,7 +13,7 @@ import { getProfessorActivities } from "@/lib/activities/server";
 import { requireRole } from "@/lib/auth/server";
 import { getProfessorWorkspaces } from "@/lib/workspaces/server";
 import { activityButton } from "@/components/activities/activity-button";
-import { glassPanelClass } from "@/components/dashboard-ui";
+import { glassPanelClass , PageMain} from "@/components/dashboard-ui";
 
 export const metadata: Metadata = {
   title: "Activities | ThoraxScan",
@@ -58,7 +58,7 @@ export default async function ProfessorActivitiesPage({
 
   return (
     <ProfessorShell activeItem="activities" sectionLabel="Activities" sectionDescription="Case-backed learning activities">
-      <main className="student-dashboard">
+      <PageMain>
         <ActivityPageHeading description="Create, publish, and archive chest X-ray activities" />
 
         <section className="mb-5 flex items-end justify-between gap-6 rounded-[10px] border border-[#33425c] bg-[#18202d] px-5 py-[18px] max-[760px]:flex-col max-[760px]:items-stretch" aria-label="Activity filters">
@@ -110,7 +110,7 @@ export default async function ProfessorActivitiesPage({
             ))}
           </div>
         )}
-      </main>
+      </PageMain>
     </ProfessorShell>
   );
 }
