@@ -49,6 +49,15 @@
     font-family: var(--font-funnel), Arial, sans-serif;
   }
 
+  /* Only real text-entry controls should display an insertion caret. */
+  :where(body *) {
+    caret-color: transparent;
+  }
+
+  :where(input:not([type="hidden"]), textarea, [contenteditable="true"]) {
+    caret-color: auto;
+  }
+
   :is(a, button, input, select, textarea):focus-visible {
     outline: 3px solid #ffffff;
     outline-offset: 4px;
