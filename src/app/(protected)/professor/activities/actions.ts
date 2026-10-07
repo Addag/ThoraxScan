@@ -9,6 +9,7 @@ import type {
   ActivityFormState,
   ActivityStatus,
   CaseUploadFormState,
+  CaseRemovalFormState,
   CaseUploadStatus,
 } from "@/lib/activities/types";
 import type { AppRole, ProfessorApplicationStatus } from "@/lib/auth/types";
@@ -427,6 +428,80 @@ export async function confirmCaseUploadAction(
 
   revalidateActivityPaths(activity.id, activity.workspace_id);
   return { status: "success", message: "Case image uploaded and verified." };
+}
+
+export async function removeActivityCaseAction(
+  previousState: CaseRemovalFormState,
+  formData: FormData,
+): Promise<CaseRemovalFormState> {
+  const activityId = value(formData, "activityId");
+  const caseId = value(formData, "caseId");
+  if (!uuidPattern.test(activityId) || !uuidPattern.test(caseId)) return activityUnauthorized();
+
+  const session = await getProfessorSession();
+  if (!session) return activityUnauthorized();
+  const activity = await getActivityAccess(session, activityId);
+  if (!activity || activity.status !== "draft") return activityUnauthorized();
+
+  const retryingCleanup = previousState.cleanupCaseId === caseId;
+  if (!retryingCleanup && activity.case_id !== caseId) {
+    return activityError("The draft case changed. Reload before removing it.");
+  }
+
+  // Read errors must not be mistaken for an already deleted case.
+  const { data: xrayCase, error: caseReadError } = await session.supabase
+    .from("xray_cases")
+    .select("id, workspace_id, storage_path, mime_type, byte_size, upload_status")
+    .eq("id", caseId)
+    .maybeSingle<CaseAccessRow>();
+  if (caseReadError) return { ...previousState, status: "error", message: "Unable to read the case. Try again." };
+  if (!xrayCase) {
+    if (retryingCleanup) return { status: "success", message: "Case image removed.", removedCaseId: caseId };
+    return activityError("The case is unavailable. Reload before removing it.");
+  }
+  if (xrayCase.workspace_id !== activity.workspace_id) return activityUnauthorized();
+
+  if (!retryingCleanup) {
+    const { data: detached, error: detachError } = await session.supabase
+      .from("activities")
+      .update({ case_id: null })
+      .eq("id", activity.id)
+      .eq("workspace_id", activity.workspace_id)
+      .eq("status", "draft")
+      .eq("case_id", caseId)
+      .select("id")
+      .maybeSingle<{ id: string }>();
+    if (detachError || !detached) return activityError("The draft case changed or could not be removed. Reload and try again.");
+    revalidateActivityPaths(activity.id, activity.workspace_id);
+  }
+
+  const cleanupPending = (message: string): CaseRemovalFormState => ({
+    status: "cleanup_pending", message, removedCaseId: caseId, cleanupCaseId: caseId,
+  });
+  const { data: linkedActivity, error: linkReadError } = await session.supabase
+    .from("activities")
+    .select("id")
+    .eq("case_id", caseId)
+    .maybeSingle<{ id: string }>();
+  if (linkReadError) return cleanupPending("The case was detached, but cleanup could not be checked. Retry cleanup.");
+  if (linkedActivity) return activityError("This case is attached to an activity and cannot be cleaned up. Reload the page.");
+
+  const { error: storageError } = await session.supabase.storage
+    .from("activity-cases")
+    .remove([xrayCase.storage_path]);
+  if (storageError) return cleanupPending("The case was detached, but its image could not be deleted. Retry cleanup.");
+
+  const { data: deleted, error: deleteError } = await session.supabase
+    .from("xray_cases")
+    .delete()
+    .eq("id", caseId)
+    .eq("workspace_id", activity.workspace_id)
+    .select("id")
+    .maybeSingle<{ id: string }>();
+  if (deleteError || !deleted) return cleanupPending("The case was detached, but its record could not be deleted. Retry cleanup.");
+
+  revalidateActivityPaths(activity.id, activity.workspace_id);
+  return { status: "success", message: "Case image removed. You can upload another image.", removedCaseId: caseId };
 }
 
 export async function publishActivityAction(

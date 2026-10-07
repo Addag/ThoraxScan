@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useEffect, useRef, useState, useTransition } from "react";
+import { useActionState, useCallback, useEffect, useId, useRef, useState, useTransition } from "react";
 
 import {
   archiveActivityAction,
@@ -9,11 +9,13 @@ import {
   deleteDraftActivityAction,
   prepareCaseUploadAction,
   publishActivityAction,
+  removeActivityCaseAction,
   updateActivityAction,
 } from "@/app/(protected)/professor/activities/actions";
 import {
   initialActivityFormState,
   initialCaseUploadFormState,
+  initialCaseRemovalFormState,
   type ProfessorActivityDetails,
 } from "@/lib/activities/types";
 import { createClient } from "@/lib/supabase/client";
@@ -136,8 +138,68 @@ export function ActivityDetailsForm({
   );
 }
 
-export function CaseUploadForm({ activityId }: { activityId: string }) {
+export function CaseUploadForm({ activityId, caseId = null }: { activityId: string; caseId?: string | null }) {
+  const [selectionVersion, setSelectionVersion] = useState(0);
+  const [uploadBusy, setUploadBusy] = useState(false);
+  const [selectionMessage, setSelectionMessage] = useState("");
+  const [reservedCase, setReservedCase] = useState<{ id: string; previousCaseId: string | null } | null>(null);
+  const handleCaseReserved = useCallback((id: string) => {
+    setReservedCase({ id, previousCaseId: caseId });
+  }, [caseId]);
+  const [removalState, removeAction, removing] = useActionState(async (previousState: typeof initialCaseRemovalFormState, formData: FormData) => {
+    const result = await removeActivityCaseAction(previousState, formData);
+    if (result.removedCaseId && !previousState.cleanupCaseId && (result.status === "success" || result.status === "cleanup_pending")) {
+      setSelectionVersion((version) => version + 1);
+      setSelectionMessage("");
+    }
+    return result;
+  }, initialCaseRemovalFormState);
+  const currentCaseId = reservedCase && caseId === reservedCase.previousCaseId ? reservedCase.id : caseId;
+  const attachedCaseId = currentCaseId !== removalState.removedCaseId ? currentCaseId : null;
+  const removalCaseId = removalState.cleanupCaseId ?? attachedCaseId;
+
+  return (
+    <div className="grid min-w-0 gap-3.5">
+      {removalCaseId ? (
+        <form action={removeAction} onSubmit={(event) => {
+          if (uploadBusy || removing || (!removalState.cleanupCaseId && !window.confirm("Remove this case image from the draft? You can upload another image."))) event.preventDefault();
+        }}>
+          <input type="hidden" name="activityId" value={activityId} />
+          <input type="hidden" name="caseId" value={removalCaseId} />
+          <button className={`${activityButton.danger} w-full focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#80caff]`} type="submit" disabled={uploadBusy || removing}>
+            {removing ? "Removing…" : removalState.cleanupCaseId ? "Retry cleanup" : "Remove uploaded case"}
+          </button>
+        </form>
+      ) : null}
+      {removalState.message ? <p className={activityFormMessageClass(removalState.status === "cleanup_pending" ? "error" : removalState.status)} role="status">{removalState.message}</p> : null}
+      <CaseUploadFields
+        key={selectionVersion}
+        activityId={activityId}
+        disabled={removing}
+        onBusyChange={setUploadBusy}
+        onCaseReserved={handleCaseReserved}
+        onSelect={() => setSelectionMessage("")}
+        onClear={() => {
+          setSelectionVersion((version) => version + 1);
+          setSelectionMessage("Selected case removed.");
+        }}
+      />
+      <p className="m-0 text-[11px] text-[#aeb6c5]" role="status">{selectionMessage}</p>
+    </div>
+  );
+}
+
+function CaseUploadFields({ activityId, disabled, onBusyChange, onCaseReserved, onSelect, onClear }: {
+  activityId: string;
+  disabled: boolean;
+  onBusyChange: (busy: boolean) => void;
+  onCaseReserved: (caseId: string) => void;
+  onSelect: () => void;
+  onClear: () => void;
+}) {
   const [file, setFile] = useState<File | null>(null);
+  const [selectedCaseId, setSelectedCaseId] = useState<string | null>(null);
+  const [libraryLoading, setLibraryLoading] = useState(false);
   const [clientError, setClientError] = useState("");
   const [uploading, setUploading] = useState(false);
   const [prepareState, prepareAction, preparing] = useActionState(
@@ -151,6 +213,7 @@ export function CaseUploadForm({ activityId }: { activityId: string }) {
   const [, startConfirmation] = useTransition();
   const processedCaseId = useRef<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const fileInputId = useId();
 
   useEffect(() => {
     if (
@@ -166,6 +229,7 @@ export function CaseUploadForm({ activityId }: { activityId: string }) {
     }
 
     processedCaseId.current = prepareState.caseId;
+    onCaseReserved(prepareState.caseId);
     let cancelled = false;
 
     async function upload() {
@@ -196,41 +260,59 @@ export function CaseUploadForm({ activityId }: { activityId: string }) {
     return () => {
       cancelled = true;
     };
-  }, [confirmAction, file, prepareState, startConfirmation]);
+  }, [confirmAction, file, onCaseReserved, prepareState, startConfirmation]);
 
   const visibleState = confirmState.status !== "idle" ? confirmState : prepareState;
-  const busy = preparing || uploading || confirming;
+  const uploadBusy = preparing || uploading || confirming || libraryLoading;
+  const busy = disabled || uploadBusy;
+
+  useEffect(() => {
+    onBusyChange(uploadBusy);
+  }, [onBusyChange, uploadBusy]);
 
   return (
     <form className="rounded-[10px] border border-[#33425c] [background:var(--glass-surface)] backdrop-blur-[18px] backdrop-saturate-[135%] shadow-(--glass-shadow) p-[22px] max-[520px]:p-[17px]" action={prepareAction}>
       <input type="hidden" name="activityId" value={activityId} />
       <input type="hidden" name="mimeType" value={file?.type ?? ""} />
       <input type="hidden" name="byteSize" value={file?.size ?? ""} />
-      <XrayLibrary disabled={busy} onSelect={(next) => {
+      <XrayLibrary disabled={busy} selectedCaseId={selectedCaseId} onLoadingChange={setLibraryLoading} onSelect={(next, nextCaseId) => {
         if (fileInputRef.current) fileInputRef.current.value = "";
         setFile(next);
+        setSelectedCaseId(nextCaseId);
         setClientError("");
+        onSelect();
       }} />
-      <label className="grid min-h-[175px] cursor-pointer place-items-center content-center gap-[7px] rounded-[6px] border-2 border-dashed border-[#d1d5db] p-5 text-center">
+      <div className="grid min-h-[175px] place-items-center content-center gap-[7px] rounded-[6px] border-2 border-dashed border-[#d1d5db] p-5 text-center">
         <span className="text-[32px] font-light" aria-hidden="true">＋</span>
-        <strong>{file ? file.name : "Choose a chest X-ray"}</strong>
+        <div className="flex min-w-0 flex-wrap items-center justify-center gap-3">
+          <label className="min-w-0 cursor-pointer break-all" htmlFor={fileInputId}><strong>{file ? file.name : "Choose a chest X-ray"}</strong></label>
+          {file ? (
+            <button className={`${activityButton.secondary} text-[11px] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#80caff]`} type="button" disabled={busy} onClick={onClear}>
+              Remove selected case
+            </button>
+          ) : null}
+        </div>
         <small className="text-[10px] text-[#8d96a5]">JPEG or PNG · maximum 6 MB · private storage</small>
         <input
           ref={fileInputRef}
+          id={fileInputId}
           className="w-full max-w-[250px] text-[10px] text-[#aeb6c5]"
           type="file"
+          aria-label="Choose a chest X-ray file"
           accept="image/jpeg,image/png"
           disabled={busy}
           onChange={(event) => {
             setFile(event.target.files?.[0] ?? null);
+            setSelectedCaseId(null);
             setClientError("");
+            onSelect();
           }}
           required={!file}
         />
-      </label>
+      </div>
       <FieldError>{prepareState.fieldErrors?.file}</FieldError>
       <label className="my-4 grid grid-cols-[18px_minmax(0,1fr)] gap-[9px] text-[11px] leading-[1.4] text-[#bdc4cf]">
-        <input className="size-4 accent-brand" type="checkbox" name="attestation" required />
+        <input className="size-4 accent-brand" type="checkbox" name="attestation" disabled={busy} required />
         <span>I attest this is a de-identified image approved for this class activity.</span>
       </label>
       <FieldError>{prepareState.fieldErrors?.attestation}</FieldError>

@@ -62,6 +62,18 @@ export type ActivityFormState = {
 
 export type CaseUploadField = "file" | "attestation";
 
+export type CaseRemovalFormState = {
+  status: "idle" | "error" | "success" | "unauthorized" | "cleanup_pending";
+  message: string;
+  removedCaseId?: string;
+  cleanupCaseId?: string;
+};
+
+export const initialCaseRemovalFormState: CaseRemovalFormState = {
+  status: "idle",
+  message: "",
+};
+
 export type CaseUploadFormState = {
   status:
     | "idle"

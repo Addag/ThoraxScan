@@ -6,31 +6,36 @@ import cases from "@/lib/xray-library/cases.json";
 const findings = [...new Set(cases.flatMap((item) => Object.entries(item.labels).filter(([, value]) => value === 1).map(([label]) => label)))];
 const focusRing = "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#80caff]";
 
-export function XrayLibrary({ onSelect, disabled = false }: {
-  onSelect: (file: File) => void;
+export function XrayLibrary({ onSelect, disabled = false, selectedCaseId, onLoadingChange }: {
+  onSelect: (file: File, caseId: string) => void;
   disabled?: boolean;
+  selectedCaseId?: string | null;
+  onLoadingChange?: (loading: boolean) => void;
 }) {
   const [filter, setFilter] = useState("");
   const [view, setView] = useState("");
   const [loading, setLoading] = useState<string | null>(null);
   const [selected, setSelected] = useState<string | null>(null);
   const [error, setError] = useState("");
+  const visibleSelection = selectedCaseId === undefined ? selected : selectedCaseId;
   const visible = cases.filter((item) => (!view || item.view === view) && (!filter || Object.entries(item.labels).some(([label, value]) => label === filter && value === 1)));
 
   async function select(item: typeof cases[number]) {
     setLoading(item.id);
+    onLoadingChange?.(true);
     setError("");
     try {
       const response = await fetch(item.imageUrl);
       if (!response.ok) throw new Error("Image unavailable");
       const blob = await response.blob();
       if (!blob.size || blob.type !== "image/jpeg") throw new Error("Invalid image");
-      onSelect(new File([blob], `${item.id}.jpg`, { type: "image/jpeg" }));
+      onSelect(new File([blob], `${item.id}.jpg`, { type: "image/jpeg" }), item.id);
       setSelected(item.id);
     } catch {
       setError("This library image could not be loaded. Please try again.");
     } finally {
       setLoading(null);
+      onLoadingChange?.(false);
     }
   }
 
@@ -65,7 +70,7 @@ export function XrayLibrary({ onSelect, disabled = false }: {
         </button>
       </article>)}
     </div>
-    <p role="status">{loading ? "Loading library image…" : selected ? `${cases.find((item) => item.id === selected)?.title} loaded.` : ""}</p>
+    <p role="status">{loading ? "Loading library image…" : visibleSelection ? `${cases.find((item) => item.id === visibleSelection)?.title} loaded.` : ""}</p>
     {error ? <p role="alert">{error}</p> : null}
     <p>Source: <a className="text-inherit underline" href="https://stanfordmlgroup.github.io/competitions/chexpert/" target="_blank" rel="noreferrer">CheXpert · Stanford</a>. Labels and views come from the dataset, not model predictions or clinical review.</p>
   </section>;

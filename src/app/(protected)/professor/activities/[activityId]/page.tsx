@@ -71,7 +71,7 @@ export default async function ProfessorActivityPage({
               status={activity.caseUploadStatus}
               darkImageBackground={accountSettings.settings.darkImageBackground}
             />
-            {activity.status === "draft" ? <CaseUploadForm activityId={activity.id} /> : null}
+            {activity.status === "draft" ? <CaseUploadForm activityId={activity.id} caseId={activity.caseId} /> : null}
             <ActivityAIStatus activityId={activity.id} imageUrl={activity.imageUrl} activityStatus={activity.status} initial={activity.aiStatus} />
           </div>
           <div className={activityConfigColumnClass}>
