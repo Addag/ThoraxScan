@@ -8,9 +8,9 @@ import { getProfessorSubmission } from "@/lib/evaluations/server";
 import { saveFacultyEvaluationAction, releaseFacultyEvaluationAction } from "../actions";
 import { getProfessorActivityAIHeatmap } from "@/lib/activity-ai/server";
 import { AttentionHeatmap } from "@/components/attention-heatmap";
-import { PageMain } from "@/components/dashboard-ui";
+import { PageHeading, PageMain } from "@/components/dashboard-ui";
 
-export const metadata = { title: "Review submission | ThoraxScan" };
+export const metadata = { title: "Student Review | ThoraxScan" };
 export default async function SubmissionPage({ params }: { params: Promise<{ submissionId: string }> }) {
   await requireRole("professor");
   const { submissionId } = await params;
@@ -19,24 +19,31 @@ export default async function SubmissionPage({ params }: { params: Promise<{ sub
   const { activity } = submission;
   const ai = activity.aiStatus;
   const attention = await getProfessorActivityAIHeatmap(activity.id);
-  return <ProfessorShell activeItem="submissions" sectionLabel="Review submission" sectionDescription={activity.workspaceName}>
+  return <ProfessorShell activeItem="submissions" sectionLabel="Student Reviews" sectionDescription={activity.workspaceName}>
     <PageMain>
-      <Link href="/professor/submissions">← Back to submissions</Link>
-      <h1>{submission.profiles?.display_name ?? "Student"} · {activity.title}</h1>
-      <p>Submitted <time dateTime={submission.submitted_at}>{new Date(submission.submitted_at).toLocaleString()}</time> · {activity.status}</p>
-      <Link href={`/professor/activities/${activity.id}`}>View activity</Link>
+      <Link className="review-back-link" href="/professor/submissions">← Back to student reviews</Link>
+      <PageHeading title="Student Reviews" subtitle="Compare student evaluations with AI output and professor reference" />
+      <section className="review-student-summary" aria-labelledby="review-student-heading">
+        <span className="review-avatar review-avatar--large" aria-hidden="true">{(submission.profiles?.display_name ?? "S").slice(0, 1).toUpperCase()}</span>
+        <div><h1 id="review-student-heading">{submission.profiles?.display_name ?? "Student"}</h1><p>{submission.student_id} · {activity.title}</p><p>Submitted <time dateTime={submission.submitted_at}>{new Date(submission.submitted_at).toLocaleString()}</time></p></div>
+        <Link href={`/professor/activities/${activity.id}`}>View activity</Link>
+      </section>
       <div className="evaluation-detail-grid">
         <div>
-          <section className="faculty-evaluation-panel"><h2>Student response</h2><dl>
+          <section className="review-card review-image-card"><h2><span aria-hidden="true">◉</span> Chest X-Ray Image</h2><XrayCasePreview imageUrl={activity.imageUrl} imageError={activity.imageError} title={activity.title} /><AttentionHeatmap imageUrl={activity.imageUrl} attention={attention} title="Relative global attention" /></section>
+          <div className="review-card review-grading-card"><FacultyEvaluationForm key={submission.faculty_evaluations?.updated_at ?? submission.id} evaluation={submission.faculty_evaluations}
+            saveAction={saveFacultyEvaluationAction.bind(null, submissionId)} releaseAction={releaseFacultyEvaluationAction.bind(null, submissionId)} />
+          </div>
+        </div>
+        <div>
+          <section className="faculty-evaluation-panel review-card"><h2><span aria-hidden="true">▣</span> Student Evaluation</h2><dl>
             <dt>Student ID</dt><dd>{submission.student_id}</dd>
             <dt>Visible findings</dt><dd className="evaluation-text">{submission.visible_findings}</dd>
             <dt>Classification</dt><dd>{submission.classification}</dd>
             <dt>Relevant region</dt><dd>{submission.relevant_region || "Not applicable"}</dd>
           </dl></section>
-          <XrayCasePreview imageUrl={activity.imageUrl} imageError={activity.imageError} title={activity.title} />
-          <section className="faculty-evaluation-panel"><h2>Private reference evaluation</h2><p className="evaluation-text">{activity.referenceEvaluation || "No reference available."}</p></section>
-          <AttentionHeatmap imageUrl={activity.imageUrl} attention={attention} title="Model attention" />
-          <section className="faculty-evaluation-panel"><h2>AI status and provenance</h2><dl>
+          <section className="faculty-evaluation-panel review-card"><h2><span aria-hidden="true">▤</span> Your Evaluation</h2><p className="evaluation-text">{activity.referenceEvaluation || "No reference available."}</p></section>
+          <section className="faculty-evaluation-panel review-card"><h2>AI status and provenance</h2><dl>
             <dt>Status</dt><dd>{ai.status}</dd><dt>Attempts</dt><dd>{ai.attemptCount}</dd>
             <dt>Model release</dt><dd>{ai.releaseId ?? "Unavailable"}</dd>
             <dt>Manifest version</dt><dd>{ai.manifestVersion ?? "Unavailable"}</dd>
@@ -47,8 +54,6 @@ export default async function SubmissionPage({ params }: { params: Promise<{ sub
             <dt>Completed</dt><dd>{ai.completedAt ?? "Not completed"}</dd>
           </dl></section>
         </div>
-        <FacultyEvaluationForm key={submission.faculty_evaluations?.updated_at ?? submission.id} evaluation={submission.faculty_evaluations}
-          saveAction={saveFacultyEvaluationAction.bind(null, submissionId)} releaseAction={releaseFacultyEvaluationAction.bind(null, submissionId)} />
       </div>
     </PageMain>
   </ProfessorShell>;

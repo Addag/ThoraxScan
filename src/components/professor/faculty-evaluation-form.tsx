@@ -18,7 +18,7 @@ export function FacultyEvaluationForm({ evaluation, saveAction, releaseAction }:
   }, initialEvaluationState);
   const locked = evaluation?.status === "released" || ["released", "already_released", "unauthorized", "unavailable"].includes(state.status);
   return <section className="faculty-evaluation-panel" aria-labelledby="faculty-review-heading">
-    <h2 id="faculty-review-heading">Faculty evaluation</h2>
+    <h2 id="faculty-review-heading">Grading</h2>
     <p role="status" aria-live="polite">{pending ? "Saving evaluation…" : state.message || (evaluation?.status === "released" ? "Released · permanently locked" : evaluation ? "Draft · visible to Professors only" : "Unreviewed")}</p>
     {evaluation?.released_at ? <p>Released <time dateTime={evaluation.released_at}>{new Date(evaluation.released_at).toLocaleString()}</time></p> : null}
     <form action={action}>
@@ -35,7 +35,7 @@ export function FacultyEvaluationForm({ evaluation, saveAction, releaseAction }:
         <p id="evaluation-feedback-help">Up to 5,000 characters per text field. Feedback is required for release and becomes visible to the Student while the activity is published.</p>
         <p id="evaluation-feedback-error" role={state.fieldErrors?.feedback ? "alert" : undefined}>{state.fieldErrors?.feedback}</p>
         {!locked ? <div className="evaluation-actions">
-          <button type="submit" name="intent" value="draft">Save draft</button>
+          <button type="submit" name="intent" value="draft">Save Review</button>
           <button type="button" onClick={() => setConfirming(true)}>Release evaluation</button>
         </div> : null}
         {confirming && !locked ? <div className="evaluation-confirmation" role="group" aria-labelledby="release-confirmation">

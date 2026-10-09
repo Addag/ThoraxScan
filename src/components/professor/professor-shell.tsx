@@ -20,7 +20,7 @@ export function ProfessorShell({
       navLabel="Main menu"
       navAriaLabel="Professor navigation"
       navItems={[
-        { label: "Submissions", href: "/professor/submissions", active: activeItem === "submissions" },
+        { label: "Student Reviews", href: "/professor/submissions", active: activeItem === "submissions" },
         { label: "Dashboard", href: "/professor", icon: "dashboard", active: activeItem === "dashboard" },
         { label: "Activities", href: "/professor/activities", icon: "activities", active: activeItem === "activities" },
         { label: "Learning mode", href: "/professor/learning", icon: "learning", active: activeItem === "learning" },
