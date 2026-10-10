@@ -15,6 +15,7 @@ import {
   type SettingsActionState,
   initialSettingsActionState,
 } from "@/lib/settings/types";
+import Link from "next/link";
 
 const tabOrder = ["profile", "display", "privacy"] as const;
 type SettingsTab = (typeof tabOrder)[number];
@@ -259,7 +260,7 @@ export function SettingsForm({
             <span className="grid size-6 place-items-center rounded-full border border-current" aria-hidden="true">✓</span>
             <div>
               <strong className="text-[13px]">Browser inference foundation</strong>
-              <p className="m-0 mt-0.5 text-[12px] leading-[1.35] text-[#e2e9f2]">The app can verify an active ONNX release for local WebGPU or WASM execution. Product-facing activity analysis and feedback are not enabled yet.</p>
+              <p className="m-0 mt-0.5 text-[12px] leading-[1.35] text-[#e2e9f2]">Learning Mode can run the active ONNX release in this browser. Authorized activity analysis may persist model results and feedback according to the <Link className="font-semibold underline underline-offset-2" href="/privacy-policy">Privacy Policy</Link>.</p>
             </div>
           </article>
         </div>

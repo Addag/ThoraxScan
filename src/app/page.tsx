@@ -72,6 +72,7 @@ export default function Home() {
         <p>
           <strong>Educational Disclaimer</strong>: ThoraxScan is a training and learning tool for Radiologic Technology students only. All AI outputs are for guided learning and must not be used for clinical diagnosis or patient care.
         </p>
+        <Link className="ml-auto whitespace-nowrap text-[12px] font-semibold text-[#d6e1f0] underline underline-offset-2" href="/privacy-policy">Privacy Policy</Link>
       </footer>
     </div>
   );

@@ -99,6 +99,7 @@ export function AppShell({
           <strong>ThoraxScan · v1.0.0 Prototype</strong>
           <span className={`text-[12px] text-[#b8b8b8] ${supportingTextClass}`}>{footerNotes[0]}</span>
           <span className={`text-[12px] text-[#b8b8b8] ${supportingTextClass}`}>{footerNotes[1]}</span>
+          <Link className="text-[12px] font-semibold text-[#d6e1f0] underline underline-offset-2" href="/privacy-policy">Privacy Policy</Link>
         </footer>
       </div>
     </div>

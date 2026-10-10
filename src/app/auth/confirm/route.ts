@@ -41,6 +41,14 @@ export async function GET(request: NextRequest) {
   }
 
   if (!error) {
+    const { data: confirmedUser } = await supabase.auth.getUser();
+    const metadata = confirmedUser.user?.user_metadata as Record<string, unknown> | undefined;
+    if (metadata?.privacy_policy_version === "1.0") {
+      await supabase.rpc("record_registration_consents", {
+        input_age_band: metadata.age_band === "minor" ? "minor" : "adult",
+        input_research_consent: metadata.research_consent === true,
+      });
+    }
     return NextResponse.redirect(new URL(next, origin));
   }
 

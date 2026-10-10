@@ -17,6 +17,10 @@ import {
 import { primaryButtonBase, primaryButtonSkin } from "@/components/primary-button";
 import { fieldErrorClass, fieldErrorText } from "@/components/field-error";
 import { initialAuthState } from "@/lib/auth/types";
+import {
+  PRIVACY_POLICY_EFFECTIVE_DATE,
+  PRIVACY_POLICY_VERSION,
+} from "@/lib/legal/privacy";
 
 export type AuthMode = "login" | "register" | "forgot" | "reset";
 
@@ -227,6 +231,43 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
             </p>
           )}
         </div>
+      )}
+
+      {mode === "register" && (
+        <>
+          <div className={fieldClass}>
+            <label htmlFor="register-age-band">Age group</label>
+            <select
+              className={inputClass}
+              id="register-age-band"
+              name="ageBand"
+              defaultValue=""
+              required
+              aria-invalid={Boolean(state.fieldErrors?.ageBand)}
+              aria-describedby={state.fieldErrors?.ageBand ? "register-age-band-error" : "register-age-band-help"}
+            >
+              <option value="" disabled>Select an age group</option>
+              <option value="adult">18 or older</option>
+              <option value="minor">Under 18</option>
+            </select>
+            <small id="register-age-band-help">Under-18 research participation requires an approved guardian process.</small>
+            {state.fieldErrors?.ageBand && <p className={fieldErrorClass} id="register-age-band-error" role="alert">{state.fieldErrors.ageBand}</p>}
+          </div>
+
+          <fieldset className="mt-5 grid gap-3 border-0 p-0 text-[13px] leading-[1.5] text-[#d6e1f0]">
+            <legend className="sr-only">Privacy and research choices</legend>
+            <label className="flex items-start gap-2">
+              <input className="mt-1 size-4 flex-none accent-[#4da5ff]" name="privacyNoticeAccepted" type="checkbox" value="yes" required aria-invalid={Boolean(state.fieldErrors?.privacyNoticeAccepted)} aria-describedby="register-privacy-help" />
+              <span id="register-privacy-help">I have read the <Link className="font-semibold text-[#9fd1ff] underline underline-offset-2" href="/privacy-policy">Privacy Policy</Link> (version {PRIVACY_POLICY_VERSION}, effective {PRIVACY_POLICY_EFFECTIVE_DATE}).</span>
+            </label>
+            {state.fieldErrors?.privacyNoticeAccepted && <p className={`${fieldErrorText} mt-[-6px] ml-6`} role="alert">{state.fieldErrors.privacyNoticeAccepted}</p>}
+            <label className="flex items-start gap-2">
+              <input className="mt-1 size-4 flex-none accent-[#4da5ff]" name="researchConsent" type="checkbox" value="yes" aria-invalid={Boolean(state.fieldErrors?.researchConsent)} aria-describedby="register-research-help" />
+              <span id="register-research-help">I voluntarily agree to participate in the ThoraxScan capstone research. This is separate from educational platform access. Under-18 participants need the approved guardian process.</span>
+            </label>
+            {state.fieldErrors?.researchConsent && <p className={`${fieldErrorText} mt-[-6px] ml-6`} role="alert">{state.fieldErrors.researchConsent}</p>}
+          </fieldset>
+        </>
       )}
 
       {mode === "login" && (

@@ -9,6 +9,10 @@ import type {
   LoginPortal,
 } from "@/lib/auth/types";
 import { createClient } from "@/lib/supabase/server";
+import {
+  PRIVACY_POLICY_EFFECTIVE_DATE,
+  PRIVACY_POLICY_VERSION,
+} from "@/lib/legal/privacy";
 
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -72,6 +76,9 @@ export async function registerAction(
   const confirmPassword = value(formData, "confirmPassword");
   const captchaToken = value(formData, "captchaToken").trim();
   const requestedRole = value(formData, "requestedRole");
+  const privacyNoticeAccepted = value(formData, "privacyNoticeAccepted");
+  const researchConsent = value(formData, "researchConsent") === "yes";
+  const ageBand = value(formData, "ageBand");
   const fieldErrors: Partial<Record<AuthField, string>> = {};
 
   if (!displayName) fieldErrors.displayName = "Enter your display name.";
@@ -88,6 +95,15 @@ export async function registerAction(
   }
   if (!isAppRole(requestedRole)) {
     fieldErrors.requestedRole = "Choose Student or Professor.";
+  }
+  if (privacyNoticeAccepted !== "yes") {
+    fieldErrors.privacyNoticeAccepted = "Read and accept the Privacy Policy to create an account.";
+  }
+  if (ageBand !== "adult" && ageBand !== "minor") {
+    fieldErrors.ageBand = "Choose an age group.";
+  }
+  if (ageBand === "minor" && researchConsent) {
+    fieldErrors.researchConsent = "Research participation requires the approved guardian process for users under 18.";
   }
 
   Object.keys(fieldErrors).forEach((key) => {
@@ -106,7 +122,14 @@ export async function registerAction(
     password,
     options: {
       captchaToken,
-      data: { display_name: displayName, requested_role: requestedRole },
+      data: {
+        display_name: displayName,
+        requested_role: requestedRole,
+        age_band: ageBand,
+        research_consent: researchConsent,
+        privacy_policy_version: PRIVACY_POLICY_VERSION,
+        privacy_policy_effective_date: PRIVACY_POLICY_EFFECTIVE_DATE,
+      },
       emailRedirectTo: `${siteUrl}/auth/confirm?next=/dashboard`,
     },
   });

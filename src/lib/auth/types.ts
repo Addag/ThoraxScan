@@ -9,7 +9,10 @@ export type AuthField =
   | "confirmPassword"
   | "captchaToken"
   | "expectedRole"
-  | "requestedRole";
+  | "requestedRole"
+  | "privacyNoticeAccepted"
+  | "researchConsent"
+  | "ageBand";
 
 export type AuthActionState = {
   status: "idle" | "error" | "success";
