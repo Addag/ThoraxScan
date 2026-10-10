@@ -47,6 +47,7 @@ Record only movements that currently run in the repository. The process shelf co
 - [browser-model-conformance.md](browser-model-conformance.md)
 - [student-learning-mode-inference.md](student-learning-mode-inference.md)
 - [activity-ai-analysis.md](activity-ai-analysis.md)
+- [privacy-consent-recording.md](privacy-consent-recording.md)
 
 Faculty evaluation is live in [faculty-evaluation.md](faculty-evaluation.md); analytics and notification movements remain ghost concepts. Prediction-only AI analysis and feedback release are live in [activity-ai-analysis.md](activity-ai-analysis.md).
 

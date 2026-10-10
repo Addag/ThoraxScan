@@ -20,7 +20,7 @@ Describe the identity objects that are implemented: the profile projection, allo
 
 ## Outputs
 
-Cards for [Profile](profile.md), [AppRole](app-role.md), and [auth session](auth-session.md).
+Cards for [Profile](profile.md), [AppRole](app-role.md), and [auth session](auth-session.md). Privacy consent is mapped separately under [runtime](../runtime/legal-consent.md).
 
 ## Human check
 

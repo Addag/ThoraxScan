@@ -21,7 +21,7 @@ Describe current visual and route surfaces without treating product copy or desi
 
 ## Outputs
 
-Cards for the landing, authentication, administration, shared Settings, design-token, X-ray sample, and Student/Professor Learning Mode surfaces.
+Cards for the landing, authentication, privacy-policy, administration, shared Settings, design-token, X-ray sample, and Student/Professor Learning Mode surfaces.
 
 ## Human check
 
