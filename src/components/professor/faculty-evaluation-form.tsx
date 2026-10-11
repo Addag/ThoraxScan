@@ -41,8 +41,10 @@ export function FacultyEvaluationForm({ evaluation, saveAction, releaseAction }:
         {confirming && !locked ? <div className="evaluation-confirmation" role="group" aria-labelledby="release-confirmation">
           <p id="release-confirmation">Release is permanent. The score and feedback cannot be changed after release.</p>
           <input type="hidden" name="confirmed" value="yes" />
-          <button type="button" onClick={() => setConfirming(false)}>Keep editing</button>
-          <button type="submit" name="intent" value="release">Confirm and release</button>
+          <div className="evaluation-confirmation-actions">
+            <button className="button-secondary" type="button" onClick={() => setConfirming(false)}>Keep editing</button>
+            <button className="button-primary" type="submit" name="intent" value="release">Confirm and release</button>
+          </div>
         </div> : null}
       </fieldset>
     </form>
