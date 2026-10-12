@@ -3,12 +3,12 @@ import Link from "next/link";
 
 const variants = {
   landing: {
-    link: "absolute top-[13px] left-9 z-[2] gap-[26px] max-[1024px]:top-[11px] max-[1024px]:left-5 max-[1024px]:gap-3.5",
-    mark: "size-[59px] max-[1024px]:size-[49px]",
-    name: "text-[32px] tracking-[-1.5px] max-[1024px]:text-[27px]",
+    link: "absolute top-[13px] left-9 z-[2] gap-[26px] narrow:top-[11px] narrow:left-5 narrow:gap-3.5",
+    mark: "size-[59px] narrow:size-[49px]",
+    name: "text-[32px] tracking-[-1.5px] narrow:text-[27px]",
   },
   auth: {
-    link: "absolute top-[65px] left-9 z-[2] gap-[26px] max-[1024px]:static max-[1024px]:mb-12",
+    link: "absolute top-[65px] left-9 z-[2] gap-[26px] narrow:static narrow:mb-12",
     mark: "size-[59px]",
     name: "text-[32px] tracking-[-1.5px]",
   },

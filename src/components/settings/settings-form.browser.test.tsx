@@ -1,11 +1,18 @@
 import { expect, test, vi } from "vitest";
 import { page, userEvent } from "vitest/browser";
 import { render } from "vitest-browser-react";
+import type { ComponentProps } from "react";
 
 const updateSettings = vi.hoisted(() => vi.fn());
 
 vi.mock("@/app/(protected)/settings/actions", () => ({
   updateAccountSettingsAction: updateSettings,
+}));
+
+// These component tests run without Next.js's router or build-time environment.
+vi.mock("next/link", () => ({
+  __esModule: true,
+  default: (props: ComponentProps<"a">) => <a {...props} />,
 }));
 
 import { SettingsForm } from "./settings-form";

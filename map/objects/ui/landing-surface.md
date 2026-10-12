@@ -16,8 +16,10 @@ It is the public entry point and establishes the educational, non-clinical produ
 
 ## Shape
 
-- Renders the brand, product copy, workflow callouts, static image, and login link in [page.tsx](<../../../src/app/page.tsx:12>).
-- The disclaimer states that AI outputs are for guided learning and not clinical diagnosis or patient care in [page.tsx](<../../../src/app/page.tsx:63>).
+- Renders the brand, product copy, workflow callouts, static image, and login link in [page.tsx](<../../../src/app/page.tsx>).
+- The disclaimer states that AI outputs are for guided learning and not clinical diagnosis or patient care in [page.tsx](<../../../src/app/page.tsx>).
+
+Styling lives in Tailwind utilities in [page.tsx](<../../../src/app/page.tsx>), with landing tokens and exact inclusive responsive/supports variants in [globals.css](<../../../src/app/globals.css>).
 
 ## Connected to
 
@@ -40,4 +42,4 @@ Public browser route /, unauthenticated users, and visual QA.
 
 ## See
 
-[page.tsx](<../../../src/app/page.tsx:12>)
+[page.tsx](<../../../src/app/page.tsx>)
