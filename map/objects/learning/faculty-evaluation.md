@@ -14,6 +14,10 @@ One Professor evaluation belongs to one immutable final Student submission. A dr
 - [Schema and RPC](../../../supabase/migrations/20260920161434_faculty_evaluations.sql)
 - [Server projections](../../../src/lib/evaluations/server.ts)
 - [Professor form](../../../src/components/professor/faculty-evaluation-form.tsx)
+- [Student panel](../../../src/components/activities/student-faculty-evaluation.tsx)
+- [Shared review utilities](../../../src/components/professor/review-styles.ts)
+
+The review list, detail page, grading form, Student evaluation panel, and attention heatmap use Tailwind utilities in their components plus `review-styles.ts`. Review cards and the Student panel retain their existing borderless layout.
 
 ## Does not do
 

@@ -1,0 +1,25 @@
+import type { ReviewStatus } from "@/lib/evaluations/types";
+
+export const reviewSurfaceClass = "[background:var(--glass-surface)]";
+export const reviewHeadingClass = "m-0 text-[16px] font-extrabold";
+export const reviewCardClass = `${reviewSurfaceClass} border-[rgb(137_161_196/42%)] p-[18px]`;
+export const reviewCardTitleClass = "mx-0 mt-0 mb-3.5 flex items-center gap-[9px] text-[16px] font-extrabold";
+export const reviewFieldLabelClass = "grid gap-1.5 text-[11px] text-[#b7c5d9]";
+const reviewFieldBase = "rounded-[6px] border border-[#687b98] bg-[rgb(16_30_51/82%)] px-2.5 py-2 text-white [font:inherit]";
+export const reviewFieldClass = `${reviewFieldBase} min-h-[38px]`;
+export const reviewTextareaClass = `${reviewFieldBase} min-h-[110px] resize-y`;
+export const reviewButtonBase = "min-h-[38px] cursor-pointer rounded-[7px] px-4 py-0 font-extrabold";
+export const reviewButtonSolid = `${reviewButtonBase} border-0 bg-[#087fff] text-white`;
+export const reviewButtonGradient = `${reviewButtonBase} border-0 [background:linear-gradient(135deg,#148cff,#006be8)] shadow-[0_7px_18px_rgb(0_119_255/24%)] text-white`;
+export const reviewButtonOutline = `${reviewButtonBase} border border-[#627997] bg-transparent text-[#d6e4f8]`;
+export const reviewLinkClass = "text-[12px] text-[#9fcfff] no-underline";
+export const reviewPanelTextClass = "mx-0 mt-0 mb-3 text-[12px] leading-[1.5] text-[#b7c5d9]";
+
+const statusColors = { unreviewed: "text-[#ffd36a]", draft: "text-[#8fc8ff]", released: "text-[#7dff8c]" };
+export function evaluationStatusClass(status?: ReviewStatus) {
+  return `rounded-[999px] border border-current px-[9px] py-[5px] font-extrabold capitalize ${status ? `text-[10px] ${statusColors[status]}` : "text-[12px]"}`;
+}
+
+export function reviewAvatarClass(size: "normal" | "large" = "normal") {
+  return `grid place-items-center rounded-full bg-[#087fff] font-extrabold text-white ${size === "large" ? "size-[46px]" : "size-[38px]"}`;
+}
