@@ -12,6 +12,8 @@ import { createClient } from "@/lib/supabase/server";
 import {
   PRIVACY_POLICY_EFFECTIVE_DATE,
   PRIVACY_POLICY_VERSION,
+  TERMS_EFFECTIVE_DATE,
+  TERMS_VERSION,
 } from "@/lib/legal/privacy";
 
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -76,6 +78,7 @@ export async function registerAction(
   const confirmPassword = value(formData, "confirmPassword");
   const captchaToken = value(formData, "captchaToken").trim();
   const requestedRole = value(formData, "requestedRole");
+  const termsAccepted = value(formData, "termsAccepted");
   const privacyNoticeAccepted = value(formData, "privacyNoticeAccepted");
   const researchConsent = value(formData, "researchConsent") === "yes";
   const ageBand = value(formData, "ageBand");
@@ -95,6 +98,9 @@ export async function registerAction(
   }
   if (!isAppRole(requestedRole)) {
     fieldErrors.requestedRole = "Choose Student or Professor.";
+  }
+  if (termsAccepted !== "yes") {
+    fieldErrors.termsAccepted = "Accept the Terms and Conditions to create an account.";
   }
   if (privacyNoticeAccepted !== "yes") {
     fieldErrors.privacyNoticeAccepted = "Read and accept the Privacy Policy to create an account.";
@@ -129,6 +135,8 @@ export async function registerAction(
         research_consent: researchConsent,
         privacy_policy_version: PRIVACY_POLICY_VERSION,
         privacy_policy_effective_date: PRIVACY_POLICY_EFFECTIVE_DATE,
+        terms_version: TERMS_VERSION,
+        terms_effective_date: TERMS_EFFECTIVE_DATE,
       },
       emailRedirectTo: `${siteUrl}/auth/confirm?next=/dashboard`,
     },

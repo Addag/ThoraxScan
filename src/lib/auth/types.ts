@@ -10,6 +10,7 @@ export type AuthField =
   | "captchaToken"
   | "expectedRole"
   | "requestedRole"
+  | "termsAccepted"
   | "privacyNoticeAccepted"
   | "researchConsent"
   | "ageBand";

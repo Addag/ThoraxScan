@@ -20,6 +20,8 @@ import { initialAuthState } from "@/lib/auth/types";
 import {
   PRIVACY_POLICY_EFFECTIVE_DATE,
   PRIVACY_POLICY_VERSION,
+  TERMS_EFFECTIVE_DATE,
+  TERMS_VERSION,
 } from "@/lib/legal/privacy";
 
 export type AuthMode = "login" | "register" | "forgot" | "reset";
@@ -255,7 +257,12 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
           </div>
 
           <fieldset className="mt-5 grid gap-3 border-0 p-0 text-[13px] leading-[1.5] text-[#d6e1f0]">
-            <legend className="sr-only">Privacy and research choices</legend>
+            <legend className="sr-only">Terms, privacy and research choices</legend>
+            <label className="flex items-start gap-2">
+              <input className="mt-1 size-4 flex-none accent-[#4da5ff]" name="termsAccepted" type="checkbox" value="yes" required aria-invalid={Boolean(state.fieldErrors?.termsAccepted)} aria-describedby={state.fieldErrors?.termsAccepted ? "register-terms-help register-terms-error" : "register-terms-help"} />
+              <span id="register-terms-help">I agree to the <Link className="font-semibold text-[#9fd1ff] underline underline-offset-2" href="/terms">Terms and Conditions</Link> (version {TERMS_VERSION}, effective {TERMS_EFFECTIVE_DATE}).</span>
+            </label>
+            {state.fieldErrors?.termsAccepted && <p className={`${fieldErrorText} mt-[-6px] ml-6`} id="register-terms-error" role="alert">{state.fieldErrors.termsAccepted}</p>}
             <label className="flex items-start gap-2">
               <input className="mt-1 size-4 flex-none accent-[#4da5ff]" name="privacyNoticeAccepted" type="checkbox" value="yes" required aria-invalid={Boolean(state.fieldErrors?.privacyNoticeAccepted)} aria-describedby="register-privacy-help" />
               <span id="register-privacy-help">I have read the <Link className="font-semibold text-[#9fd1ff] underline underline-offset-2" href="/privacy-policy">Privacy Policy</Link> (version {PRIVACY_POLICY_VERSION}, effective {PRIVACY_POLICY_EFFECTIVE_DATE}).</span>

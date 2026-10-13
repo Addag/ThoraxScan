@@ -8,14 +8,14 @@ snapshot: working tree @ privacy-consent implementation
 
 # Register an account
 
-Form data, requested role, age band, privacy acknowledgement, research choice, and Turnstile token → validation and Supabase sign-up → confirmation message, consent recording, and profile/application trigger path.
+Form data, requested role, age band, terms agreement, privacy acknowledgement, research choice, and Turnstile token → validation and Supabase sign-up → confirmation message, consent recording, and profile/application trigger path.
 
 ## Steps
 
-1. The register page renders the shared auth surface with Student and Professor requested-role options plus age-band, privacy-notice, and separate research-consent fields in [auth-form.tsx](<../../src/components/auth/auth-form.tsx>).
+1. The register page renders the shared auth surface with Student and Professor requested-role options plus age-band, required terms-agreement and privacy-notice checkboxes, and a separate research-consent field in [auth-form.tsx](<../../src/components/auth/auth-form.tsx>).
 2. The shared form requires a Cloudflare Turnstile token and resets the single-use challenge after an action response in [auth-form.tsx](<../../src/components/auth/auth-form.tsx:45>).
-3. The server action validates the account fields, requires privacy acknowledgement, validates age band, rejects minor research consent without the approved guardian process, and rejects a missing Turnstile token before contacting Supabase in [actions.ts](<../../src/app/(auth)/actions.ts>).
-4. The action calls Supabase Auth sign-up with the CAPTCHA token, display name, requested role, policy version/date, age band, and research choice in Auth metadata in [actions.ts](<../../src/app/(auth)/actions.ts>).
+3. The server action validates the account fields, requires `termsAccepted=yes` and privacy acknowledgement, validates age band, rejects minor research consent without the approved guardian process, and rejects a missing Turnstile token before contacting Supabase in [actions.ts](<../../src/app/(auth)/actions.ts>).
+4. The action calls Supabase Auth sign-up with the CAPTCHA token, display name, requested role, privacy policy version/date, `terms_version` and `terms_effective_date`, age band, and research choice in Auth metadata in [actions.ts](<../../src/app/(auth)/actions.ts>). Terms acceptance is stored in signup metadata only; it is not recorded in `legal_consents` or the confirmation RPC. Audit-grade recording requires a separate migration and RPC change.
 5. The Auth trigger creates either a Student profile or a Professor profile plus pending application in [the approval migration](<../../supabase/migrations/20260817124643_professor_approval_administration.sql:128>).
 6. The confirmation route records the privacy and optional research choices through the authenticated consent RPC after email confirmation in [route.ts](<../../src/app/auth/confirm/route.ts>).
 7. The action returns role-specific confirmation and Professor-review guidance in [actions.ts](<../../src/app/(auth)/actions.ts>).
@@ -27,6 +27,7 @@ Form data, requested role, age band, privacy acknowledgement, research choice, a
 - [Supabase profile schema](../objects/runtime/supabase-profile-schema.md)
 - [AppRole](../objects/identity/app-role.md)
 - [Privacy policy surface](../objects/ui/privacy-policy.md)
+- [Terms and conditions surface](../objects/ui/terms.md)
 - [Legal consent record](../objects/runtime/legal-consent.md)
 
 ## Produces
@@ -41,7 +42,7 @@ Form data, requested role, age band, privacy acknowledgement, research choice, a
 
 - Registration fields, CAPTCHA lifecycle, validation messages, metadata names, confirmation destination, and profile creation.
 - Auth form role copy and Professor application guidance.
-- Consent fields, policy version/date, age-band validation, Auth metadata, and confirmed-account consent recording.
+- Consent fields, terms and policy version/date, age-band validation, Auth metadata, and confirmed-account privacy/research consent recording.
 
 ### Does not hit
 

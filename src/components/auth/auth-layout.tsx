@@ -85,6 +85,7 @@ export function AuthLayout({
           <AuthForm mode={mode} />
           <p className="mt-5 text-center text-[12px] leading-[1.5] text-[#b9c8dd]">
             <Link className="font-semibold text-[#9fd1ff] underline underline-offset-2" href="/privacy-policy">Privacy Policy</Link>
+            {" · "}<Link className="font-semibold text-[#9fd1ff] underline underline-offset-2" href="/terms">Terms</Link>
           </p>
         </div>
       </section>

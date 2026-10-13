@@ -79,7 +79,10 @@ export default function Home() {
         <p className="m-0 max-w-[1294px] tablet:min-w-0">
           <strong className="font-extrabold text-(--disclaimer-yellow)">Educational Disclaimer</strong>: ThoraxScan is a training and learning tool for Radiologic Technology students only. All AI outputs are for guided learning and must not be used for clinical diagnosis or patient care.
         </p>
-        <Link className="ml-auto whitespace-nowrap text-[12px] font-semibold text-[#d6e1f0] underline underline-offset-2" href="/privacy-policy">Privacy Policy</Link>
+        <span className="ml-auto flex items-center gap-3 whitespace-nowrap text-[12px] font-semibold text-[#d6e1f0] underline underline-offset-2">
+          <Link href="/privacy-policy">Privacy Policy</Link>
+          <Link href="/terms">Terms</Link>
+        </span>
       </footer>
     </div>
   );
