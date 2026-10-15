@@ -49,6 +49,11 @@ The PyTorch run that produced the one checkpoint behind both the V1 and V2 [mode
 - The 32 lateral images alone give a competition AUC of 0.861, but that is too few images for a per-label result. Lateral support is therefore **unevaluated**, even though laterals were in training.
 - These results differ from the older `custom_train_squeezevit_b128_e38` run described in the frozen [capstone record](../../CAPSTONE_CURRENT_STATE.md) (frontal-only `train_custom.csv` with 171,821 rows and `valid_custom.csv` with 19,206 rows). Do not mix the two runs.
 - `make_chexpert_custom_split.py --all-views` writes `train_custom_all_views.csv` (200,992 rows: 171,821 frontal + 29,171 lateral) and `valid_custom_all_views.csv` (22,422 rows: 19,206 frontal + 3,216 lateral). It uses the same validation patients as the frontal-only custom split, whose frontal rows are identical. No checkpoint has been trained on it yet (2026-10-01).
+- `ViT_Models/Official_retrain_v2/` (2026-10-13; smoke-tested, not yet trained) uses the same model and preprocessing on the all-views split. It adds augmentation (no horizontal flip), warmup + cosine LR (peak 3e-4), EMA weights saved as `model_state_dict`, and selection on the held-out split logged per view. `tune_thresholds.py` writes per-label F1 thresholds to `thresholds.json`, and `evaluate.py` reports AUC and thresholded metrics per view on the official 234.
+- v2 trained 2026-10-13: best epoch 26 of 30 (EMA), checkpoint SHA-256 `e8536d8b…bf6c99`.
+  - Held-out competition AUC: 0.7935 overall, 0.789 frontal, 0.797 lateral (3,216 images).
+  - Official 234: competition 0.8589 and mean 0.7677 overall; competition 0.8572 and mean 0.7724 on the 202 frontal (v1: 0.8407 and 0.7401 overall; 0.8377 and 0.7550 frontal).
+  - Bundle `model-input/squeezevit-retrain-v2-attention-20261013.1` (thresholds `f1-heldout-custom-all-views-v1`) passed `model:validate` on 2026-10-13. Not staged or activated yet.
 
 ## Connected to
 
