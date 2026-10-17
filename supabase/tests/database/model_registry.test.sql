@@ -114,7 +114,7 @@ select throws_ok(
     'database-test',
     'stale activation'
   ),
-  '40001',
+  'PT409',
   'model slot revision changed',
   'a stale expected revision is rejected'
 );
