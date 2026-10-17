@@ -17,6 +17,7 @@ import {
   parseModelManifest,
   parseReleaseSource,
   parseThresholds,
+  withPossibleThresholds,
   type ModelManifest,
 } from "../src/lib/inference/contract";
 import { sigmoid } from "../src/lib/inference/postprocess";
@@ -413,6 +414,7 @@ async function validateBundle(directoryOption: string): Promise<ValidatedBundle>
     model: resolve(directory, "model.onnx"),
     release: resolve(directory, "release.json"),
     thresholds: resolve(directory, "thresholds.json"),
+    possibleThresholds: resolve(directory, "possible-thresholds.json"),
     preprocessingReference: resolve(directory, "preprocessing-reference.py"),
     preprocessingInput: resolve(directory, "fixtures", "preprocessing-input.png"),
     expectedTensor: resolve(directory, "fixtures", "expected-tensor.f32"),
@@ -438,6 +440,7 @@ async function validateBundle(directoryOption: string): Promise<ValidatedBundle>
     expectedLogitsValue,
     expectedProbabilitiesValue,
     expectedAttentionValue,
+    possibleThresholdsValue,
   ] = await Promise.all([
     readFile(paths.model),
     jsonFile(paths.release),
@@ -449,6 +452,7 @@ async function validateBundle(directoryOption: string): Promise<ValidatedBundle>
     readFile(paths.expectedLogits),
     readFile(paths.expectedProbabilities),
     readFile(paths.expectedAttention).catch((error: NodeJS.ErrnoException) => { if (error.code === "ENOENT") return null; throw error; }),
+    readFile(paths.possibleThresholds).catch((error: NodeJS.ErrnoException) => { if (error.code === "ENOENT") return null; throw error; }),
   ]);
 
   if (model.byteLength < 1 || model.byteLength > MODEL_MAX_BYTES) {
@@ -459,7 +463,9 @@ async function validateBundle(directoryOption: string): Promise<ValidatedBundle>
   }
 
   const release = parseReleaseSource(releaseValue);
-  const labels = parseThresholds(thresholdsValue);
+  const thresholdLabels = parseThresholds(thresholdsValue);
+  // Optional Learning Mode "possible" tier; omitted bundles keep the original manifest shape.
+  const labels = possibleThresholdsValue === null ? thresholdLabels : withPossibleThresholds(thresholdLabels, jsonBuffer(possibleThresholdsValue, paths.possibleThresholds));
   const expectedTensorValues = floatArray(expectedTensor, "expected-tensor.f32", FLOAT_COUNT);
   const modelInput = floatArray(modelInputBuffer, "model-input.f32", FLOAT_COUNT);
   const expectedLogits = numberArray(

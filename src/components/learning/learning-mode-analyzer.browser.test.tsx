@@ -122,9 +122,27 @@ test("No Finding suppression uses postprocessing output", async () => {
   mocks.analyze.mockResolvedValue(prediction(manifest.labels.map((_, i) => i < 2 ? 2 : -2)));
   await render(<LearningModeAnalyzer />); await start();
   await expect.element(page.getByText("No Finding: Suppressed by abnormal finding.")).toBeVisible();
-  expect(page.getByRole("region", { name: "Thresholded findings" }).element().textContent).not.toContain("No Finding");
+  expect(page.getByRole("region", { name: "Likely findings" }).element().textContent).not.toContain("No Finding");
   await page.getByText("All 14 labels", { exact: true }).click();
-  await expect.element(page.getByText("Matched · Suppressed by abnormal finding", { exact: true })).toBeVisible();
+  await expect.element(page.getByText("Likely · Suppressed by abnormal finding", { exact: true })).toBeVisible();
+});
+
+test("possible tier lists borderline findings only when the release defines it", async () => {
+  // Logit 0 -> probability 0.5: below the 0.6 threshold, above the 0.3 possible threshold.
+  const tiered = { ...manifest, labels: manifest.labels.map((item) => ({ ...item, threshold: 0.6, possibleThreshold: 0.3 })) };
+  const logits = manifest.labels.map((_, i) => (i === 2 ? 2 : i === 5 ? 0 : -4));
+  mocks.analyze.mockResolvedValue({ ...prediction(), ...postprocessLogits(logits, tiered) });
+  await render(<LearningModeAnalyzer />); await start();
+  expect(page.getByRole("region", { name: "Likely findings" }).element().textContent).toContain("Cardiomegaly");
+  const possible = page.getByRole("region", { name: "Possible findings" }).element().textContent;
+  expect(possible).toContain("Edema");
+  expect(possible).not.toContain("Cardiomegaly");
+});
+
+test("possible tier is hidden for releases without possible thresholds", async () => {
+  await render(<LearningModeAnalyzer />); await start();
+  await expect.element(page.getByRole("heading", { name: "Analysis result" })).toBeVisible();
+  await expect.element(page.getByRole("region", { name: "Possible findings" })).not.toBeInTheDocument();
 });
 
 const errorCodes: InferenceErrorCode[] = ["NO_ACTIVE_MODEL", "UNSUPPORTED_MANIFEST", "ARTIFACT_INTEGRITY_FAILED", "PREPROCESSING_FAILED", "MODEL_LOAD_FAILED", "INVALID_OUTPUT"];

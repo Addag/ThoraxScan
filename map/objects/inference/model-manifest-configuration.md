@@ -18,6 +18,11 @@ Weights and thresholds can be replaced without an application deployment while t
 
 Both versions fix a single-file opset-17 artifact, float32 `[batch,1,224,224]` input, 14 logits, grayscale normalization, the 14-label order, inclusive thresholds, `No Finding` suppression, and explicit no-match behavior. V2 adds `attention_map` with float32 `[batch,1,7,7]` output and the fixed rollout/normalization descriptor.
 
+Optionally, every label also carries `possibleThreshold`, from the bundle's `possible-thresholds.json`.
+- All 14 labels have it or none do, and each value is at or below the label's threshold.
+- Checked by `withPossibleThresholds` in [contract.ts](<../../../src/lib/inference/contract.ts>).
+- The database accepts the extra key unchanged, and activity analyses ignore it.
+
 ## Connected to
 
 Describes a [Model release](model-release.md), drives the [Preprocessing tensor](preprocessing-tensor.md), and interprets the [Transient prediction result](prediction-result.md).

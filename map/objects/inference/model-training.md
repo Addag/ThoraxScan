@@ -53,6 +53,30 @@ The PyTorch run that produced the one checkpoint behind both the V1 and V2 [mode
 - v2 trained 2026-10-13: best epoch 26 of 30 (EMA), checkpoint SHA-256 `e8536d8b…bf6c99`.
   - Held-out competition AUC: 0.7935 overall, 0.789 frontal, 0.797 lateral (3,216 images).
   - Official 234: competition 0.8589 and mean 0.7677 overall; competition 0.8572 and mean 0.7724 on the 202 frontal (v1: 0.8407 and 0.7401 overall; 0.8377 and 0.7550 frontal).
+  - v3 candidate `ViT_Models/Official_retrain_v3_fastvit/` (2026-10-15): timm FastViT-SA12, ImageNet-pretrained, 10.57M params, v2 recipe at peak LR 1e-4. Best epoch 5 of 30; held-out AUC falls after epoch 5 (overfitting).
+    - Held-out: competition 0.8092 and mean 0.8025 (v2: 0.7935 and 0.7791); higher on all 14 labels.
+    - Official 234: competition 0.8583 vs 0.8589 (paired-bootstrap 95% CI −0.015 to +0.014); stable-label mean 0.8263 vs 0.8113.
+    - Not exported: it needs a new exporter for the attention map, and it has not been tested in the browser (2026-10-17).
+  - v4 rerun `ViT_Models/Official_retrain_v4_fastvit/` (set up 2026-10-17; smoke-tested, not yet trained): v3 plus 8 epochs, drop-path 0.1, and a per-label uncertainty policy for training only. Uncertain Atelectasis and Edema count as positive, uncertain Cardiomegaly is left out of the loss, and other uncertain labels count as negative. Selection and evaluation stay on u-zero labels.
+    - Trained 2026-10-17: best epoch 6 of 8, plateau from epoch 5 (overfitting fixed).
+    - Held-out competition 0.8041 (below v3's 0.8092, because the u-zero held-out labels count uncertain Atelectasis/Edema as negative).
+    - Official 234: competition **0.8734** (v2 0.8589, v3 0.8583); stable-label mean 0.8254; mean 0.8169.
+    - Paired bootstrap on competition AUC: v4−v2 +0.015 (95% CI 0.000 to +0.030, P 0.98); v4−v3 +0.015 (CI +0.004 to +0.027).
+    - Atelectasis 0.754 → 0.807 vs v3. Cardiomegaly unchanged (0.786; sensitivity 0.25 at the F1 threshold).
+  - v5 `ViT_Models/Official_retrain_v5_squeezevit_kd/` (set up 2026-10-17; smoke-tested, not yet trained): SqueezeViT with the v2 recipe and the v4 per-label uncertainty policy, distilled from FastViT v4. Loss = 0.5 × masked label BCE + 0.5 × BCE against v4 probabilities. `make_teacher_probs.py` must run first and writes `results/teacher_v4_train.npz`. Same architecture and contract as v1/v2, so the existing exporter works.
+    - Trained 2026-10-17: best epoch 30 (plateau from about epoch 23); held-out competition 0.7939.
+    - Official 234: competition **0.8806**, stable-label mean 0.8300.
+    - Paired bootstrap: v5−v2 +0.022 competition (95% CI +0.011 to +0.033) and +0.019 stable (CI +0.007 to +0.030). v5−v4 +0.007 (CI −0.007 to +0.020, not significant).
+    - Atelectasis 0.849 (best of all runs). Support Devices 0.838 (v4 0.913).
+    - Bundle `model-input/squeezevit-retrain-v5-kd-attention-20261017.1` (checkpoint `1b8da78f…aa2ebeb`, thresholds `f1-heldout-custom-all-views-v5`) passed `model:validate` on 2026-10-17 and was activated locally (revision 4).
+    - Bundle `…-cardio042-20261017.1`: same model.onnx, but the Cardiomegaly threshold drops 0.68 → 0.42 (highest threshold with held-out sensitivity ≥ 0.80, rule fixed before looking at official results). Threshold version `f1-heldout-custom-all-views-v5+cardiomegaly-sens80-0.42`.
+      - Official 234 Cardiomegaly: sensitivity 0.31 → 0.49, specificity 0.98 → 0.93, false positives 3 → 12.
+      - Passed `model:validate` on 2026-10-17. Activated locally.
+    - Bundle `squeezevit-v5-kd-cardio042-possible85-20261017.1`: same model and likely thresholds, plus `possible-thresholds.json`.
+      - Possible thresholds apply to the five competition labels only, at held-out sensitivity ≥ 0.85: Cardiomegaly 0.33, Edema 0.41, Consolidation 0.32, Atelectasis 0.40, Pleural Effusion 0.43. Other labels' possible threshold equals their threshold.
+      - Rejected rules (judged on held-out): all-label sensitivity 0.85 gave 3.6 possible findings per case at 7% precision. A specificity cap removed the tier for the main labels. A precision floor gave near-zero thresholds on common labels only.
+      - Official 234: 0.58 possible per case at 24% precision; missed findings 257 → 224; Consolidation sensitivity 0.42 → 0.94.
+      - Passed `model:validate` on 2026-10-17.
   - Bundle `model-input/squeezevit-retrain-v2-attention-20261013.1` (thresholds `f1-heldout-custom-all-views-v1`) passed `model:validate` on 2026-10-13. Not staged or activated yet.
 - `ViT_Models/Official_retrain_v3_fastvit/` (2026-10-15) keeps the v2 recipe but swaps the model for FastViT-SA12 (`timm` `fastvit_sa12.apple_in1k`, ImageNet-1k pretrained, loaded from a local `pretrained/` safetensors copy, SHA-256 `4c41bc35…b5afa`). Grayscale is repeated to 3 channels inside the model, so preprocessing is unchanged. Peak LR 1e-4.
   - Best epoch 5 of 30 (EMA), checkpoint SHA-256 `e549be3b…bf14`. Held-out AUC fell every epoch after 5 while training loss kept dropping (overfitting); 0.7575 by epoch 30.

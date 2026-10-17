@@ -6,12 +6,16 @@ export interface LabelPrediction {
   probability: number;
   threshold: number;
   predicted: boolean;
+  /** Below its threshold but at or above the release's possible threshold (Learning Mode tier). */
+  possible: boolean;
 }
 
 export interface PostprocessedPrediction {
   state: "predicted" | "no-threshold-match";
   labels: LabelPrediction[];
   findings: LabelPrediction[];
+  /** Abnormal labels in the possible tier; empty when the release has no possible thresholds. */
+  possibleFindings: LabelPrediction[];
 }
 
 export function sigmoid(logit: number) {
@@ -34,13 +38,19 @@ export function postprocessLogits(
     );
   }
 
-  const labels = manifest.labels.map(({ name, threshold }, index) => {
+  const labels = manifest.labels.map(({ name, threshold, possibleThreshold }, index) => {
     const probability = sigmoid(logits[index]);
+    const predicted = probability >= threshold;
     return {
       label: name,
       probability,
       threshold,
-      predicted: probability >= threshold,
+      predicted,
+      possible:
+        !predicted &&
+        name !== "No Finding" &&
+        possibleThreshold !== undefined &&
+        probability >= possibleThreshold,
     };
   });
   const thresholdMatches = labels.filter((item) => item.predicted);
@@ -56,5 +66,6 @@ export function postprocessLogits(
     state: findings.length > 0 ? "predicted" : "no-threshold-match",
     labels,
     findings,
+    possibleFindings: labels.filter((item) => item.possible),
   };
 }

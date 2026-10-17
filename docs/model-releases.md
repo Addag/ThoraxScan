@@ -40,6 +40,7 @@ model-input/<release-id>/
 ├── model.onnx
 ├── release.json
 ├── thresholds.json
+├── possible-thresholds.json   # optional: Learning Mode "possible" tier
 ├── preprocessing-reference.py
 └── fixtures/
     ├── preprocessing-input.png
@@ -66,7 +67,12 @@ model-input/<release-id>/
 ```
 
 `thresholds.json` must contain all 14 labels in the exact contract order, each
-with a finite value from 0 through 1. The two `.f32` files are raw little-endian
+with a finite value from 0 through 1. The optional `possible-thresholds.json` has
+the same shape. Each value must be at or below that label's threshold; set a value
+equal to the threshold to give that label no possible tier. When present, the
+manifest stores it as `labels[].possibleThreshold`. Learning Mode lists abnormal
+labels in the band `[possibleThreshold, threshold)` as "Possible findings".
+Activity analyses ignore it. The two `.f32` files are raw little-endian
 float32 tensors containing exactly `224 * 224` values. Expected logits and
 probabilities are JSON arrays of exactly 14 finite numbers. The PNG must not
 contain alpha. Fixtures and the Python reference must be synthetic or otherwise

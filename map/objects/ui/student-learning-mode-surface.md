@@ -10,6 +10,8 @@ snapshot: main @ 6af6c16
 
 The protected `/student/learning` and `/professor/learning` Server Components recheck their respective roles and render the focused Learning Mode analyzer. It presents browser-only practice results, all manifest labels, release/execution provenance, and a V2 attention map when the active release supplies one.
 
+Results show "Likely findings" (at or above the threshold). When the release supplies possible thresholds, they also show "Possible findings" (abnormal labels in the band below the threshold), with a note that many of them will be false alarms.
+
 ## Connected to
 
 Uses [Built-in X-ray library](../learning/built-in-xray-library.md) as its sample gallery, [Browser inference runtime](../inference/browser-inference-runtime.md), [Local Learning Mode image](../learning/local-learning-mode-image.md), and the Student or Professor shell.

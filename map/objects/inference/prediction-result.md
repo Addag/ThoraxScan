@@ -16,7 +16,7 @@ An analysis remains attributable even if the environment's active pointer change
 
 ## Shape
 
-It contains all label probabilities and thresholds, selected findings or explicit no-match state, release and model identifiers/hashes, preprocessing and threshold versions, provider, manifest version, application build, and either a transient 7 x 7 attention map or an unavailable status.
+It contains all label probabilities and thresholds, selected findings or explicit no-match state, `possibleFindings` (abnormal labels in `[possibleThreshold, threshold)`; empty without possible thresholds, never No Finding), release and model identifiers/hashes, preprocessing and threshold versions, provider, manifest version, application build, and either a transient 7 x 7 attention map or an unavailable status.
 
 ## Connected to
 

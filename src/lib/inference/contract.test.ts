@@ -28,6 +28,18 @@ describe("ModelManifestV1", () => {
     expect(() => parseThresholds(ordered)).toThrow(/between 0 and 1/);
   });
 
+  it("keeps optional possible thresholds and rejects partial or inverted ones", () => {
+    const manifest = createTestManifest();
+    const tiered = { ...manifest, labels: manifest.labels.map((item) => ({ ...item, possibleThreshold: 0.3 })) };
+    expect(parseModelManifest(tiered)).toEqual(tiered);
+
+    const partial = { ...manifest, labels: manifest.labels.map((item, i) => (i === 0 ? { ...item, possibleThreshold: 0.3 } : item)) };
+    expect(() => parseModelManifest(partial)).toThrow(/every label or on none/);
+
+    const inverted = { ...manifest, labels: manifest.labels.map((item) => ({ ...item, possibleThreshold: 0.9 })) };
+    expect(() => parseModelManifest(inverted)).toThrow(/must not exceed/);
+  });
+
   it("rejects external data and unsafe artifact paths", () => {
     const manifest = createTestManifest();
     expect(() =>

@@ -6,8 +6,8 @@ import type { InferenceResult } from "@/lib/inference/runtime";
 function result(): InferenceResult {
   return {
     state: "no-threshold-match",
-    labels: ACTIVITY_AI_LABELS.map((label) => ({ label, probability: 0.1, threshold: 0.5, predicted: false })),
-    findings: [], releaseId: "release-a", modelReleaseId: 1, modelSha256: "a".repeat(64), bundleSha256: "b".repeat(64),
+    labels: ACTIVITY_AI_LABELS.map((label) => ({ label, probability: 0.1, threshold: 0.5, predicted: false, possible: false })),
+    findings: [], possibleFindings: [], releaseId: "release-a", modelReleaseId: 1, modelSha256: "a".repeat(64), bundleSha256: "b".repeat(64),
     preprocessingVersion: "prep-1", thresholdVersion: "threshold-1", manifestVersion: 1, executionProvider: "wasm", applicationBuild: "test",
   };
 }

@@ -84,6 +84,8 @@ export interface ModelManifestV1 {
   labels: Array<{
     name: ThoraxScanLabel;
     threshold: number;
+    /** Optional lower bound for the Learning Mode "possible" tier; never above `threshold`. */
+    possibleThreshold?: number;
   }>;
   postprocessing: {
     activation: "sigmoid";
@@ -198,23 +200,39 @@ export function parseReleaseSource(value: unknown): ReleaseSourceV1 {
   };
 }
 
-export function parseThresholds(value: unknown) {
-  const source = objectValue(value, "thresholds.json");
+export function parseThresholds(value: unknown, fileName = "thresholds.json") {
+  const source = objectValue(value, fileName);
   const keys = Object.keys(source);
 
   if (
     keys.length !== THORAXSCAN_LABELS.length ||
     keys.some((key, index) => key !== THORAXSCAN_LABELS[index])
   ) {
-    fail("thresholds.json must preserve the fixed 14-label order.");
+    fail(`${fileName} must preserve the fixed 14-label order.`);
   }
 
   return THORAXSCAN_LABELS.map((name) => {
-    const threshold = finiteNumber(source[name], `thresholds.${name}`);
+    const threshold = finiteNumber(source[name], `${fileName}.${name}`);
     if (threshold < 0 || threshold > 1) {
-      fail(`thresholds.${name} must be between 0 and 1.`);
+      fail(`${fileName}.${name} must be between 0 and 1.`);
     }
     return { name, threshold };
+  });
+}
+
+/** Adds per-label "possible" thresholds, which must cover all 14 labels and never exceed the label's threshold. */
+export function withPossibleThresholds(
+  labels: Array<{ name: ThoraxScanLabel; threshold: number }>,
+  value: unknown,
+  fileName = "possible-thresholds.json",
+) {
+  const possible = parseThresholds(value, fileName);
+  return labels.map((label, index) => {
+    const possibleThreshold = possible[index].threshold;
+    if (possibleThreshold > label.threshold) {
+      fail(`${fileName}.${label.name} must not exceed its threshold ${label.threshold}.`);
+    }
+    return { ...label, possibleThreshold };
   });
 }
 
@@ -295,14 +313,23 @@ function parseV1(value: unknown): ModelManifestV1 {
   }
   exactArray(preprocessing.pixelRange, [0, 1], "preprocessing.pixelRange");
 
-  const labels = parseThresholds(
-    Object.fromEntries(
-      (Array.isArray(manifest.labels) ? manifest.labels : []).map((item) => {
-        const label = objectValue(item, "labels item");
-        return [label.name, label.threshold];
-      }),
-    ),
+  const labelItems = (Array.isArray(manifest.labels) ? manifest.labels : []).map((item) =>
+    objectValue(item, "labels item"),
   );
+  const thresholdLabels = parseThresholds(
+    Object.fromEntries(labelItems.map((label) => [label.name, label.threshold])),
+  );
+  const possibleCount = labelItems.filter((label) => label.possibleThreshold !== undefined).length;
+  if (possibleCount !== 0 && possibleCount !== labelItems.length) {
+    fail("labels.possibleThreshold must be present on every label or on none.");
+  }
+  const labels = possibleCount
+    ? withPossibleThresholds(
+        thresholdLabels,
+        Object.fromEntries(labelItems.map((label) => [label.name, label.possibleThreshold])),
+        "labels.possibleThreshold",
+      )
+    : thresholdLabels;
 
   if (
     postprocessing.activation !== "sigmoid" ||
