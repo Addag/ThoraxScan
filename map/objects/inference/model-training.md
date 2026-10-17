@@ -54,6 +54,15 @@ The PyTorch run that produced the one checkpoint behind both the V1 and V2 [mode
   - Held-out competition AUC: 0.7935 overall, 0.789 frontal, 0.797 lateral (3,216 images).
   - Official 234: competition 0.8589 and mean 0.7677 overall; competition 0.8572 and mean 0.7724 on the 202 frontal (v1: 0.8407 and 0.7401 overall; 0.8377 and 0.7550 frontal).
   - Bundle `model-input/squeezevit-retrain-v2-attention-20261013.1` (thresholds `f1-heldout-custom-all-views-v1`) passed `model:validate` on 2026-10-13. Not staged or activated yet.
+- `ViT_Models/Official_retrain_v3_fastvit/` (2026-10-15) keeps the v2 recipe but swaps the model for FastViT-SA12 (`timm` `fastvit_sa12.apple_in1k`, ImageNet-1k pretrained, loaded from a local `pretrained/` safetensors copy, SHA-256 `4c41bc35…b5afa`). Grayscale is repeated to 3 channels inside the model, so preprocessing is unchanged. Peak LR 1e-4.
+  - Best epoch 5 of 30 (EMA), checkpoint SHA-256 `e549be3b…bf14`. Held-out AUC fell every epoch after 5 while training loss kept dropping (overfitting); 0.7575 by epoch 30.
+  - Held-out competition AUC: 0.8092 overall, 0.805 frontal, 0.813 lateral.
+  - Official 234: competition 0.8583 and mean 0.8032 overall; competition 0.8555 and mean 0.8107 on the 202 frontal. Competition AUC ties v2; mean AUC is clearly higher.
+  - Weak labels on the official 234: Enlarged Cardiomediastinum 0.50, Lung Lesion 0.38.
+  - Bundle `model-input/fastvit-retrain-v3-attention-20261016.1` (thresholds `fastvit-v3-f1-heldout-custom-all-views-v1`, ONNX 42.3 MB of the 50 MB limit) exported with [export_fastvit.py](../../../model-export/export_fastvit.py) and passed `model:validate` on 2026-10-16 (WebGPU disabled). The owner staged and activated it on 2026-10-17.
+  - `tune_thresholds.py --sensitivity 0.8` picks the highest threshold reaching that held-out sensitivity. Applied to all labels it floods weak labels on the official 234 (Fracture specificity 0.46, Pneumonia precision 0.06), so only the 5 competition labels use the lower of the F1 and 80%-sensitivity thresholds. All others keep F1 (`results/thresholds_mixed.json`).
+  - Official 234 sensitivity vs F1-only: Cardiomegaly 0.28→0.49, Edema 0.76→0.82, Consolidation 0.39→0.91, Atelectasis 0.55→0.75; specificity 0.99→0.95, 0.90→0.86, 0.97→0.74, 0.78→0.62. Pleural Effusion unchanged.
+  - Bundle `model-input/fastvit-retrain-v3-attention-20261017.1` (same ONNX, thresholds `fastvit-v3-sens80-competition-f1-other-v1`) passed `model:validate` on 2026-10-17. Not staged yet.
 
 ## Connected to
 

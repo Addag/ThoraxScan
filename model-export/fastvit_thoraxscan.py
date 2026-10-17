@@ -1,9 +1,14 @@
+from pathlib import Path
+
 import timm
 import torch
 import torch.nn as nn
 from timm.utils.model import reparameterize_model
 
 NUM_LABELS = 14
+# Local copy of https://huggingface.co/timm/fastvit_sa12.apple_in1k (SHA-256 4c41bc35...b5afa),
+# so training never contacts the Hugging Face Hub.
+PRETRAINED_FILE = Path(__file__).parent / "pretrained" / "fastvit_sa12.apple_in1k.safetensors"
 
 
 class FastViTThoraxScan(nn.Module):
@@ -12,7 +17,8 @@ class FastViTThoraxScan(nn.Module):
     def __init__(self, pretrained=True):
         super().__init__()
         self.backbone = timm.create_model(
-            "fastvit_sa12.apple_in1k", pretrained=pretrained, num_classes=NUM_LABELS
+            "fastvit_sa12.apple_in1k", pretrained=pretrained, num_classes=NUM_LABELS,
+            pretrained_cfg_overlay={"file": str(PRETRAINED_FILE)},
         )
 
     def forward(self, x):

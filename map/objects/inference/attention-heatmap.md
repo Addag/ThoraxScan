@@ -30,5 +30,6 @@ Sources: [component](../../../src/components/attention-heatmap.tsx),
 [runtime](../../../src/lib/inference/runtime.ts),
 [authorized projections](../../../src/lib/activity-ai/server.ts),
 [database contract](../../../supabase/migrations/20260922163225_attention_contract_hardening.sql),
-[exporter](../../../model-export/export_squeezevit.py),
+[SqueezeViT exporter](../../../model-export/export_squeezevit.py),
+[FastViT exporter](../../../model-export/export_fastvit.py) (rollout over its 2 stage-4 global attention blocks),
 [release operations](../../../docs/model-releases.md).
