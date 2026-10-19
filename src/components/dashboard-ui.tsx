@@ -8,7 +8,7 @@ export const sectionKickerClass =
 export const countBadgeClass =
   "rounded-[999px] border border-[#4d5b74] px-2.5 py-1.5 text-[11px] text-[#b9c2d6]";
 export const backLinkClass =
-  "mb-5 inline-block text-[13px] font-extrabold text-[#9fcfff] no-underline";
+  "transition-colors duration-160 hover:text-white mb-5 inline-block text-[13px] font-extrabold text-[#9fcfff] no-underline";
 export const listEmptyClass = "mx-0 mt-3.5 mb-0 text-[11px] text-[#8993a8]";
 
 export function PageMain({

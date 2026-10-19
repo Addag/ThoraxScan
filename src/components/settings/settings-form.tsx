@@ -128,7 +128,7 @@ export function SettingsForm({
             <button
               aria-controls={`settings-panel-${tab}`}
               aria-selected={activeTab === tab}
-              className={`grid min-h-[67px] w-full cursor-pointer grid-cols-[36px_minmax(0,1fr)] items-center rounded-[10px] border px-[22px] text-left text-[20px] font-semibold text-white max-[600px]:min-h-[58px] max-[600px]:px-[14px] max-[600px]:text-[17px] ${activeTab === tab ? "border-[#21aaff] bg-[rgba(70,193,255,0.49)]" : "border-transparent bg-transparent"}`}
+              className={`transition-colors duration-160 grid min-h-[67px] w-full cursor-pointer grid-cols-[36px_minmax(0,1fr)] items-center rounded-[10px] border px-[22px] text-left text-[20px] font-semibold text-white max-[600px]:min-h-[58px] max-[600px]:px-[14px] max-[600px]:text-[17px] ${activeTab === tab ? "border-[#21aaff] bg-[rgba(70,193,255,0.49)]" : "border-transparent bg-transparent hover:bg-white/8"}`}
               id={`settings-tab-${tab}`}
               key={tab}
               onClick={() => setActiveTab(tab)}
@@ -277,7 +277,7 @@ export function SettingsForm({
         </p>
       ) : null}
       <div className="flex justify-end">
-        <button className="min-h-[42px] min-w-[135px] cursor-pointer rounded-[5px] border-0 bg-[linear-gradient(270deg,#4363ff_0%,#8397fe_100%)] px-[18px] text-[13px] font-extrabold text-[#050612] disabled:cursor-not-allowed disabled:opacity-50 max-[600px]:w-full" disabled={!isDirty || pending || Boolean(loadError)} type="submit">
+        <button className="transition-[filter] duration-160 not-disabled:hover:brightness-115 min-h-[42px] min-w-[135px] cursor-pointer rounded-[5px] border-0 bg-[linear-gradient(270deg,#4363ff_0%,#8397fe_100%)] px-[18px] text-[13px] font-extrabold text-[#050612] disabled:cursor-not-allowed disabled:opacity-50 max-[600px]:w-full" disabled={!isDirty || pending || Boolean(loadError)} type="submit">
           {pending ? "Saving…" : "Save changes"}
         </button>
       </div>

@@ -42,7 +42,7 @@ export default async function StudentActivitiesPage() {
                     {submissionLabel(activity.submissionStatus, activity.dueAt)} · {activity.aiStatus === "ready" ? "Feedback available" : activity.aiStatus === "pending" ? "Analysis pending" : activity.aiStatus === "failed" ? "Analysis failed · retry available" : "AI feedback locked"} · {formatDueDate(activity.dueAt)}
                   </span>
                 </div>
-                <Link className="text-[12px] font-extrabold text-[#70bdff] no-underline max-[760px]:col-span-full max-[760px]:border-t max-[760px]:border-[#39465b] max-[760px]:pt-[13px]" href={`/student/activities/${activity.id}`}>Review activity <span aria-hidden="true">→</span></Link>
+                <Link className="transition-colors duration-160 hover:text-white text-[12px] font-extrabold text-[#70bdff] no-underline max-[760px]:col-span-full max-[760px]:border-t max-[760px]:border-[#39465b] max-[760px]:pt-[13px]" href={`/student/activities/${activity.id}`}>Review activity <span aria-hidden="true">→</span></Link>
               </article>
             ))}
           </div>

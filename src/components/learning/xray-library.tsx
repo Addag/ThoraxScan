@@ -65,7 +65,7 @@ export function XrayLibrary({ onSelect, disabled = false, selectedCaseId, onLoad
         <details className="text-[12px]"><summary className="cursor-pointer">Dataset reference labels</summary>
           <p>{Object.entries(item.labels).filter(([, value]) => value === 1).map(([label]) => label).join(", ") || "No positive labels recorded"}</p>
         </details>
-        <button className={`mt-auto cursor-pointer rounded-md border border-[#477daa] bg-[#20354b] p-[9px] text-inherit disabled:cursor-wait disabled:opacity-50 ${focusRing}`} type="button" disabled={disabled || loading !== null} onClick={() => void select(item)}>
+        <button className={`transition-colors duration-160 not-disabled:hover:bg-[#2a4560] mt-auto cursor-pointer rounded-md border border-[#477daa] bg-[#20354b] p-[9px] text-inherit disabled:cursor-wait disabled:opacity-50 ${focusRing}`} type="button" disabled={disabled || loading !== null} onClick={() => void select(item)}>
           {loading === item.id ? "Loading…" : `Use ${item.title.toLowerCase()}`}
         </button>
       </article>)}

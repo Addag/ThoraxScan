@@ -89,13 +89,13 @@ export function LearningModeAnalyzer() {
         <button className="cursor-not-allowed border-0 bg-none text-[#aebbd0]" type="button" disabled aria-describedby="learning-history-note">History</button>
       </div>
       <p id="learning-history-note" className="mt-[7px] mb-[18px] text-[12px] text-(--text-muted)">History unavailable · practice results are not saved.</p>
-      <button className="mb-[26px] w-full cursor-pointer rounded-[9px] border-0 bg-brand px-3.5 py-[17px] text-[22px] font-bold text-white max-[1000px]:text-[19px]" type="button" onClick={() => inputRef.current?.click()}>Use Local X-Ray Images</button>
+      <button className="transition-[filter] duration-160 not-disabled:hover:brightness-115 mb-[26px] w-full cursor-pointer rounded-[9px] border-0 bg-brand px-3.5 py-[17px] text-[22px] font-bold text-white max-[1000px]:text-[19px]" type="button" onClick={() => inputRef.current?.click()}>Use Local X-Ray Images</button>
       <div className={panelClass}>
         <h2 className="m-0 flex items-center gap-4 border-b border-b-[#3e4759] px-[18px] py-3.5 text-[16px] font-extrabold"><img src="/images/learning/eye.svg" alt="" width="26" height="26" /> Select a Chest X-Ray</h2>
         <div className="p-[22px] max-[1000px]:p-4">
           <label className="mb-2.5 block text-[13px] text-(--text-secondary)" htmlFor="learning-image">Chest X-ray image (JPEG or PNG, up to 6 MiB)</label>
           <input className="mb-4 block w-full min-w-0 text-[13px] file:mr-2 file:cursor-pointer file:rounded-[4px] file:border file:border-[#69819f] file:bg-[#26364e] file:p-2 file:text-white" ref={inputRef} id="learning-image" aria-label="Image file" type="file" accept="image/jpeg,image/png" onChange={(event) => choose(event.target.files?.[0] ?? null)} />
-          <button className="flex min-h-[240px] w-full cursor-pointer flex-col items-center justify-center gap-[18px] border-[3px] border-dashed border-[#c7d4e8] bg-none p-3 text-(--text-secondary)" type="button" aria-label={previewUrl ? "Replace selected image" : "Choose a chest X-ray image"} onClick={() => inputRef.current?.click()}>
+          <button className="transition-colors duration-160 not-disabled:hover:bg-white/8 flex min-h-[240px] w-full cursor-pointer flex-col items-center justify-center gap-[18px] border-[3px] border-dashed border-[#c7d4e8] bg-none p-3 text-(--text-secondary)" type="button" aria-label={previewUrl ? "Replace selected image" : "Choose a chest X-ray image"} onClick={() => inputRef.current?.click()}>
             {previewUrl ? (
               // Local object URLs must never go through an image optimization server.
               // eslint-disable-next-line @next/next/no-img-element
@@ -104,8 +104,8 @@ export function LearningModeAnalyzer() {
           </button>
           {file && <p className="text-[13px] [overflow-wrap:anywhere] text-(--text-secondary)">{file.name}</p>}
           <div className="mt-5 flex gap-3">
-            <button className={`${actionButtonClass} border-brand bg-brand`} type="button" onClick={run} disabled={!file || Boolean(validate(file)) || state === "running"}>Analyze</button>
-            <button className={`${actionButtonClass} border-[#7d94b5] bg-transparent`} type="button" onClick={reset} disabled={state === "idle"}>Reset</button>
+            <button className={`${actionButtonClass} transition-[filter] duration-160 not-disabled:hover:brightness-115 border-brand bg-brand`} type="button" onClick={run} disabled={!file || Boolean(validate(file)) || state === "running"}>Analyze</button>
+            <button className={`${actionButtonClass} transition-colors duration-160 not-disabled:hover:bg-white/8 border-[#7d94b5] bg-transparent`} type="button" onClick={reset} disabled={state === "idle"}>Reset</button>
           </div>
           <p className="mt-3 min-h-5 text-[13px] text-[#9fcfff]" aria-live="polite">{state === "running" ? "Analyzing in this browser…" : state === "selected" ? "Image ready to analyze." : state === "success" ? "Analysis complete." : ""}</p>
           {error && <p className="border-l-[3px] border-l-[#ff8d8d] px-3 py-2 text-[#ffd5d5]" role="alert">{error}</p>}

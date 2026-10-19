@@ -465,7 +465,7 @@ function RoleSelector({
 function AuthSwitch({ mode }: { mode: AuthMode }) {
   if (mode === "register") {
     return (
-      <p className="mt-7 mb-0 text-center text-[13px] leading-[1.5] text-[#d6e1f0] [&_a]:font-extrabold [&_a]:text-(--brand-blue-text)">
+      <p className="mt-7 mb-0 text-center text-[13px] leading-[1.5] text-[#d6e1f0] [&_a]:font-extrabold [&_a]:text-(--brand-blue-text) [&_a]:transition-colors [&_a]:duration-160 [&_a:hover]:text-white">
         Already have an account? <Link href="/login">Log in</Link>
       </p>
     );
@@ -473,14 +473,14 @@ function AuthSwitch({ mode }: { mode: AuthMode }) {
 
   if (mode === "login") {
     return (
-      <p className="mt-7 mb-0 text-center text-[13px] leading-[1.5] text-[#d6e1f0] [&_a]:font-extrabold [&_a]:text-(--brand-blue-text)">
+      <p className="mt-7 mb-0 text-center text-[13px] leading-[1.5] text-[#d6e1f0] [&_a]:font-extrabold [&_a]:text-(--brand-blue-text) [&_a]:transition-colors [&_a]:duration-160 [&_a:hover]:text-white">
         Need an account? <Link href="/register">Create an account</Link>
       </p>
     );
   }
 
   return (
-    <p className="mt-7 mb-0 text-center text-[13px] leading-[1.5] text-[#d6e1f0] [&_a]:font-extrabold [&_a]:text-(--brand-blue-text)">
+    <p className="mt-7 mb-0 text-center text-[13px] leading-[1.5] text-[#d6e1f0] [&_a]:font-extrabold [&_a]:text-(--brand-blue-text) [&_a]:transition-colors [&_a]:duration-160 [&_a:hover]:text-white">
       <Link href="/login">Back to login</Link>
     </p>
   );

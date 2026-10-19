@@ -17,12 +17,12 @@ export type NavItem = {
   disabled?: boolean;
 };
 
-const navLinkClass = "relative grid min-h-[46px] grid-cols-[25px_minmax(0,1fr)] items-center rounded-lg border px-2.5 py-2 text-[13px] no-underline max-[850px]:min-h-12 max-[850px]:gap-x-2.5 max-[850px]:text-[15px]";
+const navLinkClass = "transition-colors duration-160 relative grid min-h-[46px] grid-cols-[25px_minmax(0,1fr)] items-center rounded-lg border px-2.5 py-2 text-[13px] no-underline max-[850px]:min-h-12 max-[850px]:gap-x-2.5 max-[850px]:text-[15px]";
 const activeNavLinkClass = "border-brand bg-[rgba(44,174,255,0.21)] before:absolute before:top-2.5 before:bottom-2.5 before:-left-[7px] before:w-[3px] before:rounded-lg before:bg-brand";
 const supportingTextClass = "leading-[1.4]";
 
 function NavEntry({ item }: { item: NavItem }) {
-  const className = `${navLinkClass} ${item.active ? activeNavLinkClass : "border-transparent"} ${item.disabled ? "text-[#c1cee0]" : "text-white"}`;
+  const className = `${navLinkClass} ${item.active ? activeNavLinkClass : "border-transparent hover:bg-white/8"} ${item.disabled ? "text-[#c1cee0]" : "text-white"}`;
   const content = (
     <>
       {item.icon ? (
@@ -83,7 +83,7 @@ export function AppShell({
           {navItems.map((item) => <NavEntry item={item} key={item.label} />)}
         </nav>
         <form className="mt-auto border-t border-t-[rgba(114,112,112,0.64)] pt-[18px] max-[850px]:mt-4 max-[850px]:pt-3" action={logoutAction}>
-          <button className="w-full cursor-pointer border-0 bg-transparent p-2.5 text-left font-semibold text-[#ff5457] max-[850px]:min-h-12" type="submit">
+          <button className="transition-colors duration-160 not-disabled:hover:bg-white/8 w-full cursor-pointer border-0 bg-transparent p-2.5 text-left font-semibold text-[#ff5457] max-[850px]:min-h-12" type="submit">
             <span className="mr-2 text-[20px]" aria-hidden="true">↪</span> Log out
           </button>
         </form>

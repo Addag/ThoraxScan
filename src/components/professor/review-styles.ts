@@ -9,10 +9,10 @@ const reviewFieldBase = "rounded-[6px] border border-[#687b98] bg-[rgb(16_30_51/
 export const reviewFieldClass = `${reviewFieldBase} min-h-[38px]`;
 export const reviewTextareaClass = `${reviewFieldBase} min-h-[110px] resize-y`;
 export const reviewButtonBase = "min-h-[38px] cursor-pointer rounded-[7px] px-4 py-0 font-extrabold";
-export const reviewButtonSolid = `${reviewButtonBase} border-0 bg-[#087fff] text-white`;
-export const reviewButtonGradient = `${reviewButtonBase} border-0 [background:linear-gradient(135deg,#148cff,#006be8)] shadow-[0_7px_18px_rgb(0_119_255/24%)] text-white`;
-export const reviewButtonOutline = `${reviewButtonBase} border border-[#627997] bg-transparent text-[#d6e4f8]`;
-export const reviewLinkClass = "text-[12px] text-[#9fcfff] no-underline";
+export const reviewButtonSolid = `${reviewButtonBase} transition-[filter] duration-160 not-disabled:hover:brightness-115 border-0 bg-[#087fff] text-white`;
+export const reviewButtonGradient = `${reviewButtonBase} transition-[filter] duration-160 not-disabled:hover:brightness-115 border-0 [background:linear-gradient(135deg,#148cff,#006be8)] shadow-[0_7px_18px_rgb(0_119_255/24%)] text-white`;
+export const reviewButtonOutline = `${reviewButtonBase} transition-colors duration-160 not-disabled:hover:bg-white/8 border border-[#627997] bg-transparent text-[#d6e4f8]`;
+export const reviewLinkClass = "transition-colors duration-160 hover:text-white text-[12px] text-[#9fcfff] no-underline";
 export const reviewPanelTextClass = "mx-0 mt-0 mb-3 text-[12px] leading-[1.5] text-[#b7c5d9]";
 
 const statusColors = { unreviewed: "text-[#ffd36a]", draft: "text-[#8fc8ff]", released: "text-[#7dff8c]" };

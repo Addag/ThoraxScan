@@ -16,7 +16,7 @@ export const activityCaseColumnClass = "grid gap-3.5 max-[1050px]:grid-cols-2 ma
 export const activityConfigColumnClass = "grid gap-3.5";
 
 export const activitiesCtaClass =
-  "mt-5 flex min-h-[74px] items-center justify-between gap-5 rounded-[9px] border border-brand bg-[rgba(0,119,255,0.12)] px-5 py-4 text-white no-underline";
+  "transition-colors duration-160 hover:bg-[rgba(0,119,255,0.22)] mt-5 flex min-h-[74px] items-center justify-between gap-5 rounded-[9px] border border-brand bg-[rgba(0,119,255,0.12)] px-5 py-4 text-white no-underline";
 
 export function ActivityPageHeading({
   title = "Activities",
@@ -30,7 +30,7 @@ export function ActivityPageHeading({
   return (
     <div className="mb-[22px] flex items-end justify-between gap-6 max-[760px]:flex-col max-[760px]:items-stretch">
       <div>
-        {backHref ? <Link className="mb-3 inline-block text-[12px] font-extrabold text-[#9fcfff] no-underline" href={backHref}>← Back to activities</Link> : null}
+        {backHref ? <Link className="transition-colors duration-160 hover:text-white mb-3 inline-block text-[12px] font-extrabold text-[#9fcfff] no-underline" href={backHref}>← Back to activities</Link> : null}
         <h1 className="m-0 text-[clamp(28px,4vw,38px)] leading-[1.1]">{title}</h1>
         <p className="mt-1.5 mb-0 text-[13px] leading-[1.4] text-[#c3d0e2]">{description}</p>
       </div>

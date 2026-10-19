@@ -64,7 +64,7 @@ export function ApplicationReviewForm({
             <small className={fieldErrorClass}>{state.fieldErrors.rejectionReason}</small>
           )}
           <button
-            className="mt-[9px] rounded-[6px] border border-[#d45b60] bg-[rgba(160,32,32,0.2)] px-3 py-[9px] font-extrabold text-[#ffb4b4] disabled:cursor-not-allowed disabled:opacity-[0.58]"
+            className="transition-colors duration-160 not-disabled:hover:bg-[rgba(160,32,32,0.32)] mt-[9px] rounded-[6px] border border-[#d45b60] bg-[rgba(160,32,32,0.2)] px-3 py-[9px] font-extrabold text-[#ffb4b4] disabled:cursor-not-allowed disabled:opacity-[0.58]"
             type="submit"
             name="decision"
             value="reject"

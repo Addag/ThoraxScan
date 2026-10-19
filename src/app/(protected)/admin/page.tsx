@@ -92,7 +92,7 @@ export default async function AdminPage({
                 placeholder="Name or email"
               />
               <input type="hidden" name="status" value={selectedFilter} />
-              <button className="secondary-button" type="submit">Search</button>
+              <button className="secondary-button transition-[filter] duration-160 not-disabled:hover:brightness-115" type="submit">Search</button>
             </div>
           </form>
 
@@ -100,7 +100,7 @@ export default async function AdminPage({
             {filters.map((filter) => (
               <Link
                 key={filter}
-                className={`rounded-[999px] border px-[14px] py-2 text-[12px] font-bold no-underline ${selectedFilter === filter ? "border-[#2caeff] bg-[rgba(44,174,255,0.18)] text-white" : "border-[#526078] text-[#c7ccda]"}`}
+                className={`transition-colors duration-160 rounded-[999px] border px-[14px] py-2 text-[12px] font-bold no-underline ${selectedFilter === filter ? "border-[#2caeff] bg-[rgba(44,174,255,0.18)] text-white" : "border-[#526078] text-[#c7ccda] hover:bg-white/8"}`}
                 href={{ pathname: "/admin", query: { status: filter, ...(q ? { q } : {}) } }}
               >
                 {filter[0].toUpperCase() + filter.slice(1)}

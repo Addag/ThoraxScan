@@ -28,7 +28,7 @@ export default async function StudentPage() {
         <PageHeading title="Dashboard" subtitle={`Welcome back, ${profile.display_name}!`} />
 
         <section className="mt-6 rounded-[10px] border border-[#33425c] bg-[#18202d] p-6 max-[600px]:p-5" aria-labelledby="recent-activities-title">
-          <SectionHeading kicker="Published assignments" title="Recent activities" titleId="recent-activities-title" aside={<Link className="text-[12px] font-extrabold text-[#9fcfff] no-underline" href="/student/activities">View all</Link>} />
+          <SectionHeading kicker="Published assignments" title="Recent activities" titleId="recent-activities-title" aside={<Link className="transition-colors duration-160 hover:text-white text-[12px] font-extrabold text-[#9fcfff] no-underline" href="/student/activities">View all</Link>} />
           {recentActivities.error ? (
             <p className={listEmptyClass}>Recent activities are unavailable.</p>
           ) : recentActivities.data.length === 0 ? (
@@ -36,7 +36,7 @@ export default async function StudentPage() {
           ) : (
             <div className="grid grid-cols-3 gap-3.5 pt-[18px] max-[760px]:grid-cols-1">
               {recentActivities.data.map((activity) => (
-                <Link className="flex min-h-[130px] flex-col justify-between rounded-[8px] border border-[#3d4c67] bg-(--glass-inset) p-4 no-underline shadow-(--glass-inset-shadow)" href={`/student/activities/${activity.id}`} key={activity.id}>
+                <Link className="transition-colors duration-160 hover:bg-white/8 flex min-h-[130px] flex-col justify-between rounded-[8px] border border-[#3d4c67] bg-(--glass-inset) p-4 no-underline shadow-(--glass-inset-shadow)" href={`/student/activities/${activity.id}`} key={activity.id}>
                   <span className="text-[10px] font-extrabold uppercase tracking-[0.06em] text-[#6faef7]">{activity.workspaceName}</span>
                   <strong className="mt-2 text-[15px] leading-[1.25] text-white">{activity.title}</strong>
                   <small className="mt-3 text-[10px] leading-[1.4] text-[#8992a8]">{submissionLabel(activity.submissionStatus, activity.dueAt)} · {activity.aiStatus === "ready" ? "Feedback available" : activity.aiStatus === "pending" ? "Analysis pending" : activity.aiStatus === "failed" ? "Analysis failed" : "AI feedback locked"} · {formatDueDate(activity.dueAt)}</small>

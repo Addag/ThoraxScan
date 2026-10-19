@@ -47,7 +47,7 @@ export default async function StudentWorkspacePage({
           <div>
             <h2>Workspace activities</h2>
             <p className="mt-[5px] mb-0 text-[12px] text-[#9ba2b8]">Published assignments are available from the Activities page.</p>
-            <Link href="/student/activities">Browse activities →</Link>
+            <Link className="transition-colors duration-160 hover:text-white" href="/student/activities">Browse activities →</Link>
           </div>
         </section>
       </PageMain>

@@ -73,15 +73,15 @@ export default async function ProfessorActivitiesPage({
                 ))}
               </select>
             </label>
-            <button className="min-h-[39px] cursor-pointer rounded-[5px] border border-[#6d7480] bg-[#111927] px-[13px] font-extrabold text-white" type="submit">Apply filter</button>
+            <button className="transition-colors duration-160 hover:bg-[#1c2639] min-h-[39px] cursor-pointer rounded-[5px] border border-[#6d7480] bg-[#111927] px-[13px] font-extrabold text-white" type="submit">Apply filter</button>
           </form>
           <Link className={activityButton.primary} href="/professor/activities/new">＋ New activity</Link>
         </section>
 
         <nav className="mb-5 flex gap-2 overflow-x-auto" aria-label="Activity status">
-          <Link className={`inline-flex min-h-[37px] items-center gap-2 rounded-[6px] border px-[13px] text-[12px] font-extrabold capitalize no-underline ${!status ? "border-brand bg-[rgba(0,119,255,0.18)] text-white" : "border-[#465269] text-[#aeb6c5]"}`} href={hrefForStatus(null)}>All <span className="rounded-[999px] bg-[rgba(255,255,255,0.1)] px-[7px] py-[3px]">{activitiesResult.data.length}</span></Link>
+          <Link className={`transition-colors duration-160 inline-flex min-h-[37px] items-center gap-2 rounded-[6px] border px-[13px] text-[12px] font-extrabold capitalize no-underline ${!status ? "border-brand bg-[rgba(0,119,255,0.18)] text-white" : "border-[#465269] text-[#aeb6c5] hover:bg-white/8"}`} href={hrefForStatus(null)}>All <span className="rounded-[999px] bg-[rgba(255,255,255,0.1)] px-[7px] py-[3px]">{activitiesResult.data.length}</span></Link>
           {(["draft", "published", "archived"] as const).map((item) => (
-            <Link className={`inline-flex min-h-[37px] items-center gap-2 rounded-[6px] border px-[13px] text-[12px] font-extrabold capitalize no-underline ${status === item ? "border-brand bg-[rgba(0,119,255,0.18)] text-white" : "border-[#465269] text-[#aeb6c5]"}`} href={hrefForStatus(item)} key={item}>
+            <Link className={`transition-colors duration-160 inline-flex min-h-[37px] items-center gap-2 rounded-[6px] border px-[13px] text-[12px] font-extrabold capitalize no-underline ${status === item ? "border-brand bg-[rgba(0,119,255,0.18)] text-white" : "border-[#465269] text-[#aeb6c5] hover:bg-white/8"}`} href={hrefForStatus(item)} key={item}>
               {item} <span className="rounded-[999px] bg-[rgba(255,255,255,0.1)] px-[7px] py-[3px]">{activitiesResult.data.filter((activity) => activity.status === item).length}</span>
             </Link>
           ))}
@@ -105,7 +105,7 @@ export default async function ProfessorActivitiesPage({
                   <div className="rounded-[5px] bg-[#111927] p-2.5"><dt className="text-[9px] uppercase leading-[1.4] tracking-[0.06em] text-[#c4d0e0]">Due</dt><dd className="mx-0 mt-1 mb-0 text-[11px] leading-[1.4]">{formatDueDate(activity.dueAt)}</dd></div>
                   <div className="rounded-[5px] bg-[#111927] p-2.5"><dt className="text-[9px] uppercase leading-[1.4] tracking-[0.06em] text-[#c4d0e0]">Updated</dt><dd className="mx-0 mt-1 mb-0 text-[11px] leading-[1.4]">{new Intl.DateTimeFormat("en-US", { dateStyle: "medium" }).format(new Date(activity.updatedAt))}</dd></div>
                 </dl>
-                <Link className="flex items-center justify-between text-[12px] font-extrabold text-[#70bdff] no-underline" href={`/professor/activities/${activity.id}`}>Open activity <span aria-hidden="true">→</span></Link>
+                <Link className="transition-colors duration-160 hover:text-white flex items-center justify-between text-[12px] font-extrabold text-[#70bdff] no-underline" href={`/professor/activities/${activity.id}`}>Open activity <span aria-hidden="true">→</span></Link>
               </article>
             ))}
           </div>

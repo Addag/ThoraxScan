@@ -24,7 +24,7 @@ export function AppSidebar({ children }: { children: ReactNode }) {
       <button
         aria-controls={contentId}
         aria-expanded={expanded}
-        className="hidden max-[850px]:absolute max-[850px]:top-2.5 max-[850px]:right-3.5 max-[850px]:inline-flex max-[850px]:min-h-11 max-[850px]:cursor-pointer max-[850px]:items-center max-[850px]:gap-1.5 max-[850px]:rounded-[10px] max-[850px]:border max-[850px]:border-[rgb(153_191_240/38%)] max-[850px]:p-2.5 max-[850px]:text-[14px] max-[850px]:text-foreground max-[850px]:[background:var(--glass-surface)]"
+        className="transition-[filter] duration-160 not-disabled:hover:brightness-115 hidden max-[850px]:absolute max-[850px]:top-2.5 max-[850px]:right-3.5 max-[850px]:inline-flex max-[850px]:min-h-11 max-[850px]:cursor-pointer max-[850px]:items-center max-[850px]:gap-1.5 max-[850px]:rounded-[10px] max-[850px]:border max-[850px]:border-[rgb(153_191_240/38%)] max-[850px]:p-2.5 max-[850px]:text-[14px] max-[850px]:text-foreground max-[850px]:[background:var(--glass-surface)]"
         onClick={() => setExpanded(!expanded)}
         ref={toggleRef}
         type="button"
