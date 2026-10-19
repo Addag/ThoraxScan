@@ -12,7 +12,7 @@ Authenticated form action → Supabase sign-out → public landing page.
 
 ## Steps
 
-1. The authenticated shell and the /dashboard profile-error card render forms that invoke logoutAction in [app-shell.tsx](<../../src/components/app-shell.tsx:84>) and [dashboard/page.tsx](<../../src/app/(protected)/dashboard/page.tsx:22>).
+1. The authenticated shell and the /dashboard profile-error card render forms that invoke logoutAction in [app-shell.tsx](<../../src/components/app-shell.tsx:85>) and [dashboard/page.tsx](<../../src/app/(protected)/dashboard/page.tsx:22>).
 2. logoutAction calls Supabase signOut and redirects to / in [actions.ts](<../../src/app/(protected)/actions.ts:7>).
 
 ## Consumes

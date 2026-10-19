@@ -67,6 +67,7 @@ export function AppShell({
 }) {
   return (
     <div className="grid min-h-svh grid-cols-[230px_minmax(0,1fr)] bg-(--app-background) text-foreground max-[850px]:block">
+      <a className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50 focus:rounded-[8px] focus:bg-[#0a65bd] focus:px-4 focus:py-3 focus:font-extrabold focus:text-white" href="#main-content">Skip to main content</a>
       <AppSidebar>
         <div className="flex min-h-[68px] flex-col justify-center gap-[9px] rounded-[10px] border border-brand px-3.5 py-2.5 shadow-(--glass-inset-shadow) [background:var(--glass-inset)]">
           <span className={`m-0 text-[10px] font-extrabold tracking-[0.08em] text-[#5fa8fb] uppercase ${supportingTextClass}`}>{accessLabel}</span>

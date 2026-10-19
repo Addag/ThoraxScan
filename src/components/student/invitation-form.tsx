@@ -27,7 +27,7 @@ export function InvitationForm() {
           spellCheck={false}
           maxLength={22}
           placeholder="Paste your 22-character code"
-          className="min-h-[45px] w-full rounded-[6px] border border-[#66718b] bg-[#0c1320] px-[13px] text-white placeholder:text-[#777f93] aria-invalid:border-[#ff6b6b]"
+          className="min-h-[45px] w-full rounded-[6px] border border-[#66718b] bg-[#0c1320] px-[13px] text-white placeholder:text-[#9ba2b8] aria-invalid:border-[#ff6b6b]"
           aria-invalid={Boolean(state.fieldErrors?.code)}
           aria-describedby={state.message ? "student-invitation-status" : undefined}
         />

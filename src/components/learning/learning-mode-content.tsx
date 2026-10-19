@@ -4,7 +4,7 @@ import { LearningModeAnalyzer } from "./learning-mode-analyzer";
 
 export function LearningModeContent() {
   return (
-    <main className="mx-auto w-[min(1090px,calc(100%-64px))] flex-1 pt-[30px] pb-12 max-[1000px]:w-[calc(100%-40px)] max-[480px]:w-[calc(100%-28px)] max-[480px]:pt-6 [&_:is(summary,h2):focus-visible]:outline-3 [&_:is(summary,h2):focus-visible]:outline-offset-4 [&_:is(summary,h2):focus-visible]:outline-white">
+    <main id="main-content" tabIndex={-1} className="mx-auto w-[min(1090px,calc(100%-64px))] flex-1 outline-none pt-[30px] pb-12 max-[1000px]:w-[calc(100%-40px)] max-[480px]:w-[calc(100%-28px)] max-[480px]:pt-6 [&_:is(summary,h2):focus-visible]:outline-3 [&_:is(summary,h2):focus-visible]:outline-offset-4 [&_:is(summary,h2):focus-visible]:outline-white">
       <h1 className="mt-0 mb-8 text-[28px] font-extrabold max-[800px]:mb-6">Learning Mode</h1>
       <section className="mb-[34px] overflow-hidden rounded-[10px] border border-[#49368b] bg-[#1a1039] max-[800px]:mb-6" aria-labelledby="learning-intro-title">
         <div className="flex gap-5 px-6 py-5 max-[800px]:gap-3.5 max-[800px]:p-[18px] max-[480px]:flex-col">

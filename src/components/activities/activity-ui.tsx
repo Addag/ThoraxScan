@@ -58,10 +58,10 @@ export function ActivityStepRail({ role, submissionStatus = "Not started", aiSta
   return (
     <ol className="m-0 mb-7 grid min-h-24 list-none grid-cols-3 rounded-[11px] border border-[#aeb2b8] p-0 [background:var(--glass-inset)] shadow-(--glass-inset-shadow) max-[760px]:grid-cols-1 max-[760px]:py-2.5" aria-label="Activity stages">
       {steps.map(([number, label, state]) => (
-        <li className={`relative grid min-w-0 grid-cols-[44px_minmax(0,1fr)] content-center items-center gap-x-3.5 px-[34px] py-[19px] max-[760px]:min-h-[70px] max-[760px]:px-5 max-[760px]:py-3 ${state === "future" ? "opacity-[0.42]" : ""} ${number !== "3" ? "after:absolute after:top-1/2 after:-right-[30px] after:z-[1] after:h-px after:w-[60px] after:bg-[#58606b] after:content-[''] max-[760px]:after:bottom-[-8px] max-[760px]:after:left-[41px] max-[760px]:after:top-auto max-[760px]:after:right-auto max-[760px]:after:h-4 max-[760px]:after:w-px" : ""}`} key={label}>
+        <li className={`relative grid min-w-0 grid-cols-[44px_minmax(0,1fr)] content-center items-center gap-x-3.5 px-[34px] py-[19px] max-[760px]:min-h-[70px] max-[760px]:px-5 max-[760px]:py-3 ${state === "future" ? "opacity-70" : ""} ${number !== "3" ? "after:absolute after:top-1/2 after:-right-[30px] after:z-[1] after:h-px after:w-[60px] after:bg-[#58606b] after:content-[''] max-[760px]:after:bottom-[-8px] max-[760px]:after:left-[41px] max-[760px]:after:top-auto max-[760px]:after:right-auto max-[760px]:after:h-4 max-[760px]:after:w-px" : ""}`} key={label}>
           <span className="row-span-2 grid size-11 place-items-center rounded-full bg-brand text-[16px] font-extrabold text-white" aria-hidden="true">{number}</span>
           <strong className="text-[15px]">{label}</strong>
-          {state === "future" ? <small className="mt-0.5 text-[10px] text-[#7b818c]">{role === "student" ? "Locked until final submission" : "Future milestone"}</small> : null}
+          {state === "future" ? <small className="mt-0.5 text-[10px] text-[#aeb6c5]">{role === "student" ? "Locked until final submission" : "Future milestone"}</small> : null}
         </li>
       ))}
     </ol>
@@ -99,10 +99,10 @@ export function XrayCasePreview({
           // eslint-disable-next-line @next/next/no-img-element
           <img className="block size-full object-contain" src={imageUrl} alt={`Frontal chest X-ray for ${title}`} />
         ) : (
-          <div className="grid size-full place-items-center content-center gap-[5px] p-[22px] text-center text-[#8d96a5]">
-            <span className="text-[34px] font-light text-white" aria-hidden="true">＋</span>
+          <div className={`grid size-full place-items-center content-center gap-[5px] p-[22px] text-center ${darkImageBackground ? "text-[#aeb6c5]" : "text-[#3d4554]"}`}>
+            <span className={`text-[34px] font-light ${darkImageBackground ? "text-white" : "text-[#1f2633]"}`} aria-hidden="true">＋</span>
             <strong>{imageError ? "Preview unavailable" : "No case image yet"}</strong>
-            <small className="text-[10px] text-[#6f7887]">{imageError ? "Reload to request a new signed preview URL." : "Upload a de-identified frontal JPEG or PNG."}</small>
+            <small className="text-[10px]">{imageError ? "Reload to request a new signed preview URL." : "Upload a de-identified frontal JPEG or PNG."}</small>
           </div>
         )}
       </div>

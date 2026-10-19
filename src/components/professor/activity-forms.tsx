@@ -100,7 +100,7 @@ export function ActivityDetailsForm({
         <FieldError>{state.fieldErrors?.instructions}</FieldError>
       </label>
 
-      <label className="mt-3.5 grid gap-[7px] text-[12px] text-[#a1a7b1] [&>small:first-child]:text-[#747d8b]">
+      <label className="mt-3.5 grid gap-[7px] text-[12px] text-[#a1a7b1] [&>small:first-child]:text-[#aeb6c5]">
         Due date <small>Optional</small>
         <input
           className="w-full min-h-[42px] rounded-[5px] border border-[#82878e] bg-[#202938] px-3 py-[11px] text-white disabled:opacity-[0.52]"
@@ -124,7 +124,7 @@ export function ActivityDetailsForm({
           disabled={isArchived}
           aria-invalid={Boolean(state.fieldErrors?.referenceEvaluation)}
         />
-        <span className="text-[10px] text-[#737d8c]">Visible to teaching staff only. Required before publishing.</span>
+        <span className="text-[10px] text-[#aeb6c5]">Visible to teaching staff only. Required before publishing.</span>
         <FieldError>{state.fieldErrors?.referenceEvaluation}</FieldError>
       </label>
 

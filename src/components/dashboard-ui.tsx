@@ -22,7 +22,7 @@ export function PageMain({
   top?: string;
   bottom?: string;
 }) {
-  return <main className={`mx-auto flex flex-1 flex-col ${width} ${top} ${bottom}`}>{children}</main>;
+  return <main className={`mx-auto flex flex-1 flex-col outline-none ${width} ${top} ${bottom}`} id="main-content" tabIndex={-1}>{children}</main>;
 }
 
 export function formStatusColor(status: string) {

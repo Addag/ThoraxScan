@@ -21,6 +21,7 @@ One form component keeps field states, requested application role, selected logi
 - Form submissions select the corresponding server action in [auth-form.tsx](<../../../src/components/auth/auth-form.tsx:21>).
 - Registration, login, and forgot-password require a single-use Cloudflare Turnstile token; reset-password remains protected by its recovery session in [auth-form.tsx](<../../../src/components/auth/auth-form.tsx:45>).
 - The role selector renders first on both login and register; registration offers Student or Professor as `requestedRole`, login adds Administrator as an `expectedRole` portal in [auth-form.tsx](<../../../src/components/auth/auth-form.tsx:68>) and [RoleSelector](<../../../src/components/auth/auth-form.tsx:312>).
+- Registration agreement checkboxes (Terms, Privacy Policy, research) use their visible text as the label and set `aria-describedby` only to their error id while an error shows. The age-group select keeps its help text described alongside any error, in [auth-form.tsx](<../../../src/components/auth/auth-form.tsx:259>).
 - Password fields carry a client-only show/hide toggle (`.auth-password-control`) in [auth-form.tsx](<../../../src/components/auth/auth-form.tsx:133>); it changes no field names.
 
 ## Connected to

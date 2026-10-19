@@ -50,7 +50,7 @@ export function CreateWorkspaceForm() {
       <p className={descriptionClass}>Create a class space that you own and manage.</p>
       <div className={actionControlsClass}>
         <input
-          className={`${fieldInputClass} placeholder:text-[#777f93]`}
+          className={`${fieldInputClass} placeholder:text-[#9ba2b8]`}
           id="new-workspace-name"
           name="name"
           type="text"
@@ -79,7 +79,7 @@ export function ProfessorRedeemForm() {
       <p className={descriptionClass}>Join a workspace as a co-professor.</p>
       <div className={actionControlsClass}>
         <input
-          className={`${fieldInputClass} placeholder:text-[#777f93]`}
+          className={`${fieldInputClass} placeholder:text-[#9ba2b8]`}
           id="professor-invitation-code"
           name="code"
           type="text"
@@ -262,7 +262,7 @@ export function LeaveWorkspaceForm({ workspaceId }: { workspaceId: string }) {
       <input type="hidden" name="workspaceId" value={workspaceId} />
       <div>
         <strong className="text-[13px] text-[#ffb4b4]">Leave this workspace</strong>
-        <p className="mt-1 mb-0 text-[11px] text-[#9b8589]">You will need another Professor invitation to rejoin.</p>
+        <p className="mt-1 mb-0 text-[11px] text-[#c4a9ad]">You will need another Professor invitation to rejoin.</p>
       </div>
       <button className={`cursor-pointer rounded-[6px] border border-[#d45b60] bg-[rgba(160,32,32,0.2)] px-3.5 py-2.5 font-extrabold text-[#ffb4b4] ${busyClass}`} type="submit" disabled={pending}>
         {pending ? "Leaving…" : "Leave workspace"}
