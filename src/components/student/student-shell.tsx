@@ -9,7 +9,7 @@ export function StudentShell({
   sectionDescription = "Student workspaces",
 }: {
   children: ReactNode;
-  activeItem?: "dashboard" | "activities" | "learning" | "settings";
+  activeItem?: "dashboard" | "activities" | "learning" | "attention" | "settings";
   sectionLabel?: string;
   sectionDescription?: string;
 }) {
@@ -23,6 +23,7 @@ export function StudentShell({
         { label: "Dashboard", href: "/student", icon: "dashboard", active: activeItem === "dashboard" },
         { label: "Activities", href: "/student/activities", icon: "activities", active: activeItem === "activities" },
         { label: "Learning mode", href: "/student/learning", icon: "learning", active: activeItem === "learning" },
+        { label: "Attention maps", href: "/student/attention", icon: "attention", active: activeItem === "attention" },
         { label: "Settings", href: "/student/settings", icon: "settings", active: activeItem === "settings" },
       ]}
       sectionLabel={sectionLabel}

@@ -76,7 +76,7 @@ export function AuthLayout({
           <p className={authEyebrowClass}>{copy.eyebrow}</p>
           {message && (
             <p
-              className={`mt-4 border px-3 py-2.5 text-[13px] leading-[1.4] ${statusClass}`}
+              className={`mt-4 mb-4 border px-3 py-2.5 text-[13px] leading-[1.4] ${statusClass}`}
               role={messageStatus === "error" ? "alert" : "status"}
             >
               {message}

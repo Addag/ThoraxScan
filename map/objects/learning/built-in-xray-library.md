@@ -2,8 +2,8 @@
 node_type: object
 universe: live
 status: verified
-audited: 2026-10-03
-snapshot: Convert_to_Tailwind @ 0958975
+audited: 2026-10-18
+snapshot: main @ 5a45326
 ---
 
 # Built-in X-ray library
@@ -24,8 +24,8 @@ A static manifest plus public JPEGs gives Learning Mode and Professor activity a
 
 ## Known gaps
 
-- Lateral images can be picked for activities, but the [X-ray case](xray-case.md) row is always written with `view_position = 'frontal'` and publication requires frontal. The attestation copy no longer says "frontal"; the server error text still does. Training included about 14.5% lateral images, but lateral accuracy has never been evaluated; see [Model training](../inference/model-training.md).
-- All 234 cases are the `valid.csv` images used to pick the checkpoint, so AI results on them look better than they would on unseen images.
+- Lateral images can be picked for activities, but the [X-ray case](xray-case.md) row is always written with `view_position = 'frontal'` and publication requires frontal. The attestation copy no longer says "frontal"; the server error text still does. Retrains v2–v5 include laterals and report held-out lateral AUC (3,216 images), but no lateral-view release scope has been approved; see [Model training](../inference/model-training.md).
+- All 234 cases are the official `valid.csv` images. v1 picked its checkpoint on them, so v1 results on library cases were optimistic. v2–v5 pick checkpoints and thresholds on the held-out custom split, so the active v5 release scores them as unseen test images.
 - Dataset labels are reference data only; they are not written into the Professor's private reference evaluation.
 - Images are public static assets once deployed; the [README](<../../../src/lib/xray-library/README.md>) flags that redistribution permission under the CheXpert agreement is unconfirmed.
 

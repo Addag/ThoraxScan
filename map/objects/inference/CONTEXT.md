@@ -33,4 +33,4 @@ Activity analysis records and validated V2 attention heatmaps are live; V1 relea
 
 ## Human check
 
-The static `xray-sample.png` landing asset is not wired to inference. Private activity-case images are fetched by the browser activity-analysis boundary, and the Student and approved Professor Learning Mode routes call the same runtime. The project owner reports V2 is deployed as of 2026-09-29; the production release ID and activation revision are not independently verified in this repository. See [attention-heatmap.md](attention-heatmap.md).
+The static `xray-sample.png` landing asset is not wired to inference. Private activity-case images are fetched by the browser activity-analysis boundary, and the Student and approved Professor Learning Mode routes call the same runtime. The project owner reports (2026-10-18) that hosted production runs the app with the Learning Mode possible tier and release `squeezevit-v5-kd-cardio042-possible85-20261017.1`. This repository holds no production registry snapshot, so the release ID and revision are not independently verified. See [attention-heatmap.md](attention-heatmap.md).

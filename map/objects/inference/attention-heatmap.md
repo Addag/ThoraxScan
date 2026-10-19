@@ -11,9 +11,7 @@ Validated V2 releases expose global, class-agnostic 7x7 attention rollout.
 V1 remains unavailable. Relative attention does not localize disease or provide
 diagnostic evidence.
 
-Deployment status (2026-09-29): the project owner reports that V2 is currently
-deployed. The repository does not contain a production registry snapshot, so the
-active release ID and activation revision are not independently verified here.
+Deployment status: The project owner reports (2026-10-18) that hosted production runs the app with the Learning Mode possible tier and release `squeezevit-v5-kd-cardio042-possible85-20261017.1`. This repository holds no production registry snapshot, so the release ID and revision are not independently verified.
 
 Learning Mode keeps the map and object URL in browser memory and revokes the URL
 on replacement/unmount. Activity completion persists exactly 49 normalized values

@@ -9,7 +9,7 @@ export function ProfessorShell({
   sectionDescription = "Teaching workspaces",
 }: {
   children: ReactNode;
-  activeItem?: "dashboard" | "activities" | "submissions" | "learning" | "settings";
+  activeItem?: "dashboard" | "activities" | "submissions" | "learning" | "attention" | "settings";
   sectionLabel?: string;
   sectionDescription?: string;
 }) {
@@ -24,6 +24,7 @@ export function ProfessorShell({
         { label: "Dashboard", href: "/professor", icon: "dashboard", active: activeItem === "dashboard" },
         { label: "Activities", href: "/professor/activities", icon: "activities", active: activeItem === "activities" },
         { label: "Learning mode", href: "/professor/learning", icon: "learning", active: activeItem === "learning" },
+        { label: "Attention maps", href: "/professor/attention", icon: "attention", active: activeItem === "attention" },
         { label: "Settings", href: "/professor/settings", icon: "settings", active: activeItem === "settings" },
       ]}
       sectionLabel={sectionLabel}
