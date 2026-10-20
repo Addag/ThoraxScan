@@ -2,6 +2,7 @@
 
 import { useActionState, useEffect, useState } from "react";
 import { initialSubmissionState, type StudentSubmission, type SubmissionActionState } from "@/lib/submissions/types";
+import { ConfirmDialog } from "@/components/confirm-dialog";
 import { activityButton } from "@/components/activities/activity-button";
 import { activityFormHeadingClass, activityFormHeadingIconClass, activityFormHeadingKickerClass, activityFormHeadingTitleClass } from "@/components/activities/activity-form-styles";
 
@@ -59,13 +60,10 @@ export function StudentSubmissionForm({ submission, dueAt, deadlinePassed, actio
           <button className={activityButton.secondary} type="submit" name="intent" value="draft" onClick={() => setConfirming(false)}>Save draft</button>
           <button className={activityButton.primary} type="button" onClick={() => setConfirming(true)}>Submit final evaluation</button>
         </div>
-        {confirming ? <div className="rounded-xl border border-[#cbd5e1] light:border-(--border-strong) p-4" role="group" aria-labelledby="confirmation-title">
-          <strong id="confirmation-title">Confirm final submission</strong>
-          <p className="my-3 text-[13px] leading-[1.5]">Your final evaluation cannot be edited. Review your response before confirming.</p>
+        {confirming ? <ConfirmDialog title="Confirm final submission" cancelLabel="Keep editing" confirmLabel="Confirm and submit" name="intent" value="final" onClose={() => setConfirming(false)}>
+          Your final evaluation cannot be edited. Review your response before confirming.
           <input type="hidden" name="confirmed" value="yes" />
-          <button className={`${activityButton.primary} mt-2 mr-2`} type="submit" name="intent" value="final">Confirm and submit</button>
-          <button className={`${activityButton.secondary} mt-2 mr-2`} type="button" onClick={() => setConfirming(false)}>Keep editing</button>
-        </div> : null}
+        </ConfirmDialog> : null}
       </fieldset>
     </form>}
   </section>;

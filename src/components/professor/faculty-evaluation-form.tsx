@@ -1,9 +1,10 @@
 "use client";
 
 import { useActionState, useState } from "react";
+import { ConfirmDialog } from "@/components/confirm-dialog";
 import { initialEvaluationState, type EvaluationActionState, type ProfessorEvaluation } from "@/lib/evaluations/types";
 
-import { reviewButtonGradient, reviewButtonOutline, reviewButtonSolid, reviewFieldClass, reviewFieldLabelClass, reviewPanelTextClass, reviewTextareaClass } from "./review-styles";
+import { reviewButtonGradient, reviewButtonSolid, reviewFieldClass, reviewFieldLabelClass, reviewPanelTextClass, reviewTextareaClass } from "./review-styles";
 
 type Action = (previous: EvaluationActionState, data: FormData) => Promise<EvaluationActionState>;
 export function FacultyEvaluationForm({ evaluation, saveAction, releaseAction }: {
@@ -40,14 +41,10 @@ export function FacultyEvaluationForm({ evaluation, saveAction, releaseAction }:
           <button className={reviewButtonSolid} type="submit" name="intent" value="draft">Save Review</button>
           <button className={reviewButtonGradient} type="button" onClick={() => setConfirming(true)}>Release evaluation</button>
         </div> : null}
-        {confirming && !locked ? <div className="mt-[5px] grid gap-2.5 rounded-lg border border-[rgb(255_211_106/45%)] bg-[rgb(73_55_18/32%)] p-3.5" role="group" aria-labelledby="release-confirmation">
-          <p className="m-0 text-[12px] leading-[1.5] text-[#ffe3a0] light:text-(--status-warning-text)" id="release-confirmation">Release is permanent. The score and feedback cannot be changed after release.</p>
-          <input className={reviewFieldClass} type="hidden" name="confirmed" value="yes" />
-          <div className="flex flex-wrap gap-[9px]">
-            <button className={reviewButtonOutline} type="button" onClick={() => setConfirming(false)}>Keep editing</button>
-            <button className={reviewButtonGradient} type="submit" name="intent" value="release">Confirm and release</button>
-          </div>
-        </div> : null}
+        {confirming && !locked ? <ConfirmDialog title="Release evaluation?" cancelLabel="Keep editing" confirmLabel="Confirm and release" name="intent" value="release" onClose={() => setConfirming(false)}>
+          Release is permanent. The score and feedback cannot be changed after release.
+          <input type="hidden" name="confirmed" value="yes" />
+        </ConfirmDialog> : null}
       </fieldset>
     </form>
   </section>;

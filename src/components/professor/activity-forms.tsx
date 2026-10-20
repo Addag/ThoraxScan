@@ -22,6 +22,7 @@ import { createClient } from "@/lib/supabase/client";
 import type { ProfessorWorkspace } from "@/lib/workspaces/types";
 import { XrayLibrary } from "@/components/learning/xray-library";
 import { activityButton } from "@/components/activities/activity-button";
+import { ConfirmDialog } from "@/components/confirm-dialog";
 import { activityFormHeadingClass, activityFormHeadingIconClass, activityFormHeadingKickerClass, activityFormHeadingTitleClass, activityFormMessageClass } from "@/components/activities/activity-form-styles";
 
 function FieldError({ children }: { children?: string }) {
@@ -141,6 +142,7 @@ export function ActivityDetailsForm({
 export function CaseUploadForm({ activityId, caseId = null }: { activityId: string; caseId?: string | null }) {
   const [selectionVersion, setSelectionVersion] = useState(0);
   const [uploadBusy, setUploadBusy] = useState(false);
+  const [confirmingRemoval, setConfirmingRemoval] = useState(false);
   const [selectionMessage, setSelectionMessage] = useState("");
   const [reservedCase, setReservedCase] = useState<{ id: string; previousCaseId: string | null } | null>(null);
   const handleCaseReserved = useCallback((id: string) => {
@@ -161,14 +163,22 @@ export function CaseUploadForm({ activityId, caseId = null }: { activityId: stri
   return (
     <div className="grid min-w-0 gap-3.5">
       {removalCaseId ? (
-        <form action={removeAction} onSubmit={(event) => {
-          if (uploadBusy || removing || (!removalState.cleanupCaseId && !window.confirm("Remove this case image from the draft? You can upload another image."))) event.preventDefault();
-        }}>
+        <form action={removeAction}>
           <input type="hidden" name="activityId" value={activityId} />
           <input type="hidden" name="caseId" value={removalCaseId} />
-          <button className={`${activityButton.danger} w-full focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#80caff] light:focus-visible:outline-(--brand-blue-text)`} type="submit" disabled={uploadBusy || removing}>
+          <button
+            className={`${activityButton.danger} w-full focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#80caff] light:focus-visible:outline-(--brand-blue-text)`}
+            type={removalState.cleanupCaseId ? "submit" : "button"}
+            disabled={uploadBusy || removing}
+            onClick={removalState.cleanupCaseId ? undefined : () => setConfirmingRemoval(true)}
+          >
             {removing ? "Removing…" : removalState.cleanupCaseId ? "Retry cleanup" : "Remove uploaded case"}
           </button>
+          {confirmingRemoval ? (
+            <ConfirmDialog title="Remove case image?" confirmLabel="Remove image" danger onClose={() => setConfirmingRemoval(false)}>
+              Remove this case image from the draft? You can upload another image.
+            </ConfirmDialog>
+          ) : null}
         </form>
       ) : null}
       {removalState.message ? <p className={activityFormMessageClass(removalState.status === "cleanup_pending" ? "error" : removalState.status)} role="status">{removalState.message}</p> : null}
@@ -335,22 +345,27 @@ function LifecycleForm({
   activityId: string;
   action: typeof publishActivityAction;
   label: string;
-  confirmation?: string;
+  confirmation?: { title: string; message: string };
   danger?: boolean;
 }) {
   const [state, formAction, pending] = useActionState(action, initialActivityFormState);
+  const [confirming, setConfirming] = useState(false);
   return (
-    <form
-      className=""
-      action={formAction}
-      onSubmit={(event) => {
-        if (confirmation && !window.confirm(confirmation)) event.preventDefault();
-      }}
-    >
+    <form action={formAction}>
       <input type="hidden" name="activityId" value={activityId} />
-      <button className={`${danger ? activityButton.danger : activityButton.primary} w-full`} type="submit" disabled={pending}>
+      <button
+        className={`${danger ? activityButton.danger : activityButton.primary} w-full`}
+        type={confirmation ? "button" : "submit"}
+        disabled={pending}
+        onClick={confirmation ? () => setConfirming(true) : undefined}
+      >
         {pending ? "Working…" : label}
       </button>
+      {confirmation && confirming ? (
+        <ConfirmDialog title={confirmation.title} confirmLabel={label} danger={danger} onClose={() => setConfirming(false)}>
+          {confirmation.message}
+        </ConfirmDialog>
+      ) : null}
       {state.message ? <p className={activityFormMessageClass(state.status)} role="status">{state.message}</p> : null}
     </form>
   );
@@ -370,7 +385,7 @@ export function ActivityLifecycleControls({ activity }: { activity: ProfessorAct
             activityId={activity.id}
             action={deleteDraftActivityAction}
             label="Delete draft"
-            confirmation="Delete this draft and its private case image? This cannot be undone."
+            confirmation={{ title: "Delete draft?", message: "Delete this draft and its private case image? This cannot be undone." }}
             danger
           />
         </>
@@ -379,7 +394,7 @@ export function ActivityLifecycleControls({ activity }: { activity: ProfessorAct
           activityId={activity.id}
           action={archiveActivityAction}
           label="Archive activity"
-          confirmation="Archive this activity? Students will lose access and it cannot be restored."
+          confirmation={{ title: "Archive activity?", message: "Archive this activity? Students will lose access and it cannot be restored." }}
           danger
         />
       )}

@@ -92,22 +92,23 @@ test("uncontrolled library callers still announce their selection", async () => 
 });
 
 test("canceling uploaded-case removal leaves the case and selection intact", async () => {
-  const confirmation = vi.spyOn(window, "confirm").mockReturnValue(false);
   await render(<CaseUploadForm activityId="test-activity" caseId="attached-case" />);
   await page.getByRole("button", { name: "Use case 01", exact: true }).click();
   await page.getByRole("button", { name: "Remove uploaded case" }).click();
-  expect(confirmation).toHaveBeenCalledWith("Remove this case image from the draft? You can upload another image.");
+  await expect.element(page.getByRole("dialog", { name: "Remove case image?" })).toBeVisible();
+  await page.getByRole("button", { name: "Cancel" }).click();
+  await expect.element(page.getByRole("dialog")).not.toBeInTheDocument();
   expect(mocks.remove).not.toHaveBeenCalled();
   await expect.element(page.getByText("cxp-001.jpg", { exact: true })).toBeVisible();
 });
 
 test("removal locks uploads until completion, resets selection, and permits replacement", async () => {
-  vi.spyOn(window, "confirm").mockReturnValue(true);
   let finish!: (state: CaseRemovalFormState) => void;
   mocks.remove.mockImplementation(() => new Promise<CaseRemovalFormState>((resolve) => { finish = resolve; }));
   await render(<CaseUploadForm activityId="test-activity" caseId="attached-case" />);
   await page.getByRole("button", { name: "Use case 01", exact: true }).click();
   await page.getByRole("button", { name: "Remove uploaded case" }).click();
+  await page.getByRole("button", { name: "Remove image" }).click();
   await expect.element(page.getByRole("button", { name: "Removing…" })).toBeDisabled();
   await expect.element(page.getByRole("button", { name: "Use case 01", exact: true })).toBeDisabled();
   await expect.element(page.getByRole("button", { name: "Remove selected case" })).toBeDisabled();
@@ -128,17 +129,17 @@ test("removal locks uploads until completion, resets selection, and permits repl
 });
 
 test("cleanup retries keep their case ID after the attached-case prop is cleared", async () => {
-  const confirmation = vi.spyOn(window, "confirm").mockReturnValue(true);
   mocks.remove.mockResolvedValueOnce({ status: "cleanup_pending", message: "Image cleanup failed. Retry cleanup.", removedCaseId: "attached-case", cleanupCaseId: "attached-case" });
   const view = await render(<CaseUploadForm activityId="test-activity" caseId="attached-case" />);
   await page.getByRole("button", { name: "Remove uploaded case" }).click();
+  await page.getByRole("button", { name: "Remove image" }).click();
   await expect.element(page.getByRole("button", { name: "Retry cleanup" })).toBeVisible();
   await view.rerender(<CaseUploadForm activityId="test-activity" caseId={null} />);
   await page.getByRole("button", { name: "Use case 02", exact: true }).click();
   await page.getByRole("button", { name: "Retry cleanup" }).click();
   await expect.element(page.getByText("Case image removed.")).toBeVisible();
   await expect.element(page.getByText("cxp-002.jpg", { exact: true })).toBeVisible();
-  expect(confirmation).toHaveBeenCalledTimes(1);
+  await expect.element(page.getByRole("dialog")).not.toBeInTheDocument();
   expect(mocks.remove.mock.calls[1][0].cleanupCaseId).toBe("attached-case");
   expect((mocks.remove.mock.calls[1][1] as FormData).get("caseId")).toBe("attached-case");
 });
@@ -195,7 +196,6 @@ test("direct upload and confirmation keep removal disabled", async () => {
 });
 
 test("a failed new upload exposes removal of its reservation without a reload", async () => {
-  vi.spyOn(window, "confirm").mockReturnValue(true);
   mocks.prepare.mockResolvedValue({ status: "prepared", message: "Uploading…", activityId: "test-activity", caseId: "reserved-case", path: "reserved", token: "signed-token", expectedMimeType: "image/jpeg" });
   mocks.upload.mockResolvedValue({ error: new Error("upload failed") });
   mocks.remove.mockResolvedValue({ status: "success", message: "Case image removed.", removedCaseId: "reserved-case" });
@@ -208,13 +208,13 @@ test("a failed new upload exposes removal of its reservation without a reload", 
   await page.getByRole("button", { name: "Remove selected case" }).click();
   await expect.element(page.getByRole("alert")).not.toBeInTheDocument();
   await page.getByRole("button", { name: "Remove uploaded case" }).click();
+  await page.getByRole("button", { name: "Remove image" }).click();
   await expect.element(page.getByText("Case image removed.")).toBeVisible();
   expect((mocks.remove.mock.calls[0][1] as FormData).get("caseId")).toBe("reserved-case");
   await expect.element(page.getByRole("button", { name: "Remove uploaded case" })).not.toBeInTheDocument();
 });
 
 test("updated case props replace a previously tracked upload reservation", async () => {
-  vi.spyOn(window, "confirm").mockReturnValue(true);
   mocks.prepare.mockResolvedValue({ status: "prepared", message: "Uploading…", activityId: "test-activity", caseId: "reserved-case", path: "reserved", token: "signed-token", expectedMimeType: "image/jpeg" });
   mocks.upload.mockResolvedValue({ error: new Error("upload failed") });
   const view = await render(<CaseUploadForm activityId="test-activity" />);
@@ -224,6 +224,7 @@ test("updated case props replace a previously tracked upload reservation", async
   await expect.element(page.getByRole("alert")).toHaveTextContent("The direct upload failed.");
   await view.rerender(<CaseUploadForm activityId="test-activity" caseId="replacement-case" />);
   await page.getByRole("button", { name: "Remove uploaded case" }).click();
+  await page.getByRole("button", { name: "Remove image" }).click();
   await expect.poll(() => mocks.remove.mock.calls.length).toBe(1);
   expect((mocks.remove.mock.calls[0][1] as FormData).get("caseId")).toBe("replacement-case");
 });

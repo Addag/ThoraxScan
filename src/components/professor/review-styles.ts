@@ -11,7 +11,6 @@ export const reviewTextareaClass = `${reviewFieldBase} min-h-[110px] resize-y`;
 export const reviewButtonBase = "min-h-[38px] cursor-pointer rounded-[7px] px-4 py-0 font-extrabold";
 export const reviewButtonSolid = `${reviewButtonBase} transition-[filter] duration-160 not-disabled:hover:brightness-115 border-0 bg-[#087fff] text-white`;
 export const reviewButtonGradient = `${reviewButtonBase} transition-[filter] duration-160 not-disabled:hover:brightness-115 border-0 [background:linear-gradient(135deg,#148cff,#006be8)] shadow-[0_7px_18px_rgb(0_119_255/24%)] text-white`;
-export const reviewButtonOutline = `${reviewButtonBase} transition-colors duration-160 not-disabled:hover:bg-(--hover-overlay) border border-[#627997] bg-transparent text-[#d6e4f8] light:text-(--text-secondary)`;
 export const reviewLinkClass = "transition-colors duration-160 hover:text-(--text-primary) text-[12px] text-[#9fcfff] light:text-(--brand-blue-text) no-underline";
 export const reviewPanelTextClass = "mx-0 mt-0 mb-3 text-[12px] leading-[1.5] text-[#b7c5d9] light:text-(--text-muted)";
 

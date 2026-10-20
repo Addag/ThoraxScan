@@ -1,8 +1,9 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 
 import { reviewProfessorApplicationAction } from "@/app/(protected)/admin/actions";
+import { ConfirmDialog } from "@/components/confirm-dialog";
 import { primaryButton } from "@/components/primary-button";
 import { reviewFieldClass } from "@/components/admin/review-styles";
 import {
@@ -21,6 +22,7 @@ export function ApplicationReviewForm({
     reviewProfessorApplicationAction,
     initialAdminReviewState,
   );
+  const [confirmingRejection, setConfirmingRejection] = useState(false);
   const canApprove = application.email_confirmed && application.membership_count === 0;
 
   return (
@@ -65,13 +67,17 @@ export function ApplicationReviewForm({
           )}
           <button
             className="transition-colors duration-160 not-disabled:hover:bg-[rgba(160,32,32,0.32)] mt-[9px] rounded-[6px] border border-[#d45b60] bg-[rgba(160,32,32,0.2)] px-3 py-[9px] font-extrabold text-[#ffb4b4] light:text-(--status-error-text) disabled:cursor-not-allowed disabled:opacity-[0.58]"
-            type="submit"
-            name="decision"
-            value="reject"
+            type="button"
             disabled={pending}
+            onClick={() => setConfirmingRejection(true)}
           >
-            {pending ? "Reviewing…" : "Confirm rejection"}
+            {pending ? "Reviewing…" : "Reject application"}
           </button>
+          {confirmingRejection ? (
+            <ConfirmDialog title="Reject application?" confirmLabel="Confirm rejection" name="decision" value="reject" danger onClose={() => setConfirmingRejection(false)}>
+              The applicant will not receive Professor access. You can still approve the application later.
+            </ConfirmDialog>
+          ) : null}
         </details>
       )}
 

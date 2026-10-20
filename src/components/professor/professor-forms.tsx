@@ -11,6 +11,7 @@ import {
   renameWorkspaceAction,
   revokeInvitationAction,
 } from "@/app/(protected)/professor/actions";
+import { ConfirmDialog } from "@/components/confirm-dialog";
 import { primaryButton } from "@/components/primary-button";
 import type { AppRole } from "@/lib/auth/types";
 import {
@@ -218,12 +219,18 @@ export function RevokeInvitationButton({
     revokeInvitationAction,
     initialWorkspaceActionState,
   );
+  const [confirming, setConfirming] = useState(false);
   return (
     <form className="flex flex-col items-end" action={formAction}>
       <input type="hidden" name="invitationId" value={invitationId} />
-      <button className={inlineButtonClass} type="submit" disabled={pending}>
+      <button className={inlineButtonClass} type="button" disabled={pending} onClick={() => setConfirming(true)}>
         {pending ? "Revoking…" : "Revoke"}
       </button>
+      {confirming ? (
+        <ConfirmDialog title="Revoke invitation?" confirmLabel="Revoke invitation" danger onClose={() => setConfirming(false)}>
+          This invitation code will stop working immediately.
+        </ConfirmDialog>
+      ) : null}
       <FormStatus state={state} className="max-w-[150px] text-right" />
     </form>
   );
@@ -240,13 +247,19 @@ export function RemoveMemberButton({
     removeMemberAction,
     initialWorkspaceActionState,
   );
+  const [confirming, setConfirming] = useState(false);
   return (
     <form className="flex flex-col items-end" action={formAction}>
       <input type="hidden" name="workspaceId" value={workspaceId} />
       <input type="hidden" name="memberUserId" value={memberUserId} />
-      <button className={inlineButtonClass} type="submit" disabled={pending}>
+      <button className={inlineButtonClass} type="button" disabled={pending} onClick={() => setConfirming(true)}>
         {pending ? "Removing…" : "Remove"}
       </button>
+      {confirming ? (
+        <ConfirmDialog title="Remove member?" confirmLabel="Remove member" danger onClose={() => setConfirming(false)}>
+          This member will lose access to the workspace and its activities.
+        </ConfirmDialog>
+      ) : null}
       <FormStatus state={state} className="max-w-[150px] text-right" />
     </form>
   );
@@ -257,6 +270,7 @@ export function LeaveWorkspaceForm({ workspaceId }: { workspaceId: string }) {
     leaveWorkspaceAction,
     initialWorkspaceActionState,
   );
+  const [confirming, setConfirming] = useState(false);
   return (
     <form className={`${panelBase} mt-5 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-[18px] border-[#7b3437] p-[19px_24px] max-[700px]:grid-cols-1`} action={formAction}>
       <input type="hidden" name="workspaceId" value={workspaceId} />
@@ -264,9 +278,14 @@ export function LeaveWorkspaceForm({ workspaceId }: { workspaceId: string }) {
         <strong className="text-[13px] text-[#ffb4b4] light:text-(--status-error-text)">Leave this workspace</strong>
         <p className="mt-1 mb-0 text-[11px] text-[#c4a9ad] light:text-(--text-muted)">You will need another Professor invitation to rejoin.</p>
       </div>
-      <button className={`transition-colors duration-160 not-disabled:hover:bg-[rgba(160,32,32,0.32)] cursor-pointer rounded-[6px] border border-[#d45b60] bg-[rgba(160,32,32,0.2)] px-3.5 py-2.5 font-extrabold text-[#ffb4b4] light:text-(--status-error-text) ${busyClass}`} type="submit" disabled={pending}>
+      <button className={`transition-colors duration-160 not-disabled:hover:bg-[rgba(160,32,32,0.32)] cursor-pointer rounded-[6px] border border-[#d45b60] bg-[rgba(160,32,32,0.2)] px-3.5 py-2.5 font-extrabold text-[#ffb4b4] light:text-(--status-error-text) ${busyClass}`} type="button" disabled={pending} onClick={() => setConfirming(true)}>
         {pending ? "Leaving…" : "Leave workspace"}
       </button>
+      {confirming ? (
+        <ConfirmDialog title="Leave workspace?" confirmLabel="Leave workspace" danger onClose={() => setConfirming(false)}>
+          You will need another Professor invitation to rejoin.
+        </ConfirmDialog>
+      ) : null}
       <FormStatus state={state} className="col-span-full" />
     </form>
   );
