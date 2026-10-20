@@ -27,7 +27,7 @@ export default async function StudentWorkspacePage({
   return (
     <StudentShell>
       <PageMain top="pt-[38px]">
-        <Link className={backLinkClass} href="/student">← Back to dashboard</Link>
+        <Link className={backLinkClass} href="/student">← Back to home</Link>
         <section className={`${glassPanelClass} border-(--border-shell) p-[clamp(28px,5vw,52px)]`}>
           <p className={sectionKickerClass}>Student workspace</p>
           <h1 className="m-0 text-[clamp(28px,4vw,38px)] leading-[1.1]">{workspace.name}</h1>

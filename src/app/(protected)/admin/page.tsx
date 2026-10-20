@@ -68,7 +68,7 @@ export default async function AdminPage({
   return (
     <AdminShell>
       <PageMain bottom="pb-[60px]">
-        <PageHeading title="Administrator dashboard" subtitle={`Welcome back, ${profile.display_name}.`} />
+        <PageHeading title="Administrator home" subtitle={`Welcome back, ${profile.display_name}.`} />
 
         <StatGrid>
           <StatCard symbol="…" value={counts.pending} label="Pending" detail="Awaiting review" />

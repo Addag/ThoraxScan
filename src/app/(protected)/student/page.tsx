@@ -25,7 +25,7 @@ export default async function StudentPage() {
   return (
     <StudentShell>
       <PageMain>
-        <PageHeading title="Dashboard" subtitle={`Welcome back, ${profile.display_name}!`} />
+        <PageHeading title="Home" subtitle={`Welcome back, ${profile.display_name}!`} />
 
         <section className="mt-6 rounded-[10px] border border-(--border-shell) bg-(--surface-field) p-6 max-[600px]:p-5" aria-labelledby="recent-activities-title">
           <SectionHeading kicker="Published assignments" title="Recent activities" titleId="recent-activities-title" aside={<Link className="transition-colors duration-160 hover:text-(--text-primary) text-[12px] font-extrabold text-[#9fcfff] light:text-(--brand-blue-text) no-underline" href="/student/activities">View all</Link>} />

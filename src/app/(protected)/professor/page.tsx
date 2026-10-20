@@ -29,7 +29,7 @@ export default async function ProfessorPage() {
   return (
     <ProfessorShell>
       <PageMain bottom="pb-[60px]">
-        <PageHeading title="Dashboard" subtitle={`Welcome back, ${profile.display_name}!`} />
+        <PageHeading title="Home" subtitle={`Welcome back, ${profile.display_name}!`} />
 
         <StatGrid>
           <StatCard symbol="W" value={workspaces.data.length} label="Total workspaces" detail="Owned and joined" />

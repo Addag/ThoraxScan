@@ -20,7 +20,7 @@ export function StudentShell({
       navLabel="Main menu"
       navAriaLabel="Student navigation"
       navItems={[
-        { label: "Dashboard", href: "/student", icon: "dashboard", active: activeItem === "dashboard" },
+        { label: "Home", href: "/student", icon: "dashboard", active: activeItem === "dashboard" },
         { label: "Activities", href: "/student/activities", icon: "activities", active: activeItem === "activities" },
         { label: "Learning mode", href: "/student/learning", icon: "learning", active: activeItem === "learning" },
         { label: "Attention maps", href: "/student/attention", icon: "attention", active: activeItem === "attention" },

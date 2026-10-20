@@ -21,7 +21,7 @@ export function ProfessorShell({
       navAriaLabel="Professor navigation"
       navItems={[
         { label: "Student Reviews", href: "/professor/submissions", icon: "reviews", active: activeItem === "submissions" },
-        { label: "Dashboard", href: "/professor", icon: "dashboard", active: activeItem === "dashboard" },
+        { label: "Home", href: "/professor", icon: "dashboard", active: activeItem === "dashboard" },
         { label: "Activities", href: "/professor/activities", icon: "activities", active: activeItem === "activities" },
         { label: "Learning mode", href: "/professor/learning", icon: "learning", active: activeItem === "learning" },
         { label: "Attention maps", href: "/professor/attention", icon: "attention", active: activeItem === "attention" },

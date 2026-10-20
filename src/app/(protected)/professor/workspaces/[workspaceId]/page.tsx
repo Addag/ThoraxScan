@@ -99,7 +99,7 @@ export default async function ProfessorWorkspacePage({
   return (
     <ProfessorShell>
       <PageMain top="pt-9">
-        <Link className={backLinkClass} href="/professor">← Back to dashboard</Link>
+        <Link className={backLinkClass} href="/professor">← Back to home</Link>
 
         <section className={`${panelBase} flex items-start justify-between gap-10 border-(--border-shell) p-[28px_30px] max-[1000px]:flex-col max-[700px]:p-5`}>
           <div>
