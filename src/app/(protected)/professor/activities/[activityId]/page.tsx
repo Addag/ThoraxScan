@@ -19,7 +19,6 @@ import {
 import { ProfessorShell } from "@/components/professor/professor-shell";
 import { getProfessorActivity } from "@/lib/activities/server";
 import { requireRole } from "@/lib/auth/server";
-import { getOwnAccountSettings } from "@/lib/settings/server";
 import { getProfessorWorkspaces } from "@/lib/workspaces/server";
 import { ActivityAIStatus } from "@/components/activities/activity-ai-status";
 import { PageMain } from "@/components/dashboard-ui";
@@ -40,10 +39,9 @@ export default async function ProfessorActivityPage({
   const { activityId } = await params;
   if (!uuidPattern.test(activityId)) notFound();
 
-  const [activity, workspaces, accountSettings] = await Promise.all([
+  const [activity, workspaces] = await Promise.all([
     getProfessorActivity(activityId),
     getProfessorWorkspaces(profile.id),
-    getOwnAccountSettings(profile.id),
   ]);
   if (!activity) notFound();
 
@@ -69,7 +67,6 @@ export default async function ProfessorActivityPage({
               imageError={activity.imageError}
               title={activity.title}
               status={activity.caseUploadStatus}
-              darkImageBackground={accountSettings.settings.darkImageBackground}
             />
             {activity.status === "draft" ? <CaseUploadForm activityId={activity.id} caseId={activity.caseId} /> : null}
             <ActivityAIStatus activityId={activity.id} imageUrl={activity.imageUrl} activityStatus={activity.status} initial={activity.aiStatus} />

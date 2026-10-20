@@ -17,7 +17,7 @@ import {
 } from "@/lib/settings/types";
 import Link from "next/link";
 
-const tabOrder = ["profile", "display", "privacy"] as const;
+const tabOrder = ["profile", "privacy"] as const;
 type SettingsTab = (typeof tabOrder)[number];
 
 const panelClass = "border border-(--border-strong) rounded-[10px] [background:var(--glass-surface)] backdrop-blur-[18px] backdrop-saturate-[135%] shadow-(--glass-shadow)";
@@ -34,14 +34,6 @@ function SettingsIcon({ tab }: { tab: SettingsTab }) {
       <svg className={iconClass} aria-hidden="true" viewBox="0 0 24 24">
         <circle cx="12" cy="7" r="3.5" />
         <path d="M5.5 20v-2.5a6.5 6.5 0 0 1 13 0V20Z" />
-      </svg>
-    );
-  }
-  if (tab === "display") {
-    return (
-      <svg className={iconClass} aria-hidden="true" viewBox="0 0 24 24">
-        <rect x="2.5" y="3.5" width="19" height="14" rx="2.5" />
-        <path d="M8 21h8M12 17.5V21" />
       </svg>
     );
   }
@@ -68,13 +60,9 @@ export function SettingsForm({
   const [activeTab, setActiveTab] = useState<SettingsTab>("profile");
   const [displayName, setDisplayName] = useState(initialDisplayName);
   const [workPhone, setWorkPhone] = useState(initialSettings.workPhone ?? "");
-  const [darkImageBackground, setDarkImageBackground] = useState(
-    initialSettings.darkImageBackground,
-  );
   const [savedValues, setSavedValues] = useState({
     displayName: initialDisplayName,
     workPhone: initialSettings.workPhone ?? "",
-    darkImageBackground: initialSettings.darkImageBackground,
   });
   const submitAction = useCallback(
     async (previousState: SettingsActionState, formData: FormData) => {
@@ -83,11 +71,9 @@ export function SettingsForm({
         const nextValues = {
           displayName: nextState.savedValues.displayName,
           workPhone: nextState.savedValues.workPhone ?? "",
-          darkImageBackground: nextState.savedValues.darkImageBackground,
         };
         setDisplayName(nextValues.displayName);
         setWorkPhone(nextValues.workPhone);
-        setDarkImageBackground(nextValues.darkImageBackground);
         setSavedValues(nextValues);
       }
       return nextState;
@@ -102,8 +88,7 @@ export function SettingsForm({
 
   const isDirty =
     displayName !== savedValues.displayName ||
-    workPhone !== savedValues.workPhone ||
-    darkImageBackground !== savedValues.darkImageBackground;
+    workPhone !== savedValues.workPhone;
 
   function selectTab(tab: SettingsTab, index: number) {
     setActiveTab(tab);
@@ -203,37 +188,6 @@ export function SettingsForm({
             </label>
           ) : null}
         </div>
-      </section>
-
-      <section
-        aria-labelledby="settings-tab-display"
-        className={`${panelClass} min-h-[247px] p-[25px] max-[600px]:p-5`}
-        hidden={activeTab !== "display"}
-        id="settings-panel-display"
-        role="tabpanel"
-        tabIndex={0}
-      >
-        <div className={panelHeadingClass}>
-          <h2>Display</h2>
-          <p>Choose how teaching-case images are framed in your activity views.</p>
-        </div>
-        <label className="grid cursor-pointer grid-cols-[minmax(0,1fr)_auto_54px] items-center gap-[13px] border-t border-t-(--border-subtle) py-[30px] pb-2.5">
-          <span className="grid gap-1">
-            <strong className="text-[18px]">Dark image background</strong>
-            <small className="text-[12px] text-(--text-muted)">Use a dark neutral frame around chest X-ray previews.</small>
-          </span>
-          <input
-            checked={darkImageBackground}
-            disabled={pending}
-            className="peer absolute size-px overflow-hidden opacity-0"
-            name="darkImageBackground"
-            onChange={(event) => setDarkImageBackground(event.target.checked)}
-            role="switch"
-            type="checkbox"
-            value="true"
-          />
-          <span className="relative block h-[30px] w-[54px] rounded-full border border-[#737987] light:border-(--border-strong) bg-[#6d7078] transition-colors after:absolute after:top-[3px] after:left-[3px] after:size-[22px] after:rounded-full after:bg-white after:transition-transform peer-checked:border-[#219eff] peer-checked:bg-[#0a65bd] peer-checked:after:translate-x-6 peer-focus-visible:outline peer-focus-visible:outline-3 peer-focus-visible:outline-(--focus-ring) peer-focus-visible:outline-offset-4" aria-hidden="true" />
-        </label>
       </section>
 
       <section

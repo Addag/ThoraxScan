@@ -12,9 +12,9 @@ Authenticated settings draft → role-aware validation and atomic RPC → update
 
 ## Steps
 
-1. The shared form retains Profile and Display drafts across accessible tab changes and submits every editable value through one action in [SettingsForm](<../../src/components/settings/settings-form.tsx:46>).
+1. The shared form retains Profile drafts across accessible tab changes and submits every editable value through one action in [SettingsForm](<../../src/components/settings/settings-form.tsx:46>).
 2. The Server Action rechecks Supabase claims and the current profile role, runs shared display-name/phone validation, and calls only the authenticated settings RPC in [the settings action](<../../src/app/(protected)/settings/actions.ts:10>).
-3. The security-definer RPC repeats normalization and role validation, rejects unauthenticated/invalid requests before mutation, updates `profiles`, and upserts `account_settings` within one transaction in [the migration](<../../supabase/migrations/20260830121651_shared_account_settings.sql:33>).
+3. The security-definer RPC repeats normalization and role validation, rejects unauthenticated/invalid requests before mutation, updates `profiles`, and upserts `account_settings` within one transaction in [the migration](<../../supabase/migrations/20261021120000_drop_dark_image_background.sql:3>).
 4. The action revalidates the caller's role root and settings page, returns normalized saved values, and the client announces success or failure without discarding unsaved drafts.
 
 ## Consumes
@@ -26,13 +26,12 @@ Authenticated settings draft → role-aware validation and atomic RPC → update
 ## Produces
 
 - Normalized display name and one self-private account-settings row.
-- Saved image-background preference consumed by authorized activity previews.
 
 ## If you change this
 
 ### Hits
 
-- Shared validation, Server Action result state, RPC authorization/atomicity, both settings routes, role dashboards, and X-ray preview framing.
+- Shared validation, Server Action result state, RPC authorization/atomicity, both settings routes, and role dashboards.
 
 ### Does not hit
 

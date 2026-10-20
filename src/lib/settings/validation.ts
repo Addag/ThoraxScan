@@ -32,12 +32,10 @@ export function validateWorkPhone(value: string) {
 export function validateSettingsInput({
   displayName,
   workPhone,
-  darkImageBackground,
   role,
 }: {
   displayName: string;
   workPhone: string;
-  darkImageBackground: boolean;
   role: AppRole;
 }):
   | { valid: true; values: SavedSettingsValues }
@@ -69,7 +67,6 @@ export function validateSettingsInput({
     values: {
       displayName: normalizeDisplayName(displayName),
       workPhone: normalizedWorkPhone,
-      darkImageBackground,
     },
   };
 }

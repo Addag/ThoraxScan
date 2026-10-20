@@ -82,25 +82,23 @@ export function XrayCasePreview({
   title,
   status,
   imageError = false,
-  darkImageBackground = true,
 }: {
   imageUrl: string | null;
   title: string;
   status?: string | null;
   imageError?: boolean;
-  darkImageBackground?: boolean;
 }) {
   return (
     <section className={`${glassPanelClass} border-(--border-shell)`} aria-labelledby="xray-preview-title">
       <ActivityPanelTitle icon="◉" title="Chest X-Ray Image" titleId="xray-preview-title" />
-      <div className={`m-[9px] aspect-[1.48/1] overflow-hidden border-[5px] ${darkImageBackground ? "border-[#080a0e] bg-[#0f1622]" : "border-[#c4cad4] bg-[#e5e9ef]"}`}>
+      <div className={`m-[9px] aspect-[1.48/1] overflow-hidden border-[5px] border-[#080a0e] bg-[#0f1622]`}>
         {imageUrl ? (
           // Signed URLs are short-lived and intentionally bypass the image optimizer.
           // eslint-disable-next-line @next/next/no-img-element
           <img className="block size-full object-contain" src={imageUrl} alt={`Frontal chest X-ray for ${title}`} />
         ) : (
-          <div className={`grid size-full place-items-center content-center gap-[5px] p-[22px] text-center ${darkImageBackground ? "text-[#aeb6c5]" : "text-[#3d4554]"}`}>
-            <span className={`text-[34px] font-light ${darkImageBackground ? "text-white" : "text-[#1f2633]"}`} aria-hidden="true">＋</span>
+          <div className={`grid size-full place-items-center content-center gap-[5px] p-[22px] text-center text-[#aeb6c5]`}>
+            <span className={`text-[34px] font-light text-white`} aria-hidden="true">＋</span>
             <strong>{imageError ? "Preview unavailable" : "No case image yet"}</strong>
             <small className="text-[10px]">{imageError ? "Reload to request a new signed preview URL." : "Upload a de-identified frontal JPEG or PNG."}</small>
           </div>

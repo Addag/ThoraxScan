@@ -20,14 +20,14 @@ import { SettingsForm } from "./settings-form";
 const baseProps = {
   email: "student@example.com",
   initialDisplayName: "Ada Student",
-  initialSettings: { workPhone: null, darkImageBackground: true },
+  initialSettings: { workPhone: null },
   loadError: null,
   role: "student" as const,
 };
 
 test.beforeEach(() => {
   updateSettings.mockReset();
-  updateSettings.mockResolvedValue({ status: "success", message: "Settings saved.", savedValues: { displayName: "Ada Student", workPhone: null, darkImageBackground: true } });
+  updateSettings.mockResolvedValue({ status: "success", message: "Settings saved.", savedValues: { displayName: "Ada Student", workPhone: null } });
 });
 
 test("starts on Profile and moves tabs with click and keyboard navigation", async () => {
@@ -35,10 +35,12 @@ test("starts on Profile and moves tabs with click and keyboard navigation", asyn
 
   await expect.element(page.getByRole("tab", { name: "Profile" })).toHaveAttribute("aria-selected", "true");
   await expect.element(page.getByText("Update the account details shown throughout your ThoraxScan workspace.")).toBeVisible();
-  await page.getByRole("tab", { name: "Display" }).click();
-  await expect.element(page.getByRole("tab", { name: "Display" })).toHaveAttribute("aria-selected", "true");
-  await expect.element(page.getByText("Choose how teaching-case images are framed in your activity views.")).toBeVisible();
-  await userEvent.keyboard("{ArrowRight}");
+  await page.getByRole("tab", { name: "Privacy" }).click();
+  await expect.element(page.getByRole("tab", { name: "Privacy" })).toHaveAttribute("aria-selected", "true");
+  await expect.element(page.getByText("Current data handling based on the features that are implemented today.")).toBeVisible();
+  await userEvent.keyboard("{ArrowLeft}");
+  await expect.element(page.getByRole("tab", { name: "Profile" })).toHaveFocus();
+  await userEvent.keyboard("{End}");
   await expect.element(page.getByRole("tab", { name: "Privacy" })).toHaveFocus();
   await userEvent.keyboard("{Home}");
   await expect.element(page.getByRole("tab", { name: "Profile" })).toHaveFocus();
@@ -71,17 +73,6 @@ test("disables controls while saving and returns to clean state after success", 
   await page.getByLabelText("Full name").fill("Ada Updated");
   await page.getByRole("button", { name: "Save changes" }).click();
   await expect.element(page.getByRole("button", { name: "Saving…" })).toBeDisabled();
-  finish({ status: "success", message: "Settings saved.", savedValues: { displayName: "Ada Updated", workPhone: null, darkImageBackground: true } });
+  finish({ status: "success", message: "Settings saved.", savedValues: { displayName: "Ada Updated", workPhone: null } });
   await expect.element(page.getByRole("button", { name: "Save changes" })).toBeDisabled();
-});
-
-test("toggles display background and submits the updated value", async () => {
-  await render(<SettingsForm {...baseProps} />);
-  await page.getByRole("tab", { name: "Display" }).click();
-  const toggle = page.getByRole("switch", { name: "Dark image background" });
-  await toggle.click();
-  await expect.element(toggle).not.toBeChecked();
-  await page.getByRole("button", { name: "Save changes" }).click();
-  const formData = updateSettings.mock.calls.at(-1)?.[1] as FormData;
-  expect(formData.get("darkImageBackground")).toBeNull();
 });

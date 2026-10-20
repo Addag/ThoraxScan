@@ -1,6 +1,5 @@
 export type AccountSettings = {
   workPhone: string | null;
-  darkImageBackground: boolean;
 };
 
 export type SettingsField = "displayName" | "workPhone";
@@ -23,5 +22,4 @@ export const initialSettingsActionState: SettingsActionState = {
 
 export const defaultAccountSettings: AccountSettings = {
   workPhone: null,
-  darkImageBackground: true,
 };

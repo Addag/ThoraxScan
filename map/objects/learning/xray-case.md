@@ -23,7 +23,7 @@ Generated object paths and a separate audit row let the browser upload image byt
 - The Professor may pick the image from the [Built-in X-ray library](built-in-xray-library.md); it arrives as an ordinary `File`, and the row is still stamped `frontal` even for a lateral pick.
 - On a draft, `removeActivityCaseAction` detaches the attached case and deletes its Storage object. If deletion fails, it returns a `cleanup_pending` state that the form retries ("Retry cleanup"). The Professor can then upload or pick another image; see [removal action](<../../../src/app/(protected)/professor/activities/actions.ts:433>) and [CaseUploadForm](<../../../src/components/professor/activity-forms.tsx:149>).
 - Server confirmation downloads the reserved object and uses the runtime `sharp` dependency to reject undecodable or structurally unsupported files before database confirmation in [the confirmation action](<../../../src/app/(protected)/professor/activities/actions.ts:367>) and [package manifest](<../../../package.json:17>).
-- Authorized Student and Professor previews read the caller's [Account settings](../runtime/account-settings.md) and apply the saved dark/light frame without changing the signed image or Storage path in [XrayCasePreview](<../../../src/components/activities/activity-ui.tsx:59>).
+- Authorized Student and Professor previews render the signed image in a fixed dark frame without changing the signed image or Storage path in [XrayCasePreview](<../../../src/components/activities/activity-ui.tsx:80>).
 
 ## Connected to
 

@@ -38,7 +38,6 @@ export async function updateAccountSettingsAction(
   const validation = validateSettingsInput({
     displayName: String(formData.get("displayName") ?? ""),
     workPhone: String(formData.get("workPhone") ?? ""),
-    darkImageBackground: formData.get("darkImageBackground") === "true",
     role: profile.role,
   });
 
@@ -47,7 +46,6 @@ export async function updateAccountSettingsAction(
   const { error } = await supabase.rpc("update_own_account_settings", {
     new_display_name: validation.values.displayName,
     new_work_phone: validation.values.workPhone,
-    new_dark_image_background: validation.values.darkImageBackground,
   });
 
   if (error) {

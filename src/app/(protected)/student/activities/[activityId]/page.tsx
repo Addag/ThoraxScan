@@ -17,7 +17,6 @@ import {
 import { StudentShell } from "@/components/student/student-shell";
 import { getStudentActivity } from "@/lib/activities/server";
 import { requireRole } from "@/lib/auth/server";
-import { getOwnAccountSettings } from "@/lib/settings/server";
 import { ActivityAIFeedback } from "@/components/activities/activity-ai-feedback";
 import { PageMain } from "@/components/dashboard-ui";
 
@@ -33,13 +32,12 @@ export default async function StudentActivityPage({
 }: {
   params: Promise<{ activityId: string }>;
 }) {
-  const profile = await requireRole("student");
+  await requireRole("student");
   const { activityId } = await params;
   if (!uuidPattern.test(activityId)) notFound();
 
-  const [activity, accountSettings, facultyEvaluation] = await Promise.all([
+  const [activity, facultyEvaluation] = await Promise.all([
     getStudentActivity(activityId),
-    getOwnAccountSettings(profile.id),
     getStudentActivityFacultyEvaluation(activityId),
   ]);
   if (!activity) notFound();
@@ -71,7 +69,6 @@ export default async function StudentActivityPage({
               imageUrl={activity.imageUrl}
               imageError={activity.imageError}
               title={activity.title}
-              darkImageBackground={accountSettings.settings.darkImageBackground}
             />
             <ActivityAIFeedback activityId={activity.id} imageUrl={activity.imageUrl} initial={activity.aiFeedback} />
           </div>

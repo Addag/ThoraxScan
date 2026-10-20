@@ -33,7 +33,6 @@ describe("settings validation", () => {
     const result = validateSettingsInput({
       displayName: "Ada Student",
       workPhone: "+63 917 555 0101",
-      darkImageBackground: true,
       role: "student",
     });
 
@@ -48,7 +47,6 @@ describe("settings validation", () => {
       validateSettingsInput({
         displayName: "  Grace Professor  ",
         workPhone: " +63 2 8123 4567 ",
-        darkImageBackground: false,
         role: "professor",
       }),
     ).toEqual({
@@ -56,7 +54,6 @@ describe("settings validation", () => {
       values: {
         displayName: "Grace Professor",
         workPhone: "+63 2 8123 4567",
-        darkImageBackground: false,
       },
     });
   });
