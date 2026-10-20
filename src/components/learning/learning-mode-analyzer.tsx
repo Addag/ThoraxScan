@@ -84,11 +84,6 @@ export function LearningModeAnalyzer() {
 
   return <section className="grid grid-cols-2 items-start gap-8 max-[1000px]:gap-5 max-[800px]:grid-cols-1" aria-label="Learning Mode practice">
     <div className="min-w-0">
-      <div className="grid grid-cols-[1fr_1fr] gap-2 rounded-[5px] bg-[#1d2430] p-[7px] text-center text-[22px]" aria-label="Practice availability">
-        <span className="bg-[#174e8d] p-[7px] font-extrabold">Practice</span>
-        <button className="cursor-not-allowed border-0 bg-none text-[#aebbd0]" type="button" disabled aria-describedby="learning-history-note">History</button>
-      </div>
-      <p id="learning-history-note" className="mt-[7px] mb-[18px] text-[12px] text-(--text-muted)">History unavailable · practice results are not saved.</p>
       <button className="transition-[filter] duration-160 not-disabled:hover:brightness-115 mb-[26px] w-full cursor-pointer rounded-[9px] border-0 bg-brand px-3.5 py-[17px] text-[22px] font-bold text-white max-[1000px]:text-[19px]" type="button" onClick={() => inputRef.current?.click()}>Use Local X-Ray Images</button>
       <div className={panelClass}>
         <h2 className="m-0 flex items-center gap-4 border-b border-b-[#3e4759] px-[18px] py-3.5 text-[16px] font-extrabold"><img src="/images/learning/eye.svg" alt="" width="26" height="26" /> Select a Chest X-Ray</h2>
