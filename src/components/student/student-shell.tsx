@@ -24,7 +24,7 @@ export function StudentShell({
         { label: "Activities", href: "/student/activities", icon: "activities", active: activeItem === "activities" },
         { label: "Learning mode", href: "/student/learning", icon: "learning", active: activeItem === "learning" },
         { label: "Attention maps", href: "/student/attention", icon: "attention", active: activeItem === "attention" },
-        { label: "Settings", href: "/student/settings", icon: "settings", active: activeItem === "settings" },
+        { label: "User Profile", href: "/student/settings", icon: "settings", active: activeItem === "settings" },
       ]}
       sectionLabel={sectionLabel}
       sectionDescription={sectionDescription}

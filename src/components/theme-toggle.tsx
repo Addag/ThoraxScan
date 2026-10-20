@@ -35,7 +35,7 @@ function ThemeIcon({ className = iconClass }: { className?: string }) {
   );
 }
 
-/** Labelled switch on the Settings page. */
+/** Labelled switch on the User Profile page. */
 export function ThemeToggle() {
   useReapplyTheme();
   return (

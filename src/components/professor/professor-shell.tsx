@@ -25,7 +25,7 @@ export function ProfessorShell({
         { label: "Activities", href: "/professor/activities", icon: "activities", active: activeItem === "activities" },
         { label: "Learning mode", href: "/professor/learning", icon: "learning", active: activeItem === "learning" },
         { label: "Attention maps", href: "/professor/attention", icon: "attention", active: activeItem === "attention" },
-        { label: "Settings", href: "/professor/settings", icon: "settings", active: activeItem === "settings" },
+        { label: "User Profile", href: "/professor/settings", icon: "settings", active: activeItem === "settings" },
       ]}
       sectionLabel={sectionLabel}
       sectionDescription={sectionDescription}

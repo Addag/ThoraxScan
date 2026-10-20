@@ -16,7 +16,7 @@ export async function RoleSettingsPage({ role }: { role: AppRole }) {
     >
       <header className="mb-[34px] flex items-end justify-between gap-6 max-[600px]:mb-6 max-[600px]:items-start max-[600px]:flex-col">
         <div>
-          <h1 className="m-0 text-[clamp(28px,4vw,38px)] leading-[1.1]">Settings</h1>
+          <h1 className="m-0 text-[clamp(28px,4vw,38px)] leading-[1.1]">User Profile</h1>
           <p className="mt-1.5 mb-0 text-[13px] leading-[1.4] text-(--text-muted)">Manage your account profile, display preferences, and privacy information.</p>
         </div>
         <time className="flex-none rounded bg-[rgba(85,85,85,0.75)] light:bg-(--surface-sunken) px-[15px] py-[9px] text-[11px] text-(--text-primary) max-[600px]:self-start" dateTime={new Date().toISOString().slice(0, 10)}>
@@ -37,7 +37,7 @@ export async function RoleSettingsPage({ role }: { role: AppRole }) {
     return (
       <ProfessorShell
         activeItem="settings"
-        sectionLabel="Home / Settings"
+        sectionLabel="Home / User Profile"
         sectionDescription="Teaching account preferences"
       >
         {content}
@@ -48,7 +48,7 @@ export async function RoleSettingsPage({ role }: { role: AppRole }) {
   return (
     <StudentShell
       activeItem="settings"
-      sectionLabel="Home / Settings"
+      sectionLabel="Home / User Profile"
       sectionDescription="Learning account preferences"
     >
       {content}

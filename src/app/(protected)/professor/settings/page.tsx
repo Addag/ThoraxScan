@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { RoleSettingsPage } from "@/components/settings/settings-page";
 
 export const metadata: Metadata = {
-  title: "Professor settings | ThoraxScan",
+  title: "Professor profile | ThoraxScan",
 };
 
 export default function ProfessorSettingsPage() {
