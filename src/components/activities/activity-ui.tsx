@@ -5,7 +5,7 @@ import type { ActivityAIStatus } from "@/lib/activity-ai/types";
 import { glassPanelClass } from "@/components/dashboard-ui";
 
 export function ActivityPanelTitle({ icon, title, titleId }: { icon: string; title: string; titleId: string }) {
-  return <div className="flex min-h-[45px] items-center gap-2.5 border-b border-[#566071] px-[13px]"><span className="text-[20px]" aria-hidden="true">{icon}</span><h2 className="m-0 text-[14px]" id={titleId}>{title}</h2></div>;
+  return <div className="flex min-h-[45px] items-center gap-2.5 border-b border-[#566071] light:border-(--border-subtle) px-[13px]"><span className="text-[20px]" aria-hidden="true">{icon}</span><h2 className="m-0 text-[14px]" id={titleId}>{title}</h2></div>;
 }
 
 export function activityLayoutClass(variant: "default" | "new") {
@@ -16,7 +16,7 @@ export const activityCaseColumnClass = "grid gap-3.5 max-[1050px]:grid-cols-2 ma
 export const activityConfigColumnClass = "grid gap-3.5";
 
 export const activitiesCtaClass =
-  "transition-colors duration-160 hover:bg-[rgba(0,119,255,0.22)] mt-5 flex min-h-[74px] items-center justify-between gap-5 rounded-[9px] border border-brand bg-[rgba(0,119,255,0.12)] px-5 py-4 text-white no-underline";
+  "transition-colors duration-160 hover:bg-[rgba(0,119,255,0.22)] mt-5 flex min-h-[74px] items-center justify-between gap-5 rounded-[9px] border border-brand bg-[rgba(0,119,255,0.12)] px-5 py-4 text-(--text-primary) no-underline";
 
 export function ActivityPageHeading({
   title = "Activities",
@@ -30,11 +30,11 @@ export function ActivityPageHeading({
   return (
     <div className="mb-[22px] flex items-end justify-between gap-6 max-[760px]:flex-col max-[760px]:items-stretch">
       <div>
-        {backHref ? <Link className="transition-colors duration-160 hover:text-white mb-3 inline-block text-[12px] font-extrabold text-[#9fcfff] no-underline" href={backHref}>← Back to activities</Link> : null}
+        {backHref ? <Link className="transition-colors duration-160 hover:text-(--text-primary) mb-3 inline-block text-[12px] font-extrabold text-[#9fcfff] light:text-(--brand-blue-text) no-underline" href={backHref}>← Back to activities</Link> : null}
         <h1 className="m-0 text-[clamp(28px,4vw,38px)] leading-[1.1]">{title}</h1>
-        <p className="mt-1.5 mb-0 text-[13px] leading-[1.4] text-[#c3d0e2]">{description}</p>
+        <p className="mt-1.5 mb-0 text-[13px] leading-[1.4] text-[#c3d0e2] light:text-(--text-secondary)">{description}</p>
       </div>
-      <time className="flex-none rounded-[4px] bg-[rgba(85,85,85,0.75)] px-[15px] py-[9px] text-[11px] text-white max-[760px]:self-start" dateTime={new Date().toISOString().slice(0, 10)}>
+      <time className="flex-none rounded-[4px] bg-[rgba(85,85,85,0.75)] light:bg-(--surface-sunken) px-[15px] py-[9px] text-[11px] text-(--text-primary) max-[760px]:self-start" dateTime={new Date().toISOString().slice(0, 10)}>
         {new Intl.DateTimeFormat("en-US", { dateStyle: "full" }).format(new Date())}
       </time>
     </div>
@@ -56,12 +56,12 @@ export function ActivityStepRail({ role, submissionStatus = "Not started", aiSta
         ];
 
   return (
-    <ol className="m-0 mb-7 grid min-h-24 list-none grid-cols-3 rounded-[11px] border border-[#aeb2b8] p-0 [background:var(--glass-inset)] shadow-(--glass-inset-shadow) max-[760px]:grid-cols-1 max-[760px]:py-2.5" aria-label="Activity stages">
+    <ol className="m-0 mb-7 grid min-h-24 list-none grid-cols-3 rounded-[11px] border border-[#aeb2b8] light:border-(--border-strong) p-0 [background:var(--glass-inset)] shadow-(--glass-inset-shadow) max-[760px]:grid-cols-1 max-[760px]:py-2.5" aria-label="Activity stages">
       {steps.map(([number, label, state]) => (
         <li className={`relative grid min-w-0 grid-cols-[44px_minmax(0,1fr)] content-center items-center gap-x-3.5 px-[34px] py-[19px] max-[760px]:min-h-[70px] max-[760px]:px-5 max-[760px]:py-3 ${state === "future" ? "opacity-70" : ""} ${number !== "3" ? "after:absolute after:top-1/2 after:-right-[30px] after:z-[1] after:h-px after:w-[60px] after:bg-[#58606b] after:content-[''] max-[760px]:after:bottom-[-8px] max-[760px]:after:left-[41px] max-[760px]:after:top-auto max-[760px]:after:right-auto max-[760px]:after:h-4 max-[760px]:after:w-px" : ""}`} key={label}>
           <span className="row-span-2 grid size-11 place-items-center rounded-full bg-brand text-[16px] font-extrabold text-white" aria-hidden="true">{number}</span>
           <strong className="text-[15px]">{label}</strong>
-          {state === "future" ? <small className="mt-0.5 text-[10px] text-[#aeb6c5]">{role === "student" ? "Locked until final submission" : "Future milestone"}</small> : null}
+          {state === "future" ? <small className="mt-0.5 text-[10px] text-[#aeb6c5] light:text-(--text-muted)">{role === "student" ? "Locked until final submission" : "Future milestone"}</small> : null}
         </li>
       ))}
     </ol>
@@ -70,9 +70,9 @@ export function ActivityStepRail({ role, submissionStatus = "Not started", aiSta
 
 export function ActivityStatusBadge({ status }: { status: ActivityStatus }) {
   const colors = {
-    draft: "text-[#ffd36a] bg-[rgba(255,211,106,0.09)]",
-    published: "text-[#5fff77] bg-[rgba(95,255,119,0.08)]",
-    archived: "text-[#aab1bf] bg-[rgba(170,177,191,0.08)]",
+    draft: "text-[#ffd36a] light:text-(--status-warning-text) bg-[rgba(255,211,106,0.09)]",
+    published: "text-[#5fff77] light:text-(--status-success-text) bg-[rgba(95,255,119,0.08)]",
+    archived: "text-[#aab1bf] light:text-(--text-muted) bg-[rgba(170,177,191,0.08)]",
   } as const;
   return <span className={`inline-flex items-center rounded-[999px] border border-current px-[9px] py-1.5 text-[10px] font-extrabold uppercase leading-none tracking-[0.08em] ${colors[status]}`}>{status}</span>;
 }
@@ -91,7 +91,7 @@ export function XrayCasePreview({
   darkImageBackground?: boolean;
 }) {
   return (
-    <section className={`${glassPanelClass} border-[#33425c]`} aria-labelledby="xray-preview-title">
+    <section className={`${glassPanelClass} border-(--border-shell)`} aria-labelledby="xray-preview-title">
       <ActivityPanelTitle icon="◉" title="Chest X-Ray Image" titleId="xray-preview-title" />
       <div className={`m-[9px] aspect-[1.48/1] overflow-hidden border-[5px] ${darkImageBackground ? "border-[#080a0e] bg-[#0f1622]" : "border-[#c4cad4] bg-[#e5e9ef]"}`}>
         {imageUrl ? (
@@ -106,7 +106,7 @@ export function XrayCasePreview({
           </div>
         )}
       </div>
-      {status ? <p className="m-0 border-t border-[#566071] px-3.5 py-2.5 text-[11px] capitalize text-[#aab1bf]">Case status: <strong>{status}</strong></p> : null}
+      {status ? <p className="m-0 border-t border-[#566071] light:border-(--border-subtle) px-3.5 py-2.5 text-[11px] capitalize text-[#aab1bf] light:text-(--text-muted)">Case status: <strong>{status}</strong></p> : null}
     </section>
   );
 }
@@ -122,5 +122,5 @@ export function dueState(dueAt: string | null) {
 }
 
 export function dueStateColor(dueAt: string | null) {
-  return dueState(dueAt) === "Upcoming" ? "text-[#7dff8c]" : dueState(dueAt) === "Overdue" ? "text-[#ff8d95]" : "text-[#aeb6c5]";
+  return dueState(dueAt) === "Upcoming" ? "text-[#7dff8c] light:text-(--status-success-text)" : dueState(dueAt) === "Overdue" ? "text-[#ff8d95] light:text-(--status-error-text)" : "text-[#aeb6c5] light:text-(--text-muted)";
 }

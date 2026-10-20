@@ -61,28 +61,28 @@ export default async function ProfessorActivitiesPage({
       <PageMain>
         <ActivityPageHeading description="Create, publish, and archive chest X-ray activities" />
 
-        <section className="mb-5 flex items-end justify-between gap-6 rounded-[10px] border border-[#33425c] bg-[#18202d] px-5 py-[18px] max-[760px]:flex-col max-[760px]:items-stretch" aria-label="Activity filters">
+        <section className="mb-5 flex items-end justify-between gap-6 rounded-[10px] border border-(--border-shell) bg-(--surface-field) px-5 py-[18px] max-[760px]:flex-col max-[760px]:items-stretch" aria-label="Activity filters">
           <form className="flex items-end gap-3 max-[760px]:flex-col max-[760px]:items-stretch">
             {status ? <input type="hidden" name="status" value={status} /> : null}
-            <label className="grid gap-[7px] text-[11px] text-[#9fa7b5]">
+            <label className="grid gap-[7px] text-[11px] text-[#9fa7b5] light:text-(--text-muted)">
               Workspace
-              <select className="min-h-[39px] min-w-[250px] rounded-[5px] border border-[#6d7480] bg-[#111927] px-[13px] text-white max-[760px]:w-full max-[760px]:min-w-0" name="workspace" defaultValue={workspaceId}>
+              <select className="min-h-[39px] min-w-[250px] rounded-[5px] border border-[#6d7480] light:border-(--border-strong) bg-(--surface-sunken) px-[13px] text-(--text-primary) max-[760px]:w-full max-[760px]:min-w-0" name="workspace" defaultValue={workspaceId}>
                 <option value="">All teaching workspaces</option>
                 {workspacesResult.data.map((workspace) => (
                   <option value={workspace.id} key={workspace.id}>{workspace.name}</option>
                 ))}
               </select>
             </label>
-            <button className="transition-colors duration-160 hover:bg-[#1c2639] min-h-[39px] cursor-pointer rounded-[5px] border border-[#6d7480] bg-[#111927] px-[13px] font-extrabold text-white" type="submit">Apply filter</button>
+            <button className="transition-colors duration-160 hover:bg-[#1c2639] light:hover:bg-(--surface-sunken) min-h-[39px] cursor-pointer rounded-[5px] border border-[#6d7480] light:border-(--border-strong) bg-(--surface-sunken) px-[13px] font-extrabold text-(--text-primary)" type="submit">Apply filter</button>
           </form>
           <Link className={activityButton.primary} href="/professor/activities/new">＋ New activity</Link>
         </section>
 
         <nav className="mb-5 flex gap-2 overflow-x-auto" aria-label="Activity status">
-          <Link className={`transition-colors duration-160 inline-flex min-h-[37px] items-center gap-2 rounded-[6px] border px-[13px] text-[12px] font-extrabold capitalize no-underline ${!status ? "border-brand bg-[rgba(0,119,255,0.18)] text-white" : "border-[#465269] text-[#aeb6c5] hover:bg-white/8"}`} href={hrefForStatus(null)}>All <span className="rounded-[999px] bg-[rgba(255,255,255,0.1)] px-[7px] py-[3px]">{activitiesResult.data.length}</span></Link>
+          <Link className={`transition-colors duration-160 inline-flex min-h-[37px] items-center gap-2 rounded-[6px] border px-[13px] text-[12px] font-extrabold capitalize no-underline ${!status ? "border-brand bg-[rgba(0,119,255,0.18)] text-(--text-primary)" : "border-[#465269] light:border-(--border-subtle) text-[#aeb6c5] light:text-(--text-muted) hover:bg-(--hover-overlay)"}`} href={hrefForStatus(null)}>All <span className="rounded-[999px] bg-[rgba(255,255,255,0.1)] light:bg-(--hover-overlay) px-[7px] py-[3px]">{activitiesResult.data.length}</span></Link>
           {(["draft", "published", "archived"] as const).map((item) => (
-            <Link className={`transition-colors duration-160 inline-flex min-h-[37px] items-center gap-2 rounded-[6px] border px-[13px] text-[12px] font-extrabold capitalize no-underline ${status === item ? "border-brand bg-[rgba(0,119,255,0.18)] text-white" : "border-[#465269] text-[#aeb6c5] hover:bg-white/8"}`} href={hrefForStatus(item)} key={item}>
-              {item} <span className="rounded-[999px] bg-[rgba(255,255,255,0.1)] px-[7px] py-[3px]">{activitiesResult.data.filter((activity) => activity.status === item).length}</span>
+            <Link className={`transition-colors duration-160 inline-flex min-h-[37px] items-center gap-2 rounded-[6px] border px-[13px] text-[12px] font-extrabold capitalize no-underline ${status === item ? "border-brand bg-[rgba(0,119,255,0.18)] text-(--text-primary)" : "border-[#465269] light:border-(--border-subtle) text-[#aeb6c5] light:text-(--text-muted) hover:bg-(--hover-overlay)"}`} href={hrefForStatus(item)} key={item}>
+              {item} <span className="rounded-[999px] bg-[rgba(255,255,255,0.1)] light:bg-(--hover-overlay) px-[7px] py-[3px]">{activitiesResult.data.filter((activity) => activity.status === item).length}</span>
             </Link>
           ))}
         </nav>
@@ -94,18 +94,18 @@ export default async function ProfessorActivitiesPage({
         ) : (
           <div className="grid grid-cols-2 gap-[18px] max-[760px]:grid-cols-1">
             {filteredActivities.map((activity) => (
-              <article className={`${glassPanelClass} border-[#33425c] p-5`} key={activity.id}>
+              <article className={`${glassPanelClass} border-(--border-shell) p-5`} key={activity.id}>
                 <div className="flex items-center justify-between gap-3">
                   <ActivityStatusBadge status={activity.status} />
-                  <span className="text-[11px] leading-[1.4] text-[#c4d0e0]">{activity.hasCase ? "Case attached" : "Case required"}</span>
+                  <span className="text-[11px] leading-[1.4] text-[#c4d0e0] light:text-(--text-secondary)">{activity.hasCase ? "Case attached" : "Case required"}</span>
                 </div>
-                <p className="mx-0 mt-[22px] mb-[5px] text-[11px] leading-[1.4] text-[#c4d0e0]">{activity.workspaceName}</p>
+                <p className="mx-0 mt-[22px] mb-[5px] text-[11px] leading-[1.4] text-[#c4d0e0] light:text-(--text-secondary)">{activity.workspaceName}</p>
                 <h2 className="m-0 min-h-12 text-[20px] leading-[1.2]">{activity.title}</h2>
                 <dl className="my-5 grid grid-cols-2 gap-2.5 max-[520px]:grid-cols-1">
-                  <div className="rounded-[5px] bg-[#111927] p-2.5"><dt className="text-[9px] uppercase leading-[1.4] tracking-[0.06em] text-[#c4d0e0]">Due</dt><dd className="mx-0 mt-1 mb-0 text-[11px] leading-[1.4]">{formatDueDate(activity.dueAt)}</dd></div>
-                  <div className="rounded-[5px] bg-[#111927] p-2.5"><dt className="text-[9px] uppercase leading-[1.4] tracking-[0.06em] text-[#c4d0e0]">Updated</dt><dd className="mx-0 mt-1 mb-0 text-[11px] leading-[1.4]">{new Intl.DateTimeFormat("en-US", { dateStyle: "medium" }).format(new Date(activity.updatedAt))}</dd></div>
+                  <div className="rounded-[5px] bg-(--surface-sunken) p-2.5"><dt className="text-[9px] uppercase leading-[1.4] tracking-[0.06em] text-[#c4d0e0] light:text-(--text-secondary)">Due</dt><dd className="mx-0 mt-1 mb-0 text-[11px] leading-[1.4]">{formatDueDate(activity.dueAt)}</dd></div>
+                  <div className="rounded-[5px] bg-(--surface-sunken) p-2.5"><dt className="text-[9px] uppercase leading-[1.4] tracking-[0.06em] text-[#c4d0e0] light:text-(--text-secondary)">Updated</dt><dd className="mx-0 mt-1 mb-0 text-[11px] leading-[1.4]">{new Intl.DateTimeFormat("en-US", { dateStyle: "medium" }).format(new Date(activity.updatedAt))}</dd></div>
                 </dl>
-                <Link className="transition-colors duration-160 hover:text-white flex items-center justify-between text-[12px] font-extrabold text-[#70bdff] no-underline" href={`/professor/activities/${activity.id}`}>Open activity <span aria-hidden="true">→</span></Link>
+                <Link className="transition-colors duration-160 hover:text-(--text-primary) flex items-center justify-between text-[12px] font-extrabold text-[#70bdff] light:text-(--brand-blue-text) no-underline" href={`/professor/activities/${activity.id}`}>Open activity <span aria-hidden="true">→</span></Link>
               </article>
             ))}
           </div>

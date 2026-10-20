@@ -19,12 +19,12 @@ import {
 } from "@/lib/workspaces/types";
 import { formStatusColor } from "@/components/dashboard-ui";
 
-const fieldLabelClass = "block text-[12px] font-extrabold text-white";
-const fieldInputClass = "min-h-[43px] w-full min-w-0 rounded-[6px] border border-[#66718b] bg-[#0c1320] px-3 text-white aria-invalid:border-[#ff6b6b]";
+const fieldLabelClass = "block text-[12px] font-extrabold text-(--text-primary)";
+const fieldInputClass = "min-h-[43px] w-full min-w-0 rounded-[6px] border border-[#66718b] light:border-(--border-strong) bg-[#0c1320] light:bg-(--surface-raised) px-3 text-(--text-primary) aria-invalid:border-[#ff6b6b]";
 const busyClass = "disabled:cursor-wait disabled:opacity-[0.68]";
 const actionControlsClass = "grid grid-cols-[minmax(0,1fr)_auto] gap-2.5 max-[700px]:grid-cols-1";
-const descriptionClass = "mt-[3px] mb-2.5 text-[11px] text-[#939caf]";
-const inlineButtonClass = `transition-colors duration-160 not-disabled:hover:bg-white/8 cursor-pointer border-0 bg-transparent p-[7px] text-[10px] font-extrabold text-[#ff8d8f] ${busyClass}`;
+const descriptionClass = "mt-[3px] mb-2.5 text-[11px] text-[#939caf] light:text-(--text-muted)";
+const inlineButtonClass = `transition-colors duration-160 not-disabled:hover:bg-(--hover-overlay) cursor-pointer border-0 bg-transparent p-[7px] text-[10px] font-extrabold text-[#ff8d8f] light:text-(--status-error-text) ${busyClass}`;
 const panelBase = "rounded-[10px] border [background:var(--glass-surface)] backdrop-blur-[18px] backdrop-saturate-[135%] shadow-(--glass-shadow)";
 
 function FormStatus({ state, className = "" }: { state: WorkspaceActionState; className?: string }) {
@@ -50,7 +50,7 @@ export function CreateWorkspaceForm() {
       <p className={descriptionClass}>Create a class space that you own and manage.</p>
       <div className={actionControlsClass}>
         <input
-          className={`${fieldInputClass} placeholder:text-[#9ba2b8]`}
+          className={`${fieldInputClass} placeholder:text-[#9ba2b8] light:placeholder:text-(--text-muted)`}
           id="new-workspace-name"
           name="name"
           type="text"
@@ -79,7 +79,7 @@ export function ProfessorRedeemForm() {
       <p className={descriptionClass}>Join a workspace as a co-professor.</p>
       <div className={actionControlsClass}>
         <input
-          className={`${fieldInputClass} placeholder:text-[#9ba2b8]`}
+          className={`${fieldInputClass} placeholder:text-[#9ba2b8] light:placeholder:text-(--text-muted)`}
           id="professor-invitation-code"
           name="code"
           type="text"
@@ -159,9 +159,9 @@ export function InvitationCreateForm({
       <input type="hidden" name="workspaceId" value={workspaceId} />
       <input type="hidden" name="invitedRole" value={invitedRole} />
       <div className="mb-[13px] grid grid-cols-2 gap-3 max-[700px]:grid-cols-1">
-        <label className="flex flex-col gap-1.5 text-[12px] font-extrabold text-white">
+        <label className="flex flex-col gap-1.5 text-[12px] font-extrabold text-(--text-primary)">
           Expires in
-          <span className="flex items-center gap-[7px] text-[11px] font-normal text-[#9aa4b8]">
+          <span className="flex items-center gap-[7px] text-[11px] font-normal text-[#9aa4b8] light:text-(--text-muted)">
             <input
               className={fieldInputClass}
               name="expiresInDays"
@@ -174,7 +174,7 @@ export function InvitationCreateForm({
           </span>
         </label>
         {isStudent ? (
-          <label className="flex flex-col gap-1.5 text-[12px] font-extrabold text-white">
+          <label className="flex flex-col gap-1.5 text-[12px] font-extrabold text-(--text-primary)">
             Maximum uses
             <input
               className={fieldInputClass}
@@ -198,8 +198,8 @@ export function InvitationCreateForm({
       <FormStatus state={state} />
       {state.invitationCode && (
         <div className="mt-3.5 grid grid-cols-[minmax(0,1fr)_auto] gap-x-3 gap-y-2 rounded-[7px] border border-[#0077ff] bg-[rgba(0,119,255,0.18)] p-3 max-[700px]:grid-cols-1" role="status">
-          <strong className="col-span-full text-[11px] uppercase text-[#b9ddff]">Copy this code now</strong>
-          <code className="self-center overflow-hidden text-[14px] text-white text-ellipsis whitespace-nowrap">{state.invitationCode}</code>
+          <strong className="col-span-full text-[11px] uppercase text-[#b9ddff] light:text-(--brand-blue-text)">Copy this code now</strong>
+          <code className="self-center overflow-hidden text-[14px] text-(--text-primary) text-ellipsis whitespace-nowrap">{state.invitationCode}</code>
           <button className={`transition-colors duration-160 not-disabled:hover:bg-[#0e2547] cursor-pointer rounded-[5px] border border-[#76baff] bg-[#071832] px-2.5 py-[7px] text-[10px] font-extrabold text-white ${busyClass}`} type="button" onClick={copyCode}>
             {copied ? "Copied" : "Copy code"}
           </button>
@@ -261,10 +261,10 @@ export function LeaveWorkspaceForm({ workspaceId }: { workspaceId: string }) {
     <form className={`${panelBase} mt-5 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-[18px] border-[#7b3437] p-[19px_24px] max-[700px]:grid-cols-1`} action={formAction}>
       <input type="hidden" name="workspaceId" value={workspaceId} />
       <div>
-        <strong className="text-[13px] text-[#ffb4b4]">Leave this workspace</strong>
-        <p className="mt-1 mb-0 text-[11px] text-[#c4a9ad]">You will need another Professor invitation to rejoin.</p>
+        <strong className="text-[13px] text-[#ffb4b4] light:text-(--status-error-text)">Leave this workspace</strong>
+        <p className="mt-1 mb-0 text-[11px] text-[#c4a9ad] light:text-(--text-muted)">You will need another Professor invitation to rejoin.</p>
       </div>
-      <button className={`transition-colors duration-160 not-disabled:hover:bg-[rgba(160,32,32,0.32)] cursor-pointer rounded-[6px] border border-[#d45b60] bg-[rgba(160,32,32,0.2)] px-3.5 py-2.5 font-extrabold text-[#ffb4b4] ${busyClass}`} type="submit" disabled={pending}>
+      <button className={`transition-colors duration-160 not-disabled:hover:bg-[rgba(160,32,32,0.32)] cursor-pointer rounded-[6px] border border-[#d45b60] bg-[rgba(160,32,32,0.2)] px-3.5 py-2.5 font-extrabold text-[#ffb4b4] light:text-(--status-error-text) ${busyClass}`} type="submit" disabled={pending}>
         {pending ? "Leaving…" : "Leave workspace"}
       </button>
       <FormStatus state={state} className="col-span-full" />

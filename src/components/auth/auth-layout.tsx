@@ -42,7 +42,7 @@ export function AuthLayout({
   const statusClass = messageStatus === "error" ? "border-[#8b2929] bg-[rgba(160,32,32,0.2)] text-[#ffb4b4]" : "border-[#17643a] bg-[rgba(33,135,78,0.2)] text-[#b8f3ce]";
 
   return (
-    <main className="grid min-h-svh grid-cols-2 overflow-x-hidden [background:radial-gradient(ellipse_at_72%_28%,rgb(48_112_255/32%),transparent_42%),radial-gradient(ellipse_at_96%_70%,rgb(143_77_213/25%),transparent_38%),radial-gradient(ellipse_at_16%_55%,rgb(0_135_220/22%),transparent_46%),#030b1d] narrow:block">
+    <main data-theme="dark" className="grid min-h-svh grid-cols-2 overflow-x-hidden [background:radial-gradient(ellipse_at_72%_28%,rgb(48_112_255/32%),transparent_42%),radial-gradient(ellipse_at_96%_70%,rgb(143_77_213/25%),transparent_38%),radial-gradient(ellipse_at_16%_55%,rgb(0_135_220/22%),transparent_46%),#030b1d] narrow:block">
       <section className="relative min-h-[1024px] overflow-hidden [background:linear-gradient(145deg,rgb(24_58_113/18%),rgb(3_8_39/32%))] narrow:min-h-0 narrow:px-6 narrow:pt-20 narrow:pb-[42px] max-[420px]:px-[18px]" aria-label="ThoraxScan introduction">
         <Link className="transition-colors duration-160 hover:text-white absolute top-5 left-[-20px] z-2 w-[215px] text-center text-[13px] font-extrabold leading-4 text-[#aeb6c5] no-underline narrow:top-[18px] narrow:left-[18px] narrow:w-auto" href="/">← Back to home</Link>
         <Brand variant="auth" />

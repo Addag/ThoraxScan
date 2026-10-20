@@ -17,13 +17,16 @@ import {
 } from "@/lib/settings/types";
 import Link from "next/link";
 
+import { ThemeToggle } from "@/components/theme-toggle";
+
 const tabOrder = ["profile", "display", "privacy"] as const;
 type SettingsTab = (typeof tabOrder)[number];
 
-const panelClass = "border border-[#8d9199] rounded-[10px] [background:var(--glass-surface)] backdrop-blur-[18px] backdrop-saturate-[135%] shadow-(--glass-shadow)";
-const panelHeadingClass = "mb-[26px] [&_h2]:m-0 [&_h2]:text-[20px] [&_h2]:capitalize [&_p]:m-0 [&_p]:mt-[3px] [&_p]:text-[13px] [&_p]:text-[#b4bac6]";
-const fieldClass = "grid gap-[7px] text-[13px] text-[#f5f5f5] [&>span>small]:ml-[5px] [&>span>small]:text-[#8f96a3] [&>small:not([data-error])]:text-[10px] [&>small:not([data-error])]:leading-[1.4] [&>small:not([data-error])]:text-[#c4d0e0]";
-const inputClass = "min-h-[38px] w-full rounded-[7px] border border-[rgba(255,255,255,0.49)] bg-[#05070c] px-[11px] py-[7px] text-white [&[readonly]]:bg-[#11151d] [&[readonly]]:text-[#b8beca]";
+const panelClass = "border border-(--border-strong) rounded-[10px] [background:var(--glass-surface)] backdrop-blur-[18px] backdrop-saturate-[135%] shadow-(--glass-shadow)";
+const panelHeadingClass = "mb-[26px] [&_h2]:m-0 [&_h2]:text-[20px] [&_h2]:capitalize [&_p]:m-0 [&_p]:mt-[3px] [&_p]:text-[13px] [&_p]:text-(--text-muted)";
+const fieldClass = "grid gap-[7px] text-[13px] text-(--text-primary) [&>span>small]:ml-[5px] [&>span>small]:text-(--text-disabled) [&>small:not([data-error])]:text-[10px] [&>small:not([data-error])]:leading-[1.4] [&>small:not([data-error])]:text-(--text-secondary)";
+const inputClass = "min-h-[38px] w-full rounded-[7px] border border-(--border-field) bg-(--surface-input) px-[11px] py-[7px] text-(--text-primary) [&[readonly]]:bg-(--surface-input-readonly) [&[readonly]]:text-(--text-muted)";
+const fieldErrorClass = "text-[11px] text-(--status-error-text)";
 const iconClass = "size-6 fill-none stroke-current stroke-[1.6] [stroke-linecap:round] [stroke-linejoin:round]";
 const messageBaseClass = "-mt-[9px] rounded-[6px] px-3 py-2.5 text-[12px]";
 
@@ -122,13 +125,13 @@ export function SettingsForm({
 
   return (
     <form action={formAction} className="grid gap-6" noValidate>
-      <section className={`${panelClass} overflow-hidden after:block after:h-px after:-translate-y-[90px] after:bg-[rgba(151,151,151,0.39)] after:content-['']`} aria-label="Settings categories">
+      <section className={`${panelClass} overflow-hidden after:block after:h-px after:-translate-y-[90px] after:bg-(--border-subtle) after:content-['']`} aria-label="Settings categories">
         <div className="grid gap-5 p-[18px_17px_22px] max-[600px]:gap-[9px] max-[600px]:p-[13px]" role="tablist" aria-label="Account settings">
           {tabOrder.map((tab, index) => (
             <button
               aria-controls={`settings-panel-${tab}`}
               aria-selected={activeTab === tab}
-              className={`transition-colors duration-160 grid min-h-[67px] w-full cursor-pointer grid-cols-[36px_minmax(0,1fr)] items-center rounded-[10px] border px-[22px] text-left text-[20px] font-semibold text-white max-[600px]:min-h-[58px] max-[600px]:px-[14px] max-[600px]:text-[17px] ${activeTab === tab ? "border-[#21aaff] bg-[rgba(70,193,255,0.49)]" : "border-transparent bg-transparent hover:bg-white/8"}`}
+              className={`transition-colors duration-160 grid min-h-[67px] w-full cursor-pointer grid-cols-[36px_minmax(0,1fr)] items-center rounded-[10px] border px-[22px] text-left text-[20px] font-semibold text-(--text-primary) max-[600px]:min-h-[58px] max-[600px]:px-[14px] max-[600px]:text-[17px] ${activeTab === tab ? "border-[#21aaff] bg-[rgba(70,193,255,0.49)]" : "border-transparent bg-transparent hover:bg-(--hover-overlay)"}`}
               id={`settings-tab-${tab}`}
               key={tab}
               onClick={() => setActiveTab(tab)}
@@ -145,7 +148,7 @@ export function SettingsForm({
             </button>
           ))}
         </div>
-        <span className="relative mt-[17px] mb-5 ml-[26px] block size-[52px] rounded-full bg-[linear-gradient(180deg,#56c7ff_0%,#5557b8_100%)]" aria-hidden="true" />
+        <ThemeToggle />
       </section>
 
       <section
@@ -174,7 +177,7 @@ export function SettingsForm({
               value={displayName}
             />
             {state.fieldErrors?.displayName ? (
-              <small data-error="true" className="text-[11px] text-[#ff8d95]" role="alert">{state.fieldErrors.displayName}</small>
+              <small data-error="true" className={fieldErrorClass} role="alert">{state.fieldErrors.displayName}</small>
             ) : null}
           </label>
           <label className={fieldClass}>
@@ -198,7 +201,7 @@ export function SettingsForm({
                 value={workPhone}
               />
               {state.fieldErrors?.workPhone ? (
-                <small data-error="true" className="text-[11px] text-[#ff8d95]" role="alert">{state.fieldErrors.workPhone}</small>
+                <small data-error="true" className={fieldErrorClass} role="alert">{state.fieldErrors.workPhone}</small>
               ) : null}
             </label>
           ) : null}
@@ -217,10 +220,10 @@ export function SettingsForm({
           <h2>Display</h2>
           <p>Choose how teaching-case images are framed in your activity views.</p>
         </div>
-        <label className="grid cursor-pointer grid-cols-[minmax(0,1fr)_auto_54px] items-center gap-[13px] border-t border-t-[rgba(151,151,151,0.39)] py-[30px] pb-2.5">
+        <label className="grid cursor-pointer grid-cols-[minmax(0,1fr)_auto_54px] items-center gap-[13px] border-t border-t-(--border-subtle) py-[30px] pb-2.5">
           <span className="grid gap-1">
             <strong className="text-[18px]">Dark image background</strong>
-            <small className="text-[12px] text-[#9ba3b3]">Use a dark neutral frame around chest X-ray previews.</small>
+            <small className="text-[12px] text-(--text-muted)">Use a dark neutral frame around chest X-ray previews.</small>
           </span>
           <input
             checked={darkImageBackground}
@@ -232,7 +235,7 @@ export function SettingsForm({
             type="checkbox"
             value="true"
           />
-          <span className="relative block h-[30px] w-[54px] rounded-full border border-[#737987] bg-[#6d7078] transition-colors after:absolute after:top-[3px] after:left-[3px] after:size-[22px] after:rounded-full after:bg-white after:transition-transform peer-checked:border-[#219eff] peer-checked:bg-[#0a65bd] peer-checked:after:translate-x-6 peer-focus-visible:outline peer-focus-visible:outline-3 peer-focus-visible:outline-white peer-focus-visible:outline-offset-4" aria-hidden="true" />
+          <span className="relative block h-[30px] w-[54px] rounded-full border border-[#737987] light:border-(--border-strong) bg-[#6d7078] transition-colors after:absolute after:top-[3px] after:left-[3px] after:size-[22px] after:rounded-full after:bg-white after:transition-transform peer-checked:border-[#219eff] peer-checked:bg-[#0a65bd] peer-checked:after:translate-x-6 peer-focus-visible:outline peer-focus-visible:outline-3 peer-focus-visible:outline-(--focus-ring) peer-focus-visible:outline-offset-4" aria-hidden="true" />
         </label>
       </section>
 
@@ -253,24 +256,24 @@ export function SettingsForm({
             <SettingsIcon tab="privacy" />
             <div>
               <strong className="text-[13px]">Private teaching-case storage</strong>
-              <p className="m-0 mt-0.5 text-[12px] leading-[1.35] text-[#e2e9f2]">Approved, de-identified cases use private Supabase Storage with short-lived signed access for authorized activity pages.</p>
+              <p className="m-0 mt-0.5 text-[12px] leading-[1.35] text-(--text-secondary)">Approved, de-identified cases use private Supabase Storage with short-lived signed access for authorized activity pages.</p>
             </div>
           </article>
           <article className="grid min-h-[54px] grid-cols-[26px_minmax(0,1fr)] items-center gap-3 rounded-[5px] border border-[#0d5fc7] bg-[rgba(0,132,255,0.38)] px-3 py-2.5 max-[600px]:items-start">
             <span className="grid size-6 place-items-center rounded-full border border-current" aria-hidden="true">✓</span>
             <div>
               <strong className="text-[13px]">Browser inference foundation</strong>
-              <p className="m-0 mt-0.5 text-[12px] leading-[1.35] text-[#e2e9f2]">Learning Mode can run the active ONNX release in this browser. Authorized activity analysis may persist model results and feedback according to the <Link className="font-semibold underline underline-offset-2" href="/privacy-policy">Privacy Policy</Link>.</p>
+              <p className="m-0 mt-0.5 text-[12px] leading-[1.35] text-(--text-secondary)">Learning Mode can run the active ONNX release in this browser. Authorized activity analysis may persist model results and feedback according to the <Link className="font-semibold underline underline-offset-2" href="/privacy-policy">Privacy Policy</Link>.</p>
             </div>
           </article>
         </div>
       </section>
 
-      {loadError ? <p className={`${messageBaseClass} bg-[rgba(255,55,69,0.12)] text-[#ff9da4]`}>{loadError}</p> : null}
+      {loadError ? <p className={`${messageBaseClass} bg-[rgba(255,55,69,0.12)] text-(--status-error-text)`}>{loadError}</p> : null}
       {state.message ? (
         <p
           aria-live="polite"
-          className={`${messageBaseClass} ${state.status === "error" || state.status === "unauthorized" ? "bg-[rgba(255,55,69,0.12)] text-[#ff9da4]" : state.status === "success" ? "bg-[rgba(0,224,93,0.12)] text-[#8dffba]" : "bg-[rgba(0,119,255,0.14)] text-[#a8d5ff]"}`}
+          className={`${messageBaseClass} ${state.status === "error" || state.status === "unauthorized" ? "bg-[rgba(255,55,69,0.12)] text-(--status-error-text)" : state.status === "success" ? "bg-[rgba(0,224,93,0.12)] text-(--status-success-text)" : "bg-[rgba(0,119,255,0.14)] text-(--status-info-text)"}`}
           role={state.status === "error" || state.status === "unauthorized" ? "alert" : "status"}
         >
           {state.message}

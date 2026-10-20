@@ -16,7 +16,7 @@ export function InvitationForm() {
   return (
     <form action={formAction} noValidate>
       <label className="block text-[13px] font-extrabold" htmlFor="student-invitation-code">Student invitation code</label>
-      <p className="mt-[3px] mb-[9px] text-[11px] text-[#9ba2b8]">Enter the private code shared by your professor.</p>
+      <p className="mt-[3px] mb-[9px] text-[11px] text-[#9ba2b8] light:text-(--text-muted)">Enter the private code shared by your professor.</p>
       <div className="grid grid-cols-[minmax(0,1fr)_auto] gap-2.5 max-[600px]:grid-cols-1">
         <input
           id="student-invitation-code"
@@ -27,7 +27,7 @@ export function InvitationForm() {
           spellCheck={false}
           maxLength={22}
           placeholder="Paste your 22-character code"
-          className="min-h-[45px] w-full rounded-[6px] border border-[#66718b] bg-[#0c1320] px-[13px] text-white placeholder:text-[#9ba2b8] aria-invalid:border-[#ff6b6b]"
+          className="min-h-[45px] w-full rounded-[6px] border border-[#66718b] light:border-(--border-strong) bg-[#0c1320] light:bg-(--surface-raised) px-[13px] text-(--text-primary) placeholder:text-[#9ba2b8] light:placeholder:text-(--text-muted) aria-invalid:border-[#ff6b6b]"
           aria-invalid={Boolean(state.fieldErrors?.code)}
           aria-describedby={state.message ? "student-invitation-status" : undefined}
         />

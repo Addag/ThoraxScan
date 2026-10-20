@@ -29,10 +29,10 @@ export default async function NewProfessorActivityPage() {
           <EmptyState variant="card" error title="A teaching workspace is required">Create or join a workspace before authoring an activity.</EmptyState>
         ) : (
           <div className={activityLayoutClass("new")}>
-            <aside className="rounded-[10px] border border-[#33425c] [background:var(--glass-surface)] backdrop-blur-[18px] backdrop-saturate-[135%] shadow-(--glass-shadow) sticky top-6 p-[25px] max-[1050px]:static">
-              <span className="grid size-[35px] place-items-center rounded-full border border-brand font-extrabold text-[#5eb6ff]" aria-hidden="true">i</span>
+            <aside className="rounded-[10px] border border-(--border-shell) [background:var(--glass-surface)] backdrop-blur-[18px] backdrop-saturate-[135%] shadow-(--glass-shadow) sticky top-6 p-[25px] max-[1050px]:static">
+              <span className="grid size-[35px] place-items-center rounded-full border border-brand font-extrabold text-[#5eb6ff] light:text-(--brand-blue-text)" aria-hidden="true">i</span>
               <h2 className="mx-0 mt-[17px] mb-[7px] text-[20px]">Draft first</h2>
-              <p className="m-0 text-[12px] leading-[1.6] text-[#9ca5b3]">The draft is private to teaching staff. After it is saved, upload one de-identified frontal JPEG or PNG and publish when ready.</p>
+              <p className="m-0 text-[12px] leading-[1.6] text-[#9ca5b3] light:text-(--text-muted)">The draft is private to teaching staff. After it is saved, upload one de-identified frontal JPEG or PNG and publish when ready.</p>
             </aside>
             <ActivityDetailsForm workspaces={workspaces.data} />
           </div>

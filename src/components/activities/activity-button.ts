@@ -3,6 +3,6 @@ const base = "transition-[filter,background-color] duration-160 inline-flex min-
 
 export const activityButton = {
   primary: `${base} not-disabled:hover:brightness-115 border-brand bg-brand text-white`,
-  secondary: `${base} border-[#7d8794] bg-[#202938] not-disabled:hover:bg-[#2b3649] text-white`,
-  danger: `${base} border-[#ff5964] bg-[rgba(255,44,58,0.12)] not-disabled:hover:bg-[rgba(255,44,58,0.22)] text-[#ff7c85]`,
+  secondary: `${base} border-[#7d8794] light:border-(--border-strong) bg-(--surface-raised) not-disabled:hover:bg-[#2b3649] light:not-disabled:hover:bg-(--surface-sunken) text-(--text-primary)`,
+  danger: `${base} border-[#ff5964] bg-[rgba(255,44,58,0.12)] not-disabled:hover:bg-[rgba(255,44,58,0.22)] text-[#ff7c85] light:text-(--status-error-text)`,
 };

@@ -4,7 +4,7 @@ import { useState } from "react";
 import cases from "@/lib/xray-library/cases.json";
 
 const findings = [...new Set(cases.flatMap((item) => Object.entries(item.labels).filter(([, value]) => value === 1).map(([label]) => label)))];
-const focusRing = "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#80caff]";
+const focusRing = "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#80caff] light:focus-visible:outline-(--brand-blue-text)";
 
 export function XrayLibrary({ onSelect, disabled = false, selectedCaseId, onLoadingChange }: {
   onSelect: (file: File, caseId: string) => void;
@@ -43,21 +43,21 @@ export function XrayLibrary({ onSelect, disabled = false, selectedCaseId, onLoad
     <h3 className="m-0 text-[18px]">Built-in X-ray library</h3>
     <p>All JPEG images from CheXpert Small’s validation folder, including frontal and lateral views. Choose a case to use it. Use frontal views for the existing AI practice workflow.</p>
     <label className="grid gap-2 text-[13px]">Filter by view
-      <select className={`w-full min-w-0 rounded-lg border border-[#344158] bg-(--surface-field) p-2.5 text-inherit ${focusRing}`} value={view} onChange={(event) => setView(event.target.value)}>
+      <select className={`w-full min-w-0 rounded-lg border border-[#344158] light:border-(--border-subtle) bg-(--surface-field) p-2.5 text-inherit ${focusRing}`} value={view} onChange={(event) => setView(event.target.value)}>
         <option value="">All views</option>
         <option value="Frontal">Frontal</option>
         <option value="Lateral">Lateral</option>
       </select>
     </label>
     <label className="grid gap-2 text-[13px]">Filter by dataset label
-      <select className={`w-full min-w-0 rounded-lg border border-[#344158] bg-(--surface-field) p-2.5 text-inherit ${focusRing}`} value={filter} onChange={(event) => setFilter(event.target.value)}>
+      <select className={`w-full min-w-0 rounded-lg border border-[#344158] light:border-(--border-subtle) bg-(--surface-field) p-2.5 text-inherit ${focusRing}`} value={filter} onChange={(event) => setFilter(event.target.value)}>
         <option value="">All findings</option>
         {findings.map((finding) => <option key={finding}>{finding}</option>)}
       </select>
     </label>
     <p>{visible.length} of {cases.length} cases</p>
     <div className="grid max-h-[560px] grid-cols-[repeat(auto-fit,minmax(min(100%,180px),1fr))] gap-3 overflow-y-auto p-0.5">
-      {visible.map((item) => <article className="flex min-w-0 flex-col gap-2.5 rounded-lg border border-[#344158] p-3" key={item.id}>
+      {visible.map((item) => <article className="flex min-w-0 flex-col gap-2.5 rounded-lg border border-[#344158] light:border-(--border-subtle) p-3" key={item.id}>
         {/* Serve the original small dataset JPEG without image transformation. */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img className="h-40 w-full rounded-[5px] bg-[#080b10] object-contain" src={item.imageUrl} alt={`${item.title}, ${item.view}${item.projection ? ` ${item.projection}` : ""} chest X-ray`} width={320} height={320} loading="lazy" />
@@ -65,7 +65,7 @@ export function XrayLibrary({ onSelect, disabled = false, selectedCaseId, onLoad
         <details className="text-[12px]"><summary className="cursor-pointer">Dataset reference labels</summary>
           <p>{Object.entries(item.labels).filter(([, value]) => value === 1).map(([label]) => label).join(", ") || "No positive labels recorded"}</p>
         </details>
-        <button className={`transition-colors duration-160 not-disabled:hover:bg-[#2a4560] mt-auto cursor-pointer rounded-md border border-[#477daa] bg-[#20354b] p-[9px] text-inherit disabled:cursor-wait disabled:opacity-50 ${focusRing}`} type="button" disabled={disabled || loading !== null} onClick={() => void select(item)}>
+        <button className={`transition-colors duration-160 not-disabled:hover:bg-[#2a4560] light:not-disabled:hover:bg-(--border-subtle) mt-auto cursor-pointer rounded-md border border-[#477daa] bg-[#20354b] light:bg-(--surface-sunken) p-[9px] text-inherit disabled:cursor-wait disabled:opacity-50 ${focusRing}`} type="button" disabled={disabled || loading !== null} onClick={() => void select(item)}>
           {loading === item.id ? "Loading…" : `Use ${item.title.toLowerCase()}`}
         </button>
       </article>)}

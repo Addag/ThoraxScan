@@ -11,7 +11,7 @@ export function AppSidebar({ children }: { children: ReactNode }) {
 
   return (
     <aside
-      className="group sticky top-0 flex h-svh flex-col border-r border-r-[#33425c] bg-(--glass-shell) px-3.5 pt-6 pb-5 backdrop-blur-[12px] max-[850px]:relative max-[850px]:h-auto max-[850px]:border-r-0 max-[850px]:border-b max-[850px]:border-b-[#33425c] max-[850px]:px-[18px] max-[850px]:py-3.5"
+      className="group sticky top-0 flex h-svh flex-col border-r border-r-(--border-shell) bg-(--glass-shell) px-3.5 pt-6 pb-5 backdrop-blur-[12px] max-[850px]:relative max-[850px]:h-auto max-[850px]:border-r-0 max-[850px]:border-b max-[850px]:border-b-(--border-shell) max-[850px]:px-[18px] max-[850px]:py-3.5"
       data-expanded={expanded}
       onKeyDown={(event) => {
         if (event.key === "Escape" && expanded) {

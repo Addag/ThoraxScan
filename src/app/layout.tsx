@@ -24,7 +24,18 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={`${inter.variable} ${funnelDisplay.variable}`}>
+    <html lang="en" className={`${inter.variable} ${funnelDisplay.variable}`} suppressHydrationWarning>
+      <head>
+        {/* Applies the saved theme before first paint; the settings theme toggle writes the same key. */}
+        <script
+          // text/plain on the client stops React's dev warning; the browser only runs it from the server HTML.
+          type={typeof window === "undefined" ? "text/javascript" : "text/plain"}
+          suppressHydrationWarning
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{if(localStorage.getItem("theme")==="light")document.documentElement.setAttribute("data-theme","light")}catch(e){}})()`,
+          }}
+        />
+      </head>
       <body>
         {children}
         <SpeedInsights />

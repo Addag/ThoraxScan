@@ -1,6 +1,7 @@
 @import "tailwindcss";
 
-:root {
+:root,
+[data-theme="dark"] {
   /* Shell recedes; main panels carry depth; nested cards use only an edge highlight. */
   --glass-shell: rgb(6 15 32 / 86%);
   --glass-surface: linear-gradient(135deg, rgb(65 100 155 / 32%), rgb(10 24 46 / 86%));
@@ -32,6 +33,55 @@
   --disclaimer-yellow: #ffd636;
   --warning-fill: rgba(255, 193, 48, 0.29);
   --purple-accent: #9500da;
+  --border-subtle: rgb(151 151 151 / 39%);
+  --border-shell: #33425c;
+  --border-field: rgb(255 255 255 / 49%);
+  --surface-input: #05070c;
+  --surface-input-readonly: #11151d;
+  --hover-overlay: rgb(255 255 255 / 8%);
+  --focus-ring: #ffffff;
+  --status-error-text: #ff9da4;
+  --status-success-text: #8dffba;
+  --status-info-text: #a8d5ff;
+  --status-warning-text: #ffd166;
+  --status-accent-text: #b16cff;
+  --surface-raised: #202938;
+  --surface-sunken: #111927;
+  color-scheme: dark;
+}
+
+/* Light theme, set on <html> by the inline script in app/layout.tsx. Landing and auth pin data-theme="dark" on their root, which re-applies the dark tokens above. */
+:root[data-theme="light"] {
+  --glass-shell: rgb(255 255 255 / 86%);
+  --glass-surface: linear-gradient(135deg, rgb(255 255 255 / 94%), rgb(224 233 246 / 94%));
+  --glass-inset: linear-gradient(135deg, rgb(255 255 255 / 80%), rgb(230 238 249 / 80%));
+  --glass-inset-shadow: inset 0 1px 0 rgb(255 255 255 / 70%);
+  --glass-shadow: inset 0 1px 0 rgb(255 255 255 / 60%), 0 12px 32px rgb(15 30 60 / 10%);
+  --glass-canvas: #eef2f8;
+  --canvas: #eef2f8;
+  --app-background: #eef2f8;
+  --border-strong: #9aa3b2;
+  --text-primary: #0b1526;
+  --text-secondary: #2c3a52;
+  --text-muted: #4a5870;
+  --text-disabled: #5f6b80;
+  --brand-blue-text: #0a5fc2;
+  --border-subtle: rgb(15 30 60 / 16%);
+  --border-shell: rgb(15 30 60 / 14%);
+  --border-field: rgb(15 30 60 / 30%);
+  --surface-input: #ffffff;
+  --surface-input-readonly: #e6ecf4;
+  --hover-overlay: rgb(15 30 60 / 6%);
+  --focus-ring: #0b1526;
+  --status-error-text: #a8101c;
+  --status-success-text: #08703a;
+  --status-info-text: #0a5fc2;
+  --status-warning-text: #7a4f00;
+  --status-accent-text: #6b21a8;
+  --surface-raised: #ffffff;
+  --surface-sunken: #e6ecf4;
+  --surface-field: #ffffff;
+  color-scheme: light;
 }
 
 @theme inline {
@@ -47,6 +97,8 @@
 @custom-variant tablet (@media (min-width: 1025px) and (max-width: 1320px));
 @custom-variant narrow (@media (max-width: 1024px));
 @custom-variant no-backdrop (@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))));
+/* Light-only overrides; a nested data-theme="dark" (landing, auth) opts its subtree out. */
+@custom-variant light (&:where([data-theme="light"], [data-theme="light"] *):not(:where([data-theme="dark"], [data-theme="dark"] *)));
 
 /* App-wide defaults on top of Tailwind's preflight (box-sizing, margins, form fonts and link colour come from preflight). */
 @layer base {
@@ -54,9 +106,13 @@
     background: var(--canvas);
   }
 
+  body,
+  [data-theme="dark"] {
+    color: var(--text-primary);
+  }
+
   body {
     background: var(--canvas);
-    color: var(--text-primary);
     cursor: default;
     font-family: var(--font-funnel), Arial, sans-serif;
   }
@@ -71,7 +127,7 @@
   }
 
   :is(a, button, input, select, textarea):focus-visible {
-    outline: 3px solid #ffffff;
+    outline: 3px solid var(--focus-ring);
     outline-offset: 4px;
   }
 

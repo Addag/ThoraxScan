@@ -18,7 +18,7 @@ const calloutStyles = {
 
 export default function Home() {
   return (
-    <div className="relative min-h-[max(1024px,100svh)] overflow-hidden [background:var(--landing-bg)] stacked:min-h-svh stacked:overflow-visible">
+    <div data-theme="dark" className="relative min-h-[max(1024px,100svh)] overflow-hidden [background:var(--landing-bg)] stacked:min-h-svh stacked:overflow-visible">
       <header className="relative h-[81px] bg-(--glass-shell) backdrop-blur-[12px] shadow-[inset_0_-1px_0_rgb(255_255_255/8%)] narrow:h-[73px] no-backdrop:[background:#14243e]">
         <Brand variant="landing" />
         <span className="absolute inset-x-0 bottom-0 block h-px w-full [background:url('/images/header-divider.svg')_center/100%_1px_no-repeat]" aria-hidden="true" />

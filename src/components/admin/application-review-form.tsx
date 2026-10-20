@@ -24,7 +24,7 @@ export function ApplicationReviewForm({
   const canApprove = application.email_confirmed && application.membership_count === 0;
 
   return (
-    <form className="mt-4 grid grid-cols-[minmax(0,1fr)_minmax(220px,1fr)] items-start gap-3 border-t border-[#33425c] pt-4 max-[760px]:grid-cols-1" action={formAction} noValidate>
+    <form className="mt-4 grid grid-cols-[minmax(0,1fr)_minmax(220px,1fr)] items-start gap-3 border-t border-(--border-shell) pt-4 max-[760px]:grid-cols-1" action={formAction} noValidate>
       <input type="hidden" name="targetUserId" value={application.user_id} />
       <div className="flex items-center gap-2.5 max-[560px]:flex-col max-[560px]:items-stretch">
         <button
@@ -37,7 +37,7 @@ export function ApplicationReviewForm({
           {pending ? "Reviewing…" : application.status === "rejected" ? "Approve after review" : "Approve"}
         </button>
         {!canApprove && (
-          <small className="text-[10px] text-[#d0ab56]">
+          <small className="text-[10px] text-[#d0ab56] light:text-(--status-warning-text)">
             {!application.email_confirmed
               ? "Email confirmation required"
               : "Existing memberships must be removed"}
@@ -46,8 +46,8 @@ export function ApplicationReviewForm({
       </div>
 
       {application.status === "pending" && (
-        <details className="rounded-[6px] border border-[#633f49] p-2.5">
-          <summary className="cursor-pointer text-[12px] font-extrabold text-[#ffb4b4]">Reject application</summary>
+        <details className="rounded-[6px] border border-[#633f49] light:border-(--border-subtle) p-2.5">
+          <summary className="cursor-pointer text-[12px] font-extrabold text-[#ffb4b4] light:text-(--status-error-text)">Reject application</summary>
           <label className="mt-3 mb-1.5 block text-[11px] font-extrabold" htmlFor={`rejection-reason-${application.user_id}`}>
             Reason <span>(optional)</span>
           </label>
@@ -64,7 +64,7 @@ export function ApplicationReviewForm({
             <small className={fieldErrorClass}>{state.fieldErrors.rejectionReason}</small>
           )}
           <button
-            className="transition-colors duration-160 not-disabled:hover:bg-[rgba(160,32,32,0.32)] mt-[9px] rounded-[6px] border border-[#d45b60] bg-[rgba(160,32,32,0.2)] px-3 py-[9px] font-extrabold text-[#ffb4b4] disabled:cursor-not-allowed disabled:opacity-[0.58]"
+            className="transition-colors duration-160 not-disabled:hover:bg-[rgba(160,32,32,0.32)] mt-[9px] rounded-[6px] border border-[#d45b60] bg-[rgba(160,32,32,0.2)] px-3 py-[9px] font-extrabold text-[#ffb4b4] light:text-(--status-error-text) disabled:cursor-not-allowed disabled:opacity-[0.58]"
             type="submit"
             name="decision"
             value="reject"

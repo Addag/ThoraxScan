@@ -27,8 +27,8 @@ export default async function StudentPage() {
       <PageMain>
         <PageHeading title="Dashboard" subtitle={`Welcome back, ${profile.display_name}!`} />
 
-        <section className="mt-6 rounded-[10px] border border-[#33425c] bg-[#18202d] p-6 max-[600px]:p-5" aria-labelledby="recent-activities-title">
-          <SectionHeading kicker="Published assignments" title="Recent activities" titleId="recent-activities-title" aside={<Link className="transition-colors duration-160 hover:text-white text-[12px] font-extrabold text-[#9fcfff] no-underline" href="/student/activities">View all</Link>} />
+        <section className="mt-6 rounded-[10px] border border-(--border-shell) bg-(--surface-field) p-6 max-[600px]:p-5" aria-labelledby="recent-activities-title">
+          <SectionHeading kicker="Published assignments" title="Recent activities" titleId="recent-activities-title" aside={<Link className="transition-colors duration-160 hover:text-(--text-primary) text-[12px] font-extrabold text-[#9fcfff] light:text-(--brand-blue-text) no-underline" href="/student/activities">View all</Link>} />
           {recentActivities.error ? (
             <p className={listEmptyClass}>Recent activities are unavailable.</p>
           ) : recentActivities.data.length === 0 ? (
@@ -36,17 +36,17 @@ export default async function StudentPage() {
           ) : (
             <div className="grid grid-cols-3 gap-3.5 pt-[18px] max-[760px]:grid-cols-1">
               {recentActivities.data.map((activity) => (
-                <Link className="transition-colors duration-160 hover:bg-white/8 flex min-h-[130px] flex-col justify-between rounded-[8px] border border-[#3d4c67] bg-(--glass-inset) p-4 no-underline shadow-(--glass-inset-shadow)" href={`/student/activities/${activity.id}`} key={activity.id}>
-                  <span className="text-[10px] font-extrabold uppercase tracking-[0.06em] text-[#6faef7]">{activity.workspaceName}</span>
-                  <strong className="mt-2 text-[15px] leading-[1.25] text-white">{activity.title}</strong>
-                  <small className="mt-3 text-[10px] leading-[1.4] text-[#8992a8]">{submissionLabel(activity.submissionStatus, activity.dueAt)} · {activity.aiStatus === "ready" ? "Feedback available" : activity.aiStatus === "pending" ? "Analysis pending" : activity.aiStatus === "failed" ? "Analysis failed" : "AI feedback locked"} · {formatDueDate(activity.dueAt)}</small>
+                <Link className="transition-colors duration-160 hover:bg-(--hover-overlay) flex min-h-[130px] flex-col justify-between rounded-[8px] border border-[#3d4c67] bg-(--glass-inset) p-4 no-underline shadow-(--glass-inset-shadow)" href={`/student/activities/${activity.id}`} key={activity.id}>
+                  <span className="text-[10px] font-extrabold uppercase tracking-[0.06em] text-[#6faef7] light:text-(--brand-blue-text)">{activity.workspaceName}</span>
+                  <strong className="mt-2 text-[15px] leading-[1.25] text-(--text-primary)">{activity.title}</strong>
+                  <small className="mt-3 text-[10px] leading-[1.4] text-[#8992a8] light:text-(--text-muted)">{submissionLabel(activity.submissionStatus, activity.dueAt)} · {activity.aiStatus === "ready" ? "Feedback available" : activity.aiStatus === "pending" ? "Analysis pending" : activity.aiStatus === "failed" ? "Analysis failed" : "AI feedback locked"} · {formatDueDate(activity.dueAt)}</small>
                 </Link>
               ))}
             </div>
           )}
         </section>
 
-        <section className="mt-6 grid grid-cols-[minmax(210px,0.75fr)_minmax(320px,1.25fr)] items-center gap-9 rounded-[10px] border border-[#33425c] [background:var(--glass-surface)] p-[25px_28px] backdrop-blur-[18px] backdrop-saturate-[135%] shadow-(--glass-shadow) max-[850px]:grid-cols-1 max-[850px]:gap-5" aria-labelledby="join-workspace-title">
+        <section className="mt-6 grid grid-cols-[minmax(210px,0.75fr)_minmax(320px,1.25fr)] items-center gap-9 rounded-[10px] border border-(--border-shell) [background:var(--glass-surface)] p-[25px_28px] backdrop-blur-[18px] backdrop-saturate-[135%] shadow-(--glass-shadow) max-[850px]:grid-cols-1 max-[850px]:gap-5" aria-labelledby="join-workspace-title">
           <div>
             <p className={sectionKickerClass}>Workspace access</p>
             <h2 id="join-workspace-title">Join your class workspace</h2>
@@ -54,7 +54,7 @@ export default async function StudentPage() {
           <InvitationForm />
         </section>
 
-        <section className="mt-6 rounded-[10px] border border-[#33425c] [background:var(--glass-surface)] p-[24px_28px_28px] backdrop-blur-[18px] backdrop-saturate-[135%] shadow-(--glass-shadow) max-[600px]:p-5" aria-labelledby="joined-workspaces-title">
+        <section className="mt-6 rounded-[10px] border border-(--border-shell) [background:var(--glass-surface)] p-[24px_28px_28px] backdrop-blur-[18px] backdrop-saturate-[135%] shadow-(--glass-shadow) max-[600px]:p-5" aria-labelledby="joined-workspaces-title">
           <SectionHeading kicker="Learning spaces" title="Joined workspaces" titleId="joined-workspaces-title" aside={<span className={countBadgeClass}>{workspaces.data.length} joined</span>} />
 
           {workspaces.error ? (
@@ -72,7 +72,7 @@ export default async function StudentPage() {
 
         <aside className="mt-6 flex items-baseline gap-4 rounded-[10px] border border-(--brand-blue) bg-[rgba(0,119,255,0.18)] p-[18px_22px] leading-[1.4] max-[600px]:flex-col max-[600px]:items-start">
           <strong className="shrink-0 text-[14px] uppercase">Privacy notice</strong>
-          <p className="m-0 text-[12px] text-[#d7e8ff]">Published case images use private storage and short-lived signed access.</p>
+          <p className="m-0 text-[12px] text-[#d7e8ff] light:text-(--brand-blue-text)">Published case images use private storage and short-lived signed access.</p>
         </aside>
       </PageMain>
     </StudentShell>

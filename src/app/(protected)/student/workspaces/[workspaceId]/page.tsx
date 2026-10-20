@@ -28,26 +28,26 @@ export default async function StudentWorkspacePage({
     <StudentShell>
       <PageMain top="pt-[38px]">
         <Link className={backLinkClass} href="/student">← Back to dashboard</Link>
-        <section className={`${glassPanelClass} border-[#33425c] p-[clamp(28px,5vw,52px)]`}>
+        <section className={`${glassPanelClass} border-(--border-shell) p-[clamp(28px,5vw,52px)]`}>
           <p className={sectionKickerClass}>Student workspace</p>
           <h1 className="m-0 text-[clamp(28px,4vw,38px)] leading-[1.1]">{workspace.name}</h1>
-          <p className="mt-3.5 mb-8 max-w-[640px] leading-[1.6] text-[#aeb6c9]">
+          <p className="mt-3.5 mb-8 max-w-[640px] leading-[1.6] text-[#aeb6c9] light:text-(--text-muted)">
             Review published chest X-ray learning activities from this workspace.
           </p>
           <dl className="grid grid-cols-2 gap-3.5 max-[600px]:grid-cols-1">
-            <div className="rounded-[8px] border border-[#3d4c67] bg-[rgba(4,8,40,0.36)] p-4"><dt className="text-[10px] font-extrabold uppercase tracking-[0.06em] text-[#8290aa]">Your access</dt><dd className="mt-[5px] text-[14px]">Student · Read only</dd></div>
+            <div className="rounded-[8px] border border-[#3d4c67] bg-[rgba(4,8,40,0.36)] p-4"><dt className="text-[10px] font-extrabold uppercase tracking-[0.06em] text-[#8290aa] light:text-(--brand-blue-text)">Your access</dt><dd className="mt-[5px] text-[14px]">Student · Read only</dd></div>
             <div className="rounded-[8px] border border-[#3d4c67] bg-[rgba(4,8,40,0.36)] p-4">
-              <dt className="text-[10px] font-extrabold uppercase tracking-[0.06em] text-[#8290aa]">Joined</dt>
+              <dt className="text-[10px] font-extrabold uppercase tracking-[0.06em] text-[#8290aa] light:text-(--brand-blue-text)">Joined</dt>
               <dd className="mt-[5px] text-[14px]">{new Intl.DateTimeFormat("en-US", { dateStyle: "long" }).format(new Date(workspace.joined_at))}</dd>
             </div>
           </dl>
         </section>
-        <section className={`${glassPanelClass} mt-[22px] border-[#33425c] flex items-center gap-5 p-[25px_28px] max-[600px]:flex-col max-[600px]:items-start`}>
-          <span className="text-[36px] text-[#6faef7]" aria-hidden="true">▣</span>
+        <section className={`${glassPanelClass} mt-[22px] border-(--border-shell) flex items-center gap-5 p-[25px_28px] max-[600px]:flex-col max-[600px]:items-start`}>
+          <span className="text-[36px] text-[#6faef7] light:text-(--brand-blue-text)" aria-hidden="true">▣</span>
           <div>
             <h2>Workspace activities</h2>
-            <p className="mt-[5px] mb-0 text-[12px] text-[#9ba2b8]">Published assignments are available from the Activities page.</p>
-            <Link className="transition-colors duration-160 hover:text-white" href="/student/activities">Browse activities →</Link>
+            <p className="mt-[5px] mb-0 text-[12px] text-[#9ba2b8] light:text-(--text-muted)">Published assignments are available from the Activities page.</p>
+            <Link className="transition-colors duration-160 hover:text-(--text-primary)" href="/student/activities">Browse activities →</Link>
           </div>
         </section>
       </PageMain>

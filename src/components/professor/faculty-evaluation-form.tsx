@@ -19,13 +19,13 @@ export function FacultyEvaluationForm({ evaluation, saveAction, releaseAction }:
     return result;
   }, initialEvaluationState);
   const locked = evaluation?.status === "released" || ["released", "already_released", "unauthorized", "unavailable"].includes(state.status);
-  return <section className="text-[#f6f8ff]" aria-labelledby="faculty-review-heading">
+  return <section className="text-[#f6f8ff] light:text-(--text-primary)" aria-labelledby="faculty-review-heading">
     <h2 id="faculty-review-heading">Grading</h2>
     <p className={reviewPanelTextClass} role="status" aria-live="polite">{pending ? "Saving evaluation…" : state.message || (evaluation?.status === "released" ? "Released · permanently locked" : evaluation ? "Draft · visible to Professors only" : "Unreviewed")}</p>
     {evaluation?.released_at ? <p className={reviewPanelTextClass}>Released <time dateTime={evaluation.released_at}>{new Date(evaluation.released_at).toLocaleString()}</time></p> : null}
     <form className="min-w-0" action={action}>
       <fieldset className="m-0 grid min-w-0 gap-[9px] border-0 p-0" disabled={pending || locked}>
-        <legend className="mb-[3px] p-0 text-[13px] font-extrabold text-white">Score and feedback</legend>
+        <legend className="mb-[3px] p-0 text-[13px] font-extrabold text-(--text-primary)">Score and feedback</legend>
         <label className={reviewFieldLabelClass} htmlFor="evaluation-score">Score (%)</label>
         <input className={reviewFieldClass} id="evaluation-score" name="score" inputMode="decimal" value={score} onChange={event => setScore(event.target.value)} aria-invalid={Boolean(state.fieldErrors?.score)} aria-describedby={state.fieldErrors?.score ? "evaluation-score-error" : undefined} />
         {state.fieldErrors?.score ? <p id="evaluation-score-error" role="alert">{state.fieldErrors.score}</p> : null}
@@ -41,7 +41,7 @@ export function FacultyEvaluationForm({ evaluation, saveAction, releaseAction }:
           <button className={reviewButtonGradient} type="button" onClick={() => setConfirming(true)}>Release evaluation</button>
         </div> : null}
         {confirming && !locked ? <div className="mt-[5px] grid gap-2.5 rounded-lg border border-[rgb(255_211_106/45%)] bg-[rgb(73_55_18/32%)] p-3.5" role="group" aria-labelledby="release-confirmation">
-          <p className="m-0 text-[12px] leading-[1.5] text-[#ffe3a0]" id="release-confirmation">Release is permanent. The score and feedback cannot be changed after release.</p>
+          <p className="m-0 text-[12px] leading-[1.5] text-[#ffe3a0] light:text-(--status-warning-text)" id="release-confirmation">Release is permanent. The score and feedback cannot be changed after release.</p>
           <input className={reviewFieldClass} type="hidden" name="confirmed" value="yes" />
           <div className="flex flex-wrap gap-[9px]">
             <button className={reviewButtonOutline} type="button" onClick={() => setConfirming(false)}>Keep editing</button>
