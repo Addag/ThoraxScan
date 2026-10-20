@@ -26,7 +26,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html lang="en" className={`${inter.variable} ${funnelDisplay.variable}`} suppressHydrationWarning>
       <head>
-        {/* Applies the saved theme before first paint; the settings theme toggle writes the same key. */}
+        {/* Applies the saved theme before first paint; the header ThemeIconButton writes the same key. */}
         <script
           // text/plain on the client stops React's dev warning; the browser only runs it from the server HTML.
           type={typeof window === "undefined" ? "text/javascript" : "text/plain"}

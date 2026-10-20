@@ -17,8 +17,6 @@ import {
 } from "@/lib/settings/types";
 import Link from "next/link";
 
-import { ThemeToggle } from "@/components/theme-toggle";
-
 const tabOrder = ["profile", "display", "privacy"] as const;
 type SettingsTab = (typeof tabOrder)[number];
 
@@ -125,7 +123,7 @@ export function SettingsForm({
 
   return (
     <form action={formAction} className="grid gap-6" noValidate>
-      <section className={`${panelClass} overflow-hidden after:block after:h-px after:-translate-y-[90px] after:bg-(--border-subtle) after:content-['']`} aria-label="User profile categories">
+      <section className={`${panelClass} overflow-hidden`} aria-label="User profile categories">
         <div className="grid gap-5 p-[18px_17px_22px] max-[600px]:gap-[9px] max-[600px]:p-[13px]" role="tablist" aria-label="Account settings">
           {tabOrder.map((tab, index) => (
             <button
@@ -148,7 +146,6 @@ export function SettingsForm({
             </button>
           ))}
         </div>
-        <ThemeToggle />
       </section>
 
       <section

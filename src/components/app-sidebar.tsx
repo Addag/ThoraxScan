@@ -3,6 +3,7 @@
 import { useId, useRef, useState, type ReactNode } from "react";
 
 import { Brand } from "@/components/brand";
+import { ThemeIconButton } from "@/components/theme-toggle";
 
 export function AppSidebar({ children }: { children: ReactNode }) {
   const [expanded, setExpanded] = useState(false);
@@ -21,19 +22,23 @@ export function AppSidebar({ children }: { children: ReactNode }) {
       }}
     >
       <Brand variant="sidebar" />
-      <button
-        aria-controls={contentId}
-        aria-expanded={expanded}
-        className="transition-[filter] duration-160 not-disabled:hover:brightness-115 hidden max-[850px]:absolute max-[850px]:top-2.5 max-[850px]:right-3.5 max-[850px]:inline-flex max-[850px]:min-h-11 max-[850px]:cursor-pointer max-[850px]:items-center max-[850px]:gap-1.5 max-[850px]:rounded-[10px] max-[850px]:border max-[850px]:border-[rgb(153_191_240/38%)] max-[850px]:p-2.5 max-[850px]:text-[14px] max-[850px]:text-foreground max-[850px]:[background:var(--glass-surface)]"
-        onClick={() => setExpanded(!expanded)}
-        ref={toggleRef}
-        type="button"
-      >
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
-          <path d={expanded ? "M6 6l12 12M18 6L6 18" : "M4 6h16M4 12h16M4 18h16"} />
-        </svg>
-        {expanded ? "Close" : "Menu"}
-      </button>
+      {/* Mobile bar controls; the desktop header carries its own theme button. */}
+      <div className="hidden max-[850px]:absolute max-[850px]:top-2.5 max-[850px]:right-3.5 max-[850px]:flex max-[850px]:items-center max-[850px]:gap-2">
+        <ThemeIconButton className="size-11" />
+        <button
+          aria-controls={contentId}
+          aria-expanded={expanded}
+          className="transition-[filter] duration-160 not-disabled:hover:brightness-115 inline-flex min-h-11 cursor-pointer items-center gap-1.5 rounded-[10px] border border-[rgb(153_191_240/38%)] p-2.5 text-[14px] text-foreground [background:var(--glass-surface)]"
+          onClick={() => setExpanded(!expanded)}
+          ref={toggleRef}
+          type="button"
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
+            <path d={expanded ? "M6 6l12 12M18 6L6 18" : "M4 6h16M4 12h16M4 18h16"} />
+          </svg>
+          <span className="max-[380px]:sr-only">{expanded ? "Close" : "Menu"}</span>
+        </button>
+      </div>
       <div
         className="flex min-h-0 flex-1 flex-col max-[850px]:hidden max-[850px]:group-data-[expanded=true]:mt-5 max-[850px]:group-data-[expanded=true]:flex"
         id={contentId}

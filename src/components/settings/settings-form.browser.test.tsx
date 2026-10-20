@@ -85,14 +85,3 @@ test("toggles display background and submits the updated value", async () => {
   const formData = updateSettings.mock.calls.at(-1)?.[1] as FormData;
   expect(formData.get("darkImageBackground")).toBeNull();
 });
-
-test("theme toggle switches <html data-theme> and remembers it", async () => {
-  await render(<SettingsForm {...baseProps} />);
-  const toggle = page.getByRole("button", { name: /theme/ });
-  await toggle.click();
-  expect(document.documentElement.getAttribute("data-theme")).toBe("light");
-  expect(localStorage.getItem("theme")).toBe("light");
-  await toggle.click();
-  expect(document.documentElement.hasAttribute("data-theme")).toBe(false);
-  expect(localStorage.getItem("theme")).toBe("dark");
-});
