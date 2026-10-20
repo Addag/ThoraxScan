@@ -4,8 +4,10 @@ import { render } from "vitest-browser-react";
 import type { ComponentProps } from "react";
 
 const updateSettings = vi.hoisted(() => vi.fn());
+const changePassword = vi.hoisted(() => vi.fn());
 
 vi.mock("@/app/(protected)/settings/actions", () => ({
+  changePasswordAction: changePassword,
   updateAccountSettingsAction: updateSettings,
 }));
 
@@ -39,7 +41,9 @@ test("starts on Profile and moves tabs with click and keyboard navigation", asyn
   await expect.element(page.getByRole("tab", { name: "Privacy" })).toHaveAttribute("aria-selected", "true");
   await expect.element(page.getByText("Current data handling based on the features that are implemented today.")).toBeVisible();
   await userEvent.keyboard("{ArrowLeft}");
-  await expect.element(page.getByRole("tab", { name: "Profile" })).toHaveFocus();
+  await expect.element(page.getByRole("tab", { name: "Security" })).toHaveFocus();
+  await expect.element(page.getByRole("heading", { name: "Change password" })).toBeVisible();
+  await expect.element(page.getByRole("button", { name: "Save changes" })).not.toBeInTheDocument();
   await userEvent.keyboard("{End}");
   await expect.element(page.getByRole("tab", { name: "Privacy" })).toHaveFocus();
   await userEvent.keyboard("{Home}");
@@ -75,4 +79,16 @@ test("disables controls while saving and returns to clean state after success", 
   await expect.element(page.getByRole("button", { name: "Saving…" })).toBeDisabled();
   finish({ status: "success", message: "Settings saved.", savedValues: { displayName: "Ada Updated", workPhone: null } });
   await expect.element(page.getByRole("button", { name: "Save changes" })).toBeDisabled();
+});
+
+test("shows password errors returned by the server", async () => {
+  changePassword.mockResolvedValue({ status: "error", message: "Check the highlighted fields.", fieldErrors: { currentPassword: "Current password is incorrect." } });
+  await render(<SettingsForm {...baseProps} />);
+  await page.getByRole("tab", { name: "Security" }).click();
+  await page.getByLabelText("Current password").fill("wrong-password");
+  await page.getByLabelText(/^New password/).fill("new-password-1");
+  await page.getByLabelText("Confirm new password").fill("new-password-1");
+  await page.getByRole("button", { name: "Update password" }).click();
+  await expect.element(page.getByText("Current password is incorrect.")).toBeVisible();
+  await expect.element(page.getByLabelText("Current password")).toHaveAttribute("aria-invalid", "true");
 });

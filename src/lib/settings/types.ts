@@ -15,6 +15,14 @@ export type SettingsActionState = {
   savedValues?: SavedSettingsValues;
 };
 
+export type PasswordField = "currentPassword" | "newPassword" | "confirmPassword";
+
+export type PasswordActionState = {
+  status: "idle" | "error" | "success" | "unauthorized";
+  message: string;
+  fieldErrors?: Partial<Record<PasswordField, string>>;
+};
+
 export const initialSettingsActionState: SettingsActionState = {
   status: "idle",
   message: "",

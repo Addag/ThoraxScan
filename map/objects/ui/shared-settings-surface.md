@@ -19,6 +19,7 @@ Student and Professor accounts share one settings contract and visual structure,
 - Both thin route pages render one role-aware Server Component that rechecks access, reads Auth email plus self-private settings, and retains the existing Student or Professor shell in [the page wrapper](<../../../src/components/settings/settings-page.tsx:8>).
 - One Client Component owns the accessible tablist, retained drafts, pending state, validation messages, and Save Changes action across every tab in [the settings form](<../../../src/components/settings/settings-form.tsx:46>).
 - Profile exposes editable display name, read-only sign-in email, and Professor-only optional work phone; Privacy presents implemented Storage and inference-foundation status without editable controls.
+- Security is a separate form: `changePasswordAction` in [settings actions](<../../../src/app/(protected)/settings/actions.ts>) checks the current password through the `verify_own_password` RPC in [its migration](<../../../supabase/migrations/20261021130000_verify_own_password.sql>) (captcha blocks re-login), then calls `auth.updateUser` and signs out other sessions.
 - Responsive category rows, bordered panels, status treatments, and gradient action are Tailwind utilities in [the settings form](<../../../src/components/settings/settings-form.tsx>) and [the page wrapper](<../../../src/components/settings/settings-page.tsx>).
 
 ## Connected to
