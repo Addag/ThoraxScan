@@ -54,10 +54,9 @@ function configureOrt(ort: OrtModule) {
   // Avoid the proxy worker: its URL resolution is unreliable in bundled
   // Next.js clients and it also requires cross-origin isolation for threads.
   ort.env.wasm.proxy = false;
-  ort.env.wasm.wasmPaths = {
-    mjs: "/ort/1.27.0/ort-wasm-simd-threaded.mjs",
-    wasm: "/ort/1.27.0/ort-wasm-simd-threaded.wasm",
-  };
+  // A prefix, not fixed files: the WebGPU build needs the .asyncify binary,
+  // and pinning the plain one makes WebGPU sessions fail and fall back to WASM.
+  ort.env.wasm.wasmPaths = "/ort/1.27.0/";
   ort.env.wasm.numThreads = 1;
 }
 
