@@ -63,6 +63,23 @@ test("valid selection previews locally and enables analysis only after selection
   expect(mocks.analyze).not.toHaveBeenCalled();
 });
 
+function drop(file: File) {
+  const dataTransfer = new DataTransfer();
+  dataTransfer.items.add(file);
+  page.getByRole("button", { name: "Choose or drop a chest X-ray image", exact: true }).element()
+    .dispatchEvent(new DragEvent("drop", { dataTransfer, bubbles: true, cancelable: true }));
+}
+
+test("dropped image previews and enables analysis; invalid drop is rejected", async () => {
+  await render(<LearningModeAnalyzer />);
+  drop(new File([new Uint8Array([1])], "drop.gif", { type: "image/gif" }));
+  await expect.element(page.getByRole("alert")).toHaveTextContent("Only JPEG and PNG images are supported.");
+  drop(new File([new Uint8Array([1])], "drop.png", { type: "image/png" }));
+  await expect.element(page.getByAltText("Selected chest X-ray preview")).toHaveAttribute("src", expect.stringMatching(/^blob:/));
+  await expect.element(page.getByRole("button", { name: "Analyze", exact: true })).toBeEnabled();
+  await expect.element(page.getByRole("alert")).not.toBeInTheDocument();
+});
+
 test.each([
   ["image/gif", 1, "Only JPEG and PNG images are supported."],
   ["image/png", 0, "The selected image is empty."],

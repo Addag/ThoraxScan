@@ -44,6 +44,7 @@ export function LearningModeAnalyzer() {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [result, setResult] = useState<InferenceResult | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [dragging, setDragging] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const runRef = useRef<AbortController | null>(null);
   const resultHeadingRef = useRef<HTMLHeadingElement>(null);
@@ -90,12 +91,21 @@ export function LearningModeAnalyzer() {
         <div className="p-[22px] max-[1000px]:p-4">
           <label className="mb-2.5 block text-[13px] text-(--text-secondary)" htmlFor="learning-image">Chest X-ray image (JPEG or PNG, up to 6 MiB)</label>
           <input className="mb-4 block w-full min-w-0 text-[13px] file:mr-2 file:cursor-pointer file:rounded-[4px] file:border file:border-[#69819f] file:bg-[#26364e] file:p-2 file:text-white" ref={inputRef} id="learning-image" aria-label="Image file" type="file" accept="image/jpeg,image/png" onChange={(event) => choose(event.target.files?.[0] ?? null)} />
-          <button className="transition-colors duration-160 not-disabled:hover:bg-(--hover-overlay) flex min-h-[240px] w-full cursor-pointer flex-col items-center justify-center gap-[18px] border-[3px] border-dashed border-[#c7d4e8] light:border-(--border-strong) bg-none p-3 text-(--text-secondary)" type="button" aria-label={previewUrl ? "Replace selected image" : "Choose a chest X-ray image"} onClick={() => inputRef.current?.click()}>
+          <button className={`transition-colors duration-160 not-disabled:hover:bg-(--hover-overlay) flex min-h-[240px] w-full cursor-pointer flex-col items-center justify-center gap-[18px] border-[3px] border-dashed ${dragging ? "border-brand" : "border-[#c7d4e8] light:border-(--border-strong)"} bg-none p-3 text-(--text-secondary)`} type="button" aria-label={previewUrl ? "Replace selected image" : "Choose or drop a chest X-ray image"} onClick={() => inputRef.current?.click()}
+            onDragOver={(event) => { event.preventDefault(); setDragging(true); }}
+            onDragLeave={(event) => { if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setDragging(false); }}
+            onDrop={(event) => {
+              event.preventDefault(); setDragging(false);
+              const dropped = event.dataTransfer.files[0];
+              if (!dropped) return;
+              if (inputRef.current) inputRef.current.value = "";
+              choose(dropped);
+            }}>
             {previewUrl ? (
               // Local object URLs must never go through an image optimization server.
               // eslint-disable-next-line @next/next/no-img-element
               <img className="block max-h-[360px] w-full object-contain" src={previewUrl} alt="Selected chest X-ray preview" />
-            ) : <><img className="light:invert" src="/images/learning/plus.svg" alt="" width="32" height="32" /><span>Choose a local image</span></>}
+            ) : <><img className="light:invert" src="/images/learning/plus.svg" alt="" width="32" height="32" /><span>Choose or drop a local image</span></>}
           </button>
           {file && <p className="text-[13px] [overflow-wrap:anywhere] text-(--text-secondary)">{file.name}</p>}
           <div className="mt-5 flex gap-3">
