@@ -310,9 +310,13 @@ async function validateBrowserProviders(
     throw new Error("Browser conformance server did not receive a TCP port.");
   }
   const baseUrl = `http://127.0.0.1:${address.port}`;
-  const browser = await chromium.launch({ headless: true });
+  // New headless ("chromium" channel) exposes a GPU adapter; the default headless shell never does.
+  const browser = await chromium.launch({ channel: "chromium", headless: true, args: ["--enable-unsafe-webgpu"] });
   try {
     const page = await browser.newPage();
+    page.on("console", (message) => {
+      if (message.text().startsWith("WebGPU disabled:")) console.warn(message.text());
+    });
     await page.goto(baseUrl);
     await page.addScriptTag({ content: "globalThis.__name = (target) => target;" });
     await page.addScriptTag({ path: resolve(ortDistribution, "ort.webgpu.min.js") });
@@ -379,9 +383,13 @@ async function validateBrowserProviders(
         }
         const wasmAttentionError = expectedAttention ? compareOutputs(wasm.attention, expectedAttention).maxAbsolute : 0;
         if (wasmAttentionError > 1e-4) throw new Error("Browser WASM attention did not satisfy fixture parity.");
-        if (!("gpu" in navigator)) {
+        const disabled = (reason: string) => {
+          console.warn(`WebGPU disabled: ${reason}`);
           return { webGpuEnabled: false, webGpuMaxAbsoluteDifference: null, webGpuMaxAbsoluteAttentionDifference: null };
-        }
+        };
+        const gpu = (navigator as Navigator & { gpu?: { requestAdapter(): Promise<unknown> } }).gpu;
+        if (!gpu) return disabled("navigator.gpu is unavailable.");
+        if (!(await gpu.requestAdapter())) return disabled("no WebGPU adapter.");
         try {
           const webGpu = await run("webgpu");
           const providerDifference = compareOutputs(webGpu.logits, wasm.logits).maxAbsolute;
@@ -389,9 +397,9 @@ async function validateBrowserProviders(
           return providerDifference <= 1e-3
             && (attentionDifference === null || attentionDifference <= 1e-3)
             ? { webGpuEnabled: true, webGpuMaxAbsoluteDifference: providerDifference, webGpuMaxAbsoluteAttentionDifference: attentionDifference }
-            : { webGpuEnabled: false, webGpuMaxAbsoluteDifference: null, webGpuMaxAbsoluteAttentionDifference: null };
-        } catch {
-          return { webGpuEnabled: false, webGpuMaxAbsoluteDifference: null, webGpuMaxAbsoluteAttentionDifference: null };
+            : disabled(`parity failed (logits ${providerDifference}, attention ${attentionDifference}).`);
+        } catch (error) {
+          return disabled(`WebGPU run failed: ${error instanceof Error ? error.message : String(error)}`);
         }
       },
       {

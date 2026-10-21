@@ -87,6 +87,7 @@ The PyTorch run that produced the one checkpoint behind both the V1 and V2 [mode
   - `tune_thresholds.py --sensitivity 0.8` picks the highest threshold reaching that held-out sensitivity. Applied to all labels it floods weak labels on the official 234 (Fracture specificity 0.46, Pneumonia precision 0.06), so only the 5 competition labels use the lower of the F1 and 80%-sensitivity thresholds. All others keep F1 (`results/thresholds_mixed.json`).
   - Official 234 sensitivity vs F1-only: Cardiomegaly 0.28→0.49, Edema 0.76→0.82, Consolidation 0.39→0.91, Atelectasis 0.55→0.75; specificity 0.99→0.95, 0.90→0.86, 0.97→0.74, 0.78→0.62. Pleural Effusion unchanged.
   - Bundle `model-input/fastvit-retrain-v3-attention-20261017.1` (same ONNX, thresholds `fastvit-v3-sens80-competition-f1-other-v1`) passed `model:validate` on 2026-10-17. Not staged yet.
+  - Bundle `model-input/fastvit-retrain-v3-attention-20261016.2` (same ONNX and thresholds as `.1`, new release ID) passed `model:validate` on 2026-10-21 with WebGPU enabled (logit diff 8.6e-6, attention diff 6.9e-6 vs WASM). Not staged yet.
 
 ## Connected to
 

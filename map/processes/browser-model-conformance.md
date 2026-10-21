@@ -13,7 +13,7 @@ Version 1 input/evidence → real Chromium and ONNX Runtime Web checks → pass 
 ## Steps
 
 1. Vitest Browser Mode runs the browser image decode and preprocessing path in Chromium ([browser preprocessing test](../../src/lib/inference/preprocess.browser.test.ts#L17)).
-2. Release validation loads the ONNX Runtime Web browser bundle and runs the supplied model and parity fixtures in WASM at the fixed tolerances, attempting WebGPU only to determine whether that release may enable it ([browser provider validation](../../scripts/model-release.ts#L234)).
+2. Release validation loads the ONNX Runtime Web browser bundle and runs the supplied model and parity fixtures in WASM at the fixed tolerances, attempting WebGPU only to determine whether that release may enable it ([browser provider validation](../../scripts/model-release.ts#L264)). It launches new-headless Chromium with `--enable-unsafe-webgpu`; the default headless shell never exposes an adapter, which pinned every release before 2026-10-21 to WASM. Disabled WebGPU logs a `WebGPU disabled: <reason>` line.
 3. Activation runs the remote artifact in headless Chromium before and after the pointer change, including after pointer read-back ([browser smoke](../../scripts/model-release.ts#L660), [activation flow](../../scripts/model-release.ts#L818)).
 
 ## Consumes
@@ -38,4 +38,4 @@ Version 1 input/evidence → real Chromium and ONNX Runtime Web checks → pass 
 
 ## See
 
-[Browser provider validation](../../scripts/model-release.ts#L234)
+[Browser provider validation](../../scripts/model-release.ts#L264)

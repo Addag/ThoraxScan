@@ -83,7 +83,10 @@ absence of external data, input/output names, exact preprocessing tensor bytes,
 finite output, and WASM parity. It rejects missing evidence. The current limits
 are `1e-4` absolute logit error, `1e-3` relative logit error, and `1e-4`
 absolute probability error. Validation also runs the model in Chromium WASM and
-attempts WebGPU when the validation browser exposes it. A release enables WebGPU
+attempts WebGPU when the validation browser exposes it. The validator launches
+new-headless Chromium (`channel: "chromium"`, `--enable-unsafe-webgpu`), so a
+machine with a GPU gets a real adapter; the reason for any disabled WebGPU is
+printed as `WebGPU disabled: …`. A release enables WebGPU
 only when its logits are within `1e-3` absolute difference of WASM; otherwise
 the manifest pins that release to WASM. For V2, WebGPU must also meet the attention parity limit of `1e-3`; WASM attention must match the PyTorch fixture within `1e-4`. Unavailable WebGPU is recorded as disabled, never as a successful parity measurement.
 
