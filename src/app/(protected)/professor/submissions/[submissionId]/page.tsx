@@ -33,7 +33,7 @@ export default async function SubmissionPage({ params }: { params: Promise<{ sub
       <div className="grid grid-cols-[minmax(0,1.45fr)_minmax(310px,.75fr)] items-start gap-[18px] max-[900px]:grid-cols-1">
         <div className="grid gap-[18px]">
           <section className={`${reviewSurfaceClass} border-[rgb(137_161_196/42%)] px-[18px] pt-[18px] pb-2 [&_h2]:flex [&_h2]:items-center [&_h2]:gap-[9px] [&_h2]:font-extrabold`}><h2 className={reviewCardTitleClass}><span className="text-[#b16cff] light:text-(--status-accent-text)" aria-hidden="true">◉</span> Chest X-Ray Image</h2><XrayCasePreview imageUrl={activity.imageUrl} imageError={activity.imageError} title={activity.title} /><AttentionHeatmap className="mt-3.5" imageUrl={activity.imageUrl} attention={attention} title="Relative global attention" /></section>
-          <div className={`${reviewSurfaceClass} border-[rgb(137_161_196/42%)] p-0 [&_h2]:mb-3.5 [&_h2]:flex [&_h2]:items-center [&_h2]:gap-[9px] [&_h2]:text-[16px] [&_h2]:font-extrabold`}><FacultyEvaluationForm key={submission.faculty_evaluations?.updated_at ?? submission.id} evaluation={submission.faculty_evaluations}
+          <div className={`${reviewSurfaceClass} border-[rgb(137_161_196/42%)] [&_h2]:mb-3.5 [&_h2]:flex [&_h2]:items-center [&_h2]:gap-[9px] [&_h2]:text-[16px] [&_h2]:font-extrabold`}><FacultyEvaluationForm key={submission.faculty_evaluations?.updated_at ?? submission.id} evaluation={submission.faculty_evaluations}
             saveAction={saveFacultyEvaluationAction.bind(null, submissionId)} releaseAction={releaseFacultyEvaluationAction.bind(null, submissionId)} />
           </div>
         </div>
