@@ -53,7 +53,7 @@ export default async function ProfessorActivityPage({
           description={`${activity.workspaceName} · ${formatDueDate(activity.dueAt)}`}
           backHref="/professor/activities"
         />
-        <div className="-mt-2 mb-[18px] flex items-center gap-3 text-[12px] text-[#aab1bf] light:text-(--text-muted)">
+        <div className="-mt-2 mb-[18px] flex items-center gap-3 text-[0.75rem] text-[#aab1bf] light:text-(--text-muted)">
           <ActivityStatusBadge status={activity.status} />
           <span>{activity.status === "published" ? "Visible to current and future workspace students" : activity.status === "archived" ? "No longer visible to students" : "Visible to teaching staff only"}</span>
         </div>

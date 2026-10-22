@@ -2,6 +2,8 @@
 
 import { useLayoutEffect } from "react";
 
+import { applySavedDisplayPrefs } from "@/lib/display-prefs";
+
 // Visible state comes from the `light:` variant on <html data-theme>, so server and client render the same markup.
 // The inline script in app/layout.tsx applies the saved theme before first paint.
 
@@ -19,12 +21,8 @@ function toggleTheme() {
 
 /** Icon-only sun/moon theme button for the app header and the mobile menu bar. */
 export function ThemeIconButton({ className = "size-10" }: { className?: string }) {
-  // Dev-only: Strict Mode's remount strips attributes React doesn't own from <html>; re-apply the saved theme.
-  useLayoutEffect(() => {
-    try {
-      if (localStorage.getItem("theme") === "light") document.documentElement.setAttribute("data-theme", "light");
-    } catch {}
-  }, []);
+  // Dev-only: Strict Mode's remount strips attributes React doesn't own from <html>; re-apply the saved preferences.
+  useLayoutEffect(applySavedDisplayPrefs, []);
 
   return (
     <button

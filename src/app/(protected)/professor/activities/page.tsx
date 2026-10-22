@@ -64,7 +64,7 @@ export default async function ProfessorActivitiesPage({
         <section className="mb-5 flex items-end justify-between gap-6 rounded-[10px] border border-(--border-shell) bg-(--surface-field) px-5 py-[18px] max-[760px]:flex-col max-[760px]:items-stretch" aria-label="Activity filters">
           <form className="flex items-end gap-3 max-[760px]:flex-col max-[760px]:items-stretch">
             {status ? <input type="hidden" name="status" value={status} /> : null}
-            <label className="grid gap-[7px] text-[11px] text-[#9fa7b5] light:text-(--text-muted)">
+            <label className="grid gap-[7px] text-[0.6875rem] text-[#9fa7b5] light:text-(--text-muted)">
               Workspace
               <select className="min-h-[39px] min-w-[250px] rounded-[5px] border border-[#6d7480] light:border-(--border-strong) bg-(--surface-sunken) px-[13px] text-(--text-primary) max-[760px]:w-full max-[760px]:min-w-0" name="workspace" defaultValue={workspaceId}>
                 <option value="">All teaching workspaces</option>
@@ -79,9 +79,9 @@ export default async function ProfessorActivitiesPage({
         </section>
 
         <nav className="mb-5 flex gap-2 overflow-x-auto" aria-label="Activity status">
-          <Link className={`transition-colors duration-160 inline-flex min-h-[37px] items-center gap-2 rounded-[6px] border px-[13px] text-[12px] font-extrabold capitalize no-underline ${!status ? "border-brand bg-[rgba(0,119,255,0.18)] text-(--text-primary)" : "border-[#465269] light:border-(--border-subtle) text-[#aeb6c5] light:text-(--text-muted) hover:bg-(--hover-overlay)"}`} href={hrefForStatus(null)}>All <span className="rounded-[999px] bg-[rgba(255,255,255,0.1)] light:bg-(--hover-overlay) px-[7px] py-[3px]">{activitiesResult.data.length}</span></Link>
+          <Link className={`transition-colors duration-160 inline-flex min-h-[37px] items-center gap-2 rounded-[6px] border px-[13px] text-[0.75rem] font-extrabold capitalize no-underline ${!status ? "border-brand bg-[rgba(0,119,255,0.18)] text-(--text-primary)" : "border-[#465269] light:border-(--border-subtle) text-[#aeb6c5] light:text-(--text-muted) hover:bg-(--hover-overlay)"}`} href={hrefForStatus(null)}>All <span className="rounded-[999px] bg-[rgba(255,255,255,0.1)] light:bg-(--hover-overlay) px-[7px] py-[3px]">{activitiesResult.data.length}</span></Link>
           {(["draft", "published", "archived"] as const).map((item) => (
-            <Link className={`transition-colors duration-160 inline-flex min-h-[37px] items-center gap-2 rounded-[6px] border px-[13px] text-[12px] font-extrabold capitalize no-underline ${status === item ? "border-brand bg-[rgba(0,119,255,0.18)] text-(--text-primary)" : "border-[#465269] light:border-(--border-subtle) text-[#aeb6c5] light:text-(--text-muted) hover:bg-(--hover-overlay)"}`} href={hrefForStatus(item)} key={item}>
+            <Link className={`transition-colors duration-160 inline-flex min-h-[37px] items-center gap-2 rounded-[6px] border px-[13px] text-[0.75rem] font-extrabold capitalize no-underline ${status === item ? "border-brand bg-[rgba(0,119,255,0.18)] text-(--text-primary)" : "border-[#465269] light:border-(--border-subtle) text-[#aeb6c5] light:text-(--text-muted) hover:bg-(--hover-overlay)"}`} href={hrefForStatus(item)} key={item}>
               {item} <span className="rounded-[999px] bg-[rgba(255,255,255,0.1)] light:bg-(--hover-overlay) px-[7px] py-[3px]">{activitiesResult.data.filter((activity) => activity.status === item).length}</span>
             </Link>
           ))}
@@ -97,15 +97,15 @@ export default async function ProfessorActivitiesPage({
               <article className={`${glassPanelClass} border-(--border-shell) p-5`} key={activity.id}>
                 <div className="flex items-center justify-between gap-3">
                   <ActivityStatusBadge status={activity.status} />
-                  <span className="text-[11px] leading-[1.4] text-[#c4d0e0] light:text-(--text-secondary)">{activity.hasCase ? "Case attached" : "Case required"}</span>
+                  <span className="text-[0.6875rem] leading-[1.4] text-[#c4d0e0] light:text-(--text-secondary)">{activity.hasCase ? "Case attached" : "Case required"}</span>
                 </div>
-                <p className="mx-0 mt-[22px] mb-[5px] text-[11px] leading-[1.4] text-[#c4d0e0] light:text-(--text-secondary)">{activity.workspaceName}</p>
-                <h2 className="m-0 min-h-12 text-[20px] leading-[1.2]">{activity.title}</h2>
+                <p className="mx-0 mt-[22px] mb-[5px] text-[0.6875rem] leading-[1.4] text-[#c4d0e0] light:text-(--text-secondary)">{activity.workspaceName}</p>
+                <h2 className="m-0 min-h-12 text-[1.25rem] leading-[1.2]">{activity.title}</h2>
                 <dl className="my-5 grid grid-cols-2 gap-2.5 max-[520px]:grid-cols-1">
-                  <div className="rounded-[5px] bg-(--surface-sunken) p-2.5"><dt className="text-[9px] uppercase leading-[1.4] tracking-[0.06em] text-[#c4d0e0] light:text-(--text-secondary)">Due</dt><dd className="mx-0 mt-1 mb-0 text-[11px] leading-[1.4]">{formatDueDate(activity.dueAt)}</dd></div>
-                  <div className="rounded-[5px] bg-(--surface-sunken) p-2.5"><dt className="text-[9px] uppercase leading-[1.4] tracking-[0.06em] text-[#c4d0e0] light:text-(--text-secondary)">Updated</dt><dd className="mx-0 mt-1 mb-0 text-[11px] leading-[1.4]">{new Intl.DateTimeFormat("en-US", { dateStyle: "medium" }).format(new Date(activity.updatedAt))}</dd></div>
+                  <div className="rounded-[5px] bg-(--surface-sunken) p-2.5"><dt className="text-[0.5625rem] uppercase leading-[1.4] tracking-[0.06em] text-[#c4d0e0] light:text-(--text-secondary)">Due</dt><dd className="mx-0 mt-1 mb-0 text-[0.6875rem] leading-[1.4]">{formatDueDate(activity.dueAt)}</dd></div>
+                  <div className="rounded-[5px] bg-(--surface-sunken) p-2.5"><dt className="text-[0.5625rem] uppercase leading-[1.4] tracking-[0.06em] text-[#c4d0e0] light:text-(--text-secondary)">Updated</dt><dd className="mx-0 mt-1 mb-0 text-[0.6875rem] leading-[1.4]">{new Intl.DateTimeFormat("en-US", { dateStyle: "medium" }).format(new Date(activity.updatedAt))}</dd></div>
                 </dl>
-                <Link className="transition-colors duration-160 hover:text-(--text-primary) flex items-center justify-between text-[12px] font-extrabold text-[#70bdff] light:text-(--brand-blue-text) no-underline" href={`/professor/activities/${activity.id}`}>Open activity <span aria-hidden="true">→</span></Link>
+                <Link className="transition-colors duration-160 hover:text-(--text-primary) flex items-center justify-between text-[0.75rem] font-extrabold text-[#70bdff] light:text-(--brand-blue-text) no-underline" href={`/professor/activities/${activity.id}`}>Open activity <span aria-hidden="true">→</span></Link>
               </article>
             ))}
           </div>

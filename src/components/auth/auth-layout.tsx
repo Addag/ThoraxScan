@@ -28,6 +28,7 @@ const authCopy = {
   },
 } as const;
 
+// Font sizes here and in auth-form.tsx stay px, unlike the rest of the app: the intro panel is absolutely positioned, so text that grows with the Accessibility text size would run into the X-ray image.
 export function AuthLayout({
   mode,
   message,

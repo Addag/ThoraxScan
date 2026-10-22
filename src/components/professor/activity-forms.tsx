@@ -26,7 +26,7 @@ import { ConfirmDialog } from "@/components/confirm-dialog";
 import { activityFormHeadingClass, activityFormHeadingIconClass, activityFormHeadingKickerClass, activityFormHeadingTitleClass, activityFormMessageClass } from "@/components/activities/activity-form-styles";
 
 function FieldError({ children }: { children?: string }) {
-  return children ? <small className="text-[10px] text-[#ff7c85] light:text-(--status-error-text)">{children}</small> : null;
+  return children ? <small className="text-[0.625rem] text-[#ff7c85] light:text-(--status-error-text)">{children}</small> : null;
 }
 
 export function ActivityDetailsForm({
@@ -52,7 +52,7 @@ export function ActivityDetailsForm({
         </div>
       </div>
 
-      <label className="mt-3.5 grid gap-[7px] text-[12px] text-[#a1a7b1] light:text-(--text-muted)">
+      <label className="mt-3.5 grid gap-[7px] text-[0.75rem] text-[#a1a7b1] light:text-(--text-muted)">
         Workspace
         {activity ? (
           <>
@@ -70,7 +70,7 @@ export function ActivityDetailsForm({
         <FieldError>{state.fieldErrors?.workspaceId}</FieldError>
       </label>
 
-      <label className="mt-3.5 grid gap-[7px] text-[12px] text-[#a1a7b1] light:text-(--text-muted)">
+      <label className="mt-3.5 grid gap-[7px] text-[0.75rem] text-[#a1a7b1] light:text-(--text-muted)">
         Activity title
         <input
           className="w-full min-h-[42px] rounded-[5px] border border-[#82878e] light:border-(--border-strong) bg-(--surface-raised) px-3 py-[11px] text-(--text-primary) disabled:opacity-[0.52]"
@@ -85,7 +85,7 @@ export function ActivityDetailsForm({
         <FieldError>{state.fieldErrors?.title}</FieldError>
       </label>
 
-      <label className="mt-3.5 grid gap-[7px] text-[12px] text-[#a1a7b1] light:text-(--text-muted)">
+      <label className="mt-3.5 grid gap-[7px] text-[0.75rem] text-[#a1a7b1] light:text-(--text-muted)">
         Instructions for students
         <textarea
           className="w-full resize-y rounded-[5px] border border-[#82878e] light:border-(--border-strong) bg-(--surface-raised) px-3 py-[11px] leading-[1.45] text-(--text-primary) disabled:opacity-[0.52]"
@@ -101,7 +101,7 @@ export function ActivityDetailsForm({
         <FieldError>{state.fieldErrors?.instructions}</FieldError>
       </label>
 
-      <label className="mt-3.5 grid gap-[7px] text-[12px] text-[#a1a7b1] light:text-(--text-muted) [&>small:first-child]:text-[#aeb6c5] light:[&>small:first-child]:text-(--text-muted)">
+      <label className="mt-3.5 grid gap-[7px] text-[0.75rem] text-[#a1a7b1] light:text-(--text-muted) [&>small:first-child]:text-[#aeb6c5] light:[&>small:first-child]:text-(--text-muted)">
         Due date <small>Optional</small>
         <input
           className="w-full min-h-[42px] rounded-[5px] border border-[#82878e] light:border-(--border-strong) bg-(--surface-raised) px-3 py-[11px] text-(--text-primary) disabled:opacity-[0.52]"
@@ -114,7 +114,7 @@ export function ActivityDetailsForm({
         <FieldError>{state.fieldErrors?.dueAt}</FieldError>
       </label>
 
-      <label className="mt-3.5 grid gap-[7px] text-[12px] text-[#a1a7b1] light:text-(--text-muted)">
+      <label className="mt-3.5 grid gap-[7px] text-[0.75rem] text-[#a1a7b1] light:text-(--text-muted)">
         Private reference evaluation
         <textarea
           className="w-full resize-y rounded-[5px] border border-[#82878e] light:border-(--border-strong) bg-(--surface-raised) px-3 py-[11px] leading-[1.45] text-(--text-primary) disabled:opacity-[0.52]"
@@ -125,7 +125,7 @@ export function ActivityDetailsForm({
           disabled={isArchived}
           aria-invalid={Boolean(state.fieldErrors?.referenceEvaluation)}
         />
-        <span className="text-[10px] text-[#aeb6c5] light:text-(--text-muted)">Visible to teaching staff only. Required before publishing.</span>
+        <span className="text-[0.625rem] text-[#aeb6c5] light:text-(--text-muted)">Visible to teaching staff only. Required before publishing.</span>
         <FieldError>{state.fieldErrors?.referenceEvaluation}</FieldError>
       </label>
 
@@ -194,7 +194,7 @@ export function CaseUploadForm({ activityId, caseId = null }: { activityId: stri
           setSelectionMessage("Selected case removed.");
         }}
       />
-      <p className="m-0 text-[11px] text-[#aeb6c5] light:text-(--text-muted)" role="status">{selectionMessage}</p>
+      <p className="m-0 text-[0.6875rem] text-[#aeb6c5] light:text-(--text-muted)" role="status">{selectionMessage}</p>
     </div>
   );
 }
@@ -293,20 +293,20 @@ function CaseUploadFields({ activityId, disabled, onBusyChange, onCaseReserved, 
         onSelect();
       }} />
       <div className="grid min-h-[175px] place-items-center content-center gap-[7px] rounded-[6px] border-2 border-dashed border-[#d1d5db] light:border-(--border-strong) p-5 text-center">
-        <span className="text-[32px] font-light" aria-hidden="true">＋</span>
+        <span className="text-[2rem] font-light" aria-hidden="true">＋</span>
         <div className="flex min-w-0 flex-wrap items-center justify-center gap-3">
           <label className="min-w-0 cursor-pointer break-all" htmlFor={fileInputId}><strong>{file ? file.name : "Choose a chest X-ray"}</strong></label>
           {file ? (
-            <button className={`${activityButton.secondary} text-[11px] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#80caff] light:focus-visible:outline-(--brand-blue-text)`} type="button" disabled={busy} onClick={onClear}>
+            <button className={`${activityButton.secondary} text-[0.6875rem] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#80caff] light:focus-visible:outline-(--brand-blue-text)`} type="button" disabled={busy} onClick={onClear}>
               Remove selected case
             </button>
           ) : null}
         </div>
-        <small className="text-[10px] text-[#8d96a5] light:text-(--text-muted)">JPEG or PNG · maximum 6 MB · private storage</small>
+        <small className="text-[0.625rem] text-[#8d96a5] light:text-(--text-muted)">JPEG or PNG · maximum 6 MB · private storage</small>
         <input
           ref={fileInputRef}
           id={fileInputId}
-          className="w-full max-w-[250px] text-[10px] text-[#aeb6c5] light:text-(--text-muted)"
+          className="w-full max-w-[250px] text-[0.625rem] text-[#aeb6c5] light:text-(--text-muted)"
           type="file"
           aria-label="Choose a chest X-ray file"
           accept="image/jpeg,image/png"
@@ -321,7 +321,7 @@ function CaseUploadFields({ activityId, disabled, onBusyChange, onCaseReserved, 
         />
       </div>
       <FieldError>{prepareState.fieldErrors?.file}</FieldError>
-      <label className="my-4 grid grid-cols-[18px_minmax(0,1fr)] gap-[9px] text-[11px] leading-[1.4] text-[#bdc4cf] light:text-(--text-muted)">
+      <label className="my-4 grid grid-cols-[18px_minmax(0,1fr)] gap-[9px] text-[0.6875rem] leading-[1.4] text-[#bdc4cf] light:text-(--text-muted)">
         <input className="size-4 accent-brand" type="checkbox" name="attestation" disabled={busy} required />
         <span>I attest this is a de-identified image approved for this class activity.</span>
       </label>
@@ -373,7 +373,7 @@ function LifecycleForm({
 
 export function ActivityLifecycleControls({ activity }: { activity: ProfessorActivityDetails }) {
   if (activity.status === "archived") {
-    return <p className="m-0 rounded-[7px] border border-[#626b79] light:border-(--border-subtle) bg-[rgba(255,255,255,0.04)] light:bg-(--hover-overlay) p-3.5 text-[12px] text-[#aeb6c5] light:text-(--text-muted)">Archived activities are read-only and cannot be restored.</p>;
+    return <p className="m-0 rounded-[7px] border border-[#626b79] light:border-(--border-subtle) bg-[rgba(255,255,255,0.04)] light:bg-(--hover-overlay) p-3.5 text-[0.75rem] text-[#aeb6c5] light:text-(--text-muted)">Archived activities are read-only and cannot be restored.</p>;
   }
 
   return (

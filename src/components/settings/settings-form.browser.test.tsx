@@ -1,4 +1,4 @@
-import { expect, test, vi } from "vitest";
+import { expect, onTestFinished, test, vi } from "vitest";
 import { page, userEvent } from "vitest/browser";
 import { render } from "vitest-browser-react";
 import type { ComponentProps } from "react";
@@ -45,7 +45,7 @@ test("starts on Profile and moves tabs with click and keyboard navigation", asyn
   await expect.element(page.getByRole("heading", { name: "Change password" })).toBeVisible();
   await expect.element(page.getByRole("button", { name: "Save changes" })).not.toBeInTheDocument();
   await userEvent.keyboard("{End}");
-  await expect.element(page.getByRole("tab", { name: "Privacy" })).toHaveFocus();
+  await expect.element(page.getByRole("tab", { name: "Accessibility" })).toHaveFocus();
   await userEvent.keyboard("{Home}");
   await expect.element(page.getByRole("tab", { name: "Profile" })).toHaveFocus();
 });
@@ -79,6 +79,37 @@ test("disables controls while saving and returns to clean state after success", 
   await expect.element(page.getByRole("button", { name: "Saving…" })).toBeDisabled();
   finish({ status: "success", message: "Settings saved.", savedValues: { displayName: "Ada Updated", workPhone: null } });
   await expect.element(page.getByRole("button", { name: "Save changes" })).toBeDisabled();
+});
+
+test("applies text size and high contrast to <html> and remembers them", async () => {
+  const root = document.documentElement;
+  onTestFinished(() => {
+    root.removeAttribute("data-text-size");
+    root.removeAttribute("data-contrast");
+    localStorage.removeItem("text-size");
+    localStorage.removeItem("contrast");
+  });
+  await render(<SettingsForm {...baseProps} />);
+  await page.getByRole("tab", { name: "Accessibility" }).click();
+  await expect.element(page.getByRole("button", { name: "Save changes" })).not.toBeInTheDocument();
+
+  await page.getByRole("radio", { name: "Larger" }).click();
+  await expect.element(page.getByRole("radio", { name: "Larger" })).toBeChecked();
+  expect(root.getAttribute("data-text-size")).toBe("larger");
+  expect(localStorage.getItem("text-size")).toBe("larger");
+  await page.getByRole("radio", { name: "Default" }).click();
+  expect(root.hasAttribute("data-text-size")).toBe(false);
+
+  const contrast = page.getByRole("checkbox", { name: /High contrast/ });
+  await contrast.click();
+  await expect.element(contrast).toBeChecked();
+  expect(root.getAttribute("data-contrast")).toBe("high");
+  expect(localStorage.getItem("contrast")).toBe("high");
+  await contrast.click();
+  await expect.element(contrast).not.toBeChecked();
+  expect(root.hasAttribute("data-contrast")).toBe(false);
+  // "normal", not removed, so the prefers-contrast fallback doesn't switch it back on.
+  expect(localStorage.getItem("contrast")).toBe("normal");
 });
 
 test("shows password errors returned by the server", async () => {

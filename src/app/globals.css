@@ -84,6 +84,67 @@
   color-scheme: light;
 }
 
+/* Settings → Accessibility, applied on <html> by the inline script in app/layout.tsx. Font sizes are rem, so these scale all text on top of the browser's own font-size setting. */
+:root[data-text-size="large"] {
+  font-size: 112.5%;
+}
+
+:root[data-text-size="larger"] {
+  font-size: 125%;
+}
+
+/* High contrast: solid surfaces, near-primary secondary text, strong borders. The second selector reaches the dark-pinned landing and auth roots. */
+/* ponytail: tokens only; ~200 hardcoded dark-mode text hexes keep their (already 4.5:1+) colour. Move them onto tokens if they need to follow this too. */
+:root[data-contrast="high"]:not([data-theme="light"]),
+[data-contrast="high"] [data-theme="dark"] {
+  --glass-shell: #000000;
+  --glass-surface: #060b16;
+  --glass-inset: #0d1424;
+  --glass-canvas: #000000;
+  --canvas: #000000;
+  --app-background: #000000;
+  --surface-input: #000000;
+  --text-primary: #ffffff;
+  --text-secondary: #f2f6fc;
+  --text-muted: #e3e9f2;
+  --text-disabled: #c9d3e1;
+  --border-default: #c9d3e1;
+  --border-strong: #e3e9f2;
+  --border-subtle: #9aa6b8;
+  --border-shell: #9aa6b8;
+  --border-field: #e3e9f2;
+  --brand-blue-text: #9fd6ff;
+  --status-error-text: #ffc4c9;
+  --status-success-text: #b8ffd4;
+  --status-info-text: #cfe8ff;
+  --status-warning-text: #ffe08f;
+  --status-accent-text: #dcb8ff;
+}
+
+:root[data-contrast="high"][data-theme="light"] {
+  --glass-shell: #ffffff;
+  --glass-surface: #ffffff;
+  --glass-inset: #f4f7fb;
+  --glass-canvas: #ffffff;
+  --canvas: #ffffff;
+  --app-background: #ffffff;
+  --text-primary: #000000;
+  --text-secondary: #0b1526;
+  --text-muted: #1a2538;
+  --text-disabled: #364256;
+  --border-default: #364256;
+  --border-strong: #1a2538;
+  --border-subtle: #5d6a80;
+  --border-shell: #5d6a80;
+  --border-field: #1a2538;
+  --brand-blue-text: #003d8f;
+  --status-error-text: #7d0010;
+  --status-success-text: #004d25;
+  --status-info-text: #003d8f;
+  --status-warning-text: #4d3000;
+  --status-accent-text: #4a1680;
+}
+
 @theme inline {
   --color-background: var(--canvas);
   --color-foreground: var(--text-primary);

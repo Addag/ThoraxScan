@@ -34,15 +34,15 @@ export default async function StudentActivitiesPage() {
           <div className="grid gap-3.5">
             {activities.data.map((activity) => (
               <article className="grid grid-cols-[56px_minmax(0,1fr)_auto] items-center gap-[18px] rounded-[10px] border border-(--border-shell) bg-(--surface-field) px-5 py-[18px] max-[760px]:grid-cols-[50px_minmax(0,1fr)]" key={activity.id}>
-                <div className="grid size-[50px] place-items-center rounded-full bg-brand text-[22px]" aria-hidden="true">◉</div>
+                <div className="grid size-[50px] place-items-center rounded-full bg-brand text-[1.375rem]" aria-hidden="true">◉</div>
                 <div>
-                  <p className="mx-0 mt-0 mb-1 text-[10px] font-extrabold uppercase text-[#8f98a8] light:text-(--text-muted)">{activity.workspaceName}</p>
-                  <h2 className="mx-0 mt-0 mb-[7px] text-[19px]">{activity.title}</h2>
-                  <span className={`text-[11px] ${dueStateColor(activity.dueAt)}`}>
+                  <p className="mx-0 mt-0 mb-1 text-[0.625rem] font-extrabold uppercase text-[#8f98a8] light:text-(--text-muted)">{activity.workspaceName}</p>
+                  <h2 className="mx-0 mt-0 mb-[7px] text-[1.1875rem]">{activity.title}</h2>
+                  <span className={`text-[0.6875rem] ${dueStateColor(activity.dueAt)}`}>
                     {submissionLabel(activity.submissionStatus, activity.dueAt)} · {activity.aiStatus === "ready" ? "Feedback available" : activity.aiStatus === "pending" ? "Analysis pending" : activity.aiStatus === "failed" ? "Analysis failed · retry available" : "AI feedback locked"} · {formatDueDate(activity.dueAt)}
                   </span>
                 </div>
-                <Link className="transition-colors duration-160 hover:text-(--text-primary) text-[12px] font-extrabold text-[#70bdff] light:text-(--brand-blue-text) no-underline max-[760px]:col-span-full max-[760px]:border-t max-[760px]:border-[#39465b] light:max-[760px]:border-(--border-subtle) max-[760px]:pt-[13px]" href={`/student/activities/${activity.id}`}>Review activity <span aria-hidden="true">→</span></Link>
+                <Link className="transition-colors duration-160 hover:text-(--text-primary) text-[0.75rem] font-extrabold text-[#70bdff] light:text-(--brand-blue-text) no-underline max-[760px]:col-span-full max-[760px]:border-t max-[760px]:border-[#39465b] light:max-[760px]:border-(--border-subtle) max-[760px]:pt-[13px]" href={`/student/activities/${activity.id}`}>Review activity <span aria-hidden="true">→</span></Link>
               </article>
             ))}
           </div>

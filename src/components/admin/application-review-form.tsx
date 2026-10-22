@@ -39,7 +39,7 @@ export function ApplicationReviewForm({
           {pending ? "Reviewing…" : application.status === "rejected" ? "Approve after review" : "Approve"}
         </button>
         {!canApprove && (
-          <small className="text-[10px] text-[#d0ab56] light:text-(--status-warning-text)">
+          <small className="text-[0.625rem] text-[#d0ab56] light:text-(--status-warning-text)">
             {!application.email_confirmed
               ? "Email confirmation required"
               : "Existing memberships must be removed"}
@@ -49,8 +49,8 @@ export function ApplicationReviewForm({
 
       {application.status === "pending" && (
         <details className="rounded-[6px] border border-[#633f49] light:border-(--border-subtle) p-2.5">
-          <summary className="cursor-pointer text-[12px] font-extrabold text-[#ffb4b4] light:text-(--status-error-text)">Reject application</summary>
-          <label className="mt-3 mb-1.5 block text-[11px] font-extrabold" htmlFor={`rejection-reason-${application.user_id}`}>
+          <summary className="cursor-pointer text-[0.75rem] font-extrabold text-[#ffb4b4] light:text-(--status-error-text)">Reject application</summary>
+          <label className="mt-3 mb-1.5 block text-[0.6875rem] font-extrabold" htmlFor={`rejection-reason-${application.user_id}`}>
             Reason <span>(optional)</span>
           </label>
           <textarea
@@ -83,7 +83,7 @@ export function ApplicationReviewForm({
 
       {state.message && (
         <p
-          className={`col-span-full m-0 text-[11px] leading-[1.35] ${formStatusColor(state.status)}`}
+          className={`col-span-full m-0 text-[0.6875rem] leading-[1.35] ${formStatusColor(state.status)}`}
           role={state.status === "success" ? "status" : "alert"}
         >
           {state.message}

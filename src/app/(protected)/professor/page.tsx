@@ -39,19 +39,19 @@ export default async function ProfessorPage() {
         </StatGrid>
 
         <Link className={activitiesCtaClass} href="/professor/activities">
-          <span className="grid gap-1"><strong>Manage activities</strong><small className="text-[11px] text-[#9fcfff] light:text-(--brand-blue-text)">Author, publish, and archive case-backed assignments</small></span>
-          <span className="text-[24px] text-[#70bdff] light:text-(--brand-blue-text)" aria-hidden="true">→</span>
+          <span className="grid gap-1"><strong>Manage activities</strong><small className="text-[0.6875rem] text-[#9fcfff] light:text-(--brand-blue-text)">Author, publish, and archive case-backed assignments</small></span>
+          <span className="text-[1.5rem] text-[#70bdff] light:text-(--brand-blue-text)" aria-hidden="true">→</span>
         </Link>
 
         <section className="mt-[22px] grid grid-cols-2 gap-[18px] max-[1000px]:grid-cols-1" aria-label="Workspace actions">
           <article className="rounded-[10px] border border-(--border-shell) [background:var(--glass-surface)] p-[22px] backdrop-blur-[18px] backdrop-saturate-[135%] shadow-(--glass-shadow)">
             <p className={sectionKickerClass}>New class space</p>
-            <h2 className="m-0 mb-[18px] text-[19px]">Create a workspace</h2>
+            <h2 className="m-0 mb-[18px] text-[1.1875rem]">Create a workspace</h2>
             <CreateWorkspaceForm />
           </article>
           <article className="rounded-[10px] border border-(--border-shell) [background:var(--glass-surface)] p-[22px] backdrop-blur-[18px] backdrop-saturate-[135%] shadow-(--glass-shadow)">
             <p className={sectionKickerClass}>Teaching access</p>
-            <h2 className="m-0 mb-[18px] text-[19px]">Join as co-professor</h2>
+            <h2 className="m-0 mb-[18px] text-[1.1875rem]">Join as co-professor</h2>
             <ProfessorRedeemForm />
           </article>
         </section>

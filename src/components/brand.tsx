@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 
+// The wordmark stays px, unlike other text: it sits beside a fixed-size logo image and would overflow the 230px sidebar at larger text sizes.
 const variants = {
   landing: {
     link: "absolute top-[13px] left-9 z-[2] gap-[26px] narrow:top-[11px] narrow:left-5 narrow:gap-3.5",

@@ -24,7 +24,7 @@ const detailsClass = "mt-[18px] border-t border-t-[#3f5271] pt-3.5";
 const summaryClass = "cursor-pointer font-bold";
 const labelListClass = "mt-3 grid list-none gap-2 p-0";
 const labelItemClass = "flex flex-col gap-2 rounded-[7px] border border-[#3f5271] px-3 py-2.5";
-const labelDetailClass = "text-[13px] text-(--text-secondary)";
+const labelDetailClass = "text-[0.8125rem] text-(--text-secondary)";
 
 function messageForError(error: unknown) {
   if (error instanceof InferenceError) return errorCopy[error.code];
@@ -85,12 +85,12 @@ export function LearningModeAnalyzer() {
 
   return <section className="grid grid-cols-2 items-start gap-8 max-[1000px]:gap-5 max-[800px]:grid-cols-1" aria-label="Learning Mode practice">
     <div className="min-w-0">
-      <button className="transition-[filter] duration-160 not-disabled:hover:brightness-115 mb-[26px] w-full cursor-pointer rounded-[9px] border-0 bg-brand px-3.5 py-[17px] text-[22px] font-bold text-white max-[1000px]:text-[19px]" type="button" onClick={() => inputRef.current?.click()}>Use Local X-Ray Images</button>
+      <button className="transition-[filter] duration-160 not-disabled:hover:brightness-115 mb-[26px] w-full cursor-pointer rounded-[9px] border-0 bg-brand px-3.5 py-[17px] text-[1.375rem] font-bold text-white max-[1000px]:text-[1.1875rem]" type="button" onClick={() => inputRef.current?.click()}>Use Local X-Ray Images</button>
       <div className={panelClass}>
-        <h2 className="m-0 flex items-center gap-4 border-b border-b-[#3e4759] light:border-b-(--border-subtle) px-[18px] py-3.5 text-[16px] font-extrabold"><img className="light:invert" src="/images/learning/eye.svg" alt="" width="26" height="26" /> Select a Chest X-Ray</h2>
+        <h2 className="m-0 flex items-center gap-4 border-b border-b-[#3e4759] light:border-b-(--border-subtle) px-[18px] py-3.5 text-[1rem] font-extrabold"><img className="light:invert" src="/images/learning/eye.svg" alt="" width="26" height="26" /> Select a Chest X-Ray</h2>
         <div className="p-[22px] max-[1000px]:p-4">
-          <label className="mb-2.5 block text-[13px] text-(--text-secondary)" htmlFor="learning-image">Chest X-ray image (JPEG or PNG, up to 6 MiB)</label>
-          <input className="mb-4 block w-full min-w-0 text-[13px] file:mr-2 file:cursor-pointer file:rounded-[4px] file:border file:border-[#69819f] file:bg-[#26364e] file:p-2 file:text-white" ref={inputRef} id="learning-image" aria-label="Image file" type="file" accept="image/jpeg,image/png" onChange={(event) => choose(event.target.files?.[0] ?? null)} />
+          <label className="mb-2.5 block text-[0.8125rem] text-(--text-secondary)" htmlFor="learning-image">Chest X-ray image (JPEG or PNG, up to 6 MiB)</label>
+          <input className="mb-4 block w-full min-w-0 text-[0.8125rem] file:mr-2 file:cursor-pointer file:rounded-[4px] file:border file:border-[#69819f] file:bg-[#26364e] file:p-2 file:text-white" ref={inputRef} id="learning-image" aria-label="Image file" type="file" accept="image/jpeg,image/png" onChange={(event) => choose(event.target.files?.[0] ?? null)} />
           <button className={`transition-colors duration-160 not-disabled:hover:bg-(--hover-overlay) flex min-h-[240px] w-full cursor-pointer flex-col items-center justify-center gap-[18px] border-[3px] border-dashed ${dragging ? "border-brand" : "border-[#c7d4e8] light:border-(--border-strong)"} bg-none p-3 text-(--text-secondary)`} type="button" aria-label={previewUrl ? "Replace selected image" : "Choose or drop a chest X-ray image"} onClick={() => inputRef.current?.click()}
             onDragOver={(event) => { event.preventDefault(); setDragging(true); }}
             onDragLeave={(event) => { if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setDragging(false); }}
@@ -107,34 +107,34 @@ export function LearningModeAnalyzer() {
               <img className="block max-h-[360px] w-full object-contain" src={previewUrl} alt="Selected chest X-ray preview" />
             ) : <><img className="light:invert" src="/images/learning/plus.svg" alt="" width="32" height="32" /><span>Choose or drop a local image</span></>}
           </button>
-          {file && <p className="text-[13px] [overflow-wrap:anywhere] text-(--text-secondary)">{file.name}</p>}
+          {file && <p className="text-[0.8125rem] [overflow-wrap:anywhere] text-(--text-secondary)">{file.name}</p>}
           <div className="mt-5 flex gap-3">
             <button className={`${actionButtonClass} transition-[filter] duration-160 not-disabled:hover:brightness-115 border-brand bg-brand`} type="button" onClick={run} disabled={!file || Boolean(validate(file)) || state === "running"}>Analyze</button>
             <button className={`${actionButtonClass} transition-colors duration-160 not-disabled:hover:bg-(--hover-overlay) border-[#7d94b5] bg-transparent`} type="button" onClick={reset} disabled={state === "idle"}>Reset</button>
           </div>
-          <p className="mt-3 min-h-5 text-[13px] text-[#9fcfff] light:text-(--brand-blue-text)" aria-live="polite">{state === "running" ? "Analyzing in this browser…" : state === "selected" ? "Image ready to analyze." : state === "success" ? "Analysis complete." : ""}</p>
+          <p className="mt-3 min-h-5 text-[0.8125rem] text-[#9fcfff] light:text-(--brand-blue-text)" aria-live="polite">{state === "running" ? "Analyzing in this browser…" : state === "selected" ? "Image ready to analyze." : state === "success" ? "Analysis complete." : ""}</p>
           {error && <p className="border-l-[3px] border-l-[#ff8d8d] px-3 py-2 text-[#ffd5d5] light:text-(--status-error-text)" role="alert">{error}</p>}
         </div>
       </div>
-      <p className="mt-4 text-[13px] leading-[1.6] text-(--text-muted)">Your selected image stays in browser memory. The application contacts Supabase for the active release and downloads the model artifact.</p>
+      <p className="mt-4 text-[0.8125rem] leading-[1.6] text-(--text-muted)">Your selected image stays in browser memory. The application contacts Supabase for the active release and downloads the model artifact.</p>
     </div>
     <div className="min-w-0">
     {result ? <div className={`${panelClass} p-6 max-[480px]:p-5`} aria-live="polite">
-      <h2 className="mb-5 text-[24px] font-extrabold" tabIndex={-1} ref={resultHeadingRef}>Analysis result</h2>
+      <h2 className="mb-5 text-[1.5rem] font-extrabold" tabIndex={-1} ref={resultHeadingRef}>Analysis result</h2>
       <section aria-labelledby="learning-findings-title"><h3 className="mb-3" id="learning-findings-title">Likely findings</h3>{result.state === "no-threshold-match" ? <p>No finding met its configured threshold.</p> : <ul className={labelListClass}>{result.findings.map((finding) => <li className={labelItemClass} key={finding.label}><strong>{finding.label}</strong><span className={labelDetailClass}>{(finding.probability * 100).toFixed(1)}% probability</span></li>)}</ul>}</section>
-      {result.possibleFindings.length > 0 && <section className="mt-5" aria-labelledby="learning-possible-title"><h3 className="mb-1" id="learning-possible-title">Possible findings</h3><p className="mb-3 text-[13px] leading-[1.5] text-(--text-muted)">Below the likely threshold but above a lower, more sensitive one. Check these against the image yourself; many will be false alarms.</p><ul className={labelListClass}>{result.possibleFindings.map((finding) => <li className={labelItemClass} key={finding.label}><strong>{finding.label}</strong><span className={labelDetailClass}>{(finding.probability * 100).toFixed(1)}% probability</span></li>)}</ul></section>}
+      {result.possibleFindings.length > 0 && <section className="mt-5" aria-labelledby="learning-possible-title"><h3 className="mb-1" id="learning-possible-title">Possible findings</h3><p className="mb-3 text-[0.8125rem] leading-[1.5] text-(--text-muted)">Below the likely threshold but above a lower, more sensitive one. Check these against the image yourself; many will be false alarms.</p><ul className={labelListClass}>{result.possibleFindings.map((finding) => <li className={labelItemClass} key={finding.label}><strong>{finding.label}</strong><span className={labelDetailClass}>{(finding.probability * 100).toFixed(1)}% probability</span></li>)}</ul></section>}
       {suppressedLabels.map((item) => <p className="text-[#ffd98b] light:text-(--status-warning-text)" key={item.label}>{item.label}: Suppressed by abnormal finding.</p>)}
       <details className={detailsClass}><summary className={summaryClass}>All {result.labels.length} labels</summary><ul className={labelListClass}>{result.labels.map((item) => <li className={labelItemClass} key={item.label}><div className="flex flex-col gap-1"><strong>{item.label}</strong><span className={labelDetailClass}>{item.predicted ? "Likely" : item.possible ? "Possible" : "Not matched"}{suppressedLabels.includes(item) ? " · Suppressed by abnormal finding" : ""}</span></div><span className={labelDetailClass}>Probability {(item.probability * 100).toFixed(2)}% · Release-supplied threshold {item.threshold}</span></li>)}</ul></details>
-      <details className={detailsClass}><summary className={summaryClass}>Release and execution provenance</summary><dl className="grid grid-cols-[minmax(0,.8fr)_minmax(0,1.2fr)] gap-2.5 text-[13px] max-[480px]:grid-cols-1 [&>dd]:m-0 [&>dd]:[overflow-wrap:anywhere] [&>dt]:text-(--text-muted)"><dt>Release ID</dt><dd>{result.releaseId}</dd><dt>Execution provider</dt><dd>{result.executionProvider.toUpperCase()}</dd><dt>Manifest version</dt><dd>{result.manifestVersion}</dd><dt>Preprocessing version</dt><dd>{result.preprocessingVersion}</dd><dt>Threshold version</dt><dd>{result.thresholdVersion}</dd><dt>Application build</dt><dd>{result.applicationBuild}</dd><dt>Model SHA-256</dt><dd>{result.modelSha256}</dd><dt>Bundle SHA-256</dt><dd>{result.bundleSha256}</dd></dl></details>
+      <details className={detailsClass}><summary className={summaryClass}>Release and execution provenance</summary><dl className="grid grid-cols-[minmax(0,.8fr)_minmax(0,1.2fr)] gap-2.5 text-[0.8125rem] max-[480px]:grid-cols-1 [&>dd]:m-0 [&>dd]:[overflow-wrap:anywhere] [&>dt]:text-(--text-muted)"><dt>Release ID</dt><dd>{result.releaseId}</dd><dt>Execution provider</dt><dd>{result.executionProvider.toUpperCase()}</dd><dt>Manifest version</dt><dd>{result.manifestVersion}</dd><dt>Preprocessing version</dt><dd>{result.preprocessingVersion}</dd><dt>Threshold version</dt><dd>{result.thresholdVersion}</dd><dt>Application build</dt><dd>{result.applicationBuild}</dd><dt>Model SHA-256</dt><dd>{result.modelSha256}</dd><dt>Bundle SHA-256</dt><dd>{result.bundleSha256}</dd></dl></details>
       <AttentionHeatmap imageUrl={previewUrl} attention={result.attention ?? { status: "unavailable", reason: "legacy-model-release" }} title="Model attention" />
-      <p className="mt-5 text-[12px] leading-[1.5] text-(--text-muted)">Educational use only. This result is not a diagnosis and should not guide medical decisions.</p>
+      <p className="mt-5 text-[0.75rem] leading-[1.5] text-(--text-muted)">Educational use only. This result is not a diagnosis and should not guide medical decisions.</p>
     </div> : <section className={`${panelClass} flex min-h-[327px] flex-col items-center justify-center p-8 text-center max-[480px]:p-5`} aria-labelledby="learning-empty-title">
       <div className="mb-6 grid size-16 flex-none place-items-center rounded-md border border-[#5925a7] bg-[#2e1677]"><img src="/images/learning/scan.svg" alt="" width="36" height="36" /></div>
-      <h2 className="mb-[18px] text-[24px] font-bold" id="learning-empty-title">{state === "running" ? "Analyzing your X-ray" : "Select an X-ray to begin"}</h2>
-      <p className="m-0 text-[14px] leading-[1.6] text-(--text-muted)">{state === "running" ? "Resolving the active release, verifying the model, and analyzing in your browser. You can reset at any time." : "Choose a built-in case or a local JPEG or PNG image, review the preview, then select Analyze to explore the model’s findings."}</p>
+      <h2 className="mb-[18px] text-[1.5rem] font-bold" id="learning-empty-title">{state === "running" ? "Analyzing your X-ray" : "Select an X-ray to begin"}</h2>
+      <p className="m-0 text-[0.875rem] leading-[1.6] text-(--text-muted)">{state === "running" ? "Resolving the active release, verifying the model, and analyzing in your browser. You can reset at any time." : "Choose a built-in case or a local JPEG or PNG image, review the preview, then select Analyze to explore the model’s findings."}</p>
     </section>}
     <section className={`${panelClass} mt-7 min-h-[220px] p-7 max-[480px]:p-5`} aria-labelledby="learning-gallery-title">
-      <h2 className="mb-6 flex items-center gap-[18px] text-[20px] font-bold" id="learning-gallery-title"><img src="/images/learning/book.svg" alt="" width="28" height="28" /> Sample Gallery</h2>
+      <h2 className="mb-6 flex items-center gap-[18px] text-[1.25rem] font-bold" id="learning-gallery-title"><img src="/images/learning/book.svg" alt="" width="28" height="28" /> Sample Gallery</h2>
       <XrayLibrary onSelect={(next) => { if (inputRef.current) inputRef.current.value = ""; choose(next); }} />
     </section>
     </div>
