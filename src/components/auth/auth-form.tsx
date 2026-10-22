@@ -208,45 +208,19 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
       )}
 
       {mode === "register" && (
-        <>
-          <div className={fieldClass}>
-            <label htmlFor="register-age-band">Age group</label>
-            <select
-              className={inputClass}
-              id="register-age-band"
-              name="ageBand"
-              defaultValue=""
-              required
-              aria-invalid={Boolean(state.fieldErrors?.ageBand)}
-              aria-describedby={state.fieldErrors?.ageBand ? "register-age-band-help register-age-band-error" : "register-age-band-help"}
-            >
-              <option value="" disabled>Select an age group</option>
-              <option value="adult">18 or older</option>
-              <option value="minor">Under 18</option>
-            </select>
-            <small id="register-age-band-help">Under-18 research participation requires an approved guardian process.</small>
-            {state.fieldErrors?.ageBand && <p className={fieldErrorClass} id="register-age-band-error" role="alert">{state.fieldErrors.ageBand}</p>}
-          </div>
-
-          <fieldset className="mt-5 grid gap-3 border-0 p-0 text-[13px] leading-[1.5] text-[#d6e1f0]">
-            <legend className="sr-only">Terms, privacy and research choices</legend>
-            <label className="flex items-start gap-2">
-              <input className="mt-1 size-4 flex-none accent-[#4da5ff]" name="termsAccepted" type="checkbox" value="yes" required aria-invalid={Boolean(state.fieldErrors?.termsAccepted)} aria-describedby={state.fieldErrors?.termsAccepted ? "register-terms-error" : undefined} />
-              <span>I agree to the <Link className="font-semibold text-[#9fd1ff] underline underline-offset-2" href="/terms">Terms and Conditions</Link> (version {TERMS_VERSION}, effective {TERMS_EFFECTIVE_DATE}).</span>
-            </label>
-            {state.fieldErrors?.termsAccepted && <p className={`${fieldErrorText} mt-[-6px] ml-6`} id="register-terms-error" role="alert">{state.fieldErrors.termsAccepted}</p>}
-            <label className="flex items-start gap-2">
-              <input className="mt-1 size-4 flex-none accent-[#4da5ff]" name="privacyNoticeAccepted" type="checkbox" value="yes" required aria-invalid={Boolean(state.fieldErrors?.privacyNoticeAccepted)} aria-describedby={state.fieldErrors?.privacyNoticeAccepted ? "register-privacy-error" : undefined} />
-              <span>I have read the <Link className="font-semibold text-[#9fd1ff] underline underline-offset-2" href="/privacy-policy">Privacy Policy</Link> (version {PRIVACY_POLICY_VERSION}, effective {PRIVACY_POLICY_EFFECTIVE_DATE}).</span>
-            </label>
-            {state.fieldErrors?.privacyNoticeAccepted && <p className={`${fieldErrorText} mt-[-6px] ml-6`} id="register-privacy-error" role="alert">{state.fieldErrors.privacyNoticeAccepted}</p>}
-            <label className="flex items-start gap-2">
-              <input className="mt-1 size-4 flex-none accent-[#4da5ff]" name="researchConsent" type="checkbox" value="yes" aria-invalid={Boolean(state.fieldErrors?.researchConsent)} aria-describedby={state.fieldErrors?.researchConsent ? "register-research-error" : undefined} />
-              <span>I voluntarily agree to participate in the ThoraxScan capstone research. This is separate from educational platform access. Under-18 participants need the approved guardian process.</span>
-            </label>
-            {state.fieldErrors?.researchConsent && <p className={`${fieldErrorText} mt-[-6px] ml-6`} id="register-research-error" role="alert">{state.fieldErrors.researchConsent}</p>}
-          </fieldset>
-        </>
+        <fieldset className="mt-5 grid gap-3 border-0 p-0 text-[13px] leading-[1.5] text-[#d6e1f0]">
+          <legend className="sr-only">Terms and privacy agreements</legend>
+          <label className="flex items-start gap-2">
+            <input className="mt-1 size-4 flex-none accent-[#4da5ff]" name="termsAccepted" type="checkbox" value="yes" required aria-invalid={Boolean(state.fieldErrors?.termsAccepted)} aria-describedby={state.fieldErrors?.termsAccepted ? "register-terms-error" : undefined} />
+            <span>I agree to the <Link className="font-semibold text-[#9fd1ff] underline underline-offset-2" href="/terms">Terms and Conditions</Link> (version {TERMS_VERSION}, effective {TERMS_EFFECTIVE_DATE}).</span>
+          </label>
+          {state.fieldErrors?.termsAccepted && <p className={`${fieldErrorText} mt-[-6px] ml-6`} id="register-terms-error" role="alert">{state.fieldErrors.termsAccepted}</p>}
+          <label className="flex items-start gap-2">
+            <input className="mt-1 size-4 flex-none accent-[#4da5ff]" name="privacyNoticeAccepted" type="checkbox" value="yes" required aria-invalid={Boolean(state.fieldErrors?.privacyNoticeAccepted)} aria-describedby={state.fieldErrors?.privacyNoticeAccepted ? "register-privacy-error" : undefined} />
+            <span>I have read the <Link className="font-semibold text-[#9fd1ff] underline underline-offset-2" href="/privacy-policy">Privacy Policy</Link> (version {PRIVACY_POLICY_VERSION}, effective {PRIVACY_POLICY_EFFECTIVE_DATE}).</span>
+          </label>
+          {state.fieldErrors?.privacyNoticeAccepted && <p className={`${fieldErrorText} mt-[-6px] ml-6`} id="register-privacy-error" role="alert">{state.fieldErrors.privacyNoticeAccepted}</p>}
+        </fieldset>
       )}
 
       {mode === "login" && (

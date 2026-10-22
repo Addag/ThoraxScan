@@ -8,28 +8,29 @@ snapshot: working tree @ privacy-consent migration
 
 # Legal consent record
 
-`public.legal_consents` is the append-only-ish audit record for privacy-notice acknowledgement and voluntary research consent.
+`public.legal_consents` is the append-only-ish audit record for privacy-notice acknowledgement.
 
 ## Why this shape
 
-The platform must distinguish required notice acknowledgement from optional research participation and retain the policy version, age band, timestamp, and withdrawal state used to audit that choice.
+The platform must keep the policy version, timestamp, and withdrawal state used to audit each privacy-notice acknowledgement.
 
 ## Shape
 
-- The table stores `user_id`, `consent_type`, `document_version`, `age_band`, `accepted_at`, `withdrawn_at`, and `created_at` in [20261010120000_privacy_consents.sql](<../../../supabase/migrations/20261010120000_privacy_consents.sql>).
-- `record_registration_consents` is an authenticated, security-definer RPC that records privacy notice consent and optional research consent; it rejects minor research consent until an approved guardian process exists.
-- `withdraw_research_consent` marks the caller's active research consent withdrawn. Direct client insert/update/delete privileges are revoked; RLS exposes a user's own records for select.
-- Registration temporarily carries consent metadata through Supabase Auth and the confirmation route records it after email confirmation in [actions.ts](<../../../src/app/(auth)/actions.ts>), [auth-form.tsx](<../../../src/components/auth/auth-form.tsx>), and [route.ts](<../../../src/app/auth/confirm/route.ts>).
+- The table stores `user_id`, `consent_type`, `document_version`, `accepted_at`, `withdrawn_at`, and `created_at`; `consent_type` allows only `privacy_notice`. Created in [20261010120000_privacy_consents.sql](<../../../supabase/migrations/20261010120000_privacy_consents.sql>) and narrowed in [20261022120000_drop_age_band_and_research_consent.sql](<../../../supabase/migrations/20261022120000_drop_age_band_and_research_consent.sql>).
+- `record_registration_consents(input_policy_version)` is an authenticated, security-definer RPC that records one privacy-notice consent per accepted policy version. It accepts only published versions (`1.0`, `1.1`), so a sign-up confirmed after a policy change still records the version shown at registration. Each new policy version needs a migration that adds it.
+- Direct client insert/update/delete privileges are revoked; RLS exposes a user's own records for select.
+- Registration temporarily carries the policy version through Supabase Auth metadata, and the confirmation route records it after email confirmation in [actions.ts](<../../../src/app/(auth)/actions.ts>) and [route.ts](<../../../src/app/auth/confirm/route.ts>).
+- Registration no longer collects an age group or in-app research consent. The 2026-10-22 migration dropped `age_band`, deleted every `research_participation` row, removed `withdraw_research_consent`, and stripped `age_band` and `research_consent` from Auth user metadata.
 
 ## Connected to
 
-Owned by the authenticated user and linked to [privacy-policy surface](../ui/privacy-policy.md), [registration](../../processes/registration.md), and confirmation. It is not guardian verification, clinical consent, or consent from a person depicted in an X-ray.
+Owned by the authenticated user and linked to [privacy-policy surface](../ui/privacy-policy.md), [registration](../../processes/registration.md), and confirmation. It is not research consent, guardian verification, clinical consent, or consent from a person depicted in an X-ray.
 
 ## If you change this
 
 ### Hits
 
-- Migration constraints/RLS/grants, registration fields and validation, Auth metadata, confirmation recording, research withdrawal, database tests, and policy version display.
+- Migration constraints/RLS/grants, the accepted-version list, Auth metadata, confirmation recording, database tests, and policy version display.
 
 ### Does not hit
 
@@ -37,8 +38,8 @@ Owned by the authenticated user and linked to [privacy-policy surface](../ui/pri
 
 ## Surfaces
 
-Registration form, Supabase Auth metadata, confirmation route, authenticated Supabase RPCs, and privacy-audit administrators.
+Registration form, Supabase Auth metadata, confirmation route, authenticated Supabase RPC, and privacy-audit administrators.
 
 ## See
 
-[Consent migration](<../../../supabase/migrations/20261010120000_privacy_consents.sql>)
+[Consent migration](<../../../supabase/migrations/20261010120000_privacy_consents.sql>) and [age and research removal](<../../../supabase/migrations/20261022120000_drop_age_band_and_research_consent.sql>)

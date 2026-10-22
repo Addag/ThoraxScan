@@ -10,12 +10,6 @@ select has_table_privilege(
 
 select has_function_privilege(
   'authenticated',
-  'public.record_registration_consents(text,boolean)',
-  'execute'
-);
-
-select has_function_privilege(
-  'authenticated',
-  'public.withdraw_research_consent()',
+  'public.record_registration_consents(text)',
   'execute'
 );

@@ -12,10 +12,10 @@ Registration fields → server validation and Auth metadata → confirmed-accoun
 
 ## Steps
 
-1. Registration requires an age band and privacy-notice acknowledgement; research consent is a separate unticked option in [auth-form.tsx](<../../src/components/auth/auth-form.tsx>) and [actions.ts](<../../src/app/(auth)/actions.ts>).
-2. The server action rejects missing notice acknowledgement, invalid age bands, and research consent from minors until the guardian process is approved, then places the policy version/date and research choice in Auth metadata.
-3. After confirmation, [route.ts](<../../src/app/auth/confirm/route.ts>) calls `record_registration_consents` using that metadata.
-4. The RPC records a privacy-notice consent and optional research consent under the authenticated user; a separate RPC can withdraw active research consent.
+1. Registration requires privacy-notice acknowledgement in [auth-form.tsx](<../../src/components/auth/auth-form.tsx>) and [actions.ts](<../../src/app/(auth)/actions.ts>). It asks no age group and offers no research consent.
+2. The server action rejects a missing notice acknowledgement, then places the policy version/date in Auth metadata.
+3. After confirmation, [route.ts](<../../src/app/auth/confirm/route.ts>) calls `record_registration_consents` with the metadata policy version.
+4. The RPC records one privacy-notice consent per accepted policy version under the authenticated user and rejects versions that were never published.
 
 ## Consumes
 
@@ -25,8 +25,7 @@ Registration fields → server validation and Auth metadata → confirmed-accoun
 
 ## Produces
 
-- Confirmed user consent records in `public.legal_consents`.
-- A release-blocker signal for guardian verification and research/privacy approval; no guardian consent is currently recorded.
+- Confirmed privacy-notice records in `public.legal_consents`. Research consent for the capstone evaluation is collected outside the app.
 
 ## If you change this
 

@@ -16,7 +16,6 @@ function registrationForm() {
     confirmPassword: "test-password-123",
     captchaToken: "test-captcha-token",
     requestedRole: "student",
-    ageBand: "adult",
     privacyNoticeAccepted: "yes",
     termsAccepted: "yes",
   })) {
@@ -45,7 +44,7 @@ describe("registration terms agreement", () => {
     expect(mocks.signUp).not.toHaveBeenCalled();
   });
 
-  it.each(["student", "professor"])("includes terms version and date in %s signup metadata without requiring research consent", async (role) => {
+  it.each(["student", "professor"])("includes terms and privacy versions in %s signup metadata without age or research answers", async (role) => {
     const formData = registrationForm();
     formData.set("requestedRole", role);
 
@@ -56,14 +55,16 @@ describe("registration terms agreement", () => {
       options: expect.objectContaining({
         data: expect.objectContaining({
           requested_role: role,
-          terms_version: "1.0",
-          terms_effective_date: "2026-10-13",
-          privacy_policy_version: "1.0",
-          privacy_policy_effective_date: "2026-10-10",
-          research_consent: false,
+          terms_version: "1.1",
+          terms_effective_date: "2026-10-22",
+          privacy_policy_version: "1.1",
+          privacy_policy_effective_date: "2026-10-22",
         }),
       }),
     }));
+    const { data } = mocks.signUp.mock.calls[0][0].options;
+    expect(data).not.toHaveProperty("age_band");
+    expect(data).not.toHaveProperty("research_consent");
   });
 
   it("still requires privacy acknowledgement when terms are accepted", async () => {

@@ -11,9 +11,7 @@ export type AuthField =
   | "expectedRole"
   | "requestedRole"
   | "termsAccepted"
-  | "privacyNoticeAccepted"
-  | "researchConsent"
-  | "ageBand";
+  | "privacyNoticeAccepted";
 
 export type AuthActionState = {
   status: "idle" | "error" | "success";

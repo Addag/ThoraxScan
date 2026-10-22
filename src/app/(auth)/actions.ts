@@ -80,8 +80,6 @@ export async function registerAction(
   const requestedRole = value(formData, "requestedRole");
   const termsAccepted = value(formData, "termsAccepted");
   const privacyNoticeAccepted = value(formData, "privacyNoticeAccepted");
-  const researchConsent = value(formData, "researchConsent") === "yes";
-  const ageBand = value(formData, "ageBand");
   const fieldErrors: Partial<Record<AuthField, string>> = {};
 
   if (!displayName) fieldErrors.displayName = "Enter your display name.";
@@ -105,12 +103,6 @@ export async function registerAction(
   if (privacyNoticeAccepted !== "yes") {
     fieldErrors.privacyNoticeAccepted = "Read and accept the Privacy Policy to create an account.";
   }
-  if (ageBand !== "adult" && ageBand !== "minor") {
-    fieldErrors.ageBand = "Choose an age group.";
-  }
-  if (ageBand === "minor" && researchConsent) {
-    fieldErrors.researchConsent = "Research participation requires the approved guardian process for users under 18.";
-  }
 
   Object.keys(fieldErrors).forEach((key) => {
     if (!fieldErrors[key as AuthField]) delete fieldErrors[key as AuthField];
@@ -131,8 +123,6 @@ export async function registerAction(
       data: {
         display_name: displayName,
         requested_role: requestedRole,
-        age_band: ageBand,
-        research_consent: researchConsent,
         privacy_policy_version: PRIVACY_POLICY_VERSION,
         privacy_policy_effective_date: PRIVACY_POLICY_EFFECTIVE_DATE,
         terms_version: TERMS_VERSION,
