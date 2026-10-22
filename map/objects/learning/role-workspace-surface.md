@@ -24,6 +24,7 @@ The role surfaces share one responsive shell while keeping Professor activity au
 - Professor activity routes expose filtered lifecycle lists, draft authoring, direct case upload, publishing, and archive controls in [activities/page.tsx](<../../../src/app/(protected)/professor/activities/page.tsx:21>).
 - Student activity routes list joined published assignments and render read-only instructions/private previews without reference answers in [student activities](<../../../src/app/(protected)/student/activities/page.tsx:17>).
 - Both responsive shells link to one role-aware [Shared settings surface](../ui/shared-settings-surface.md), with active navigation state and the existing truthful future-feature/model labels preserved.
+- Both shells are async and load the [bell notification](notification.md) feed for the header and mobile-bar bell.
 
 ## Connected to
 

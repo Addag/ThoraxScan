@@ -34,6 +34,7 @@ One line per important noun. live cards are source-backed; ghost entries are doc
 | AI feedback release | live | [ai-feedback-release.md](learning/ai-feedback-release.md) | `public.ai_feedback_releases`, submission trigger, and authorized feedback RPC |
 | Faculty evaluation | live | [faculty-evaluation.md](learning/faculty-evaluation.md) | immutable Professor review and Student projection |
 | Built-in X-ray library | live | [built-in-xray-library.md](learning/built-in-xray-library.md) | Bundled CheXpert `valid` JPEGs, `cases.json` manifest, and shared gallery component |
+| Bell notification | live | [notification.md](learning/notification.md) | Derived due/submission feed, `public.notification_reads`, and popover bell |
 | Analytics | ghost | stub | [application flow reference](../thoraxscan-app-flow.md#L48) |
 
 ## Inference

@@ -5,7 +5,7 @@ import { useId, useRef, useState, type ReactNode } from "react";
 import { Brand } from "@/components/brand";
 import { ThemeIconButton } from "@/components/theme-toggle";
 
-export function AppSidebar({ children }: { children: ReactNode }) {
+export function AppSidebar({ children, actions }: { children: ReactNode; actions?: ReactNode }) {
   const [expanded, setExpanded] = useState(false);
   const contentId = useId();
   const toggleRef = useRef<HTMLButtonElement>(null);
@@ -22,8 +22,9 @@ export function AppSidebar({ children }: { children: ReactNode }) {
       }}
     >
       <Brand variant="sidebar" />
-      {/* Mobile bar controls; the desktop header carries its own theme button. */}
+      {/* Mobile bar controls; the desktop header carries its own bell and theme button. */}
       <div className="hidden max-[850px]:absolute max-[850px]:top-2.5 max-[850px]:right-3.5 max-[850px]:flex max-[850px]:items-center max-[850px]:gap-2">
+        {actions}
         <ThemeIconButton className="size-11" />
         <button
           aria-controls={contentId}

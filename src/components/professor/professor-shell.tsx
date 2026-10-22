@@ -1,8 +1,9 @@
 import type { ReactNode } from "react";
 
 import { AppShell } from "@/components/app-shell";
+import { getNotifications } from "@/lib/notifications/server";
 
-export function ProfessorShell({
+export async function ProfessorShell({
   children,
   activeItem = "dashboard",
   sectionLabel = "Home",
@@ -30,6 +31,7 @@ export function ProfessorShell({
       sectionLabel={sectionLabel}
       sectionDescription={sectionDescription}
       footerNotes={["Assistive tool — not a standalone diagnosis", "ONNX Runtime Web · in-browser inference"]}
+      notifications={await getNotifications("professor")}
     >
       {children}
     </AppShell>

@@ -30,10 +30,11 @@ Owned by a [Workspace](workspace.md), attaches one [X-ray case](xray-case.md), i
 ### Hits
 
 - Migration constraints/RLS, Professor and Student projections, all five activity routes, dashboard counts/recent cards, Server Action validation, and publication/archive behavior.
+- The [bell notification](notification.md) due feed, which filters on `status` and `due_at`.
 
 ### Does not hit
 
-- Faculty evaluation is a separate review record keyed by a final submission; analytics and notifications remain deferred. Published activities expose authorized AI analysis and V2 heatmap feedback through their activity projections. Activity publication gates the Student projection.
+- Faculty evaluation is a separate review record keyed by a final submission; analytics remains deferred. Published activities expose authorized AI analysis and V2 heatmap feedback through their activity projections. Activity publication gates the Student projection.
 
 ## Surfaces
 

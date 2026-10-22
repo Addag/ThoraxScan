@@ -4,7 +4,9 @@ import type { ReactNode } from "react";
 
 import { logoutAction } from "@/app/(protected)/actions";
 import { AppSidebar } from "@/components/app-sidebar";
+import { NotificationBellButton, NotificationPanel } from "@/components/notification-bell";
 import { ThemeIconButton } from "@/components/theme-toggle";
+import type { NotificationsResult } from "@/lib/notifications/types";
 
 export type NavItem = {
   label: string;
@@ -54,6 +56,7 @@ export function AppShell({
   sectionLabel,
   sectionDescription,
   footerNotes,
+  notifications,
 }: {
   children: ReactNode;
   accessLabel: string;
@@ -65,11 +68,15 @@ export function AppShell({
   sectionLabel: string;
   sectionDescription: string;
   footerNotes: [string, string];
+  /** Omitted on shells without a bell (administrator, pending Professor application). */
+  notifications?: NotificationsResult;
 }) {
+  const unread = notifications?.data.filter((item) => !item.read).length ?? 0;
+
   return (
     <div className="grid min-h-svh grid-cols-[230px_minmax(0,1fr)] bg-(--app-background) text-foreground max-[850px]:block">
       <a className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50 focus:rounded-[8px] focus:bg-[#0a65bd] focus:px-4 focus:py-3 focus:font-extrabold focus:text-white" href="#main-content">Skip to main content</a>
-      <AppSidebar>
+      <AppSidebar actions={notifications ? <NotificationBellButton className="size-11" unread={unread} /> : null}>
         <div className="flex min-h-[68px] flex-col justify-center gap-[9px] rounded-[10px] border border-brand px-3.5 py-2.5 shadow-(--glass-inset-shadow) [background:var(--glass-inset)]">
           <span className={`m-0 text-[0.625rem] font-extrabold tracking-[0.08em] text-(--brand-blue-text) uppercase ${supportingTextClass}`}>{accessLabel}</span>
           <strong className="text-[0.8125rem]">
@@ -95,7 +102,10 @@ export function AppShell({
             <strong className="text-[0.8125rem]">{sectionLabel}</strong>
             <span className={`text-[0.75rem] text-(--text-muted) ${supportingTextClass}`}>{sectionDescription}</span>
           </div>
-          <ThemeIconButton />
+          <div className="flex items-center gap-2">
+            {notifications ? <NotificationBellButton unread={unread} /> : null}
+            <ThemeIconButton />
+          </div>
         </header>
         {children}
         <footer className="flex min-h-[42px] items-center justify-between gap-5 border-t border-t-(--border-shell) bg-(--glass-shell) px-[clamp(22px,4vw,54px)] py-2.5 text-[0.6875rem] backdrop-blur-[12px] max-[850px]:flex-wrap max-[600px]:hidden">
@@ -108,6 +118,7 @@ export function AppShell({
           </span>
         </footer>
       </div>
+      {notifications ? <NotificationPanel notifications={notifications} /> : null}
     </div>
   );
 }
