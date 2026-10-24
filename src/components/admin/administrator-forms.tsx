@@ -32,7 +32,7 @@ export function AddAdministratorForm() {
         <button
           type="button"
           disabled={pending}
-          className={`${primaryButton} disabled:cursor-not-allowed disabled:opacity-[0.58]`}
+          className={`${primaryButton} min-h-[43px] px-[17px] disabled:cursor-not-allowed disabled:opacity-[0.58]`}
           onClick={() => setConfirmingEmail(emailRef.current?.value.trim() ?? "")}
         >
           {pending ? "Adding…" : "Add administrator"}

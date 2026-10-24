@@ -33,7 +33,7 @@ export function ApplicationReviewForm({
         <button
           type="button"
           disabled={pending || !canApprove}
-          className={`${primaryButton} disabled:cursor-not-allowed disabled:opacity-[0.58]`}
+          className={`${primaryButton} min-h-[43px] px-[17px] disabled:cursor-not-allowed disabled:opacity-[0.58]`}
           onClick={() => setConfirmingApproval(true)}
         >
           {pending ? "Reviewing…" : application.status === "rejected" ? "Approve after review" : "Approve"}
