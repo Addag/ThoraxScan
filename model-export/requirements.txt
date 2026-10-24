@@ -1,6 +1,26 @@
-numpy==2.4.6
-torch==2.11.0
-onnx==1.21.0
-onnxruntime==1.26.0
+# Training, evaluation and ONNX export environment (Python 3.14.7).
+# CUDA 12.8 builds of torch/torchvision come from the PyTorch index below.
+# CPU-only machine: drop the index line and the +cu128 suffixes.
+--extra-index-url https://download.pytorch.org/whl/cu128
+
+# PyTorch (CUDA)
+torch==2.11.0+cu128
+torchvision==0.26.0+cu128
+
+# Model, training and evaluation
 timm==1.0.27
 safetensors==0.7.0
+numpy==2.4.6
+pandas==3.0.3
+pillow==12.2.0
+opencv-python==4.13.0.92
+scikit-learn==1.8.0
+scipy==1.17.1
+matplotlib==3.10.9
+tqdm==4.67.3
+
+# ONNX export and testing
+onnx==1.21.0
+onnxruntime-gpu==1.26.0
+onnxsim==0.6.3
+onnxscript==0.7.0
