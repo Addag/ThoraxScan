@@ -88,7 +88,7 @@ export function AppShell({
           {navItems.map((item) => <NavEntry item={item} key={item.label} />)}
         </nav>
         <form className="mt-auto border-t border-t-(--border-subtle) pt-[18px] max-[850px]:mt-4 max-[850px]:pt-3" action={logoutAction}>
-          <button className="transition-colors duration-160 not-disabled:hover:bg-(--hover-overlay) w-full cursor-pointer border-0 bg-transparent p-2.5 text-left font-semibold text-[#ff5457] light:text-(--status-error-text) max-[850px]:min-h-12" type="submit">
+          <button className="transition-colors duration-160 not-disabled:hover:bg-(--hover-overlay) w-full cursor-pointer rounded-lg border-0 bg-transparent p-2.5 text-left font-semibold text-[#ff5457] light:text-(--status-error-text) max-[850px]:min-h-12" type="submit">
             <span className="mr-2 text-[1.25rem]" aria-hidden="true">↪</span> Log out
           </button>
         </form>
