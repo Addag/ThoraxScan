@@ -5,11 +5,12 @@ import { AdminShell } from "@/components/admin/admin-shell";
 import { ApplicationReviewForm } from "@/components/admin/application-review-form";
 import { EmptyState } from "@/components/empty-state";
 import { rejectionReasonClass, reviewFieldClass, reviewPanelClass } from "@/components/admin/review-styles";
-import { getProfessorApplications } from "@/lib/admin/server";
+import { AddAdministratorForm, RemoveAdministratorForm } from "@/components/admin/administrator-forms";
+import { getPlatformAdmins, getProfessorApplications } from "@/lib/admin/server";
 import type { ProfessorApplicationProjection } from "@/lib/admin/types";
 import type { ProfessorApplicationStatus } from "@/lib/auth/types";
 import { requirePlatformAdmin } from "@/lib/auth/server";
-import { PageHeading, SectionHeading, StatCard, StatGrid, countBadgeClass , PageMain} from "@/components/dashboard-ui";
+import { PageHeading, SectionHeading, countBadgeClass , PageMain} from "@/components/dashboard-ui";
 
 export const metadata: Metadata = {
   title: "Professor approvals | ThoraxScan",
@@ -36,13 +37,18 @@ function formatDate(value: string) {
   }).format(new Date(value));
 }
 
+function reviewSummary({ reviewed_at, reviewer_name }: ProfessorApplicationProjection) {
+  if (!reviewed_at) return "—";
+  return reviewer_name ? `${formatDate(reviewed_at)} by ${reviewer_name}` : formatDate(reviewed_at);
+}
+
 export default async function AdminPage({
   searchParams,
 }: {
   searchParams: Promise<{ status?: string; q?: string }>;
 }) {
   const profile = await requirePlatformAdmin();
-  const applications = await getProfessorApplications();
+  const [applications, administrators] = await Promise.all([getProfessorApplications(), getPlatformAdmins()]);
   const { status, q } = await searchParams;
   const selectedFilter = isFilter(status) ? status : "pending";
   const query = q?.trim().toLowerCase() ?? "";
@@ -52,7 +58,7 @@ export default async function AdminPage({
       result[application.status] += 1;
       return result;
     },
-    { pending: 0, approved: 0, rejected: 0 } satisfies Record<ProfessorApplicationStatus, number>,
+    { pending: 0, approved: 0, rejected: 0, all: applications.data.length } satisfies Record<ApplicationFilter, number>,
   );
 
   const visibleApplications = applications.data.filter((application) => {
@@ -69,13 +75,6 @@ export default async function AdminPage({
     <AdminShell>
       <PageMain bottom="pb-[60px]">
         <PageHeading title="Administrator home" subtitle={`Welcome back, ${profile.display_name}.`} />
-
-        <StatGrid>
-          <StatCard symbol="…" value={counts.pending} label="Pending" detail="Awaiting review" />
-          <StatCard symbol="✓" value={counts.approved} label="Approved" detail="Professor access granted" />
-          <StatCard symbol="×" value={counts.rejected} label="Rejected" detail="May be reconsidered" />
-          <StatCard symbol="Σ" value={applications.data.length} label="Total applications" detail="All review states" />
-        </StatGrid>
 
         <section className={`${reviewPanelClass} p-6 max-[560px]:p-[18px]`} aria-labelledby="applications-title">
           <div className="mb-5"><SectionHeading kicker="Account provisioning" title="Professor applications" titleId="applications-title" aside={<span className={countBadgeClass}>{visibleApplications.length} shown</span>} /></div>
@@ -100,10 +99,10 @@ export default async function AdminPage({
             {filters.map((filter) => (
               <Link
                 key={filter}
-                className={`transition-colors duration-160 rounded-[999px] border px-[14px] py-2 text-[0.75rem] font-bold no-underline ${selectedFilter === filter ? "border-[#2caeff] bg-[rgba(44,174,255,0.18)] text-(--text-primary)" : "border-[#526078] light:border-(--border-subtle) text-[#c7ccda] light:text-(--text-secondary) hover:bg-(--hover-overlay)"}`}
+                className={`transition-colors duration-160 whitespace-nowrap rounded-[999px] border px-[14px] py-2 text-[0.75rem] font-bold no-underline ${selectedFilter === filter ? "border-[#2caeff] bg-[rgba(44,174,255,0.18)] text-(--text-primary)" : "border-[#526078] light:border-(--border-subtle) text-[#c7ccda] light:text-(--text-secondary) hover:bg-(--hover-overlay)"}`}
                 href={{ pathname: "/admin", query: { status: filter, ...(q ? { q } : {}) } }}
               >
-                {filter[0].toUpperCase() + filter.slice(1)}
+                {filter[0].toUpperCase() + filter.slice(1)} <span className="ml-1 tabular-nums opacity-75">{counts[filter]}</span>
               </Link>
             ))}
           </nav>
@@ -119,6 +118,33 @@ export default async function AdminPage({
               ))}
             </div>
           )}
+        </section>
+
+        <section className={`${reviewPanelClass} p-6 max-[560px]:p-[18px]`} aria-labelledby="administrators-title">
+          <div className="mb-5"><SectionHeading kicker="Platform access" title="Administrators" titleId="administrators-title" aside={<span className={countBadgeClass}>{administrators.data.length}</span>} /></div>
+          {administrators.error ? (
+            <EmptyState error role="alert" title="Administrators are unavailable">Refresh the page or try again later.</EmptyState>
+          ) : (
+            <ul className="m-0 grid list-none gap-2.5 p-0">
+              {administrators.data.map((administrator) => (
+                <li key={administrator.user_id} className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 rounded-[9px] border border-(--border-shell) bg-(--glass-inset) px-[18px] py-3.5 max-[560px]:grid-cols-1">
+                  <div className="min-w-0">
+                    <p className="m-0 font-extrabold">{administrator.display_name}</p>
+                    <p className="mt-[3px] truncate text-[0.75rem] text-[#9da6b8] light:text-(--text-muted)">{administrator.email}</p>
+                    <p className="mt-[3px] text-[0.6875rem] text-[#9da6b8] light:text-(--text-muted)">
+                      Added {formatDate(administrator.created_at)}{administrator.created_by_name ? ` by ${administrator.created_by_name}` : ""}
+                    </p>
+                  </div>
+                  {administrator.user_id === profile.id ? (
+                    <span className={`${countBadgeClass} w-fit`}>You</span>
+                  ) : (
+                    <RemoveAdministratorForm userId={administrator.user_id} displayName={administrator.display_name} />
+                  )}
+                </li>
+              ))}
+            </ul>
+          )}
+          <AddAdministratorForm />
         </section>
       </PageMain>
     </AdminShell>
@@ -148,11 +174,21 @@ function ApplicationCard({
           <dt className="text-[0.625rem] text-[#8f99ad] light:text-(--text-muted) uppercase">Email</dt>
           <dd className="mt-1 text-[0.75rem] font-extrabold">{application.email_confirmed ? "Confirmed" : "Unconfirmed"}</dd>
         </div>
-        <div className="rounded-[6px] bg-[rgba(52,65,85,0.45)] p-2.5">
-          <dt className="text-[0.625rem] text-[#8f99ad] light:text-(--text-muted) uppercase">Memberships</dt>
-          <dd className="mt-1 text-[0.75rem] font-extrabold">{application.membership_count}</dd>
-        </div>
+        {application.status === "approved" ? (
+          <div className="rounded-[6px] bg-[rgba(52,65,85,0.45)] p-2.5">
+            <dt className="text-[0.625rem] text-[#8f99ad] light:text-(--text-muted) uppercase">Reviewed</dt>
+            <dd className="mt-1 text-[0.75rem] font-extrabold">{reviewSummary(application)}</dd>
+          </div>
+        ) : (
+          <div className="rounded-[6px] bg-[rgba(52,65,85,0.45)] p-2.5">
+            <dt className="text-[0.625rem] text-[#8f99ad] light:text-(--text-muted) uppercase">Memberships</dt>
+            <dd className="mt-1 text-[0.75rem] font-extrabold">{application.membership_count}</dd>
+          </div>
+        )}
       </dl>
+      {application.status === "rejected" && application.reviewed_at && (
+        <p className="mt-3 text-[0.6875rem] text-[#9da6b8] light:text-(--text-muted)">Rejected {reviewSummary(application)}</p>
+      )}
       {application.status === "rejected" && application.rejection_reason && (
         <div className={rejectionReasonClass}>
           <strong>Rejection reason</strong>

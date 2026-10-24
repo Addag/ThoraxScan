@@ -71,6 +71,10 @@ join auth.users as auth_user on auth_user.id = administrator.user_id;
 
 The administrator then selects **Administrator** on the normal login page and is routed to `/admin`.
 
+After the first administrator exists, add or remove others from the
+**Administrators** section of `/admin`. Administrators cannot remove themselves,
+so at least one always remains.
+
 ## Verification
 
 ```bash

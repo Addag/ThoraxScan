@@ -1,5 +1,5 @@
 import type { ProfessorApplication } from "@/lib/auth/types";
-import type { ProfessorApplicationProjection } from "@/lib/admin/types";
+import type { PlatformAdminProjection, ProfessorApplicationProjection } from "@/lib/admin/types";
 import { createClient } from "@/lib/supabase/server";
 
 export async function getProfessorApplications() {
@@ -12,6 +12,20 @@ export async function getProfessorApplications() {
 
   return {
     data: (data ?? []) as ProfessorApplicationProjection[],
+    error: null,
+  };
+}
+
+export async function getPlatformAdmins() {
+  const supabase = await createClient();
+  const { data, error } = await supabase.rpc("list_platform_admins");
+
+  if (error) {
+    return { data: [] as PlatformAdminProjection[], error: error.message };
+  }
+
+  return {
+    data: (data ?? []) as PlatformAdminProjection[],
     error: null,
   };
 }

@@ -2,8 +2,8 @@
 node_type: object
 universe: live
 status: verified
-audited: 2026-08-17
-snapshot: main @ 767ee8f + working tree
+audited: 2026-10-24
+snapshot: main @ 391ebdb + working tree
 ---
 
 # Platform administrator
@@ -16,10 +16,11 @@ Administrator authority is stored separately from `Profile.role`, preserving the
 
 ## Shape
 
-- `public.platform_admins.user_id` is a profile-backed primary key; `created_by` is an optional self-reference and deletion of the profile cascades to the capability in [the approval migration](<../../../supabase/migrations/20260817124643_professor_approval_administration.sql:1>).
+- `public.platform_admins.user_id` is a profile-backed primary key and deletion of the profile cascades to the capability in [the approval migration](<../../../supabase/migrations/20260817124643_professor_approval_administration.sql:1>). Since [the admin management migration](<../../../supabase/migrations/20261024130000_platform_admin_management.sql>), `created_by` and `professor_applications.reviewed_by` reference `profiles`, so removing a capability keeps the name on past grants and reviews.
 - RLS exposes only the authenticated caller's capability row in [the approval migration](<../../../supabase/migrations/20260817124643_professor_approval_administration.sql:54>).
 - Administrator login and protected-page access each re-check that row in [auth actions](<../../../src/app/(auth)/actions.ts:151>) and [auth server guards](<../../../src/lib/auth/server.ts:86>). The dashboard uses the shared Tailwind primitives in [dashboard-ui.tsx](<../../../src/components/dashboard-ui.tsx>).
-- The first capability is inserted by an operator using the documented bootstrap statement in [README.md](<../../../README.md:20>); no public self-provisioning path exists.
+- The first capability is inserted by an operator using the documented bootstrap statement in [README.md](<../../../README.md:47>); no public self-provisioning path exists.
+- After that, administrators list, grant (by email of a confirmed account), and revoke capabilities through `list_platform_admins`, `grant_platform_admin`, and `revoke_platform_admin` in [the admin management migration](<../../../supabase/migrations/20261024130000_platform_admin_management.sql>). Revoke refuses the caller's own row, so at least one administrator always remains; it share-locks the caller's row so two administrators cannot remove each other at once.
 
 ## Connected to
 

@@ -22,6 +22,7 @@ export function ApplicationReviewForm({
     reviewProfessorApplicationAction,
     initialAdminReviewState,
   );
+  const [confirmingApproval, setConfirmingApproval] = useState(false);
   const [confirmingRejection, setConfirmingRejection] = useState(false);
   const canApprove = application.email_confirmed && application.membership_count === 0;
 
@@ -30,14 +31,18 @@ export function ApplicationReviewForm({
       <input type="hidden" name="targetUserId" value={application.user_id} />
       <div className="flex items-center gap-2.5 max-[560px]:flex-col max-[560px]:items-stretch">
         <button
-          type="submit"
-          name="decision"
-          value="approve"
+          type="button"
           disabled={pending || !canApprove}
           className={`${primaryButton} disabled:cursor-not-allowed disabled:opacity-[0.58]`}
+          onClick={() => setConfirmingApproval(true)}
         >
           {pending ? "Reviewing…" : application.status === "rejected" ? "Approve after review" : "Approve"}
         </button>
+        {confirmingApproval ? (
+          <ConfirmDialog title="Approve Professor access?" confirmLabel="Confirm approval" name="decision" value="approve" onClose={() => setConfirmingApproval(false)}>
+            {application.display_name} will be able to create workspaces and manage students. This can&apos;t be undone from this page.
+          </ConfirmDialog>
+        ) : null}
         {!canApprove && (
           <small className="text-[0.625rem] text-[#d0ab56] light:text-(--status-warning-text)">
             {!application.email_confirmed

@@ -12,7 +12,6 @@ export function AdminShell({ children }: { children: ReactNode }) {
       navAriaLabel="Administrator navigation"
       navItems={[
         { label: "Home", href: "/admin", icon: "dashboard", active: true },
-        { label: "Audit log", glyph: "▤", note: "Coming soon", disabled: true },
       ]}
       sectionLabel="Administration"
       sectionDescription="Professor approvals"

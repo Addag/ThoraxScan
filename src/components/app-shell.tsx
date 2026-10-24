@@ -15,9 +15,7 @@ export type NavItem = {
   icon?: string;
   /** Text glyph shown when there is no image icon. */
   glyph?: string;
-  note?: string;
   active?: boolean;
-  disabled?: boolean;
 };
 
 const navLinkClass = "transition-colors duration-160 relative grid min-h-[46px] grid-cols-[25px_minmax(0,1fr)] items-center rounded-lg border px-2.5 py-2 text-[0.8125rem] no-underline max-[850px]:min-h-12 max-[850px]:gap-x-2.5 max-[850px]:text-[0.9375rem]";
@@ -25,16 +23,15 @@ const activeNavLinkClass = "border-brand bg-[rgba(44,174,255,0.21)] before:absol
 const supportingTextClass = "leading-[1.4]";
 
 function NavEntry({ item }: { item: NavItem }) {
-  const className = `${navLinkClass} ${item.active ? activeNavLinkClass : "border-transparent hover:bg-(--hover-overlay)"} ${item.disabled ? "text-(--text-secondary)" : "text-(--text-primary)"}`;
+  const className = `${navLinkClass} ${item.active ? activeNavLinkClass : "border-transparent hover:bg-(--hover-overlay)"} text-(--text-primary)`;
   const content = (
     <>
       {item.icon ? (
         <Image className="block size-6 flex-[0_0_24px] object-contain light:invert" src={`/images/menu-icons/${item.icon}.png`} alt="" width={24} height={24} aria-hidden="true" />
       ) : item.glyph ? (
-        <span className={`text-[1.25rem] ${item.disabled ? "text-(--text-secondary)" : "text-(--text-primary)"}`} aria-hidden="true">{item.glyph}</span>
+        <span className="text-[1.25rem] text-(--text-primary)" aria-hidden="true">{item.glyph}</span>
       ) : null}
       {item.icon || item.glyph ? " " : null}{item.label}
-      {item.note ? <> <small className={`col-start-2 text-[0.5625rem] text-(--text-secondary) max-[850px]:text-[0.75rem] ${supportingTextClass}`}>{item.note}</small></> : null}
     </>
   );
 
