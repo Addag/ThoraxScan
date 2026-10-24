@@ -21,9 +21,10 @@ export function AppSidebar({ children, actions }: { children: ReactNode; actions
         }
       }}
     >
+      <div className="contents max-[850px]:flex max-[850px]:items-center max-[850px]:justify-between max-[850px]:gap-2">
       <Brand variant="sidebar" />
       {/* Mobile bar controls; the desktop header carries its own bell and theme button. */}
-      <div className="hidden max-[850px]:absolute max-[850px]:top-2.5 max-[850px]:right-3.5 max-[850px]:flex max-[850px]:items-center max-[850px]:gap-2">
+      <div className="hidden max-[850px]:flex max-[850px]:shrink-0 max-[850px]:items-center max-[850px]:gap-2">
         {actions}
         <ThemeIconButton className="size-11" />
         <button
@@ -37,8 +38,9 @@ export function AppSidebar({ children, actions }: { children: ReactNode; actions
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
             <path d={expanded ? "M6 6l12 12M18 6L6 18" : "M4 6h16M4 12h16M4 18h16"} />
           </svg>
-          <span className="max-[380px]:sr-only">{expanded ? "Close" : "Menu"}</span>
+          <span className="max-[389px]:sr-only">{expanded ? "Close" : "Menu"}</span>
         </button>
+      </div>
       </div>
       <div
         className="flex min-h-0 flex-1 flex-col max-[850px]:hidden max-[850px]:group-data-[expanded=true]:mt-5 max-[850px]:group-data-[expanded=true]:flex"

@@ -14,9 +14,10 @@ const variants = {
     name: "text-[32px] tracking-[-1.5px]",
   },
   sidebar: {
-    link: "static mx-1 mt-0 mb-7 gap-2.5 max-[850px]:m-0 max-[850px]:self-start",
+    link: "static mx-1 mt-0 mb-7 gap-2.5 max-[850px]:m-0 max-[850px]:min-w-0",
     mark: "size-[42px] max-[850px]:size-9",
-    name: "text-[23px] tracking-[-1px] max-[850px]:text-[clamp(19px,5vw,23px)]",
+    // Below 360px the wordmark can't fit beside the mobile bar's three buttons; the logo remains.
+    name: "text-[23px] tracking-[-1px] max-[850px]:text-[clamp(19px,5vw,23px)] max-[359px]:sr-only",
   },
 } as const;
 
