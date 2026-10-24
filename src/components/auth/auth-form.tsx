@@ -382,7 +382,7 @@ function RoleSelector({
           />
           <label className={`relative flex ${mode === "login" ? "h-32" : "h-[147px]"} cursor-pointer flex-col items-center justify-center overflow-hidden rounded-[10px] border border-[rgb(153_191_240/32%)] bg-(--glass-inset) text-center text-(--text-primary) shadow-(--glass-inset-shadow) transition-[background-color,border-color,transform] duration-[160ms] hover:bg-[rgba(0,119,255,0.28)] peer-checked:border-[#0077ff] peer-checked:bg-[rgba(0,119,255,0.6)] peer-focus-visible:outline-3 peer-focus-visible:outline-white peer-active:[transform:translateY(1px)]`} htmlFor={`${mode}-role-student`}>
             <Image
-              className={`absolute top-[7px] left-1/2 block h-[88px] w-[125px] [transform:translateX(-50%)_scaleX(-1)] ${mode === "login" ? "scale-[0.84] origin-top max-sm:scale-[0.7]" : ""}`}
+              className={`absolute inset-x-0 top-[7px] mx-auto block h-[88px] w-[125px] [transform:scaleX(-1)] ${mode === "login" ? "scale-[0.84] origin-top max-sm:scale-[0.7]" : ""}`}
               src="/images/student-role.png"
               alt=""
               width={125}
