@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { InferenceError, type InferenceErrorCode } from "@/lib/inference/errors";
 import type { InferenceResult } from "@/lib/inference/runtime";
 import { AttentionHeatmap } from "@/components/attention-heatmap";
+import { AnalysisFindings } from "@/components/analysis-findings";
 import { XrayLibrary } from "./xray-library";
 
 const MAX_BYTES = 6 * 1024 * 1024;
@@ -22,9 +23,6 @@ const panelClass = "overflow-hidden rounded-[10px] border border-[#283349] light
 const actionButtonClass = "cursor-pointer rounded-md border px-5 py-2.5 font-bold text-(--text-primary) disabled:cursor-not-allowed disabled:opacity-45";
 const detailsClass = "mt-[18px] border-t border-t-[#3f5271] pt-3.5";
 const summaryClass = "cursor-pointer font-bold";
-const labelListClass = "mt-3 grid list-none gap-2 p-0";
-const labelItemClass = "flex flex-col gap-2 rounded-[7px] border border-[#3f5271] px-3 py-2.5";
-const labelDetailClass = "text-[0.8125rem] text-(--text-secondary)";
 
 function messageForError(error: unknown) {
   if (error instanceof InferenceError) return errorCopy[error.code];
@@ -81,8 +79,6 @@ export function LearningModeAnalyzer() {
     } finally { if (runRef.current === controller) runRef.current = null; }
   }
 
-  const suppressedLabels = result?.labels.filter((item) => item.predicted && !result.findings.some((finding) => finding.label === item.label)) ?? [];
-
   return <section className="grid grid-cols-2 items-start gap-8 max-[1000px]:gap-5 max-[800px]:grid-cols-1" aria-label="Learning Mode practice">
     <div className="min-w-0">
       <button className="transition-[filter] duration-160 not-disabled:hover:brightness-115 mb-[26px] w-full cursor-pointer rounded-[9px] border-0 bg-brand px-3.5 py-[17px] text-[1.375rem] font-bold text-white max-[1000px]:text-[1.1875rem]" type="button" onClick={() => inputRef.current?.click()}>Use Local X-Ray Images</button>
@@ -121,10 +117,7 @@ export function LearningModeAnalyzer() {
     <div className="min-w-0">
     {result ? <div className={`${panelClass} p-6 max-[480px]:p-5`} aria-live="polite">
       <h2 className="mb-5 text-[1.5rem] font-extrabold" tabIndex={-1} ref={resultHeadingRef}>Analysis result</h2>
-      <section aria-labelledby="learning-findings-title"><h3 className="mb-3" id="learning-findings-title">Likely findings</h3>{result.state === "no-threshold-match" ? <p>No finding met its configured threshold.</p> : <ul className={labelListClass}>{result.findings.map((finding) => <li className={labelItemClass} key={finding.label}><strong>{finding.label}</strong><span className={labelDetailClass}>{(finding.probability * 100).toFixed(1)}% probability</span></li>)}</ul>}</section>
-      {result.possibleFindings.length > 0 && <section className="mt-5" aria-labelledby="learning-possible-title"><h3 className="mb-1" id="learning-possible-title">Possible findings</h3><p className="mb-3 text-[0.8125rem] leading-[1.5] text-(--text-muted)">Below the likely threshold but above a lower, more sensitive one. Check these against the image yourself; many will be false alarms.</p><ul className={labelListClass}>{result.possibleFindings.map((finding) => <li className={labelItemClass} key={finding.label}><strong>{finding.label}</strong><span className={labelDetailClass}>{(finding.probability * 100).toFixed(1)}% probability</span></li>)}</ul></section>}
-      {suppressedLabels.map((item) => <p className="text-[#ffd98b] light:text-(--status-warning-text)" key={item.label}>{item.label}: Suppressed by abnormal finding.</p>)}
-      <details className={detailsClass}><summary className={summaryClass}>All {result.labels.length} labels</summary><ul className={labelListClass}>{result.labels.map((item) => <li className={labelItemClass} key={item.label}><div className="flex flex-col gap-1"><strong>{item.label}</strong><span className={labelDetailClass}>{item.predicted ? "Likely" : item.possible ? "Possible" : "Not matched"}{suppressedLabels.includes(item) ? " · Suppressed by abnormal finding" : ""}</span></div><span className={labelDetailClass}>Probability {(item.probability * 100).toFixed(2)}% · Release-supplied threshold {item.threshold}</span></li>)}</ul></details>
+      <AnalysisFindings state={result.state} labels={result.labels} findings={result.findings} possibleFindings={result.possibleFindings} idPrefix="learning" />
       <details className={detailsClass}><summary className={summaryClass}>Release and execution provenance</summary><dl className="grid grid-cols-[minmax(0,.8fr)_minmax(0,1.2fr)] gap-2.5 text-[0.8125rem] max-[480px]:grid-cols-1 [&>dd]:m-0 [&>dd]:[overflow-wrap:anywhere] [&>dt]:text-(--text-muted)"><dt>Release ID</dt><dd>{result.releaseId}</dd><dt>Execution provider</dt><dd>{result.executionProvider.toUpperCase()}</dd><dt>Manifest version</dt><dd>{result.manifestVersion}</dd><dt>Preprocessing version</dt><dd>{result.preprocessingVersion}</dd><dt>Threshold version</dt><dd>{result.thresholdVersion}</dd><dt>Application build</dt><dd>{result.applicationBuild}</dd><dt>Model SHA-256</dt><dd>{result.modelSha256}</dd><dt>Bundle SHA-256</dt><dd>{result.bundleSha256}</dd></dl></details>
       <AttentionHeatmap imageUrl={previewUrl} attention={result.attention ?? { status: "unavailable", reason: "legacy-model-release" }} title="Model attention" />
       <p className="mt-5 text-[0.75rem] leading-[1.5] text-(--text-muted)">Educational use only. This result is not a diagnosis and should not guide medical decisions.</p>

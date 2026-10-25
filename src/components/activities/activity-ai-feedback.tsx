@@ -7,6 +7,7 @@ import { toActivityAIPersistencePayload } from "@/lib/activity-ai/adapter";
 import { claimActivityAIAnalysis, completeActivityAIAnalysis, failActivityAIAnalysis, refreshActivityCaseUrl } from "@/lib/activity-ai/actions";
 import type { ActivityAIFeedback } from "@/lib/activity-ai/types";
 import { AttentionHeatmap } from "@/components/attention-heatmap";
+import { AnalysisFindings } from "@/components/analysis-findings";
 import { activityButton } from "@/components/activities/activity-button";
 import { ActivityPanelTitle } from "@/components/activities/activity-ui";
 
@@ -79,13 +80,10 @@ export function ActivityAIFeedback({ activityId, imageUrl, initial }: { activity
     {feedback.status === "locked" ? <p className="m-0 px-4 py-3.5 text-[0.75rem] leading-[1.55] text-(--text-secondary)">Submit your final evaluation to unlock controlled AI feedback.</p> : null}
     {feedback.status === "pending" || running ? <p role="status" className="m-0 px-4 py-3.5 text-[0.75rem] leading-[1.55] text-(--text-secondary)">{message || "Analysis is pending…"}</p> : null}
     {feedback.status === "failed" && !running ? <div className="m-0 px-4 py-3.5 text-[0.75rem] leading-[1.55] text-(--text-secondary)"><p role="alert">{message || "Analysis failed. No prediction was released."}</p><button className={`${activityButton.primary} mx-4 mt-0 mb-4`} type="button" onClick={() => { startedRef.current = false; void runAnalysis(); }}>Retry analysis</button></div> : null}
-    {feedback.status === "ready" && result ? <div className="m-0 px-4 py-3.5 text-[0.75rem] leading-[1.55] text-(--text-secondary) [&_h3]:mx-0 [&_h3]:mt-0 [&_h3]:mb-2.5 [&_h3]:text-[0.875rem] [&_ul]:mx-0 [&_ul]:mt-2 [&_ul]:mb-3.5 [&_ul]:grid [&_ul]:gap-1.5 [&_ul]:pl-[18px] [&_details]:border-t [&_details]:border-[#3f5271] [&_details]:py-[11px] [&_summary]:cursor-pointer [&_summary]:font-bold [&_dl]:grid [&_dl]:grid-cols-[minmax(90px,.8fr)_minmax(0,1.2fr)] [&_dl]:gap-x-3 [&_dl]:gap-y-[7px] [&_dt]:text-[#8e9bb0] light:[&_dt]:text-(--text-muted) [&_dd]:m-0 [&_dd]:[overflow-wrap:anywhere]">
+    {feedback.status === "ready" && result ? <div className="m-0 px-4 py-3.5 text-[0.75rem] leading-[1.55] text-(--text-secondary) [&_dl]:mt-3 [&_dl]:grid [&_dl]:grid-cols-[minmax(90px,.8fr)_minmax(0,1.2fr)] [&_dl]:gap-x-3 [&_dl]:gap-y-[7px] [&_dt]:text-[#8e9bb0] light:[&_dt]:text-(--text-muted) [&_dd]:m-0 [&_dd]:[overflow-wrap:anywhere]">
       <p className="border-l-[3px] border-l-(color:--disclaimer-yellow) pl-2.5 text-[#ffe28a] light:text-(--status-warning-text)">Educational use only. This result is not a diagnosis and should not guide medical decisions.</p>
-      <h3>Thresholded findings</h3>
-      {result.findings.length ? <ul>{result.findings.map((finding) => <li key={finding.label}><strong>{finding.label}</strong> · {(finding.probability * 100).toFixed(1)}%</li>)}</ul> : <p>No finding met its configured threshold.</p>}
-      {result.labels.some((item) => item.predicted && !result.findings.some((finding) => finding.label === item.label)) ? <p className="text-[#ffd98b] light:text-(--status-warning-text)">No Finding is suppressed when an abnormal finding is present.</p> : null}
-      <details><summary>All 14 probabilities and thresholds</summary><ul>{result.labels.map((item) => <li key={item.label}><strong>{item.label}</strong>: {(item.probability * 100).toFixed(2)}% · threshold {item.threshold}</li>)}</ul></details>
-      <details><summary>Release and execution provenance</summary><dl><dt>Model release</dt><dd>{result.provenance.releaseId}</dd><dt>Preprocessing</dt><dd>{result.provenance.preprocessingVersion}</dd><dt>Thresholds</dt><dd>{result.provenance.thresholdVersion}</dd><dt>Provider</dt><dd>{result.provenance.executionProvider.toUpperCase()}</dd><dt>Model SHA-256</dt><dd>{result.provenance.modelSha256}</dd><dt>Bundle SHA-256</dt><dd>{result.provenance.bundleSha256}</dd><dt>Application build</dt><dd>{result.provenance.applicationBuild}</dd></dl></details>
+      <AnalysisFindings state={result.state} labels={result.labels} findings={result.findings} possibleFindings={result.possibleFindings} idPrefix="activity" />
+      <details className="mt-[18px] border-t border-t-[#3f5271] pt-3.5"><summary className="cursor-pointer font-bold">Release and execution provenance</summary><dl><dt>Model release</dt><dd>{result.provenance.releaseId}</dd><dt>Preprocessing</dt><dd>{result.provenance.preprocessingVersion}</dd><dt>Thresholds</dt><dd>{result.provenance.thresholdVersion}</dd><dt>Provider</dt><dd>{result.provenance.executionProvider.toUpperCase()}</dd><dt>Model SHA-256</dt><dd>{result.provenance.modelSha256}</dd><dt>Bundle SHA-256</dt><dd>{result.provenance.bundleSha256}</dd><dt>Application build</dt><dd>{result.provenance.applicationBuild}</dd></dl></details>
       <AttentionHeatmap imageUrl={imageUrl} attention={result.attention ?? { status: "unavailable", reason: "legacy-model-release" }} title="Model attention" />
     </div> : null}
   </section>;

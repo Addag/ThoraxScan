@@ -9,7 +9,7 @@ type FeedbackRow = {
   attempted_at: string | null;
   completed_at: string | null;
   probabilities: number[] | null;
-  thresholds: { label: string; threshold: number }[] | null;
+  thresholds: { label: string; threshold: number; possibleThreshold?: number | null }[] | null;
   findings: { label: string; probability: number; threshold: number }[] | null;
   provenance: ActivityAIProvenance | null;
   attention_status: "ready" | "unavailable";
@@ -22,19 +22,24 @@ export async function getStudentActivityAIFeedback(activityId: string): Promise<
   const { data, error } = await supabase.rpc("get_student_activity_ai_feedback", { target_activity_id: activityId }).maybeSingle<FeedbackRow>();
   if (error || !data) return { status: "locked", attemptCount: 0, safeErrorCode: null, attemptedAt: null, completedAt: null, result: null };
   const status = data.status === "released" ? "ready" : data.status === "failed" ? "failed" : data.status === "pending_analysis" ? "pending" : "locked";
-  const result = status === "ready" && data.probabilities && data.thresholds && data.findings && data.provenance
+  // Same "possible" rule as postprocessLogits in Learning Mode; rows saved before possible thresholds were stored have none.
+  const labels = data.probabilities?.map((probability, index) => {
+    const threshold = data.thresholds?.[index]?.threshold ?? 0;
+    const possibleThreshold = data.thresholds?.[index]?.possibleThreshold;
+    const candidate = data.thresholds?.[index]?.label;
+    const label = isActivityAILabel(candidate) ? candidate : ACTIVITY_AI_LABELS[index];
+    const predicted = probability >= threshold;
+    return { label, probability, threshold, predicted, possible: !predicted && label !== "No Finding" && possibleThreshold != null && probability >= possibleThreshold };
+  });
+  const result = status === "ready" && labels && data.thresholds && data.findings && data.provenance
     ? {
         state: data.findings.length ? ("predicted" as const) : ("no-threshold-match" as const),
-        labels: data.probabilities.map((probability, index) => {
-          const threshold = data.thresholds?.[index]?.threshold ?? 0;
-          const candidate = data.thresholds?.[index]?.label;
-          const label = isActivityAILabel(candidate) ? candidate : ACTIVITY_AI_LABELS[index];
-          return { label, probability, threshold, predicted: probability >= threshold };
-        }),
+        labels,
         findings: data.findings.flatMap((finding) => {
           const label = isActivityAILabel(finding.label) ? finding.label : null;
-          return label ? [{ label, probability: finding.probability, threshold: finding.threshold, predicted: true }] : [];
+          return label ? [{ label, probability: finding.probability, threshold: finding.threshold, predicted: true, possible: false }] : [];
         }),
+        possibleFindings: labels.filter((item) => item.possible),
         provenance: data.provenance,
         attention: data.attention_status === "ready" && data.attention_map ? readyAttention(data.attention_map) : UNAVAILABLE_ATTENTION,
         attentionStatus: data.attention_status,

@@ -53,8 +53,8 @@ export function StudentSubmissionForm({ submission, dueAt, deadlinePassed, actio
         </fieldset>
         {fieldError("classification")}
         <label htmlFor="relevantRegion">Which region appears most relevant?</label>
-        <input className="w-full min-h-[42px] rounded-[5px] border border-[#82878e] light:border-(--border-strong) bg-(--surface-raised) px-3 py-[11px] text-(--text-primary) disabled:opacity-[0.52] aria-invalid:outline-2 aria-invalid:outline-[#ff7c85] light:aria-invalid:outline-(--status-error-text)" id="relevantRegion" name="relevantRegion" disabled={classification !== "abnormal"} value={region} onChange={(event) => { setRegion(event.target.value); setConfirming(false); }} aria-invalid={Boolean(errors?.relevantRegion)} aria-describedby={errors?.relevantRegion ? "relevantRegion-error" : "region-hint"} />
-        <small className="text-[0.75rem] text-[#aeb6c5] light:text-(--text-muted)" id="region-hint">Required for a final abnormal response. Maximum 200 characters.</small>
+        <input className="w-full min-h-[42px] rounded-[5px] border border-[#82878e] light:border-(--border-strong) bg-(--surface-raised) px-3 py-[11px] text-(--text-primary) disabled:opacity-[0.52] disabled:cursor-not-allowed aria-invalid:outline-2 aria-invalid:outline-[#ff7c85] light:aria-invalid:outline-(--status-error-text)" id="relevantRegion" name="relevantRegion" disabled={classification !== "abnormal"} value={region} onChange={(event) => { setRegion(event.target.value); setConfirming(false); }} aria-invalid={Boolean(errors?.relevantRegion)} aria-describedby={errors?.relevantRegion ? "relevantRegion-error" : "region-hint"} />
+        <small className="text-[0.75rem] text-[#aeb6c5] light:text-(--text-muted)" id="region-hint">{classification === "abnormal" ? "Required for a final abnormal response." : "Select Abnormal to enter a region."} Maximum 200 characters.</small>
         {fieldError("relevantRegion")}
         <div className="flex flex-wrap gap-4">
           <button className={activityButton.secondary} type="submit" name="intent" value="draft" onClick={() => setConfirming(false)}>Save draft</button>

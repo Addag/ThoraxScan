@@ -38,6 +38,7 @@ export type ActivityAIProbability = {
   probability: number;
   threshold: number;
   predicted: boolean;
+  possible: boolean;
 };
 
 export type ActivityAIProvenance = {
@@ -55,6 +56,7 @@ export type ActivityAIResult = {
   state: "predicted" | "no-threshold-match";
   labels: ActivityAIProbability[];
   findings: ActivityAIProbability[];
+  possibleFindings: ActivityAIProbability[];
   provenance: ActivityAIProvenance;
   attention?: AttentionHeatmap;
   attentionStatus: "ready" | "unavailable";
