@@ -1,0 +1,163 @@
+<!doctype html>
+<!-- Source for public/guides/attention-maps.pdf. Regenerate with: node scripts/guides/render-attention-guide.mjs -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>ThoraxScan – Attention Maps Student Guide</title>
+<style>
+  @page { size: A4; margin: 16mm 16mm 18mm; }
+  * { box-sizing: border-box; }
+  body { margin: 0; font: 10.5pt/1.55 "Segoe UI", Arial, sans-serif; color: #1b2433; }
+  .page { break-after: page; }
+  .page:last-child { break-after: auto; }
+  .brand { font-weight: 800; letter-spacing: .18em; color: #0077ff; font-size: 9pt; }
+  h1 { font-size: 24pt; line-height: 1.15; margin: 4mm 0 2mm; }
+  h2 { font-size: 15pt; margin: 0 0 3mm; color: #10065a; border-bottom: 2px solid #0077ff; padding-bottom: 1.5mm; }
+  h3 { font-size: 11.5pt; margin: 5mm 0 1.5mm; color: #10065a; }
+  p { margin: 0 0 2.5mm; }
+  ul, ol { margin: 0 0 3mm; padding-left: 5mm; }
+  li { margin-bottom: 1.2mm; }
+  .lead { font-size: 11.5pt; color: #3a4558; }
+  .legend { margin: 5mm 0 2mm; }
+  .bar { height: 9mm; border-radius: 2mm; background: linear-gradient(to right, rgb(80,15,110), rgb(255,200,20)); }
+  .legend-labels { display: flex; justify-content: space-between; font-size: 9pt; color: #3a4558; margin-top: 1mm; }
+  .grid-demo { display: grid; grid-template-columns: repeat(7, 7mm); gap: 0; border: 1px solid #91918c; width: fit-content; }
+  .grid-demo span { width: 7mm; height: 7mm; }
+  .row { display: flex; gap: 7mm; align-items: flex-start; margin: 3mm 0; }
+  .callout { border-left: 4px solid #0077ff; background: #eef5ff; padding: 3mm 4mm; margin: 4mm 0; border-radius: 0 2mm 2mm 0; }
+  .warn { border-left-color: #ba0000; background: #fff0f0; }
+  .callout p:last-child { margin-bottom: 0; }
+  table { width: 100%; border-collapse: collapse; margin: 2mm 0 4mm; font-size: 10pt; }
+  th, td { border: 1px solid #c5cdd9; padding: 2mm 3mm; text-align: left; vertical-align: top; }
+  th { background: #eef2f8; }
+  .steps { display: flex; gap: 2mm; margin: 2mm 0 4mm; }
+  .steps div { flex: 1; border: 1px solid #0077ff; border-radius: 2mm; padding: 2.5mm; font-size: 9.5pt; }
+  .steps b { display: block; color: #0077ff; font-size: 10.5pt; }
+  .foot { margin-top: 6mm; font-size: 8.5pt; color: #6b7587; border-top: 1px solid #c5cdd9; padding-top: 2mm; }
+</style>
+</head>
+<body>
+
+<section class="page">
+  <div class="brand">THORAXSCAN · STUDENT GUIDE</div>
+  <h1>Reading attention maps</h1>
+  <p class="lead">What ThoraxScan's attention heatmap shows, where you will find it, and how to use it responsibly while learning chest X-ray interpretation.</p>
+
+  <div class="legend">
+    <div class="bar"></div>
+    <div class="legend-labels"><span>Purple: lower relative attention</span><span>Yellow: higher relative attention</span></div>
+  </div>
+
+  <div class="callout warn">
+    <p><b>Key idea:</b> the attention map shows where the model's internal attention was concentrated across the image. <b>It doesn't show where disease is.</b> It is a learning aid, not a diagnosis, and it never replaces your own image review.</p>
+  </div>
+
+  <h2>1. What the map is</h2>
+  <div class="row">
+    <div class="grid-demo" aria-hidden="true">
+      <!-- 7×7 values from the Attention Maps page sample -->
+      <script>
+        const v=[0,.05,.12,.18,.14,.06,.02,.04,.2,.38,.46,.34,.18,.05,.1,.36,.62,.74,.58,.28,.08,.14,.44,.78,1,.82,.4,.12,.12,.38,.68,.86,.7,.32,.1,.06,.22,.42,.54,.4,.2,.04,.01,.08,.16,.24,.18,.08,0];
+        document.write(v.map(x=>`<span style="background:rgb(${80+175*x},${15+185*x},${110-90*x})"></span>`).join(""));
+      </script>
+    </div>
+    <div>
+      <ol>
+        <li><b>7×7 grid.</b> The Vision Transformer splits the X-ray into a 7×7 grid of patches, so every map has 49 values.</li>
+        <li><b>Four-layer attention rollout.</b> Attention from four of the model's layers is combined and averaged over queries into one map.</li>
+        <li><b>Normalized per image.</b> The 49 values are scaled from 0 to 1 within that single image. Warmer (yellow) means higher <i>relative</i> attention.</li>
+      </ol>
+    </div>
+  </div>
+
+  <h3>What the colors do and do not mean</h3>
+  <table>
+    <tr><th style="width:32%">On the map</th><th>Meaning</th></tr>
+    <tr><td>Yellow / brighter patches</td><td>The model attended more to these patches than to others <i>in this image</i>.</td></tr>
+    <tr><td>Purple / darker patches</td><td>Less relative attention. This does <b>not</b> mean the area is normal or irrelevant.</td></tr>
+    <tr><td>Comparing two images</td><td>Not meaningful. Each map is scaled on its own, so a yellow patch in one image is not "stronger" than one in another.</td></tr>
+  </table>
+
+  <div class="callout">
+    <p><b>Global and class-agnostic.</b> ThoraxScan produces one map per image. It is <b>not</b> specific to any predicted finding, so it cannot tell you where a particular finding is or why the model predicted it. Attention values are not probabilities and not a measure of model confidence.</p>
+  </div>
+</section>
+
+<section class="page">
+  <div class="brand">THORAXSCAN · STUDENT GUIDE</div>
+  <h2 style="margin-top:4mm">2. Where you will see it</h2>
+
+  <h3>Attention Maps page</h3>
+  <p>Opened from the main menu. It explains the method and shows a sample chest X-ray with an overlay labelled <i>"Illustrative example – not model output"</i>. The sample uses hand-picked values to demonstrate the display. No model was run on it.</p>
+
+  <h3>Learning Mode (ungraded practice)</h3>
+  <ol>
+    <li>Choose or drop a local chest X-ray (JPEG or PNG, up to 6 MiB).</li>
+    <li>Select <b>Analyze</b>. The model runs in your browser, and your image stays in browser memory.</li>
+    <li>The analysis result shows the findings and a <b>Model attention</b> overlay together.</li>
+  </ol>
+  <p>Tip: write down your own observations <i>before</i> you select Analyze, so you can compare them honestly afterwards.</p>
+
+  <h3>Assigned activities</h3>
+  <ol>
+    <li>Review the case X-ray and submit your final evaluation.</li>
+    <li>AI feedback is <b>locked until you submit</b>. After submission it shows "Analysis pending" until the analysis runs and is released.</li>
+    <li>Once released, the <b>AI feedback</b> panel shows the findings and the <b>Model attention</b> overlay. If analysis fails, select <b>Retry analysis</b>.</li>
+    <li>Your professor's evaluation, grade and comments remain the assessment. Use the map for reflection.</li>
+  </ol>
+
+  <h3>Professor submission review</h3>
+  <p>Professors see a <b>Relative global attention</b> overlay next to the case X-ray while reviewing student submissions. They can use it to discuss agreement and disagreement with student observations.</p>
+
+  <h3>Overlay controls</h3>
+  <table>
+    <tr><th style="width:32%">Control</th><th>Use it to</th></tr>
+    <tr><td>Show attention overlay</td><td>Toggle the heatmap off to see the original X-ray unobstructed.</td></tr>
+    <tr><td>Overlay opacity (default 55%)</td><td>Fade the colors so the anatomy underneath stays visible.</td></tr>
+    <tr><td>Method and 7×7 data</td><td>Expand to read the exact 49 normalized values, by row and column.</td></tr>
+  </table>
+
+  <div class="callout">
+    <p><b>No map shown?</b> If you see <i>"This model release does not export attention data,"</i> the active model version does not produce attention maps. The prediction results are still available.</p>
+  </div>
+</section>
+
+<section class="page">
+  <div class="brand">THORAXSCAN · STUDENT GUIDE</div>
+  <h2 style="margin-top:4mm">3. How to read it</h2>
+
+  <div class="steps">
+    <div><b>1. Observe</b>Describe what is visible on the X-ray yourself.</div>
+    <div><b>2. Locate</b>State where the overlay is warmest, using anatomical location words.</div>
+    <div><b>3. Compare</b>Check the model's focus against your own observations.</div>
+    <div><b>4. Qualify</b>Note agreement or mismatch, and don't treat attention as evidence.</div>
+  </div>
+
+  <table>
+    <tr><th style="width:50%">Do</th><th>Avoid</th></tr>
+    <tr><td>Use the map as one visual cue alongside the original image and your course knowledge.</td><td>Calling a yellow patch a confirmed abnormality.</td></tr>
+    <tr><td>Describe location carefully, e.g. "attention is concentrated over the lower right lung field."</td><td>Assuming purple areas are disease-free.</td></tr>
+    <tr><td>Treat a mismatch as a reason to re-check the image.</td><td>Reading the map as the reason for a specific predicted finding.</td></tr>
+    <tr><td>Keep reviewing the whole image, including areas with low attention.</td><td>Comparing color intensity between different images.</td></tr>
+  </table>
+
+  <h3>Discussion prompts</h3>
+  <ul>
+    <li>Which anatomy or region received the most relative attention?</li>
+    <li>Does that region correspond to something you can see on the X-ray?</li>
+    <li>What did you observe outside the highlighted area?</li>
+    <li>Where does your interpretation differ from the model's focus, and what should you re-check?</li>
+  </ul>
+
+  <h2 style="margin-top:6mm">4. Use limits</h2>
+  <p>ThoraxScan is an assistive learning tool for Radiologic Technology students. Its AI output, including attention maps, is for educational use only. It is not a diagnosis and must not guide clinical decisions or patient care. Follow your instructor's directions and course-approved interpretation methods.</p>
+
+  <div class="callout">
+    <p><b>Quick reference.</b> 7×7 grid, 49 values · four-layer attention rollout · normalized per image · yellow = higher, purple = lower <i>relative</i> attention · global and class-agnostic · not a probability · not a disease location.</p>
+  </div>
+
+  <div class="foot">ThoraxScan · Attention Maps student guide</div>
+</section>
+
+</body>
+</html>
