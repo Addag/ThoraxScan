@@ -18,13 +18,13 @@ const calloutStyles = {
 
 export default function Home() {
   return (
-    <div data-theme="dark" className="relative min-h-[max(1024px,100svh)] overflow-hidden [background:var(--landing-bg)] stacked:min-h-svh stacked:overflow-visible">
+    <div data-theme="dark" className="relative min-h-[max(1024px,100svh)] overflow-hidden [background:var(--landing-bg)] stacked:min-h-svh stacked:overflow-visible stacked:flex stacked:flex-col">
       <header className="relative h-[81px] bg-(--glass-shell) backdrop-blur-[12px] shadow-[inset_0_-1px_0_rgb(255_255_255/8%)] narrow:h-[73px] no-backdrop:[background:#14243e]">
         <Brand variant="landing" />
         <span className="absolute inset-x-0 bottom-0 block h-px w-full [background:url('/images/header-divider.svg')_center/100%_1px_no-repeat]" aria-hidden="true" />
       </header>
 
-      <main className="relative mx-auto min-h-[820px] max-w-[1440px] stacked:min-h-0 tablet:grid tablet:grid-cols-[minmax(0,1fr)_minmax(320px,507px)] tablet:items-start tablet:gap-[clamp(24px,3vw,48px)] tablet:px-[clamp(24px,5vw,72px)] tablet:pt-[clamp(64px,7vw,88px)] tablet:pb-14 narrow:flex narrow:flex-col narrow:px-6 narrow:pt-[72px] narrow:pb-[52px]">
+      <main className="relative mx-auto min-h-[820px] max-w-[1440px] stacked:min-h-0 stacked:w-full tablet:grid tablet:grid-cols-[minmax(0,1fr)_minmax(320px,507px)] tablet:items-start tablet:gap-[clamp(24px,3vw,48px)] tablet:px-[clamp(24px,5vw,72px)] tablet:pt-[clamp(64px,7vw,88px)] tablet:pb-14 narrow:flex narrow:flex-col narrow:px-6 narrow:pt-[72px] narrow:pb-[52px]">
         <div className="absolute top-[108px] left-[6.25%] flex h-[25px] w-[479px] items-center justify-center rounded-[15px] border border-[rgb(123_185_255/38%)] [background:linear-gradient(120deg,rgb(92_155_255/20%),rgb(37_75_145/14%))] text-[1rem] font-semibold leading-[1.4375rem] text-[#b9dbff] text-center backdrop-blur-[20px] backdrop-saturate-[140%] shadow-(--glass-inset-shadow) stacked:static stacked:h-auto stacked:min-h-[25px] stacked:w-[min(100%,479px)] stacked:px-2.5 stacked:py-1 stacked:leading-[1.2] tablet:min-w-0 tablet:col-span-full tablet:justify-self-start tablet:text-[clamp(0.75rem,1.2vw,1rem)] narrow:self-center narrow:text-[0.75rem] no-backdrop:[background:#14243e]">
           SqueezeViT | ONNX Runtime Web | Attention Heatmap XAI
         </div>
@@ -68,7 +68,7 @@ export default function Home() {
         </figure>
       </main>
 
-      <footer className="absolute inset-x-0 bottom-0 z-[2] flex min-h-[54px] items-start border border-[rgb(244_195_1/38%)] bg-[rgb(38_33_18/78%)] px-[31px] pt-1.5 pb-[5px] text-[1rem] font-semibold leading-[1.15] text-[#ffe082] backdrop-blur-[20px] backdrop-saturate-[140%] shadow-[inset_0_1px_0_rgb(244_195_1/8%)] stacked:static stacked:min-h-0 stacked:px-[18px] stacked:py-2.5 stacked:text-[0.8125rem] stacked:leading-[1.2] no-backdrop:[background:#262112]">
+      <footer className="absolute inset-x-0 bottom-0 z-[2] flex min-h-[54px] items-start border border-[rgb(244_195_1/38%)] bg-[rgb(38_33_18/78%)] px-[31px] pt-1.5 pb-[5px] text-[1rem] font-semibold leading-[1.15] text-[#ffe082] backdrop-blur-[20px] backdrop-saturate-[140%] shadow-[inset_0_1px_0_rgb(244_195_1/8%)] stacked:static stacked:mt-auto stacked:min-h-0 stacked:px-[18px] stacked:py-2.5 stacked:text-[0.8125rem] stacked:leading-[1.2] no-backdrop:[background:#262112]">
         <Image
           className="mt-2 mr-[18px] h-6 w-6 flex-[0_0_24px] stacked:mt-[5px] stacked:mr-[13px] stacked:h-5 stacked:w-5 stacked:basis-5"
           src="/images/danger-triangle.svg"
@@ -79,7 +79,7 @@ export default function Home() {
         <p className="m-0 max-w-[1294px] tablet:min-w-0">
           <strong className="font-extrabold text-(--disclaimer-yellow)">Educational Disclaimer</strong>: ThoraxScan is a training and learning tool for Radiologic Technology students only. All AI outputs are for guided learning and must not be used for clinical diagnosis or patient care.
         </p>
-        <span className="ml-auto flex items-center gap-3 whitespace-nowrap text-[0.75rem] font-semibold text-[#d6e1f0] underline underline-offset-2">
+        <span className="ml-auto flex items-center gap-3 self-center pl-6 whitespace-nowrap text-[0.75rem] font-semibold text-[#d6e1f0] underline underline-offset-2">
           <Link href="/privacy-policy">Privacy Policy</Link>
           <Link href="/terms">Terms</Link>
         </span>
