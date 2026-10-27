@@ -2,8 +2,10 @@
 
 import { revalidatePath } from "next/cache";
 
-import type { AppRole } from "@/lib/auth/types";
+import { type AppRole, emailPattern } from "@/lib/auth/types";
 import type {
+  EmailActionState,
+  EmailField,
   PasswordActionState,
   PasswordField,
   SettingsActionState,
@@ -139,4 +141,88 @@ export async function changePasswordAction(
   // Keep this device signed in; end every other session.
   await supabase.auth.signOut({ scope: "others" });
   return { status: "success", message: "Password updated." };
+}
+
+export async function changeEmailAction(
+  _previousState: EmailActionState,
+  formData: FormData,
+): Promise<EmailActionState> {
+  const newEmail = String(formData.get("newEmail") ?? "").trim().toLowerCase();
+  const currentPassword = String(formData.get("currentPassword") ?? "");
+  const fieldErrors: Partial<Record<EmailField, string>> = {};
+
+  if (!newEmail) fieldErrors.newEmail = "Enter a new email address.";
+  else if (!emailPattern.test(newEmail)) fieldErrors.newEmail = "Enter a valid email address.";
+  if (!currentPassword) fieldErrors.currentPassword = "Enter your current password.";
+
+  if (Object.keys(fieldErrors).length > 0) {
+    return { status: "error", message: "Check the highlighted fields.", fieldErrors };
+  }
+
+  const supabase = await createClient();
+  const { data: claimsData, error: claimsError } = await supabase.auth.getClaims();
+
+  if (claimsError || !claimsData?.claims?.sub) {
+    return {
+      status: "unauthorized",
+      message: "Your session has expired. Log in again before changing your email.",
+    };
+  }
+  if (newEmail === claimsData.claims.email?.toLowerCase()) {
+    return {
+      status: "error",
+      message: "Check the highlighted fields.",
+      fieldErrors: { newEmail: "This is already your sign-in email." },
+    };
+  }
+
+  const { data: verified, error: verifyError } = await supabase.rpc(
+    "verify_own_password",
+    { current_password: currentPassword },
+  );
+
+  if (verifyError) {
+    return { status: "error", message: "Unable to verify your password. Try again." };
+  }
+  if (!verified) {
+    return {
+      status: "error",
+      message: "Check the highlighted fields.",
+      fieldErrors: { currentPassword: "Current password is incorrect." },
+    };
+  }
+
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+  const { error } = await supabase.auth.updateUser(
+    { email: newEmail },
+    { emailRedirectTo: `${siteUrl}/auth/confirm?next=/dashboard` },
+  );
+
+  if (error) {
+    if (error.code === "email_exists") {
+      return {
+        status: "error",
+        message: "Check the highlighted fields.",
+        fieldErrors: { newEmail: "That email is already in use." },
+      };
+    }
+    if (error.code === "email_address_invalid") {
+      return {
+        status: "error",
+        message: "Check the highlighted fields.",
+        fieldErrors: { newEmail: "This email address can't be used. Try another one." },
+      };
+    }
+    if (error.code === "over_email_send_rate_limit") {
+      return { status: "error", message: "Too many emails were requested. Please try again later." };
+    }
+    return { status: "error", message: "Unable to change your email. Try again." };
+  }
+
+  revalidatePath("/student/settings");
+  revalidatePath("/professor/settings");
+  return {
+    status: "success",
+    message: `Confirmation links were sent to your current email and ${newEmail}. Click both to finish the change.`,
+  };
 }

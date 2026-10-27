@@ -1,5 +1,7 @@
 export type AppRole = "student" | "professor";
 export type LoginPortal = AppRole | "administrator";
+export const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 export type ProfessorApplicationStatus = "pending" | "approved" | "rejected";
 
 export type AuthField =

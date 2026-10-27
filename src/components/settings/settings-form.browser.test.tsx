@@ -5,8 +5,10 @@ import type { ComponentProps } from "react";
 
 const updateSettings = vi.hoisted(() => vi.fn());
 const changePassword = vi.hoisted(() => vi.fn());
+const changeEmail = vi.hoisted(() => vi.fn());
 
 vi.mock("@/app/(protected)/settings/actions", () => ({
+  changeEmailAction: changeEmail,
   changePasswordAction: changePassword,
   updateAccountSettingsAction: updateSettings,
 }));
@@ -24,6 +26,7 @@ const baseProps = {
   initialDisplayName: "Ada Student",
   initialSettings: { workPhone: null },
   loadError: null,
+  pendingEmail: null,
   role: "student" as const,
 };
 
@@ -122,4 +125,16 @@ test("shows password errors returned by the server", async () => {
   await page.getByRole("button", { name: "Update password" }).click();
   await expect.element(page.getByText("Current password is incorrect.")).toBeVisible();
   await expect.element(page.getByLabelText("Current password")).toHaveAttribute("aria-invalid", "true");
+});
+
+test("shows email change errors and the pending change", async () => {
+  changeEmail.mockResolvedValue({ status: "error", message: "Check the highlighted fields.", fieldErrors: { newEmail: "That email is already in use." } });
+  await render(<SettingsForm {...baseProps} pendingEmail="new@example.com" />);
+  await expect.element(page.getByText(/Pending change to new@example.com/)).toBeVisible();
+  await page.getByRole("tab", { name: "Security" }).click();
+  await page.getByLabelText("New email").fill("taken@example.com");
+  await page.getByLabelText("Your password").fill("current-password");
+  await page.getByRole("button", { name: "Update email" }).click();
+  await expect.element(page.getByText("That email is already in use.")).toBeVisible();
+  await expect.element(page.getByLabelText("New email")).toHaveAttribute("aria-invalid", "true");
 });

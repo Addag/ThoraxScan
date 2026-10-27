@@ -6,10 +6,10 @@
   <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:480px;">
     <tr><td style="padding:0 0 20px;font-size:22px;font-weight:bold;color:#fafafa;">Thorax<span style="color:#51b6ff;">Scan</span></td></tr>
     <tr><td bgcolor="#010d2a" style="background:#010d2a;border:1px solid #33425c;border-radius:12px;padding:32px;">
-      <h1 style="margin:0 0 12px;font-size:20px;color:#fafafa;">Confirm your new email</h1>
+      <h1 style="margin:0 0 12px;font-size:20px;color:#fafafa;">Confirm your email change</h1>
       <p style="margin:0 0 24px;font-size:15px;line-height:22px;color:#c7d4e8;">Confirm that you want to change your ThoraxScan email from <strong style="color:#fafafa;">{{ .Email }}</strong> to <strong style="color:#fafafa;">{{ .NewEmail }}</strong>.</p>
-      <a href="{{ .ConfirmationURL }}" style="display:inline-block;background:#0077ff;color:#ffffff;text-decoration:none;font-size:15px;font-weight:bold;padding:12px 24px;border-radius:8px;">Change email</a>
-      <p style="margin:24px 0 0;font-size:13px;line-height:20px;color:#aebbd0;">If you didn't request this, don't click the button and change your password.</p>
+      <a href="{{ .RedirectTo }}&token_hash={{ .TokenHash }}&type=email_change" style="display:inline-block;background:#0077ff;color:#ffffff;text-decoration:none;font-size:15px;font-weight:bold;padding:12px 24px;border-radius:8px;">Change email</a>
+      <p style="margin:24px 0 0;font-size:13px;line-height:20px;color:#aebbd0;">We sent this link to both addresses. The change finishes after both are confirmed. If you didn't request this, don't click the button and change your password.</p>
     </td></tr>
   </table>
 </td></tr>

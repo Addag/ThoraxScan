@@ -23,6 +23,14 @@ export type PasswordActionState = {
   fieldErrors?: Partial<Record<PasswordField, string>>;
 };
 
+export type EmailField = "newEmail" | "currentPassword";
+
+export type EmailActionState = {
+  status: "idle" | "error" | "success" | "unauthorized";
+  message: string;
+  fieldErrors?: Partial<Record<EmailField, string>>;
+};
+
 export const initialSettingsActionState: SettingsActionState = {
   status: "idle",
   message: "",

@@ -35,7 +35,7 @@ Authenticated settings draft → role-aware validation and atomic RPC → update
 
 ### Does not hit
 
-- Sign-in email, Professor approval, case bytes/storage authorization, or active model release selection.
+- Sign-in email (changed separately by `changeEmailAction`; see the [Shared settings surface](../objects/ui/shared-settings-surface.md)), Professor approval, case bytes/storage authorization, or active model release selection.
 
 ## See
 

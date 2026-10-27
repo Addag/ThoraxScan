@@ -28,6 +28,7 @@ export async function RoleSettingsPage({ role }: { role: AppRole }) {
         initialDisplayName={profile.display_name}
         initialSettings={pageData.settings}
         loadError={pageData.error}
+        pendingEmail={pageData.pendingEmail}
         role={role}
       />
     </PageMain>

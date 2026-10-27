@@ -8,6 +8,7 @@ import type {
   AuthField,
   LoginPortal,
 } from "@/lib/auth/types";
+import { emailPattern } from "@/lib/auth/types";
 import { createClient } from "@/lib/supabase/server";
 import {
   PRIVACY_POLICY_EFFECTIVE_DATE,
@@ -15,8 +16,6 @@ import {
   TERMS_EFFECTIVE_DATE,
   TERMS_VERSION,
 } from "@/lib/legal/privacy";
-
-const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 function value(formData: FormData, name: string) {
   return String(formData.get(name) ?? "");

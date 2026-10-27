@@ -28,6 +28,7 @@ export async function getSettingsPageData(profileId: string) {
 
   return {
     email: userResult.data.user?.email ?? "",
+    pendingEmail: userResult.data.user?.new_email ?? null,
     settings: projectSettings(settingsResult.data),
     error:
       userResult.error || settingsResult.error

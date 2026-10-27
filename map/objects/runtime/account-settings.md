@@ -33,7 +33,7 @@ Extends the private preferences of [Profile](../identity/profile.md), is edited 
 
 ### Does not hit
 
-- Supabase Auth email ownership, workspace membership roles, case object access, or model-release activation.
+- Supabase Auth email ownership (changed separately by `changeEmailAction` on the [Shared settings surface](../ui/shared-settings-surface.md)), workspace membership roles, case object access, or model-release activation.
 
 ## Surfaces
 

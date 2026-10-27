@@ -10,12 +10,15 @@ import {
 } from "react";
 
 import {
+  changeEmailAction,
   changePasswordAction,
   updateAccountSettingsAction,
 } from "@/app/(protected)/settings/actions";
+import { PasswordToggle } from "@/components/password-toggle";
 import type { AppRole } from "@/lib/auth/types";
 import {
   type AccountSettings,
+  type EmailActionState,
   type PasswordActionState,
   type SettingsActionState,
   initialSettingsActionState,
@@ -78,12 +81,14 @@ export function SettingsForm({
   initialDisplayName,
   initialSettings,
   loadError,
+  pendingEmail,
   role,
 }: {
   email: string;
   initialDisplayName: string;
   initialSettings: AccountSettings;
   loadError: string | null;
+  pendingEmail: string | null;
   role: AppRole;
 }) {
   const [activeTab, setActiveTab] = useState<SettingsTab>("profile");
@@ -162,7 +167,17 @@ export function SettingsForm({
         </div>
       </section>
 
-      <PasswordPanel hidden={activeTab !== "security"} />
+      <div
+        aria-labelledby="settings-tab-security"
+        className="grid gap-6"
+        hidden={activeTab !== "security"}
+        id="settings-panel-security"
+        role="tabpanel"
+        tabIndex={0}
+      >
+        <EmailPanel />
+        <PasswordPanel />
+      </div>
 
       <AccessibilityPanel hidden={activeTab !== "accessibility"} />
 
@@ -199,7 +214,11 @@ export function SettingsForm({
             <label className={fieldClass}>
               <span>Email address</span>
               <input className={inputClass} aria-readonly="true" readOnly type="email" value={email} />
-              <small>Sign-in email changes are not available here.</small>
+              <small>
+                {pendingEmail
+                  ? `Pending change to ${pendingEmail}. Click the confirmation links sent to both addresses to finish.`
+                  : "Change your sign-in email under Security."}
+              </small>
             </label>
             {role === "professor" ? (
               <label className={fieldClass}>
@@ -366,22 +385,86 @@ const passwordFields = [
   { name: "confirmPassword", label: "Confirm new password", autoComplete: "new-password" },
 ] as const;
 
-function PasswordPanel({ hidden }: { hidden: boolean }) {
+function EmailPanel() {
+  // Uncontrolled like PasswordPanel, so React clears the password after each submission.
+  const [state, formAction, pending] = useActionState<EmailActionState, FormData>(
+    changeEmailAction,
+    { status: "idle", message: "" },
+  );
+  const [visible, setVisible] = useState(false);
+
+  return (
+    <form action={formAction} className="grid gap-6" noValidate>
+      <section className={`${panelClass} p-[25px] max-[600px]:p-5`}>
+        <div className={panelHeadingClass}>
+          <h2>Change email</h2>
+          <p>We&apos;ll send a confirmation link to your current and new email. The change finishes after you click both.</p>
+        </div>
+        <div className="grid grid-cols-2 gap-x-[84px] gap-y-[26px] max-[600px]:grid-cols-1 max-[600px]:gap-y-5">
+          <label className={`${fieldClass} content-start`}>
+            <span>New email</span>
+            <input
+              className={inputClass}
+              aria-invalid={Boolean(state.fieldErrors?.newEmail)}
+              autoComplete="email"
+              disabled={pending}
+              name="newEmail"
+              required
+              type="email"
+            />
+            {state.fieldErrors?.newEmail ? (
+              <small data-error="true" className={fieldErrorClass} role="alert">{state.fieldErrors.newEmail}</small>
+            ) : null}
+          </label>
+          <label className={`${fieldClass} content-start`}>
+            <span>Your password</span>
+            <div className="relative">
+              <input
+                className={`${inputClass} pr-10`}
+                aria-invalid={Boolean(state.fieldErrors?.currentPassword)}
+                autoComplete="current-password"
+                disabled={pending}
+                name="currentPassword"
+                required
+                type={visible ? "text" : "password"}
+              />
+              <PasswordToggle className="right-1 size-8" visible={visible} onToggle={() => setVisible((v) => !v)} />
+            </div>
+            {state.fieldErrors?.currentPassword ? (
+              <small data-error="true" className={fieldErrorClass} role="alert">{state.fieldErrors.currentPassword}</small>
+            ) : null}
+          </label>
+        </div>
+      </section>
+      {state.message ? (
+        <p
+          aria-live="polite"
+          className={statusMessageClass(state.status)}
+          role={state.status === "error" || state.status === "unauthorized" ? "alert" : "status"}
+        >
+          {state.message}
+        </p>
+      ) : null}
+      <div className="flex justify-end">
+        <button className={submitButtonClass} disabled={pending} type="submit">
+          {pending ? "Sending…" : "Update email"}
+        </button>
+      </div>
+    </form>
+  );
+}
+
+function PasswordPanel() {
   // React resets this uncontrolled form after each submission, so passwords never linger.
   const [state, formAction, pending] = useActionState<PasswordActionState, FormData>(
     changePasswordAction,
     { status: "idle", message: "" },
   );
+  const [visible, setVisible] = useState<Record<string, boolean>>({});
 
   return (
-    <form action={formAction} className="grid gap-6" hidden={hidden} noValidate>
-      <section
-        aria-labelledby="settings-tab-security"
-        className={`${panelClass} min-h-[247px] p-[25px] max-[600px]:p-5`}
-        id="settings-panel-security"
-        role="tabpanel"
-        tabIndex={0}
-      >
+    <form action={formAction} className="grid gap-6" noValidate>
+      <section className={`${panelClass} min-h-[247px] p-[25px] max-[600px]:p-5`}>
         <div className={panelHeadingClass}>
           <h2>Change password</h2>
           <p>Enter your current password, then choose a new one. Other signed-in devices will be logged out.</p>
@@ -390,15 +473,22 @@ function PasswordPanel({ hidden }: { hidden: boolean }) {
           {passwordFields.map((field) => (
             <label className={`${fieldClass} content-start ${field.name === "newPassword" ? "col-start-1" : ""}`} key={field.name}>
               <span>{field.label}</span>
-              <input
-                className={inputClass}
-                aria-invalid={Boolean(state.fieldErrors?.[field.name])}
-                autoComplete={field.autoComplete}
-                disabled={pending}
-                name={field.name}
-                required
-                type="password"
-              />
+              <div className="relative">
+                <input
+                  className={`${inputClass} pr-10`}
+                  aria-invalid={Boolean(state.fieldErrors?.[field.name])}
+                  autoComplete={field.autoComplete}
+                  disabled={pending}
+                  name={field.name}
+                  required
+                  type={visible[field.name] ? "text" : "password"}
+                />
+                <PasswordToggle
+                  className="right-1 size-8"
+                  visible={Boolean(visible[field.name])}
+                  onToggle={() => setVisible((v) => ({ ...v, [field.name]: !v[field.name] }))}
+                />
+              </div>
               {state.fieldErrors?.[field.name] ? (
                 <small data-error="true" className={fieldErrorClass} role="alert">{state.fieldErrors[field.name]}</small>
               ) : "hint" in field ? (
