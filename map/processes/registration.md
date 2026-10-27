@@ -2,8 +2,8 @@
 node_type: process
 universe: live
 status: verified
-audited: 2026-10-11
-snapshot: working tree @ privacy-consent implementation
+audited: 2026-10-27
+snapshot: main @ 76f6977 + working tree
 ---
 
 # Register an account
@@ -14,7 +14,7 @@ Form data, requested role, terms agreement, privacy acknowledgement, and Turnsti
 
 1. The register page renders the shared auth surface with Student and Professor requested-role options plus required terms-agreement and privacy-notice checkboxes in [auth-form.tsx](<../../src/components/auth/auth-form.tsx>).
 2. The shared form requires a Cloudflare Turnstile token and resets the single-use challenge after an action response in [auth-form.tsx](<../../src/components/auth/auth-form.tsx:45>).
-3. The server action validates the account fields, requires `termsAccepted=yes` and privacy acknowledgement, and rejects a missing Turnstile token before contacting Supabase in [actions.ts](<../../src/app/(auth)/actions.ts>).
+3. The server action validates the account fields (the password must be at least 8 characters with at least one letter and one number (`validatePassword` in [actions.ts](<../../src/app/(auth)/actions.ts:36>)); Supabase's `weak_password` error maps to the same message ([actions.ts](<../../src/app/(auth)/actions.ts:61>))), requires `termsAccepted=yes` and privacy acknowledgement, and rejects a missing Turnstile token before contacting Supabase in [actions.ts](<../../src/app/(auth)/actions.ts>).
 4. The action calls Supabase Auth sign-up with the CAPTCHA token, display name, requested role, privacy policy version/date, and `terms_version` and `terms_effective_date` in Auth metadata in [actions.ts](<../../src/app/(auth)/actions.ts>). Terms acceptance is stored in signup metadata only; it is not recorded in `legal_consents` or the confirmation RPC. Audit-grade recording requires a separate migration and RPC change.
 5. The Auth trigger creates either a Student profile or a Professor profile plus pending application in [the approval migration](<../../supabase/migrations/20260817124643_professor_approval_administration.sql:128>).
 6. The confirmation route records the privacy-notice acknowledgement for the metadata policy version through the authenticated consent RPC after email confirmation in [route.ts](<../../src/app/auth/confirm/route.ts>).

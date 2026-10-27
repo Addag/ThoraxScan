@@ -2,8 +2,8 @@
 node_type: catalog
 subject: ThoraxScan repository
 status: live
-snapshot: main @ 6af6c16
-audited: 2026-10-11
+snapshot: main @ 76f6977 + working tree
+audited: 2026-10-27
 ---
 
 # ThoraxScan system map
@@ -27,6 +27,7 @@ This is a source-backed map of the ThoraxScan application repository one level a
 | How are Student and Professor settings updated? | [Shared settings surface](objects/ui/shared-settings-surface.md), [Account settings](objects/runtime/account-settings.md), then [settings update](processes/account-settings-update.md) |
 | What protects the administrator dashboard? | [Platform administrator](objects/identity/platform-administrator.md) and [Administrator approval surface](objects/ui/administrator-approval-surface.md) |
 | How do Students and Professors practice with the active model? | [Student and Professor Learning Mode](objects/ui/student-learning-mode-surface.md), then [Learning Mode inference](processes/student-learning-mode-inference.md) |
+| Where is the educational attention-map guide? | [Attention Maps surface](objects/ui/attention-maps-surface.md) |
 | Where do built-in practice/activity images come from? | [Built-in X-ray library](objects/learning/built-in-xray-library.md) |
 | What else moves if I change X? | [effects/CONTEXT.md](effects/CONTEXT.md) |
 | What is planned but not wired? | The ghost cards in [objects/_index.md](objects/_index.md) |

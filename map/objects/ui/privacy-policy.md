@@ -2,8 +2,8 @@
 node_type: object
 universe: live
 status: verified
-audited: 2026-10-11
-snapshot: working tree @ privacy-policy implementation
+audited: 2026-10-27
+snapshot: main @ 76f6977 + working tree
 ---
 
 # Privacy policy surface
@@ -16,11 +16,11 @@ The notice is a public, versioned disclosure for account, educational, teaching-
 
 ## Shape
 
-- The page identifies version `1.1`, effective date `2026-10-22`, controller/address/contact placeholders, purposes, provider disclosures, international processing, retention limitations, rights, age and research participation, and medical-use limits in [page.tsx](<../../../src/app/privacy-policy/page.tsx>).
+- The page identifies version `1.1`, effective date `2026-10-22`, the named controllers (the four capstone developers), their institutional address, and their LPU Batangas contact emails, purposes, provider disclosures, international processing, retention limitations, rights, age and research participation, and medical-use limits in [page.tsx](<../../../src/app/privacy-policy/page.tsx>).
 - Section 8 states that the app asks no age, that under-18 use follows the institution, and that registration does not enroll anyone in research; the capstone evaluation asks for its own consent.
-- Shared legal constants are owned by [privacy.ts](<../../../src/lib/legal/privacy.ts>).
+- Shared legal constants, including `PRIVACY_CONTROLLER_NAME`, `PRIVACY_CONTROLLER_ADDRESS`, and `PRIVACY_CONTACT_EMAIL`, are owned by [privacy.ts](<../../../src/lib/legal/privacy.ts>).
 - Landing, authentication, protected-shell, and settings navigation link to the page in [page.tsx](<../../../src/app/page.tsx>), [auth-layout.tsx](<../../../src/components/auth/auth-layout.tsx>), [app-shell.tsx](<../../../src/components/app-shell.tsx>), and [settings-form.tsx](<../../../src/components/settings/settings-form.tsx>).
-- Operator identity, address, privacy email, institutional approval, and verified retention enforcement remain release blockers; the page labels them instead of asserting completion.
+- The page no longer shows the warning banner about placeholders and pending research/privacy approval. Source does not record whether that approval or retention enforcement is done; treat both as unverified.
 
 ## Connected to
 

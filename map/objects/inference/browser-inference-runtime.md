@@ -2,8 +2,8 @@
 node_type: object
 universe: live
 status: verified
-audited: 2026-09-29
-snapshot: main @ 6af6c16
+audited: 2026-10-27
+snapshot: main @ 76f6977 + working tree
 ---
 
 # Browser inference runtime
@@ -18,6 +18,8 @@ Runtime replacement must fail closed and must not silently use a cached older mo
 
 It attempts WebGPU and falls back to WASM on WebGPU load or execution failure, caches at most two sessions keyed by bundle and provider, protects loading/in-use sessions from eviction, and emits typed failures.
 
+ORT's `wasmPaths` is the folder prefix `/ort/1.27.0/`, not fixed file names, so each build loads its own binary; the WebGPU build needs the `.asyncify` file ([runtime.ts](<../../../src/lib/inference/runtime.ts:59>)).
+
 ## Connected to
 
 Consumes [Active model slot](active-model-slot.md), [Model manifest and configuration](model-manifest-configuration.md), and [Preprocessing tensor](preprocessing-tensor.md); produces [Transient prediction result](prediction-result.md) for [Student Learning Mode](../ui/student-learning-mode-surface.md) and the activity analysis browser boundary.
@@ -26,7 +28,7 @@ Consumes [Active model slot](active-model-slot.md), [Model manifest and configur
 
 ### Hits
 
-- Active RPC shape, artifact integrity, ONNX Runtime bundling, provider fallback, session reuse, and inference result provenance.
+- Active RPC shape, artifact integrity, the `/ort/1.27.0/` asset folder (pinning the plain WASM files makes WebGPU sessions fail and silently fall back to WASM), ONNX Runtime bundling, provider fallback, session reuse, and inference result provenance.
 
 ### Does not hit
 

@@ -2,8 +2,8 @@
 node_type: object
 universe: live
 status: verified
-audited: 2026-09-29
-snapshot: main @ 6af6c16
+audited: 2026-10-27
+snapshot: main @ 76f6977 + working tree
 ---
 
 # AI analysis
@@ -13,6 +13,7 @@ One immutable prediction-only analysis per activity. The browser resolves the ac
 ## Shape
 
 - `public.ai_analyses` uses `pending | ready | failed`, a five-minute claim lease, retry count, safe failure code, all 14 probabilities, thresholds/findings derived from the active manifest, provenance, and V1-unavailable or V2-ready attention fields ([base migration](<../../../supabase/migrations/20260920100000_activity_ai_analysis.sql:6>), [V2 contract](<../../../supabase/migrations/20260922163225_attention_contract_hardening.sql:11>)).
+- Each stored threshold entry also carries the manifest label's optional `possibleThreshold` (null when the release has none), written by the current `complete_activity_ai_analysis` in [the possible-thresholds migration](<../../../supabase/migrations/20261025120000_activity_ai_possible_thresholds.sql>). Rows completed before that migration have no possible thresholds and so show no possible findings; they are not backfilled.
 - Ready rows are protected by an immutable trigger and are not overwritten when a newer model is activated.
 - `claim_activity_ai_analysis`, `complete_activity_ai_analysis`, and `fail_activity_ai_analysis` are authenticated, security-definer RPCs with workspace and final-submission checks ([migration](<../../../supabase/migrations/20260920100000_activity_ai_analysis.sql:137>)).
 
@@ -24,7 +25,7 @@ One immutable prediction-only analysis per activity. The browser resolves the ac
 
 ### Hits
 
-Migration constraints/RPCs, activity projections, browser analysis adapter, Student feedback UI, Professor status UI, tests, and map process/effect cards.
+Migration constraints/RPCs, the stored `thresholds` JSON shape (including `possibleThreshold`), activity projections, browser analysis adapter, Student feedback UI, Professor status UI, tests, and map process/effect cards.
 
 ### Does not hit
 

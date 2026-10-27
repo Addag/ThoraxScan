@@ -21,6 +21,7 @@ Uses [Built-in X-ray library](../learning/built-in-xray-library.md) as its sampl
 ### Hits
 
 - Student and Professor navigation, analyzer states, accessible result focus, responsive styles, and provenance presentation.
+- The findings list is the shared [AnalysisFindings](<../../../src/components/analysis-findings.tsx:10>) component, which the activity AI feedback card also renders; changing it changes both.
 
 ### Does not hit
 

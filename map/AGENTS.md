@@ -2,8 +2,8 @@
 node_type: catalog
 subject: ThoraxScan repository
 status: live
-snapshot: main @ 5a45326
-audited: 2026-10-18
+snapshot: main @ 76f6977 + working tree
+audited: 2026-10-27
 ---
 
 # ThoraxScan system map

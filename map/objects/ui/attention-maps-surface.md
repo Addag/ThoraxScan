@@ -2,8 +2,8 @@
 node_type: surface
 universe: live
 status: verified
-audited: 2026-10-18
-snapshot: main @ 5a45326 + working tree
+audited: 2026-10-27
+snapshot: main @ 76f6977 + working tree
 ---
 
 # Attention Maps surface
@@ -14,7 +14,7 @@ The page describes the 7×7 patch grid, four-layer attention rollout averaged ov
 
 The sample uses `/images/chexpert/cxp-001.jpg` with 49 hand-picked values validated by `readyAttention`. It is explicitly labeled illustrative, not model output. The shared `AttentionHeatmap` uses its illustrative mode with the real purple-to-yellow scale, overlay toggle, opacity slider, legend, and expandable 7×7 table. The content grid becomes one column below 800px.
 
-The PDF Guide opens `/guides/attention-maps.pdf` in a new tab. The user supplies that file; until then the link returns 404. Quick Reference links to Learning Mode for the current role.
+The PDF Guide opens the committed [attention-maps.pdf](<../../../public/guides/attention-maps.pdf>) in a new tab. It is generated, not hand-made: [render-attention-guide.mjs](<../../../scripts/guides/render-attention-guide.mjs>) prints [attention-maps.html](<../../../scripts/guides/attention-maps.html>) through Playwright Chromium with the LPU letterhead banners (`header.jpg`, `footer.jpg`). Edit the HTML and re-run the script; never edit the PDF. Quick Reference links to Learning Mode for the current role.
 
 ## Connected to
 
@@ -25,6 +25,7 @@ The PDF Guide opens `/guides/attention-maps.pdf` in a new tab. The user supplies
 ### Hits
 
 - Both role routes, sidebar navigation, static educational copy, illustrative heatmap presentation, PDF destination, and responsive layout.
+- The PDF copy: its HTML source, letterhead images, and render script, and the committed PDF they regenerate.
 
 ### Does not hit
 
