@@ -72,12 +72,12 @@ const status = {
     "Draft and final submissions",
     "In-browser AI analysis with attention heatmaps, released after submission",
     "Faculty evaluation and notifications",
+    "Class analytics with CSV export",
     "Learning Mode with the built-in X-ray library",
     "Model registry with validation, staging, activation and rollback",
     "Privacy notice consent recording and accessibility settings",
   ],
   continuing: [
-    "Class analytics (planned, not built)",
     "Network testing to confirm what the browser inference path sends and keeps",
     "A lateral-view release scope",
     "Legal and institutional review of the privacy policy and terms",

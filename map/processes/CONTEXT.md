@@ -49,7 +49,7 @@ Record only movements that currently run in the repository. The process shelf co
 - [activity-ai-analysis.md](activity-ai-analysis.md)
 - [privacy-consent-recording.md](privacy-consent-recording.md)
 
-Faculty evaluation is live in [faculty-evaluation.md](faculty-evaluation.md); analytics movements remain a ghost concept. Bell notifications are a read-time projection with no process of their own; see [notification.md](../objects/learning/notification.md). Prediction-only AI analysis and feedback release are live in [activity-ai-analysis.md](activity-ai-analysis.md).
+Faculty evaluation is live in [faculty-evaluation.md](faculty-evaluation.md). Class analytics is a read-time projection with no process of its own; see [analytics.md](../objects/learning/analytics.md). Bell notifications are a read-time projection with no process of their own; see [notification.md](../objects/learning/notification.md). Prediction-only AI analysis and feedback release are live in [activity-ai-analysis.md](activity-ai-analysis.md).
 
 ## Human check
 

@@ -88,7 +88,7 @@ export function StatCard({
   detail,
 }: {
   symbol: string;
-  value: number;
+  value: number | string;
   label: string;
   detail: string;
 }) {

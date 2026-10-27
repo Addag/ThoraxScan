@@ -10,7 +10,7 @@ export async function ProfessorShell({
   sectionDescription = "Teaching workspaces",
 }: {
   children: ReactNode;
-  activeItem?: "dashboard" | "activities" | "submissions" | "learning" | "attention" | "settings";
+  activeItem?: "dashboard" | "activities" | "submissions" | "learning" | "attention" | "analytics" | "settings";
   sectionLabel?: string;
   sectionDescription?: string;
 }) {
@@ -23,6 +23,7 @@ export async function ProfessorShell({
       navItems={[
         { label: "Student Reviews", href: "/professor/submissions", icon: "reviews", active: activeItem === "submissions" },
         { label: "Home", href: "/professor", icon: "dashboard", active: activeItem === "dashboard" },
+        { label: "Class Analytics", href: "/professor/analytics", glyph: "▥", active: activeItem === "analytics" },
         { label: "Activities", href: "/professor/activities", icon: "activities", active: activeItem === "activities" },
         { label: "Learning mode", href: "/professor/learning", icon: "learning", active: activeItem === "learning" },
         { label: "Attention maps", href: "/professor/attention", icon: "attention", active: activeItem === "attention" },
