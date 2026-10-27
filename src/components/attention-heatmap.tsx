@@ -1,7 +1,17 @@
 "use client";
 
 import { useId, useState } from "react";
-import type { AttentionHeatmap as Heatmap } from "@/lib/inference/attention";
+import { attentionColor, attentionGradient, upsampleAttention, type AttentionHeatmap as Heatmap } from "@/lib/inference/attention";
+
+// Canvas resolution for the smoothed overlay; CSS scales it to the image.
+const OVERLAY_SIZE = 112;
+function drawOverlay(canvas: HTMLCanvasElement | null, values: number[]) {
+  const context = canvas?.getContext("2d");
+  if (!context) return;
+  const image = context.createImageData(OVERLAY_SIZE, OVERLAY_SIZE);
+  upsampleAttention(values, OVERLAY_SIZE).forEach((value, index) => image.data.set([...attentionColor(value), 255], index * 4));
+  context.putImageData(image, 0, 0);
+}
 
 export function AttentionHeatmap({ imageUrl, attention, title = "Attention overlay", illustrative = false, className = "" }: { imageUrl: string | null; attention: Heatmap; title?: string; illustrative?: boolean; className?: string }) {
   const titleId = useId();
@@ -10,21 +20,19 @@ export function AttentionHeatmap({ imageUrl, attention, title = "Attention overl
   if (attention.status !== "ready") return <p className="m-0 px-4 py-3.5 text-[0.75rem] leading-[1.55] text-(--text-secondary)">This model release does not export attention data. Prediction results are still available.</p>;
   return <section aria-labelledby={titleId} className={`text-[#e7eefb] light:text-(--text-primary) ${className}`}>
     <h3 className="mx-0 mt-0 mb-1.5 text-[0.9375rem]" id={titleId}>{title}</h3>
-    <p className="mx-0 mt-0 mb-2.5 text-[0.75rem] leading-[1.55] text-[#c8d5e8] light:text-(--text-secondary)">{illustrative ? "This illustrative overlay uses hand-picked values to demonstrate the global, class-agnostic attention display. These values are not model output for this X-ray." : "This global, class-agnostic overlay shows the relative internal attention the model assigned across the image during this inference."} Warmer colors indicate higher relative attention within this image. It does not identify a lesion, explain a specific finding, or confirm disease location.</p>
+    <p className="mx-0 mt-0 mb-2.5 text-[0.75rem] leading-[1.55] text-[#c8d5e8] light:text-(--text-secondary)">{illustrative ? "This illustrative overlay uses hand-picked values to demonstrate the global, class-agnostic attention display. These values are not model output for this X-ray." : "This global, class-agnostic overlay shows the relative internal attention the model assigned across the image during this inference."} Warmer colors (red) indicate higher relative attention within this image; cooler colors (blue) indicate lower. It does not identify a lesion, explain a specific finding, or confirm disease location.</p>
     {imageUrl ? <div style={{ position: "relative", maxWidth: 448 }}>
       {/* Native image keeps private signed and local blob URLs out of an image proxy. */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img src={imageUrl} alt={illustrative ? "Sample chest X-ray for an illustrative attention overlay" : "Chest X-ray used for this inference"} style={{ display: "block", width: "100%", filter: "grayscale(1)" }} />
-      {enabled ? <svg aria-hidden="true" viewBox="0 0 7 7" preserveAspectRatio="none" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", opacity, pointerEvents: "none" }}>
-        {attention.values.map((value, index) => <rect key={index} x={index % 7} y={Math.floor(index / 7)} width="1" height="1" fill={`rgb(${80 + 175 * value}, ${15 + 185 * value}, ${110 - 90 * value})`} />)}
-      </svg> : null}
+      {enabled ? <canvas aria-hidden="true" width={OVERLAY_SIZE} height={OVERLAY_SIZE} ref={canvas => drawOverlay(canvas, attention.values)} style={{ position: "absolute", inset: 0, width: "100%", height: "100%", opacity, pointerEvents: "none" }} /> : null}
     </div> : <p className="mx-0 mt-0 mb-2.5 text-[0.75rem] leading-[1.55] text-[#c8d5e8] light:text-(--text-secondary)">Original image unavailable. The normalized attention data remains available below.</p>}
     <label className="mt-2.5 flex items-center gap-[7px] text-[0.75rem] text-[#d7e3f5] light:text-(--text-secondary)"><input className="size-[15px] accent-[#087fff]" type="checkbox" checked={enabled} onChange={event => setEnabled(event.target.checked)} /> Show attention overlay</label>
     <label className="mt-2.5 flex items-center gap-[7px] text-[0.75rem] text-[#d7e3f5] light:text-(--text-secondary)">Overlay opacity <input className="w-[min(180px,42vw)] accent-[#087fff]" type="range" min="0" max="1" step="0.05" value={opacity} onChange={event => setOpacity(Number(event.target.value))} /> {Math.round(opacity * 100)}%</label>
-    <div aria-hidden="true" style={{ height: 12, maxWidth: 448, background: "linear-gradient(to right, rgb(80,15,110), rgb(255,200,20))" }} />
+    <div aria-hidden="true" style={{ height: 12, maxWidth: 448, background: attentionGradient }} />
     <p className="mx-0 mt-0 mb-2.5 text-[0.75rem] leading-[1.55] text-[#c8d5e8] light:text-(--text-secondary)">Lower relative attention → Higher relative attention</p>
     <details className="mt-2.5 text-[0.75rem] text-[#d7e3f5] light:text-(--text-secondary)"><summary>Method and 7×7 data</summary>
-      <p>{illustrative ? "Illustrative values only; no attention rollout was run for this example. Model-generated maps use four-layer attention rollout, averaged over queries, normalized per image." : "Four-layer attention rollout, averaged over queries, normalized per image."} These values are relative attention, not probabilities.</p>
+      <p>{illustrative ? "Illustrative values only; no attention rollout was run for this example. Model-generated maps use four-layer attention rollout, averaged over queries, normalized per image." : "Four-layer attention rollout, averaged over queries, normalized per image."} These values are relative attention, not probabilities. The overlay is smoothed between patch centers for display; the underlying data is still this 7×7 grid.</p>
       <div style={{ overflowX: "auto" }}><table>
         <caption>Normalized attention values, rows top to bottom and columns left to right</caption>
         <thead><tr><th scope="col">Row</th>{Array.from({ length: 7 }, (_, col) => <th key={col} scope="col">{col + 1}</th>)}</tr></thead>

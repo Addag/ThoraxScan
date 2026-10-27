@@ -20,8 +20,12 @@ maps only after submission and feedback release. Approved Professors require
 workspace access through a separate heatmap RPC. Direct analysis table reads remain
 revoked. There is no saved-map history route.
 
-The SVG component has a toggle, native keyboard opacity slider, sequential legend
-and expandable numeric table. Rollback to V1 affects new inference only; existing
+The component draws a canvas overlay: the 49 values are bilinearly interpolated
+between patch centers (display only, `upsampleAttention`) and colored with the
+blue-to-red `ATTENTION_RAMP` in [attention.ts](../../../src/lib/inference/attention.ts),
+which also feeds the legend. It has a toggle, native keyboard opacity slider,
+legend and expandable numeric table of the raw 7x7 values. The PDF guide's
+inline script copies the ramp and interpolation; keep them in sync. Rollback to V1 affects new inference only; existing
 V2 analyses retain their maps.
 
 Sources: [component](../../../src/components/attention-heatmap.tsx),

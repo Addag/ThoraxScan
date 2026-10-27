@@ -5,7 +5,7 @@ import { PageHeading, PageMain } from "@/components/dashboard-ui";
 import { readyAttention } from "@/lib/inference/attention";
 
 // Hand-picked display values, not inference results for the sample X-ray.
-const illustrativeAttention = readyAttention([
+export const illustrativeAttention = readyAttention([
   0.00, 0.05, 0.12, 0.18, 0.14, 0.06, 0.02,
   0.04, 0.20, 0.38, 0.46, 0.34, 0.18, 0.05,
   0.10, 0.36, 0.62, 0.74, 0.58, 0.28, 0.08,
@@ -71,7 +71,7 @@ export function AttentionMapsContent({ role }: { role: "student" | "professor" }
               <p className="m-0">The 49 patch values are scaled from 0 to 1 within each image. They show relative attention, not probabilities or an explanation of a particular prediction. The sample here uses hand-picked values to demonstrate the display.</p>
               <aside className="mt-8 rounded-lg border border-[#0077ff] bg-[#150d59] light:bg-(--surface-raised) p-4" aria-labelledby="attention-friendly-title">
                 <h3 className="mt-0 mb-3 text-[0.9375rem] font-semibold text-[#09f7ff] light:text-(--brand-blue-text)" id="attention-friendly-title">Student-Friendly Explanation</h3>
-                <p className="m-0">Think of it as a spotlight on the image’s patches. Warmer colors (yellow) = higher relative attention. Cooler colors (purple) = lower.</p>
+                <p className="m-0">Think of it as a spotlight on the image’s patches. Warmer colors (red) = higher relative attention. Cooler colors (blue) = lower.</p>
                 <p className="mt-3 mb-0 font-semibold text-(--text-primary)">It doesn’t show where disease is.</p>
               </aside>
             </div>
