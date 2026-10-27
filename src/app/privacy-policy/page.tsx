@@ -26,7 +26,6 @@ export default function PrivacyPolicyPage() {
           <p className="m-0 text-[0.75rem] font-extrabold tracking-[0.08em] text-[#8ecbff] light:text-(--brand-blue-text) uppercase">Privacy and data</p>
           <h1 className="m-0 text-[clamp(1.875rem,5vw,3rem)] font-extrabold leading-[1.1]">ThoraxScan Privacy Policy</h1>
           <p className="m-0 text-[0.875rem] leading-[1.6] text-(--text-secondary)">Version {PRIVACY_POLICY_VERSION} · Effective {PRIVACY_POLICY_EFFECTIVE_DATE}</p>
-          <p className="m-0 border border-[#b98a26] bg-[rgba(185,138,38,0.16)] px-3.5 py-3 text-[0.8125rem] leading-[1.5] text-[#ffe3a1] light:text-(--status-warning-text)">This policy contains operator and institutional placeholders. Replace them and obtain the required research and privacy approvals before public launch.</p>
         </header>
 
         <section className={sectionClass}><h2>1. Who operates ThoraxScan</h2><p>ThoraxScan is currently operated by {PRIVACY_CONTROLLER_NAME}.</p><dl className="grid gap-1 text-[0.875rem] leading-[1.6]"><div><dt className="inline font-semibold">Address: </dt><dd className="inline">{PRIVACY_CONTROLLER_ADDRESS}</dd></div><div><dt className="inline font-semibold">Privacy requests: </dt><dd className="inline">{PRIVACY_CONTACT_EMAIL}</dd></div></dl></section>
