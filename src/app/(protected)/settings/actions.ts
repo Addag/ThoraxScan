@@ -82,6 +82,9 @@ export async function changePasswordAction(
   if (!currentPassword) fieldErrors.currentPassword = "Enter your current password.";
   if (!newPassword) fieldErrors.newPassword = "Enter a new password.";
   else if (newPassword.length < 8) fieldErrors.newPassword = "Use at least 8 characters.";
+  else if (!/[a-z]/i.test(newPassword) || !/\d/.test(newPassword)) {
+    fieldErrors.newPassword = "Include at least one letter and one number.";
+  }
   else if (newPassword === currentPassword) {
     fieldErrors.newPassword = "Choose a password different from your current one.";
   }

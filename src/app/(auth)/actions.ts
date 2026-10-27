@@ -36,6 +36,9 @@ function validateEmail(email: string) {
 function validatePassword(password: string) {
   if (!password) return "Enter your password.";
   if (password.length < 8) return "Use at least 8 characters.";
+  if (!/[a-z]/i.test(password) || !/\d/.test(password)) {
+    return "Include at least one letter and one number.";
+  }
 }
 
 function validateCaptchaToken(captchaToken: string) {
@@ -54,6 +57,9 @@ function authMessage(code: string | undefined, fallback: string) {
   if (code === "invalid_credentials") return "Email or password is incorrect.";
   if (code === "email_not_confirmed") {
     return "Confirm your email address before logging in.";
+  }
+  if (code === "weak_password") {
+    return "This password is too weak. Include at least one letter and one number.";
   }
   if (code === "over_email_send_rate_limit") {
     return "Too many emails were requested. Please try again later.";

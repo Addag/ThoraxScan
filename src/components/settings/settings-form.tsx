@@ -381,7 +381,7 @@ function AccessibilityPanel({ hidden }: { hidden: boolean }) {
 
 const passwordFields = [
   { name: "currentPassword", label: "Current password", autoComplete: "current-password" },
-  { name: "newPassword", label: "New password", autoComplete: "new-password", hint: "Use at least 8 characters." },
+  { name: "newPassword", label: "New password", autoComplete: "new-password", hint: "Use at least 8 characters, including a letter and a number." },
   { name: "confirmPassword", label: "Confirm new password", autoComplete: "new-password" },
 ] as const;
 
