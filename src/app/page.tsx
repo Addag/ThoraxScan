@@ -6,6 +6,7 @@ import { illustrativeAttention } from "@/components/learning/attention-maps-cont
 import { primaryButtonBase } from "@/components/primary-button";
 import { RevealOnScroll } from "@/components/reveal-on-scroll";
 import { TechnicalOverview } from "@/components/technical-overview";
+import { DocsSection } from "@/components/docs-section";
 import { LandingFooter, LandingHeader, glassCard, secondaryPill, sectionLead, sectionShell, sectionTitle } from "@/components/landing-ui";
 
 const workflowCallouts = [
@@ -205,6 +206,8 @@ export default function Home() {
         </section>
 
         <TechnicalOverview />
+
+        <DocsSection />
 
         <section className={`${sectionShell} text-center`} aria-labelledby="start-title">
           <h2 className={sectionTitle} id="start-title" data-reveal>Ready to practice?</h2>

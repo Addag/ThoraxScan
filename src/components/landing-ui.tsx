@@ -2,7 +2,7 @@ import Link from "next/link";
 
 import { Brand } from "@/components/brand";
 
-// Shared by the landing page (/) and its technical overview section.
+// Shared by the landing page (/) and its technical overview and docs sections.
 export const sectionShell = "mx-auto max-w-[1200px] px-[clamp(16px,5vw,72px)] py-[clamp(64px,9vw,120px)]";
 export const sectionTitle = "m-0 [font-family:var(--font-inter),Arial,sans-serif] text-[clamp(2rem,4vw,3rem)] font-extrabold tracking-[-1.2px] leading-[1.15] text-(--text-primary)";
 export const sectionLead = "mt-4 mb-0 max-w-[640px] text-[1.0625rem] font-semibold leading-[1.5] text-[#c3d0e2]";
@@ -13,6 +13,7 @@ export const secondaryPill = "inline-flex min-h-11 items-center justify-center g
 const navLinks = [
   { href: "#how-it-works", label: "How it works" },
   { href: "#technical", label: "Technical" },
+  { href: "#docs", label: "Docs" },
 ] as const;
 
 export function LandingHeader() {
@@ -21,9 +22,9 @@ export function LandingHeader() {
       <Brand variant="landing" />
       <nav className="absolute top-1/2 right-9 flex -translate-y-1/2 gap-1 narrow:right-5" aria-label="On this page">
         {navLinks.map((link) => (
-          // Phones keep only the Technical link beside the brand; the hero's button already reaches How it works.
+          // Phones keep only Docs beside the brand; the hero's button reaches How it works and the footer links Technical.
           <a
-            className={`rounded-[10px] px-3.5 py-2 text-[0.9375rem] font-semibold text-[#c3d0e2] no-underline hover:bg-[rgb(92_155_255/20%)] hover:text-[#e7f1ff] ${link.href === "#how-it-works" ? "max-[480px]:hidden" : ""}`}
+            className={`rounded-[10px] px-3.5 py-2 text-[0.9375rem] font-semibold text-[#c3d0e2] no-underline hover:bg-[rgb(92_155_255/20%)] hover:text-[#e7f1ff] ${link.href === "#docs" ? "" : "max-[480px]:hidden"}`}
             href={link.href}
             key={link.href}
           >
@@ -43,6 +44,7 @@ export function LandingFooter() {
         <p className="m-0">ThoraxScan · For guided learning only, not for clinical diagnosis or patient care.</p>
         <span className="flex gap-4 text-[#d6e1f0] underline underline-offset-2">
           <a href="#technical">Technical</a>
+          <a href="#docs">Docs</a>
           <Link href="/privacy-policy">Privacy Policy</Link>
           <Link href="/terms">Terms</Link>
         </span>
