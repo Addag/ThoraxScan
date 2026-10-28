@@ -58,6 +58,9 @@ function configureOrt(ort: OrtModule) {
   // and pinning the plain one makes WebGPU sessions fail and fall back to WASM.
   ort.env.wasm.wasmPaths = "/ort/1.27.0/";
   ort.env.wasm.numThreads = 1;
+  // ORT prints harmless node-placement warnings (shape ops pinned to CPU)
+  // via console.error, which the Next dev overlay surfaces as errors.
+  ort.env.logLevel = "error";
 }
 
 function isSafeInteger(value: unknown): value is number {
