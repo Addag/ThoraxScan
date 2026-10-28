@@ -11,7 +11,7 @@ export function LearningModeContent() {
           <div className="grid h-10 w-11 flex-none place-items-center rounded-md border border-[#5925a7] bg-[#2e1677]"><Image src="/images/learning/scan.svg" alt="" width={24} height={24} /></div>
           <div>
             <h2 className="mt-0 mb-3 text-[1.6875rem] font-extrabold max-[800px]:text-[1.5rem]" id="learning-intro-title">AI Learning Mode</h2>
-            <p className="m-0 max-w-[860px] text-[0.875rem] leading-[1.65] text-(--text-secondary)">Practice chest X-ray interpretation at your own pace. Select a frontal chest X-ray and explore the active model’s findings. No grades — just learning. The application does not verify the image’s view.</p>
+            <p className="m-0 max-w-[860px] text-[0.875rem] leading-[1.65] text-(--text-secondary)">Practice chest X-ray interpretation at your own pace. Select a frontal or lateral chest X-ray and explore the active model’s findings. Lateral results are less tested than frontal results. No grades — just learning. The application does not verify the image’s view.</p>
           </div>
         </div>
         <p className="m-0 flex items-center gap-3 border-t border-t-(color:--disclaimer-yellow) bg-(--warning-fill) px-[18px] py-2.5 text-[0.75rem] leading-[1.5] text-[#ffe28a] light:text-(--status-warning-text) max-[480px]:items-start max-[480px]:p-3">

@@ -285,7 +285,7 @@ function CaseUploadFields({ activityId, disabled, onBusyChange, onCaseReserved, 
       <input type="hidden" name="activityId" value={activityId} />
       <input type="hidden" name="mimeType" value={file?.type ?? ""} />
       <input type="hidden" name="byteSize" value={file?.size ?? ""} />
-      <XrayLibrary disabled={busy} selectedCaseId={selectedCaseId} onLoadingChange={setLibraryLoading} onSelect={(next, nextCaseId) => {
+      <XrayLibrary frontalOnly disabled={busy} selectedCaseId={selectedCaseId} onLoadingChange={setLibraryLoading} onSelect={(next, nextCaseId) => {
         if (fileInputRef.current) fileInputRef.current.value = "";
         setFile(next);
         setSelectedCaseId(nextCaseId);

@@ -65,6 +65,10 @@ The PyTorch run that produced the one checkpoint behind both the V1 and V2 [mode
     - Atelectasis 0.754 → 0.807 vs v3. Cardiomegaly unchanged (0.786; sensitivity 0.25 at the F1 threshold).
   - v5 `ViT_Models/Official_retrain_v5_squeezevit_kd/` (set up 2026-10-17; smoke-tested, not yet trained): SqueezeViT with the v2 recipe and the v4 per-label uncertainty policy, distilled from FastViT v4. Loss = 0.5 × masked label BCE + 0.5 × BCE against v4 probabilities. `make_teacher_probs.py` must run first and writes `results/teacher_v4_train.npz`. Same architecture and contract as v1/v2, so the existing exporter works.
     - Trained 2026-10-17: best epoch 30 (plateau from about epoch 23); held-out competition 0.7939.
+      - Held-out by view (epoch 30): frontal competition 0.7889, mean 0.7842; lateral (3,216 images) competition 0.8019, mean 0.7446. Lateral is on par for the competition labels and weaker on the rest.
+      - Official 234 by view: frontal competition 0.8801, stable 0.8321; lateral (32) competition 0.8882, stable 0.8203, mean 0.8619 (too few images for per-label claims).
+      - Thresholds are tuned on all views together, not per view.
+      - Release scope (2026-10-28): laterals are supported in Learning Mode only; activities stay frontal-only.
     - Official 234: competition **0.8806**, stable-label mean 0.8300.
     - Paired bootstrap: v5−v2 +0.022 competition (95% CI +0.011 to +0.033) and +0.019 stable (CI +0.007 to +0.030). v5−v4 +0.007 (CI −0.007 to +0.020, not significant).
     - Atelectasis 0.849 (best of all runs). Support Devices 0.838 (v4 0.913).

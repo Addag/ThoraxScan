@@ -91,6 +91,13 @@ test("uncontrolled library callers still announce their selection", async () => 
   expect(select).toHaveBeenCalledWith(expect.any(File), "cxp-001");
 });
 
+test("activity library offers frontal cases only", async () => {
+  await render(<XrayLibrary frontalOnly onSelect={vi.fn()} />);
+  await expect.element(page.getByText("202 of 202 cases")).toBeVisible();
+  await expect.element(page.getByLabelText("Filter by view")).not.toBeInTheDocument();
+  await expect.element(page.getByRole("button", { name: "Use case 03", exact: true })).not.toBeInTheDocument();
+});
+
 test("canceling uploaded-case removal leaves the case and selection intact", async () => {
   await render(<CaseUploadForm activityId="test-activity" caseId="attached-case" />);
   await page.getByRole("button", { name: "Use case 01", exact: true }).click();

@@ -43,7 +43,7 @@ const modelDetails = [
   ["Input", "Grayscale, resized to 224×224 and normalized, with the same transform in training and in the browser."],
   ["Thresholds", "Per-label F1 on the held-out split. Cardiomegaly is lowered to reach 80% held-out sensitivity. A \"possible\" tier flags the five competition labels at 85% sensitivity."],
   ["Explainability", "Four-layer attention rollout, averaged over queries and normalized per image into a 7×7 map. Global and class-agnostic, not Grad-CAM, and it doesn't locate lesions."],
-  ["Limits", "Activities accept frontal images only; no lateral release scope is approved. Cardiomegaly sensitivity is 0.49 on the official set even after tuning. Not clinically validated."],
+  ["Limits", "Learning Mode accepts frontal and lateral images; activities accept frontal only. Lateral held-out competition AUC is 0.80 (frontal 0.79), but lateral mean AUC is lower (0.74 vs 0.78). Cardiomegaly sensitivity is 0.49 on the official set even after tuning. Not clinically validated."],
 ] as const;
 
 const stack = [
@@ -73,13 +73,13 @@ const status = {
     "In-browser AI analysis with attention heatmaps, released after submission",
     "Faculty evaluation and notifications",
     "Class analytics with CSV export",
-    "Learning Mode with the built-in X-ray library",
+    "Learning Mode with the built-in X-ray library, frontal and lateral",
     "Model registry with validation, staging, activation and rollback",
     "Privacy notice consent recording and accessibility settings",
   ],
   continuing: [
     "Network testing to confirm what the browser inference path sends and keeps",
-    "A lateral-view release scope",
+    "Lateral views for activities",
     "Legal and institutional review of the privacy policy and terms",
     "Separate research evaluation, such as a usability questionnaire, with its own consent",
   ],
