@@ -56,9 +56,9 @@ describe("registration terms agreement", () => {
         data: expect.objectContaining({
           requested_role: role,
           terms_version: "1.1",
-          terms_effective_date: "2026-10-22",
+          terms_effective_date: "2026-10-30",
           privacy_policy_version: "1.1",
-          privacy_policy_effective_date: "2026-10-22",
+          privacy_policy_effective_date: "2026-10-30",
         }),
       }),
     }));
