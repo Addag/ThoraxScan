@@ -58,7 +58,7 @@ export default async function ProfessorActivityPage({
           <span>{activity.status === "published" ? "Visible to current and future workspace students" : activity.status === "archived" ? "No longer visible to students" : "Visible to teaching staff only"}</span>
         </div>
         <ActivityStepRail role="professor" />
-        <Link className={activitiesCtaClass} href={`/professor/submissions?activity=${activity.id}`}>Review submissions</Link>
+        <Link className={`${activitiesCtaClass} mb-7`} href={`/professor/submissions?activity=${activity.id}`}>Review submissions</Link>
 
         <div className={activityLayoutClass("default")}>
           <div className={activityCaseColumnClass}>

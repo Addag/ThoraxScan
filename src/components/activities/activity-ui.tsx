@@ -58,10 +58,12 @@ export function ActivityStepRail({ role, submissionStatus = "Not started", aiSta
   return (
     <ol className="m-0 mb-7 grid min-h-24 list-none grid-cols-3 rounded-[11px] border border-[#aeb2b8] light:border-(--border-strong) p-0 [background:var(--glass-inset)] shadow-(--glass-inset-shadow) max-[760px]:grid-cols-1 max-[760px]:py-2.5" aria-label="Activity stages">
       {steps.map(([number, label, state]) => (
-        <li className={`relative grid min-w-0 grid-cols-[44px_minmax(0,1fr)] content-center items-center gap-x-3.5 px-[34px] py-[19px] max-[760px]:min-h-[70px] max-[760px]:px-5 max-[760px]:py-3 ${state === "future" ? "opacity-70" : ""} ${number !== "3" ? "after:absolute after:top-1/2 after:-right-[30px] after:z-[1] after:h-px after:w-[60px] after:bg-[#58606b] after:content-[''] max-[760px]:after:bottom-[-8px] max-[760px]:after:left-[41px] max-[760px]:after:top-auto max-[760px]:after:right-auto max-[760px]:after:h-4 max-[760px]:after:w-px" : ""}`} key={label}>
-          <span className="row-span-2 grid size-11 place-items-center rounded-full bg-brand text-[1rem] font-extrabold text-white" aria-hidden="true">{number}</span>
-          <strong className="text-[0.9375rem]">{label}</strong>
-          {state === "future" ? <small className="mt-0.5 text-[0.625rem] text-[#aeb6c5] light:text-(--text-muted)">{role === "student" ? "Locked until final submission" : "Future milestone"}</small> : null}
+        <li className={`relative grid min-w-0 grid-cols-[44px_minmax(0,1fr)] items-center gap-x-3.5 px-[34px] py-[19px] max-[760px]:min-h-[70px] max-[760px]:px-5 max-[760px]:py-3 ${state === "future" ? "opacity-70" : ""} ${number !== "3" ? "after:absolute after:top-1/2 after:-right-3 after:z-[1] after:-translate-y-1/2 after:text-[1.5rem] after:leading-none after:text-[#8a929e] light:after:text-(--text-muted) after:content-['→'] max-[760px]:after:top-auto max-[760px]:after:right-auto max-[760px]:after:bottom-[-12px] max-[760px]:after:left-9 max-[760px]:after:translate-y-0 max-[760px]:after:content-['↓']" : ""}`} key={label}>
+          <span className="grid size-11 place-items-center rounded-full bg-brand text-[1rem] font-extrabold text-white" aria-hidden="true">{number}</span>
+          <div className="grid">
+            <strong className="text-[0.9375rem]">{label}</strong>
+            {state === "future" ? <small className="mt-0.5 text-[0.625rem] text-[#aeb6c5] light:text-(--text-muted)">{role === "student" ? "Locked until final submission" : "Future milestone"}</small> : null}
+          </div>
         </li>
       ))}
     </ol>
