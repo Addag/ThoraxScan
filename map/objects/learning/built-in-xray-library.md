@@ -25,7 +25,7 @@ A static manifest plus public JPEGs gives Learning Mode and Professor activity a
 ## Known gaps
 
 - Lateral support is scoped to Learning Mode. The Professor form passes `frontalOnly`, which hides lateral cases and the view filter, so library picks for activities are frontal. A lateral file uploaded from disk is caught by the [View detector](view-detector.md) about 99.5% of the time; the [X-ray case](xray-case.md) row is always written with `view_position = 'frontal'`. The attestation copy no longer says "frontal"; the server error text still does. Active v5 lateral numbers are in [Model training](../inference/model-training.md).
-- All 234 cases are the official `valid.csv` images. v1 picked its checkpoint on them, so v1 results on library cases were optimistic. v2–v5 pick checkpoints and thresholds on the held-out custom split, so the active v5 release scores them as unseen test images.
+- All 234 cases are the official `valid.csv` images. v1 picked its checkpoint on them, so v1 results on library cases were optimistic. v2–v6 pick checkpoints and thresholds on the held-out custom split, so the active v6 release scores them as unseen test images.
 - Dataset labels are reference data only; they are not written into the Professor's private reference evaluation.
 - Images are public static assets once deployed; the [README](<../../../src/lib/xray-library/README.md>) flags that redistribution permission under the CheXpert agreement is unconfirmed.
 

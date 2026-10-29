@@ -37,13 +37,13 @@ const features = [
 ] as const;
 
 const modelDetails = [
-  ["Release", "squeezevit-v5-kd-cardio042-possible85-20261017.1"],
+  ["Release", "squeezevit-v6-nih-cam-possible85-20261030.1"],
   ["Model", "SqueezeViT, a compact vision transformer distilled from a FastViT-SA12 teacher."],
-  ["Training data", "CheXpert v1.0, frontal and lateral views. Checkpoint and thresholds are chosen on a held-out patient split, so the 234-image official validation set stays unseen."],
+  ["Training data", "CheXpert v1.0 (frontal and lateral views) plus the NIH ChestX-ray14 training split (frontal). Labels NIH does not report are left out of the loss for its images. Checkpoint and thresholds are chosen on a held-out patient split, so the 234-image official validation set stays unseen."],
   ["Input", "Grayscale, resized to 224×224 and normalized, with the same transform in training and in the browser."],
   ["Thresholds", "Per-label F1 on the held-out split. Cardiomegaly is lowered to reach 80% held-out sensitivity. A \"possible\" tier flags the five competition labels at 85% sensitivity."],
   ["Explainability", "Class activation maps: the classifier's weights for each finding applied to the final 14×14 feature map, clipped at zero and scaled per finding. Exact for this architecture and computed in the same forward pass. A guide to where the evidence is, not a lesion outline."],
-  ["Limits", "Learning Mode accepts frontal and lateral images; activities accept frontal only. Lateral held-out competition AUC is 0.80 (frontal 0.79), but lateral mean AUC is lower (0.74 vs 0.78). Cardiomegaly sensitivity is 0.49 on the official set even after tuning. Not clinically validated."],
+  ["Limits", "Learning Mode accepts frontal and lateral images; activities accept frontal only. Lateral held-out competition AUC is 0.81 (frontal 0.79), but lateral mean AUC is lower (0.74 vs 0.79). Cardiomegaly sensitivity is 0.50 on the official set even after tuning. Not clinically validated."],
 ] as const;
 
 const stack = [

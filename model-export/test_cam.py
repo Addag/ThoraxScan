@@ -24,6 +24,14 @@ class ClassActivationTests(unittest.TestCase):
         self.assertEqual(cam[0, 1].abs().sum().item(), 0)  # all-negative evidence clamps to zeros
         self.assertEqual(cam[0, 2].abs().sum().item(), 0)  # constant zero stays finite
 
+    def test_pointing_game_peak_maps_cell_to_image_pixels(self):
+        from eval_localization import hit, peak
+        grid = torch.zeros(14, 14)
+        grid[3, 10] = 1  # row 3, column 10 covers x 731-804, y 219-292 in a 1024 image
+        x, y = peak(grid, (1024, 1024))
+        self.assertTrue(hit((x, y), (731, 219, 73, 73)))
+        self.assertFalse(hit((x, y), (0, 0, 512, 512)))
+
 
 if __name__ == "__main__":
     unittest.main()
