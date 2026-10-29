@@ -18,7 +18,9 @@ V1 releases have no heatmap (`unavailable`).
 
 V3 is a class activation map: SqueezeViT's `fc` weights for each label applied to the 256×14×14 `head_conv` features. The head is a plain average pool, so `mean(raw map) + bias = logit` exactly ([test_cam.py](../../../model-export/test_cam.py)). Negative evidence is clipped, then each label is divided by its own maximum, so a map shows *where* the evidence is, not how likely the finding is. V2 rollout is class-agnostic and stays only for analyses saved before V3.
 
-Deployment status: the owner reports (2026-10-18) that hosted production runs the V2 release `squeezevit-v5-kd-cardio042-possible85-20261017.1`. The V3 bundle `squeezevit-v5-kd-cam-possible85-20261029.1` (same v5 checkpoint and thresholds) was exported 2026-10-29 and is not staged or activated yet.
+Deployment status: the owner reports (2026-10-18) that hosted production runs the V2 release `squeezevit-v5-kd-cardio042-possible85-20261017.1`. The V3 bundle `squeezevit-v5-kd-cam-possible85-20261029.1` (same v5 checkpoint and thresholds) was exported 2026-10-29 and is active only in local Supabase; hosted production has not been staged or activated.
+
+Hosted rollout order matters: apply [the V3 migration](../../../supabase/migrations/20261029120000_class_activation_maps.sql), `model:stage` the bundle, deploy the app, then `model:status` and `model:activate`. A deployed app built before V3 rejects `schemaVersion: 3` in `parseModelManifest`, so activating before the deploy breaks inference until it lands. Rollback target: `squeezevit-v5-kd-cardio042-possible85-20261017.1`. Commands: [release operations](../../../docs/model-releases.md).
 
 ## Persistence and access
 
