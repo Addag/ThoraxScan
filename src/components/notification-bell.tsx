@@ -21,7 +21,7 @@ export function NotificationBellButton({ unread, className = "size-10" }: { unre
     >
       <svg className="size-5 fill-none stroke-current stroke-[1.6] [stroke-linecap:round] [stroke-linejoin:round]" aria-hidden="true" viewBox="0 0 24 24"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" /><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" /></svg>
       {unread ? (
-        <span className="absolute -top-1 -right-1 grid h-[18px] min-w-[18px] place-items-center rounded-full bg-[#ff5457] px-1 text-[0.625rem] leading-none font-extrabold text-white" aria-hidden="true">
+        <span className="absolute -top-1 -right-1 grid h-[18px] min-w-[18px] place-items-center rounded-full bg-[#ff5457] px-1 text-[0.6875rem] leading-none font-extrabold text-white" aria-hidden="true">
           {unread > 9 ? "9+" : unread}
         </span>
       ) : null}
@@ -36,7 +36,7 @@ export function NotificationPanel({ notifications }: { notifications: Notificati
   return (
     <div
       aria-label="Notifications"
-      className="fixed inset-auto top-[84px] right-[clamp(22px,4vw,54px)] m-0 max-h-[min(520px,calc(100svh-100px))] w-[min(360px,calc(100vw-32px))] overflow-y-auto rounded-[10px] border border-(--border-shell) bg-(--surface-raised) p-0 pb-1.5 text-(--text-primary) shadow-(--glass-shadow) max-[850px]:top-[68px] max-[850px]:right-4"
+      className="fixed inset-auto top-[84px] right-[clamp(22px,4vw,54px)] m-0 max-h-[min(520px,calc(100svh-100px))] w-[min(360px,calc(100vw-32px))] overflow-y-auto rounded-panel border border-(--border-shell) bg-(--surface-raised) p-0 pb-1.5 text-(--text-primary) shadow-(--glass-shadow) max-[850px]:top-[68px] max-[850px]:right-4"
       id={panelId}
       popover="auto"
     >
@@ -45,7 +45,7 @@ export function NotificationPanel({ notifications }: { notifications: Notificati
         {unread.length ? (
           <form action={markAllNotificationsReadAction}>
             {unread.map((item) => <input key={item.refId} name="notification" type="hidden" value={`${item.kind}:${item.refId}`} />)}
-            <button className="cursor-pointer border-0 bg-transparent p-0 text-[0.75rem] font-extrabold text-[#9fcfff] hover:underline light:text-(--brand-blue-text)" type="submit">Mark all read</button>
+            <button className="cursor-pointer border-0 bg-transparent p-0 text-[0.75rem] font-extrabold text-(--brand-blue-text) hover:underline" type="submit">Mark all read</button>
           </form>
         ) : null}
       </div>
@@ -56,7 +56,7 @@ export function NotificationPanel({ notifications }: { notifications: Notificati
           const items = notifications.data.filter((item) => item.kind === group.kind);
           return (
             <section aria-label={group.label} key={group.kind}>
-              <h3 className="m-0 px-4 pt-3 pb-1 text-[0.625rem] font-extrabold tracking-[0.08em] text-(--text-secondary) uppercase">{group.label}</h3>
+              <h3 className="m-0 px-4 pt-3 pb-1 text-[0.6875rem] font-extrabold tracking-[0.08em] text-(--text-secondary) uppercase">{group.label}</h3>
               {items.length === 0 ? (
                 <p className="m-0 px-4 pb-2 text-[0.75rem] text-(--text-muted)">{group.empty}</p>
               ) : (

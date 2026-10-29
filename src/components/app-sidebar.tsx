@@ -30,7 +30,7 @@ export function AppSidebar({ children, actions }: { children: ReactNode; actions
         <button
           aria-controls={contentId}
           aria-expanded={expanded}
-          className="transition-[filter] duration-160 not-disabled:hover:brightness-115 inline-flex min-h-11 cursor-pointer items-center gap-1.5 rounded-[10px] border border-[rgb(153_191_240/38%)] p-2.5 text-[0.875rem] text-foreground [background:var(--glass-surface)]"
+          className="transition-[filter] duration-160 not-disabled:hover:brightness-115 inline-flex min-h-11 cursor-pointer items-center gap-1.5 rounded-panel border border-[rgb(153_191_240/38%)] p-2.5 text-[0.875rem] text-foreground [background:var(--glass-surface)]"
           onClick={() => setExpanded(!expanded)}
           ref={toggleRef}
           type="button"

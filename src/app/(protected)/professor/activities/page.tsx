@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import {
-  ActivityPageHeading,
   ActivityStatusBadge,
   formatDueDate,
 } from "@/components/activities/activity-ui";
@@ -12,8 +11,8 @@ import type { ActivityStatus } from "@/lib/activities/types";
 import { getProfessorActivities } from "@/lib/activities/server";
 import { requireRole } from "@/lib/auth/server";
 import { getProfessorWorkspaces } from "@/lib/workspaces/server";
-import { activityButton } from "@/components/activities/activity-button";
-import { glassPanelClass , PageMain} from "@/components/dashboard-ui";
+import { button, field } from "@/components/controls";
+import { glassPanelClass, PageHeading, PageMain } from "@/components/dashboard-ui";
 
 export const metadata: Metadata = {
   title: "Activities | ThoraxScan",
@@ -59,30 +58,30 @@ export default async function ProfessorActivitiesPage({
   return (
     <ProfessorShell activeItem="activities" sectionLabel="Activities" sectionDescription="Case-backed learning activities">
       <PageMain>
-        <ActivityPageHeading description="Create, publish, and archive chest X-ray activities" />
+        <PageHeading title="Activities" subtitle="Create, publish, and archive chest X-ray activities" />
 
-        <section className="mb-5 flex items-end justify-between gap-6 rounded-[10px] border border-(--border-shell) bg-(--surface-field) px-5 py-[18px] max-[760px]:flex-col max-[760px]:items-stretch" aria-label="Activity filters">
+        <section className="mb-5 flex items-end justify-between gap-6 rounded-panel border border-(--border-shell) bg-(--surface-field) px-5 py-[18px] max-[760px]:flex-col max-[760px]:items-stretch" aria-label="Activity filters">
           <form className="flex items-end gap-3 max-[760px]:flex-col max-[760px]:items-stretch">
             {status ? <input type="hidden" name="status" value={status} /> : null}
-            <label className="grid gap-[7px] text-[0.6875rem] text-[#9fa7b5] light:text-(--text-muted)">
+            <label className="grid w-[250px] gap-[7px] text-[0.6875rem] text-(--text-muted) max-[760px]:w-full">
               Workspace
-              <select className="min-h-[39px] min-w-[250px] rounded-[5px] border border-[#6d7480] light:border-(--border-strong) bg-(--surface-sunken) px-[13px] text-(--text-primary) max-[760px]:w-full max-[760px]:min-w-0" name="workspace" defaultValue={workspaceId}>
+              <select className={field} name="workspace" defaultValue={workspaceId}>
                 <option value="">All teaching workspaces</option>
                 {workspacesResult.data.map((workspace) => (
                   <option value={workspace.id} key={workspace.id}>{workspace.name}</option>
                 ))}
               </select>
             </label>
-            <button className="transition-colors duration-160 hover:bg-[#1c2639] light:hover:bg-(--surface-sunken) min-h-[39px] cursor-pointer rounded-[5px] border border-[#6d7480] light:border-(--border-strong) bg-(--surface-sunken) px-[13px] font-extrabold text-(--text-primary)" type="submit">Apply filter</button>
+            <button className={button("secondary")} type="submit">Apply filter</button>
           </form>
-          <Link className={activityButton.primary} href="/professor/activities/new">＋ New activity</Link>
+          <Link className={button("primary")} href="/professor/activities/new">＋ New activity</Link>
         </section>
 
         <nav className="mb-5 flex gap-2 overflow-x-auto" aria-label="Activity status">
-          <Link className={`transition-colors duration-160 inline-flex min-h-[37px] items-center gap-2 rounded-[6px] border px-[13px] text-[0.75rem] font-extrabold capitalize no-underline ${!status ? "border-brand bg-[rgba(0,119,255,0.18)] text-(--text-primary)" : "border-[#465269] light:border-(--border-subtle) text-[#aeb6c5] light:text-(--text-muted) hover:bg-(--hover-overlay)"}`} href={hrefForStatus(null)}>All <span className="rounded-[999px] bg-[rgba(255,255,255,0.1)] light:bg-(--hover-overlay) px-[7px] py-[3px]">{activitiesResult.data.length}</span></Link>
+          <Link className={`transition-colors duration-160 inline-flex min-h-10 items-center gap-2 rounded-control border px-[13px] text-[0.75rem] font-extrabold capitalize no-underline ${!status ? "border-brand bg-[rgba(0,119,255,0.18)] text-(--text-primary)" : "border-(--border-subtle) text-(--text-muted) hover:bg-(--hover-overlay)"}`} href={hrefForStatus(null)}>All <span className="rounded-full bg-(--hover-overlay) px-[7px] py-[3px]">{activitiesResult.data.length}</span></Link>
           {(["draft", "published", "archived"] as const).map((item) => (
-            <Link className={`transition-colors duration-160 inline-flex min-h-[37px] items-center gap-2 rounded-[6px] border px-[13px] text-[0.75rem] font-extrabold capitalize no-underline ${status === item ? "border-brand bg-[rgba(0,119,255,0.18)] text-(--text-primary)" : "border-[#465269] light:border-(--border-subtle) text-[#aeb6c5] light:text-(--text-muted) hover:bg-(--hover-overlay)"}`} href={hrefForStatus(item)} key={item}>
-              {item} <span className="rounded-[999px] bg-[rgba(255,255,255,0.1)] light:bg-(--hover-overlay) px-[7px] py-[3px]">{activitiesResult.data.filter((activity) => activity.status === item).length}</span>
+            <Link className={`transition-colors duration-160 inline-flex min-h-10 items-center gap-2 rounded-control border px-[13px] text-[0.75rem] font-extrabold capitalize no-underline ${status === item ? "border-brand bg-[rgba(0,119,255,0.18)] text-(--text-primary)" : "border-(--border-subtle) text-(--text-muted) hover:bg-(--hover-overlay)"}`} href={hrefForStatus(item)} key={item}>
+              {item} <span className="rounded-full bg-(--hover-overlay) px-[7px] py-[3px]">{activitiesResult.data.filter((activity) => activity.status === item).length}</span>
             </Link>
           ))}
         </nav>
@@ -97,15 +96,15 @@ export default async function ProfessorActivitiesPage({
               <article className={`${glassPanelClass} border-(--border-shell) p-5`} key={activity.id}>
                 <div className="flex items-center justify-between gap-3">
                   <ActivityStatusBadge status={activity.status} />
-                  <span className="text-[0.6875rem] leading-[1.4] text-[#c4d0e0] light:text-(--text-secondary)">{activity.hasCase ? "Case attached" : "Case required"}</span>
+                  <span className="text-[0.6875rem] leading-[1.4] text-(--text-secondary)">{activity.hasCase ? "Case attached" : "Case required"}</span>
                 </div>
-                <p className="mx-0 mt-[22px] mb-[5px] text-[0.6875rem] leading-[1.4] text-[#c4d0e0] light:text-(--text-secondary)">{activity.workspaceName}</p>
+                <p className="mx-0 mt-[22px] mb-[5px] text-[0.6875rem] leading-[1.4] text-(--text-secondary)">{activity.workspaceName}</p>
                 <h2 className="m-0 min-h-12 text-[1.25rem] leading-[1.2]">{activity.title}</h2>
                 <dl className="my-5 grid grid-cols-2 gap-2.5 max-[520px]:grid-cols-1">
-                  <div className="rounded-[5px] bg-(--surface-sunken) p-2.5"><dt className="text-[0.5625rem] uppercase leading-[1.4] tracking-[0.06em] text-[#c4d0e0] light:text-(--text-secondary)">Due</dt><dd className="mx-0 mt-1 mb-0 text-[0.6875rem] leading-[1.4]">{formatDueDate(activity.dueAt)}</dd></div>
-                  <div className="rounded-[5px] bg-(--surface-sunken) p-2.5"><dt className="text-[0.5625rem] uppercase leading-[1.4] tracking-[0.06em] text-[#c4d0e0] light:text-(--text-secondary)">Updated</dt><dd className="mx-0 mt-1 mb-0 text-[0.6875rem] leading-[1.4]">{new Intl.DateTimeFormat("en-US", { dateStyle: "medium" }).format(new Date(activity.updatedAt))}</dd></div>
+                  <div className="rounded-control bg-(--surface-sunken) p-2.5"><dt className="text-[0.6875rem] uppercase leading-[1.4] tracking-[0.06em] text-(--text-secondary)">Due</dt><dd className="mx-0 mt-1 mb-0 text-[0.6875rem] leading-[1.4]">{formatDueDate(activity.dueAt)}</dd></div>
+                  <div className="rounded-control bg-(--surface-sunken) p-2.5"><dt className="text-[0.6875rem] uppercase leading-[1.4] tracking-[0.06em] text-(--text-secondary)">Updated</dt><dd className="mx-0 mt-1 mb-0 text-[0.6875rem] leading-[1.4]">{new Intl.DateTimeFormat("en-US", { dateStyle: "medium" }).format(new Date(activity.updatedAt))}</dd></div>
                 </dl>
-                <Link className="transition-colors duration-160 hover:text-(--text-primary) flex items-center justify-between text-[0.75rem] font-extrabold text-[#70bdff] light:text-(--brand-blue-text) no-underline" href={`/professor/activities/${activity.id}`}>Open activity <span aria-hidden="true">→</span></Link>
+                <Link className="transition-colors duration-160 hover:text-(--text-primary) flex items-center justify-between text-[0.75rem] font-extrabold text-(--brand-blue-text) no-underline" href={`/professor/activities/${activity.id}`}>Open activity <span aria-hidden="true">→</span></Link>
               </article>
             ))}
           </div>

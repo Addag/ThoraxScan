@@ -24,10 +24,11 @@
   --border-strong: #838383;
   --text-primary: #fafafa;
   --text-secondary: #c7d4e8;
-  --text-muted: #aebbd0;
-  --text-disabled: #98a6bc;
+  /* muted / disabled / brand-blue-text dark values sit where the hard-coded hexes they replaced used to cluster. */
+  --text-muted: #9aa6ba;
+  --text-disabled: #808ca1;
   --brand-blue: #0077ff;
-  --brand-blue-text: #51b6ff;
+  --brand-blue-text: #8ecbff;
   --success-green: #24ff3d;
   --warning-yellow: #f6ff00;
   --disclaimer-yellow: #ffd636;
@@ -94,7 +95,7 @@
 }
 
 /* High contrast: solid surfaces, near-primary secondary text, strong borders. The second selector reaches the dark-pinned landing and auth roots. */
-/* ponytail: tokens only; ~200 hardcoded dark-mode text hexes keep their (already 4.5:1+) colour. Move them onto tokens if they need to follow this too. */
+/* The app's colours follow these tokens; only the always-dark landing and auth pages keep literal hexes. */
 :root[data-contrast="high"]:not([data-theme="light"]),
 [data-contrast="high"] [data-theme="dark"] {
   --glass-shell: #000000;
@@ -151,6 +152,9 @@
   --color-brand: var(--brand-blue);
   --font-sans: var(--font-funnel);
   --font-brand: var(--font-inter);
+  /* rounded-control: buttons, inputs, small cells. rounded-panel: panels and cards. */
+  --radius-control: 6px;
+  --radius-panel: 10px;
 }
 
 /* Landing/auth breakpoints, matching the original inclusive media queries exactly. */
@@ -165,6 +169,8 @@
 @layer base {
   html {
     background: var(--canvas);
+    /* Short and long pages keep the same content edge; no sideways jump when the scrollbar appears. */
+    scrollbar-gutter: stable;
   }
 
   body,

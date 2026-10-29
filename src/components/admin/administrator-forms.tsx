@@ -4,8 +4,7 @@ import { useActionState, useRef, useState } from "react";
 
 import { grantPlatformAdminAction, revokePlatformAdminAction } from "@/app/(protected)/admin/actions";
 import { ConfirmDialog } from "@/components/confirm-dialog";
-import { primaryButton } from "@/components/primary-button";
-import { reviewFieldClass } from "@/components/admin/review-styles";
+import { button, field } from "@/components/controls";
 import { initialAdminReviewState } from "@/lib/admin/types";
 import { formStatusColor } from "@/components/dashboard-ui";
 import { fieldErrorClass } from "@/components/field-error";
@@ -25,14 +24,14 @@ export function AddAdministratorForm() {
           name="email"
           type="email"
           autoComplete="off"
-          className={`${reviewFieldClass} h-[43px]`}
+          className={field}
           placeholder="Email of an existing account"
           aria-invalid={Boolean(state.fieldErrors?.email)}
         />
         <button
           type="button"
           disabled={pending}
-          className={`${primaryButton} min-h-[43px] px-[17px] disabled:cursor-not-allowed disabled:opacity-[0.58]`}
+          className={button("primary")}
           onClick={() => setConfirmingEmail(emailRef.current?.value.trim() ?? "")}
         >
           {pending ? "Adding…" : "Add administrator"}
@@ -61,7 +60,7 @@ export function RemoveAdministratorForm({ userId, displayName }: { userId: strin
     <form className="grid justify-items-end gap-1 max-[560px]:justify-items-start" action={formAction}>
       <input type="hidden" name="targetUserId" value={userId} />
       <button
-        className="transition-colors duration-160 not-disabled:hover:bg-[rgba(160,32,32,0.32)] rounded-[6px] border border-[#d45b60] bg-[rgba(160,32,32,0.2)] px-3 py-[7px] text-[0.75rem] font-extrabold text-[#ffb4b4] light:text-(--status-error-text) disabled:cursor-not-allowed disabled:opacity-[0.58]"
+        className={button("danger")}
         type="button"
         disabled={pending}
         onClick={() => setConfirming(true)}

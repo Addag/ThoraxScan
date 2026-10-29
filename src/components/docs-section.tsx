@@ -9,9 +9,9 @@ const repoFile = (path: string) => `https://github.com/Addag/ThoraxScan/blob/mai
 type Topic = { id: string; title: string; gist: string; body: ReactNode; sources: string[] };
 
 const p = "m-0 text-[0.9375rem] leading-[1.6] text-[#c3d0e2]";
-const steps = "m-0 list-decimal space-y-2 pl-5 text-[0.9375rem] leading-[1.6] text-[#c3d0e2] marker:font-bold marker:text-brand";
+const steps = "m-0 list-decimal space-y-2 pl-5 text-[0.9375rem] leading-[1.6] text-[#c3d0e2] marker:font-extrabold marker:text-brand";
 const bullets = "m-0 list-disc space-y-2 pl-5 text-[0.9375rem] leading-[1.6] text-[#c3d0e2] marker:text-brand";
-const code = "rounded-[6px] bg-(--glass-inset) px-1.5 py-0.5 font-mono text-[0.8125rem] text-[#e7f1ff]";
+const code = "rounded-control bg-(--glass-inset) px-1.5 py-0.5 font-mono text-[0.8125rem] text-[#e7f1ff]";
 const pre = "m-0 overflow-x-auto rounded-[12px] border border-[rgb(175_207_255/20%)] bg-(--glass-inset) p-4 font-mono text-[0.8125rem] leading-[1.6] text-[#e7f1ff]";
 const table = "w-full border-collapse text-left text-[0.875rem] leading-[1.5] text-[#c3d0e2] [&_td]:border-t [&_td]:border-[rgb(175_207_255/16%)] [&_td]:py-2 [&_td]:pr-4 [&_td]:align-top [&_td:first-child]:whitespace-nowrap [&_td:first-child]:font-mono [&_td:first-child]:text-[0.8125rem] [&_td:first-child]:text-[#e7f1ff]";
 

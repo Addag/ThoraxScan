@@ -7,7 +7,6 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import {
-  ActivityPageHeading,
   ActivityStepRail,
   XrayCasePreview,
   dueState,
@@ -18,7 +17,7 @@ import { StudentShell } from "@/components/student/student-shell";
 import { getStudentActivity } from "@/lib/activities/server";
 import { requireRole } from "@/lib/auth/server";
 import { ActivityAIFeedback } from "@/components/activities/activity-ai-feedback";
-import { PageMain } from "@/components/dashboard-ui";
+import { PageHeading, PageMain } from "@/components/dashboard-ui";
 
 export const metadata: Metadata = {
   title: "Activity | ThoraxScan",
@@ -45,16 +44,16 @@ export default async function StudentActivityPage({
   return (
     <StudentShell activeItem="activities" sectionLabel="Activities" sectionDescription={activity.workspaceName}>
       <PageMain>
-        <ActivityPageHeading
+        <PageHeading
           title={activity.title}
-          description={`${activity.workspaceName} · ${formatDueDate(activity.dueAt)}`}
-          backHref="/student/activities"
+          subtitle={`${activity.workspaceName} · ${formatDueDate(activity.dueAt)}`}
+          back={{ href: "/student/activities", label: "Back to activities" }}
         />
         <ActivityStepRail role="student" submissionStatus={submissionLabel(activity.submissionStatus, activity.dueAt)} aiStatus={activity.aiFeedback.status} />
 
-        <section className="rounded-[10px] border border-(--border-shell) [background:var(--glass-surface)] backdrop-blur-[18px] backdrop-saturate-[135%] shadow-(--glass-shadow) mb-7 pb-[22px]" aria-labelledby="assignment-title">
+        <section className="rounded-panel border border-(--border-shell) [background:var(--glass-surface)] backdrop-blur-[18px] backdrop-saturate-[135%] shadow-(--glass-shadow) mb-6 pb-6" aria-labelledby="assignment-title">
           <ActivityPanelTitle icon="▤" title="Activity Assignment" titleId="assignment-title" />
-          <div className="mx-[25px] mt-[22px] mb-0 rounded-[9px] border border-brand bg-[rgba(0,119,255,0.24)] p-[17px] [&>p]:m-0 [&>p]:whitespace-pre-wrap [&>p]:leading-[1.55] [&_dl]:mx-0 [&_dl]:mt-[18px] [&_dl]:mb-0 [&_dl]:grid [&_dl]:grid-cols-2 [&_dl]:gap-3 max-[520px]:[&_dl]:grid-cols-1 [&_dl_div]:rounded-[5px] [&_dl_div]:bg-[rgba(0,0,0,0.18)] [&_dl_div]:p-2.5 [&_dt]:text-[0.5625rem] [&_dt]:uppercase [&_dt]:text-[#9fcfff] light:[&_dt]:text-(--brand-blue-text) [&_dd]:mx-0 [&_dd]:mt-1 [&_dd]:mb-0 [&_dd]:text-[0.6875rem]">
+          <div className="mx-[25px] mt-[22px] mb-0 rounded-panel border border-brand bg-[rgba(0,119,255,0.24)] p-4 [&>p]:m-0 [&>p]:whitespace-pre-wrap [&>p]:leading-[1.55] [&_dl]:mx-0 [&_dl]:mt-[18px] [&_dl]:mb-0 [&_dl]:grid [&_dl]:grid-cols-2 [&_dl]:gap-3 max-[520px]:[&_dl]:grid-cols-1 [&_dl_div]:rounded-control [&_dl_div]:bg-[rgba(0,0,0,0.18)] [&_dl_div]:p-2.5 [&_dt]:text-[0.6875rem] [&_dt]:uppercase [&_dt]:text-(--brand-blue-text) [&_dd]:mx-0 [&_dd]:mt-1 [&_dd]:mb-0 [&_dd]:text-[0.6875rem]">
             <p>{activity.instructions}</p>
             <dl>
               <div><dt>Workspace</dt><dd>{activity.workspaceName}</dd></div>

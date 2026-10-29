@@ -3,7 +3,6 @@ import Link from "next/link";
 
 import { AttentionHeatmap } from "@/components/attention-heatmap";
 import { sampleHeatmap, sampleHeatmapLabels } from "@/components/learning/attention-maps-content";
-import { primaryButtonBase } from "@/components/primary-button";
 import { RevealOnScroll } from "@/components/reveal-on-scroll";
 import { TechnicalOverview } from "@/components/technical-overview";
 import { DocsSection } from "@/components/docs-section";
@@ -54,19 +53,19 @@ const roles = [
 
 const modelFacts = [
   "SqueezeViT, a compact vision transformer, distilled from a larger FastViT teacher.",
-  "Trained on CheXpert frontal and lateral chest X-rays to score 14 findings.",
+  "Trained on CheXpert frontal and lateral chest X-rays plus NIH ChestX-ray14 to score 14 findings.",
   "Runs in your browser with ONNX Runtime Web: WebGPU where available, WebAssembly otherwise.",
   "Finding heatmaps are class activation maps: one 14×14 map per finding, showing where the evidence for that finding sits. They guide the eye; they don't outline lesions.",
 ] as const;
 
-// From map/objects/inference/model-training.md (v5 release). Update when the active release changes.
+// From map/objects/inference/model-training.md (v6 release). Update when the active release changes.
 const modelScore = {
-  value: "0.881",
+  value: "0.877",
   label: "mean AUC across the five CheXpert competition labels",
-  source: "Release v5, measured on the 234-image CheXpert validation set, which the model was neither trained nor tuned on.",
+  source: "Release v6, measured on the 234-image CheXpert validation set, which the model was neither trained nor tuned on.",
 };
 
-const loginButton = `${primaryButtonBase} h-[53px] w-[206px] gap-[7px] rounded-[12px] border border-[rgb(168_211_255/48%)] [background:var(--landing-login-bg)] shadow-(--landing-login-shadow) text-[1.575rem] leading-none hover:[background:var(--landing-login-bg-hover)] focus-visible:outline-3 focus-visible:outline-[#c5e3ff] focus-visible:outline-offset-[5px]`;
+const loginButton = "inline-flex min-h-12 items-center justify-center gap-2 rounded-full border border-[rgb(168_211_255/48%)] px-7 text-[1rem] font-extrabold text-white no-underline [background:var(--landing-login-bg)] shadow-(--landing-login-shadow) [transition:transform_160ms_ease] hover:[background:var(--landing-login-bg-hover)] active:translate-y-px focus-visible:outline-3 focus-visible:outline-[#c5e3ff] focus-visible:outline-offset-[5px]";
 
 export default function Home() {
   return (
@@ -77,7 +76,7 @@ export default function Home() {
       <main>
         <section className="relative min-h-[max(819px,calc(100svh-81px))] overflow-hidden stacked:flex stacked:min-h-[calc(100svh-81px)] stacked:flex-col stacked:overflow-visible narrow:min-h-[calc(100svh-73px)]" aria-labelledby="landing-title">
           <div className="relative mx-auto min-h-[820px] max-w-[1440px] stacked:min-h-0 stacked:w-full tablet:grid tablet:grid-cols-[minmax(0,1fr)_minmax(320px,507px)] tablet:items-start tablet:gap-[clamp(24px,3vw,48px)] tablet:px-[clamp(24px,5vw,72px)] tablet:pt-[clamp(64px,7vw,88px)] tablet:pb-14 narrow:flex narrow:flex-col narrow:px-6 narrow:pt-[72px] narrow:pb-[52px]">
-            <div className="absolute top-[108px] left-[6.25%] flex h-[25px] w-[479px] items-center justify-center rounded-[15px] border border-[rgb(123_185_255/38%)] [background:linear-gradient(120deg,rgb(92_155_255/20%),rgb(37_75_145/14%))] text-[1rem] font-semibold leading-[1.4375rem] text-[#b9dbff] text-center backdrop-blur-[20px] backdrop-saturate-[140%] shadow-(--glass-inset-shadow) stacked:static stacked:h-auto stacked:min-h-[25px] stacked:w-[min(100%,479px)] stacked:px-2.5 stacked:py-1 stacked:leading-[1.2] tablet:min-w-0 tablet:col-span-full tablet:justify-self-start tablet:text-[clamp(0.75rem,1.2vw,1rem)] narrow:self-center narrow:text-[0.75rem] no-backdrop:[background:#14243e]">
+            <div className="absolute top-[108px] left-[8.0556%] flex h-[25px] w-[479px] items-center justify-center rounded-[15px] border border-[rgb(123_185_255/38%)] [background:linear-gradient(120deg,rgb(92_155_255/20%),rgb(37_75_145/14%))] text-[1rem] font-semibold leading-[1.4375rem] text-[#b9dbff] text-center backdrop-blur-[20px] backdrop-saturate-[140%] shadow-(--glass-inset-shadow) stacked:static stacked:h-auto stacked:min-h-[25px] stacked:w-[min(100%,479px)] stacked:px-2.5 stacked:py-1 stacked:leading-[1.2] tablet:min-w-0 tablet:col-span-full tablet:justify-self-start tablet:text-[clamp(0.75rem,1.2vw,1rem)] narrow:self-center narrow:text-[0.75rem] no-backdrop:[background:#14243e]">
               SqueezeViT | ONNX Runtime Web | Finding Heatmap XAI
             </div>
 
@@ -90,7 +89,7 @@ export default function Home() {
               <p className="mt-[22px] w-[390px] text-[1rem] font-semibold leading-[1.35] text-[#c3d0e2] stacked:mt-[26px] stacked:leading-[1.25] tablet:w-[min(100%,340px)] narrow:w-[min(100%,390px)]">
                 ThoraxScan is an educational LMS for Radiologic Technology students. Practice chest X-ray interpretation through professor-guided activities, with AI-powered finding heatmaps after submission.
               </p>
-              <Link className={`${loginButton} mt-[42px] ml-2 stacked:mt-[34px] stacked:ml-0 stacked:w-[min(206px,100%)] stacked:text-[1.4rem]`} href="/login">
+              <Link className={`${loginButton} mt-[42px] stacked:mt-[34px]`} href="/login">
                 Log in <span aria-hidden="true">→</span>
               </Link>
             </div>
@@ -216,7 +215,7 @@ export default function Home() {
             <Link className={loginButton} href="/login">
               Log in <span aria-hidden="true">→</span>
             </Link>
-            <Link className={`${secondaryPill} h-[53px]`} href="/register">Create an account</Link>
+            <Link className={secondaryPill} href="/register">Create an account</Link>
           </div>
         </section>
       </main>

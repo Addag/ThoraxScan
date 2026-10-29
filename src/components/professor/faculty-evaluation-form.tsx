@@ -4,13 +4,13 @@ import { useActionState, useState } from "react";
 import { ConfirmDialog } from "@/components/confirm-dialog";
 import { initialEvaluationState, type EvaluationActionState, type ProfessorEvaluation } from "@/lib/evaluations/types";
 
-import { reviewButtonGradient, reviewButtonSolid, reviewFieldClass, reviewTextareaClass } from "./review-styles";
+import { button, field, textarea } from "@/components/controls";
 
-const labelClass = "grid gap-1.5 text-[0.8125rem] text-[#b7c5d9] light:text-(--text-muted)";
-const textClass = "mx-0 mt-0 mb-3 text-[0.8125rem] leading-[1.5] text-[#b7c5d9] light:text-(--text-muted)";
-const lockable = "text-[0.9375rem] disabled:cursor-default disabled:opacity-100";
-const fieldClass = `${reviewFieldClass} ${lockable}`;
-const textareaClass = `${reviewTextareaClass} ${lockable} field-sizing-content`;
+const labelClass = "grid gap-1.5 text-[0.8125rem] text-(--text-muted)";
+const textClass = "mx-0 mt-0 mb-3 text-[0.8125rem] leading-[1.5] text-(--text-muted)";
+const lockable = "disabled:cursor-default";
+const fieldClass = `${field} ${lockable}`;
+const textareaClass = `${textarea} min-h-[110px] ${lockable} field-sizing-content`;
 
 type Action = (previous: EvaluationActionState, data: FormData) => Promise<EvaluationActionState>;
 export function FacultyEvaluationForm({ evaluation, saveAction, releaseAction }: {
@@ -26,7 +26,7 @@ export function FacultyEvaluationForm({ evaluation, saveAction, releaseAction }:
     return result;
   }, initialEvaluationState);
   const locked = evaluation?.status === "released" || ["released", "already_released", "unauthorized", "unavailable"].includes(state.status);
-  return <section className="p-[18px] text-[#f6f8ff] light:text-(--text-primary)" aria-labelledby="faculty-review-heading">
+  return <section className="p-4 text-(--text-primary)" aria-labelledby="faculty-review-heading">
     <h2 id="faculty-review-heading">Grading</h2>
     <p className={textClass} role="status" aria-live="polite">{pending ? "Saving evaluation…" : state.message || (evaluation?.status === "released" ? "Released · permanently locked" : evaluation ? "Draft · visible to Professors only" : "Unreviewed")}</p>
     {evaluation?.released_at ? <p className={textClass}>Released <time dateTime={evaluation.released_at}>{new Date(evaluation.released_at).toLocaleString()}</time></p> : null}
@@ -41,11 +41,11 @@ export function FacultyEvaluationForm({ evaluation, saveAction, releaseAction }:
         {state.fieldErrors?.remarks ? <p className="m-0 text-[0.8125rem]" id="evaluation-remarks-error" role="alert">{state.fieldErrors.remarks}</p> : null}
         <label className={labelClass} htmlFor="evaluation-feedback">Student feedback</label>
         <textarea className={textareaClass} id="evaluation-feedback" name="feedback" rows={6} value={feedback} onChange={event => setFeedback(event.target.value)} aria-invalid={Boolean(state.fieldErrors?.feedback)} aria-describedby="evaluation-feedback-help evaluation-feedback-error" />
-        <p className="m-0 text-[0.8125rem] text-[#b7c5d9] light:text-(--text-muted)" id="evaluation-feedback-help">Up to 5,000 characters per text field. Feedback is required for release and becomes visible to the Student while the activity is published.</p>
+        <p className="m-0 text-[0.8125rem] text-(--text-muted)" id="evaluation-feedback-help">Up to 5,000 characters per text field. Feedback is required for release and becomes visible to the Student while the activity is published.</p>
         <p className="m-0 text-[0.8125rem]" id="evaluation-feedback-error" role={state.fieldErrors?.feedback ? "alert" : undefined}>{state.fieldErrors?.feedback}</p>
         {!locked ? <div className="mt-[5px] flex flex-wrap gap-[9px]">
-          <button className={reviewButtonSolid} type="submit" name="intent" value="draft">Save Review</button>
-          <button className={reviewButtonGradient} type="button" onClick={() => setConfirming(true)}>Release evaluation</button>
+          <button className={button("secondary")} type="submit" name="intent" value="draft">Save Review</button>
+          <button className={button("primary")} type="button" onClick={() => setConfirming(true)}>Release evaluation</button>
         </div> : null}
         {confirming && !locked ? <ConfirmDialog title="Release evaluation?" cancelLabel="Keep editing" confirmLabel="Confirm and release" name="intent" value="release" onClose={() => setConfirming(false)}>
           Release is permanent. The score and feedback cannot be changed after release.

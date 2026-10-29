@@ -11,8 +11,8 @@ import {
   renameWorkspaceAction,
   revokeInvitationAction,
 } from "@/app/(protected)/professor/actions";
+import { button, field } from "@/components/controls";
 import { ConfirmDialog } from "@/components/confirm-dialog";
-import { primaryButton } from "@/components/primary-button";
 import type { AppRole } from "@/lib/auth/types";
 import {
   initialWorkspaceActionState,
@@ -21,12 +21,11 @@ import {
 import { formStatusColor } from "@/components/dashboard-ui";
 
 const fieldLabelClass = "block text-[0.75rem] font-extrabold text-(--text-primary)";
-const fieldInputClass = "min-h-[43px] w-full min-w-0 rounded-[6px] border border-[#66718b] light:border-(--border-strong) bg-[#0c1320] light:bg-(--surface-raised) px-3 text-(--text-primary) aria-invalid:border-[#ff6b6b]";
 const busyClass = "disabled:cursor-wait disabled:opacity-[0.68]";
 const actionControlsClass = "grid grid-cols-[minmax(0,1fr)_auto] gap-2.5 max-[700px]:grid-cols-1";
-const descriptionClass = "mt-[3px] mb-2.5 text-[0.6875rem] text-[#939caf] light:text-(--text-muted)";
-const inlineButtonClass = `transition-colors duration-160 not-disabled:hover:bg-(--hover-overlay) cursor-pointer border-0 bg-transparent p-[7px] text-[0.625rem] font-extrabold text-[#ff8d8f] light:text-(--status-error-text) ${busyClass}`;
-const panelBase = "rounded-[10px] border [background:var(--glass-surface)] backdrop-blur-[18px] backdrop-saturate-[135%] shadow-(--glass-shadow)";
+const descriptionClass = "mt-[3px] mb-2.5 text-[0.6875rem] text-(--text-muted)";
+const inlineButtonClass = `transition-colors duration-160 not-disabled:hover:bg-(--hover-overlay) cursor-pointer border-0 bg-transparent p-[7px] text-[0.6875rem] font-extrabold text-(--status-error-text) ${busyClass}`;
+const panelBase = "rounded-panel border [background:var(--glass-surface)] backdrop-blur-[18px] backdrop-saturate-[135%] shadow-(--glass-shadow)";
 
 function FormStatus({ state, className = "" }: { state: WorkspaceActionState; className?: string }) {
   if (!state.message) return null;
@@ -51,7 +50,7 @@ export function CreateWorkspaceForm() {
       <p className={descriptionClass}>Create a class space that you own and manage.</p>
       <div className={actionControlsClass}>
         <input
-          className={`${fieldInputClass} placeholder:text-[#9ba2b8] light:placeholder:text-(--text-muted)`}
+          className={field}
           id="new-workspace-name"
           name="name"
           type="text"
@@ -60,7 +59,7 @@ export function CreateWorkspaceForm() {
           placeholder="e.g. RAD 302 — Section A"
           aria-invalid={Boolean(state.fieldErrors?.name)}
         />
-        <button className={`${primaryButton} min-h-[43px] px-[17px] max-[700px]:w-full ${busyClass}`} type="submit" disabled={pending}>
+        <button className={`${button("primary")} max-[700px]:w-full`} type="submit" disabled={pending}>
           {pending ? "Creating…" : "Create workspace"}
         </button>
       </div>
@@ -80,7 +79,7 @@ export function ProfessorRedeemForm() {
       <p className={descriptionClass}>Join a workspace as a co-professor.</p>
       <div className={actionControlsClass}>
         <input
-          className={`${fieldInputClass} placeholder:text-[#9ba2b8] light:placeholder:text-(--text-muted)`}
+          className={field}
           id="professor-invitation-code"
           name="code"
           type="text"
@@ -91,7 +90,7 @@ export function ProfessorRedeemForm() {
           placeholder="Paste your 22-character code"
           aria-invalid={Boolean(state.fieldErrors?.code)}
         />
-        <button className={`${primaryButton} min-h-[43px] px-[17px] max-[700px]:w-full ${busyClass}`} type="submit" disabled={pending}>
+        <button className={`${button("primary")} max-[700px]:w-full`} type="submit" disabled={pending}>
           {pending ? "Joining…" : "Join workspace"}
         </button>
       </div>
@@ -117,7 +116,7 @@ export function RenameWorkspaceForm({
       <label className={fieldLabelClass} htmlFor="rename-workspace">Workspace name</label>
       <div className="mt-1.5 grid grid-cols-[minmax(0,1fr)_auto] gap-[9px] max-[700px]:grid-cols-1">
         <input
-          className={fieldInputClass}
+          className={field}
           id="rename-workspace"
           name="name"
           type="text"
@@ -126,7 +125,7 @@ export function RenameWorkspaceForm({
           maxLength={100}
           aria-invalid={Boolean(state.fieldErrors?.name)}
         />
-        <button className={`transition-[filter] duration-160 not-disabled:hover:brightness-115 min-h-[43px] px-[15px] max-[700px]:w-full ${busyClass}`} type="submit" disabled={pending}>
+        <button className={`${button("secondary")} max-[700px]:w-full`} type="submit" disabled={pending}>
           {pending ? "Saving…" : "Save name"}
         </button>
       </div>
@@ -156,15 +155,15 @@ export function InvitationCreateForm({
   }
 
   return (
-    <form className="rounded-lg border border-[#3d4c67] bg-[rgba(4,8,40,0.3)] p-[18px]" action={formAction} noValidate>
+    <form className="rounded-lg border border-(--border-shell) bg-(--surface-sunken) p-4" action={formAction} noValidate>
       <input type="hidden" name="workspaceId" value={workspaceId} />
       <input type="hidden" name="invitedRole" value={invitedRole} />
       <div className="mb-[13px] grid grid-cols-2 gap-3 max-[700px]:grid-cols-1">
         <label className="flex flex-col gap-1.5 text-[0.75rem] font-extrabold text-(--text-primary)">
           Expires in
-          <span className="flex items-center gap-[7px] text-[0.6875rem] font-normal text-[#9aa4b8] light:text-(--text-muted)">
+          <span className="flex items-center gap-[7px] text-[0.6875rem] font-normal text-(--text-muted)">
             <input
-              className={fieldInputClass}
+              className={field}
               name="expiresInDays"
               type="number"
               min={1}
@@ -178,7 +177,7 @@ export function InvitationCreateForm({
           <label className="flex flex-col gap-1.5 text-[0.75rem] font-extrabold text-(--text-primary)">
             Maximum uses
             <input
-              className={fieldInputClass}
+              className={field}
               name="maxUses"
               type="number"
               min={1}
@@ -191,17 +190,17 @@ export function InvitationCreateForm({
           <input type="hidden" name="maxUses" value="1" />
         )}
       </div>
-      <button className={`${primaryButton} min-h-[43px] px-[17px] max-[700px]:w-full ${busyClass}`} type="submit" disabled={pending}>
+      <button className={`${button("primary")} max-[700px]:w-full`} type="submit" disabled={pending}>
         {pending
           ? "Generating…"
           : `Generate ${isStudent ? "Student" : "Professor"} code`}
       </button>
       <FormStatus state={state} />
       {state.invitationCode && (
-        <div className="mt-3.5 grid grid-cols-[minmax(0,1fr)_auto] gap-x-3 gap-y-2 rounded-[7px] border border-[#0077ff] bg-[rgba(0,119,255,0.18)] p-3 max-[700px]:grid-cols-1" role="status">
-          <strong className="col-span-full text-[0.6875rem] uppercase text-[#b9ddff] light:text-(--brand-blue-text)">Copy this code now</strong>
+        <div className="mt-3.5 grid grid-cols-[minmax(0,1fr)_auto] gap-x-3 gap-y-2 rounded-control border border-[#0077ff] bg-[rgba(0,119,255,0.18)] p-3 max-[700px]:grid-cols-1" role="status">
+          <strong className="col-span-full text-[0.6875rem] uppercase text-(--brand-blue-text)">Copy this code now</strong>
           <code className="self-center overflow-hidden text-[0.875rem] text-(--text-primary) text-ellipsis whitespace-nowrap">{state.invitationCode}</code>
-          <button className={`transition-colors duration-160 not-disabled:hover:bg-[#0e2547] cursor-pointer rounded-[5px] border border-[#76baff] bg-[#071832] px-2.5 py-[7px] text-[0.625rem] font-extrabold text-white ${busyClass}`} type="button" onClick={copyCode}>
+          <button className={button("secondary")} type="button" onClick={copyCode}>
             {copied ? "Copied" : "Copy code"}
           </button>
         </div>
@@ -272,13 +271,13 @@ export function LeaveWorkspaceForm({ workspaceId }: { workspaceId: string }) {
   );
   const [confirming, setConfirming] = useState(false);
   return (
-    <form className={`${panelBase} mt-5 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-[18px] border-[#7b3437] p-[19px_24px] max-[700px]:grid-cols-1`} action={formAction}>
+    <form className={`${panelBase} mt-5 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-[18px] border-[#7b3437] p-6 max-[700px]:grid-cols-1`} action={formAction}>
       <input type="hidden" name="workspaceId" value={workspaceId} />
       <div>
-        <strong className="text-[0.8125rem] text-[#ffb4b4] light:text-(--status-error-text)">Leave this workspace</strong>
-        <p className="mt-1 mb-0 text-[0.6875rem] text-[#c4a9ad] light:text-(--text-muted)">You will need another Professor invitation to rejoin.</p>
+        <strong className="text-[0.8125rem] text-(--status-error-text)">Leave this workspace</strong>
+        <p className="mt-1 mb-0 text-[0.6875rem] text-(--text-muted)">You will need another Professor invitation to rejoin.</p>
       </div>
-      <button className={`transition-colors duration-160 not-disabled:hover:bg-[rgba(160,32,32,0.32)] cursor-pointer rounded-[6px] border border-[#d45b60] bg-[rgba(160,32,32,0.2)] px-3.5 py-2.5 font-extrabold text-[#ffb4b4] light:text-(--status-error-text) ${busyClass}`} type="button" disabled={pending} onClick={() => setConfirming(true)}>
+      <button className={button("danger")} type="button" disabled={pending} onClick={() => setConfirming(true)}>
         {pending ? "Leaving…" : "Leave workspace"}
       </button>
       {confirming ? (

@@ -18,7 +18,7 @@ export type NavItem = {
   active?: boolean;
 };
 
-const navLinkClass = "transition-colors duration-160 relative grid min-h-[46px] grid-cols-[25px_minmax(0,1fr)] items-center rounded-lg border px-2.5 py-2 text-[0.8125rem] no-underline max-[850px]:min-h-12 max-[850px]:gap-x-2.5 max-[850px]:text-[0.9375rem]";
+const navLinkClass = "transition-colors duration-160 relative grid min-h-[46px] grid-cols-[25px_minmax(0,1fr)] items-center gap-x-2.5 rounded-lg border px-2.5 py-2 text-[0.8125rem] no-underline max-[850px]:min-h-12 max-[850px]:text-[0.9375rem]";
 const activeNavLinkClass = "border-brand bg-[rgba(44,174,255,0.21)] before:absolute before:top-2.5 before:bottom-2.5 before:-left-[7px] before:w-[3px] before:rounded-lg before:bg-brand";
 const supportingTextClass = "leading-[1.4]";
 
@@ -27,7 +27,7 @@ function NavEntry({ item }: { item: NavItem }) {
   const content = (
     <>
       {item.icon ? (
-        <Image className="block size-6 flex-[0_0_24px] object-contain light:invert" src={`/images/menu-icons/${item.icon}.png`} alt="" width={24} height={24} aria-hidden="true" />
+        <Image className="block size-6 flex-[0_0_24px] object-contain light:invert" src={`/images/menu-icons/${item.icon}.png`} alt="" width={24} height={24} loading="eager" aria-hidden="true" />
       ) : item.glyph ? (
         <span className="text-[1.25rem] text-(--text-primary)" aria-hidden="true">{item.glyph}</span>
       ) : null}
@@ -72,10 +72,10 @@ export function AppShell({
 
   return (
     <div className="grid min-h-svh grid-cols-[230px_minmax(0,1fr)] bg-(--app-background) text-foreground max-[850px]:block">
-      <a className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50 focus:rounded-[8px] focus:bg-[#0a65bd] focus:px-4 focus:py-3 focus:font-extrabold focus:text-white" href="#main-content">Skip to main content</a>
+      <a className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50 focus:rounded-panel focus:bg-[#0a65bd] focus:px-4 focus:py-3 focus:font-extrabold focus:text-white" href="#main-content">Skip to main content</a>
       <AppSidebar actions={notifications ? <NotificationBellButton className="size-11" unread={unread} /> : null}>
-        <div className="flex min-h-[68px] flex-col justify-center gap-[9px] rounded-[10px] border border-brand px-3.5 py-2.5 shadow-(--glass-inset-shadow) [background:var(--glass-inset)]">
-          <span className={`m-0 text-[0.625rem] font-extrabold tracking-[0.08em] text-(--brand-blue-text) uppercase ${supportingTextClass}`}>{accessLabel}</span>
+        <div className="flex min-h-[68px] flex-col justify-center gap-[9px] rounded-panel border border-brand px-3.5 py-2.5 shadow-(--glass-inset-shadow) [background:var(--glass-inset)]">
+          <span className={`m-0 text-[0.6875rem] font-extrabold tracking-[0.08em] text-(--brand-blue-text) uppercase ${supportingTextClass}`}>{accessLabel}</span>
           <strong className="text-[0.8125rem]">
             <i
               className={`mr-1.5 inline-block size-[7px] rounded-full ${accessTone === "ok" ? "bg-[#46ff2d] shadow-[0_0_10px_rgba(70,255,45,0.75)]" : "bg-[#ffce4b] shadow-[0_0_10px_rgba(255,206,75,0.7)]"}`}
@@ -83,13 +83,13 @@ export function AppShell({
             /> {accessValue}
           </strong>
         </div>
-        <p className={`mx-1.5 mt-[22px] mb-2 text-[0.625rem] font-extrabold tracking-[0.08em] text-(--text-secondary) uppercase ${supportingTextClass}`}>{navLabel}</p>
+        <p className={`mx-1.5 mt-[22px] mb-2 text-[0.6875rem] font-extrabold tracking-[0.08em] text-(--text-secondary) uppercase ${supportingTextClass}`}>{navLabel}</p>
         <nav className="flex flex-col gap-1.5" aria-label={navAriaLabel}>
           {navItems.map((item) => <NavEntry item={item} key={item.label} />)}
         </nav>
         <form className="mt-auto border-t border-t-(--border-subtle) pt-[18px] max-[850px]:mt-4 max-[850px]:pt-3" action={logoutAction}>
-          <button className="transition-colors duration-160 not-disabled:hover:bg-(--hover-overlay) w-full cursor-pointer rounded-lg border-0 bg-transparent p-2.5 text-left font-semibold text-[#ff5457] light:text-(--status-error-text) max-[850px]:min-h-12" type="submit">
-            <span className="mr-2 text-[1.25rem]" aria-hidden="true">↪</span> Log out
+          <button className="transition-colors duration-160 not-disabled:hover:bg-(--hover-overlay) grid w-full cursor-pointer grid-cols-[25px_minmax(0,1fr)] items-center gap-x-2.5 rounded-lg border border-transparent bg-transparent p-2.5 text-left font-semibold text-(--status-error-text) max-[850px]:min-h-12" type="submit">
+            <span className="text-[1.25rem]" aria-hidden="true">↪</span> Log out
           </button>
         </form>
       </AppSidebar>

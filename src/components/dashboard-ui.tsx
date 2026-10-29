@@ -2,14 +2,14 @@ import type { ReactNode } from "react";
 import Link from "next/link";
 
 export const glassPanelClass =
-  "rounded-[10px] border [background:var(--glass-surface)] backdrop-blur-[18px] backdrop-saturate-[135%] shadow-(--glass-shadow)";
+  "rounded-panel border [background:var(--glass-surface)] backdrop-blur-[18px] backdrop-saturate-[135%] shadow-(--glass-shadow)";
 export const sectionKickerClass =
-  "mx-0 mt-0 mb-[5px] text-[0.625rem] font-extrabold uppercase leading-[1.4] tracking-[0.08em] text-[#5fa8fb] light:text-(--brand-blue-text)";
+  "mx-0 mt-0 mb-[5px] text-[0.6875rem] font-extrabold uppercase leading-[1.4] tracking-[0.08em] text-(--brand-blue-text)";
 export const countBadgeClass =
-  "rounded-[999px] border border-[#4d5b74] px-2.5 py-1.5 text-[0.6875rem] text-[#b9c2d6] light:text-(--text-muted)";
+  "rounded-full border border-(--border-shell) px-2.5 py-1.5 text-[0.6875rem] text-(--text-muted)";
 export const backLinkClass =
-  "transition-colors duration-160 hover:text-(--text-primary) mb-5 inline-block text-[0.8125rem] font-extrabold text-[#9fcfff] light:text-(--brand-blue-text) no-underline";
-export const listEmptyClass = "mx-0 mt-3.5 mb-0 text-[0.6875rem] text-[#8993a8] light:text-(--text-muted)";
+  "transition-colors duration-160 hover:text-(--text-primary) mb-3 inline-block text-[0.8125rem] font-extrabold text-(--brand-blue-text) no-underline";
+export const listEmptyClass = "mx-0 mt-3.5 mb-0 text-[0.6875rem] text-(--text-muted)";
 
 export function PageMain({
   children,
@@ -26,28 +26,32 @@ export function PageMain({
 }
 
 export function formStatusColor(status: string) {
-  if (status === "success") return "text-[#b8f3ce] light:text-(--status-success-text)";
-  if (status === "expired" || status === "revoked") return "text-[#ffd59a] light:text-(--status-warning-text)";
-  return "text-[#ffb4b4] light:text-(--status-error-text)";
+  if (status === "success") return "text-(--status-success-text)";
+  if (status === "expired" || status === "revoked") return "text-(--status-warning-text)";
+  return "text-(--status-error-text)";
 }
 
+// The one page header: optional back link, title, subtitle, and today's date aligned to the subtitle.
 export function PageHeading({
   title,
   subtitle,
+  back,
   showDate = true,
 }: {
   title: string;
   subtitle: string;
+  back?: { href: string; label: string };
   showDate?: boolean;
 }) {
   return (
-    <div className="mb-[26px] flex items-start justify-between gap-7 max-[600px]:block">
+    <div className="mb-6 flex items-end justify-between gap-6 max-[760px]:flex-col max-[760px]:items-start">
       <div>
+        {back ? <Link className={backLinkClass} href={back.href}>← {back.label}</Link> : null}
         <h1 className="m-0 text-[clamp(1.75rem,4vw,2.375rem)] leading-[1.1]">{title}</h1>
-        <p className="mt-[5px] mb-0 text-[0.8125rem] text-(--text-muted)">{subtitle}</p>
+        <p className="mt-1.5 mb-0 text-[0.8125rem] leading-[1.4] text-(--text-muted)">{subtitle}</p>
       </div>
       {showDate && (
-        <time className="rounded-[4px] bg-[rgba(85,85,85,0.7)] light:bg-(--surface-sunken) px-[15px] py-2.5 text-[0.6875rem] text-(--text-primary) max-[600px]:mt-[15px] max-[600px]:inline-block" dateTime={new Date().toISOString().slice(0, 10)}>
+        <time className="flex-none rounded-control bg-[rgba(85,85,85,0.7)] light:bg-(--surface-sunken) px-3.5 py-2 text-[0.75rem] text-(--text-primary)" dateTime={new Date().toISOString().slice(0, 10)}>
           {new Intl.DateTimeFormat("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" }).format(new Date())}
         </time>
       )}
@@ -67,7 +71,7 @@ export function SectionHeading({
   aside?: ReactNode;
 }) {
   return (
-    <div className="flex items-center justify-between gap-6 border-b border-[rgba(172,172,172,0.55)] light:border-(--border-strong) pb-[18px] max-[600px]:items-start">
+    <div className="flex items-center justify-between gap-6 border-b border-(--border-strong) pb-[18px] max-[600px]:items-start">
       <div>
         <p className={sectionKickerClass}>{kicker}</p>
         <h2 className="m-0 text-[1.25rem]" id={titleId}>{title}</h2>
@@ -78,7 +82,8 @@ export function SectionHeading({
 }
 
 export function StatGrid({ children }: { children: ReactNode }) {
-  return <section className="grid grid-cols-2 gap-[18px] max-[700px]:grid-cols-1">{children}</section>;
+  // One row on desktop whatever the count (4 on Home, 5 on Analytics); two per row on phones.
+  return <section className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,150px),1fr))] gap-4">{children}</section>;
 }
 
 export function StatCard({
@@ -93,11 +98,11 @@ export function StatCard({
   detail: string;
 }) {
   return (
-    <article className="relative min-h-[155px] overflow-hidden rounded-[10px] border border-(--border-shell) bg-(--glass-inset) px-[22px] py-[18px] shadow-(--glass-inset-shadow)">
-      <span className="grid size-[43px] place-items-center rounded-[5px] bg-white font-extrabold text-[#2d264b]" aria-hidden="true">{symbol}</span>
-      <strong className="absolute top-[18px] right-6 font-(--font-inter) text-[2.625rem] leading-none text-[#65b8ff] light:text-(--brand-blue-text)">{value}</strong>
-      <p className="mt-[31px] mb-0.5 text-[0.875rem] font-extrabold">{label}</p>
-      <small className="text-[0.6875rem] leading-[1.4] text-[rgba(167,167,167,0.72)] light:text-(--text-muted)">{detail}</small>
+    <article className="relative overflow-hidden rounded-panel border border-(--border-shell) bg-(--glass-inset) p-4 shadow-(--glass-inset-shadow)">
+      <span className="grid size-10 place-items-center rounded-control bg-white font-extrabold text-[#2d264b]" aria-hidden="true">{symbol}</span>
+      <strong className="absolute top-4 right-4 font-brand text-[clamp(1.75rem,3vw,2.625rem)] leading-none text-(--brand-blue-text)">{value}</strong>
+      <p className="mt-5 mb-0.5 text-[0.875rem] font-extrabold">{label}</p>
+      <small className="text-[0.6875rem] leading-[1.4] text-(--text-muted)">{detail}</small>
     </article>
   );
 }
@@ -118,12 +123,12 @@ export function WorkspaceCard({
   minHeight?: 205 | 210;
 }) {
   return (
-    <article className={`relative ${minHeight === 205 ? "min-h-[205px]" : "min-h-[210px]"} overflow-hidden rounded-[9px] border border-[#3d4c67] bg-(--glass-inset) p-5 shadow-(--glass-inset-shadow)`}>
-      <div className="grid size-[42px] place-items-center rounded-[7px] bg-white font-(--font-inter) font-extrabold text-[#2d264b]" aria-hidden="true">W</div>
-      <p className="mt-[18px] mb-[3px] text-[0.625rem] font-extrabold uppercase leading-[1.4] tracking-[0.07em] text-[#6faef7] light:text-(--brand-blue-text)">{role}</p>
+    <article className={`relative ${minHeight === 205 ? "min-h-[205px]" : "min-h-[210px]"} overflow-hidden rounded-panel border border-(--border-shell) bg-(--glass-inset) p-5 shadow-(--glass-inset-shadow)`}>
+      <div className="grid size-[42px] place-items-center rounded-control bg-white font-brand font-extrabold text-[#2d264b]" aria-hidden="true">W</div>
+      <p className="mt-[18px] mb-[3px] text-[0.6875rem] font-extrabold uppercase leading-[1.4] tracking-[0.07em] text-(--brand-blue-text)">{role}</p>
       <h3 className="m-0 mb-[5px] overflow-hidden text-[1.1875rem] text-ellipsis whitespace-nowrap">{name}</h3>
-      <span className="text-[0.6875rem] leading-[1.4] text-[#8992a8] light:text-(--text-muted)">{detail}</span>
-      <Link className="absolute right-5 bottom-[18px] text-[0.8125rem] font-extrabold text-(--text-primary) no-underline hover:text-[#7fc3ff] light:hover:text-(--brand-blue-text)" href={href}>{linkLabel} <span aria-hidden="true">→</span></Link>
+      <span className="text-[0.6875rem] leading-[1.4] text-(--text-muted)">{detail}</span>
+      <Link className="absolute right-5 bottom-[18px] text-[0.8125rem] font-extrabold text-(--text-primary) no-underline hover:text-(--brand-blue-text)" href={href}>{linkLabel} <span aria-hidden="true">→</span></Link>
     </article>
   );
 }

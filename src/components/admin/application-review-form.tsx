@@ -4,8 +4,7 @@ import { useActionState, useState } from "react";
 
 import { reviewProfessorApplicationAction } from "@/app/(protected)/admin/actions";
 import { ConfirmDialog } from "@/components/confirm-dialog";
-import { primaryButton } from "@/components/primary-button";
-import { reviewFieldClass } from "@/components/admin/review-styles";
+import { button, textarea } from "@/components/controls";
 import {
   initialAdminReviewState,
   type ProfessorApplicationProjection,
@@ -33,7 +32,7 @@ export function ApplicationReviewForm({
         <button
           type="button"
           disabled={pending || !canApprove}
-          className={`${primaryButton} min-h-[43px] px-[17px] disabled:cursor-not-allowed disabled:opacity-[0.58]`}
+          className={button("primary")}
           onClick={() => setConfirmingApproval(true)}
         >
           {pending ? "Reviewing…" : application.status === "rejected" ? "Approve after review" : "Approve"}
@@ -44,7 +43,7 @@ export function ApplicationReviewForm({
           </ConfirmDialog>
         ) : null}
         {!canApprove && (
-          <small className="text-[0.625rem] text-[#d0ab56] light:text-(--status-warning-text)">
+          <small className="text-[0.6875rem] text-(--status-warning-text)">
             {!application.email_confirmed
               ? "Email confirmation required"
               : "Existing memberships must be removed"}
@@ -53,13 +52,13 @@ export function ApplicationReviewForm({
       </div>
 
       {application.status === "pending" && (
-        <details className="rounded-[6px] border border-[#633f49] light:border-(--border-subtle) p-2.5">
-          <summary className="cursor-pointer text-[0.75rem] font-extrabold text-[#ffb4b4] light:text-(--status-error-text)">Reject application</summary>
+        <details className="rounded-control border border-(--border-subtle) p-2.5">
+          <summary className="cursor-pointer text-[0.75rem] font-extrabold text-(--status-error-text)">Reject application</summary>
           <label className="mt-3 mb-1.5 block text-[0.6875rem] font-extrabold" htmlFor={`rejection-reason-${application.user_id}`}>
             Reason <span>(optional)</span>
           </label>
           <textarea
-            className={`${reviewFieldClass} min-h-[78px] pt-[9px] resize-y`}
+            className={`${textarea} min-h-[78px]`}
             id={`rejection-reason-${application.user_id}`}
             name="rejectionReason"
             maxLength={500}
@@ -71,7 +70,7 @@ export function ApplicationReviewForm({
             <small className={fieldErrorClass}>{state.fieldErrors.rejectionReason}</small>
           )}
           <button
-            className="transition-colors duration-160 not-disabled:hover:bg-[rgba(160,32,32,0.32)] mt-[9px] rounded-[6px] border border-[#d45b60] bg-[rgba(160,32,32,0.2)] px-3 py-[9px] font-extrabold text-[#ffb4b4] light:text-(--status-error-text) disabled:cursor-not-allowed disabled:opacity-[0.58]"
+            className={`${button("danger")} mt-2.5`}
             type="button"
             disabled={pending}
             onClick={() => setConfirmingRejection(true)}

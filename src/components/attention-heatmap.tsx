@@ -17,8 +17,8 @@ function drawOverlay(canvas: HTMLCanvasElement | null, values: number[], grid: n
 type HeatmapLabel = { label: string; probability: number; predicted: boolean; possible: boolean };
 // Without probabilities (the Professor projection keeps them private), every finding can be inspected.
 const ALL_FINDINGS = THORAXSCAN_LABELS.filter(label => label !== "No Finding");
-const textClass = "mx-0 mt-0 mb-2.5 text-[0.75rem] leading-[1.55] text-[#c8d5e8] light:text-(--text-secondary)";
-const controlClass = "mt-2.5 flex items-center gap-[7px] text-[0.75rem] text-[#d7e3f5] light:text-(--text-secondary)";
+const textClass = "mx-0 mt-0 mb-2.5 text-[0.75rem] leading-[1.55] text-(--text-secondary)";
+const controlClass = "mt-2.5 flex items-center gap-[7px] text-[0.75rem] text-(--text-secondary)";
 
 export function AttentionHeatmap({ imageUrl, attention, labels, title = "Attention overlay", illustrative = false, className = "" }: { imageUrl: string | null; attention: Heatmap; labels?: HeatmapLabel[]; title?: string; illustrative?: boolean; className?: string }) {
   const titleId = useId();
@@ -34,19 +34,19 @@ export function AttentionHeatmap({ imageUrl, attention, labels, title = "Attenti
       .map(item => ({ label: item.label, text: `${item.label} (${item.predicted ? "likely" : "possible"}, ${(item.probability * 100).toFixed(1)}%)` }))
     : ALL_FINDINGS.map(label => ({ label, text: label }));
   const current = options.find(item => item.label === selected) ?? options[0];
-  if (perLabel && !current) return <section aria-labelledby={titleId} className={`text-[#e7eefb] light:text-(--text-primary) ${className}`}>
+  if (perLabel && !current) return <section aria-labelledby={titleId} className={`text-(--text-primary) ${className}`}>
     <h3 className="mx-0 mt-0 mb-1.5 text-[0.9375rem]" id={titleId}>{title}</h3>
     <p className={textClass}>No finding met its threshold, so there is no finding-specific heatmap to show.</p>
   </section>;
   const grid = attention.width;
   const values = perLabel ? labelActivation(attention.values, THORAXSCAN_LABELS.indexOf(current.label as (typeof THORAXSCAN_LABELS)[number])) : attention.values;
-  return <section aria-labelledby={titleId} className={`text-[#e7eefb] light:text-(--text-primary) ${className}`}>
+  return <section aria-labelledby={titleId} className={`text-(--text-primary) ${className}`}>
     <h3 className="mx-0 mt-0 mb-1.5 text-[0.9375rem]" id={titleId}>{title}</h3>
     {perLabel
       ? <p className={textClass}>This class activation map shows where the model&apos;s evidence for <strong>{current.label}</strong> is strongest in this image. Warmer colors (red) mark more evidence relative to the rest of this image; cooler colors (blue) mark little or none. It is a coarse 14×14 guide for where to look, not a lesion outline, a measurement, or a diagnosis.</p>
       : <p className={textClass}>{illustrative ? "This illustrative overlay uses hand-picked values to demonstrate the global, class-agnostic attention display. These values are not model output for this X-ray." : "Legacy global attention: this class-agnostic overlay shows the relative internal attention the model assigned across the image during this inference."} Warmer colors (red) indicate higher relative attention within this image; cooler colors (blue) indicate lower. It does not identify a lesion, explain a specific finding, or confirm disease location.</p>}
     {perLabel ? <label className={controlClass} htmlFor={selectId}>Finding
-      <select id={selectId} className="min-h-[32px] max-w-full rounded-[5px] border border-[#6d7480] light:border-(--border-strong) bg-(--surface-sunken) px-[10px] text-[0.75rem] text-(--text-primary)" value={current.label} onChange={event => setSelected(event.target.value)}>
+      <select id={selectId} className="min-h-[32px] max-w-full rounded-control border border-(--border-strong) bg-(--surface-sunken) px-[10px] text-[0.75rem] text-(--text-primary)" value={current.label} onChange={event => setSelected(event.target.value)}>
         {options.map(item => <option key={item.label} value={item.label}>{item.text}</option>)}
       </select>
     </label> : null}
@@ -56,11 +56,11 @@ export function AttentionHeatmap({ imageUrl, attention, labels, title = "Attenti
       <img src={imageUrl} alt={illustrative ? "Sample chest X-ray for an illustrative attention overlay" : "Chest X-ray used for this inference"} style={{ display: "block", width: "100%", filter: "grayscale(1)" }} />
       {enabled ? <canvas aria-hidden="true" width={OVERLAY_SIZE} height={OVERLAY_SIZE} ref={canvas => drawOverlay(canvas, values, grid)} style={{ position: "absolute", inset: 0, width: "100%", height: "100%", opacity, pointerEvents: "none" }} /> : null}
     </div> : <p className={textClass}>Original image unavailable. The normalized heatmap data remains available below.</p>}
-    <label className={controlClass}><input className="size-[15px] accent-[#087fff]" type="checkbox" checked={enabled} onChange={event => setEnabled(event.target.checked)} /> Show heatmap overlay</label>
-    <label className={controlClass}>Overlay opacity <input className="w-[min(180px,42vw)] accent-[#087fff]" type="range" min="0" max="1" step="0.05" value={opacity} onChange={event => setOpacity(Number(event.target.value))} /> {Math.round(opacity * 100)}%</label>
+    <label className={controlClass}><input className="size-[15px] accent-brand" type="checkbox" checked={enabled} onChange={event => setEnabled(event.target.checked)} /> Show heatmap overlay</label>
+    <label className={controlClass}>Overlay opacity <input className="w-[min(180px,42vw)] accent-brand" type="range" min="0" max="1" step="0.05" value={opacity} onChange={event => setOpacity(Number(event.target.value))} /> {Math.round(opacity * 100)}%</label>
     <div aria-hidden="true" style={{ height: 12, maxWidth: 448, background: attentionGradient }} />
     <p className={textClass}>{perLabel ? `Less evidence for ${current.label} → More evidence for ${current.label}` : "Lower relative attention → Higher relative attention"}</p>
-    <details className="mt-2.5 text-[0.75rem] text-[#d7e3f5] light:text-(--text-secondary)"><summary>Method and {grid}×{grid} data</summary>
+    <details className="mt-2.5 text-[0.75rem] text-(--text-secondary)"><summary>Method and {grid}×{grid} data</summary>
       <p>{perLabel
         ? "Class activation map (CAM): the classifier's weights for this finding applied to the final feature map, negative evidence clipped to zero, then scaled so this finding's strongest cell is 1. The values are relative evidence within this image, not probabilities. A strong map does not mean the finding is present; check the finding's probability for that."
         : illustrative ? "Illustrative values only; no attention rollout was run for this example. Model-generated maps use four-layer attention rollout, averaged over queries, normalized per image." : "Four-layer attention rollout, averaged over queries, normalized per image. These values are relative attention, not probabilities."}{" "}The overlay is smoothed between cell centers for display; the underlying data is still this {grid}×{grid} grid.</p>

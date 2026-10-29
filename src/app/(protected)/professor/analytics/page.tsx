@@ -1,3 +1,4 @@
+import { button, field } from "@/components/controls";
 import Link from "next/link";
 import { ProfessorShell } from "@/components/professor/professor-shell";
 import { EmptyState } from "@/components/empty-state";
@@ -6,13 +7,13 @@ import { requireRole } from "@/lib/auth/server";
 import { getProfessorActivities } from "@/lib/activities/server";
 import { getClassAnalytics } from "@/lib/analytics/server";
 import { getProfessorWorkspaces } from "@/lib/workspaces/server";
-import { reviewButtonSolid, reviewFieldClass, reviewFieldLabelClass, reviewHeadingClass, reviewLinkClass, reviewPanelTextClass } from "@/components/professor/review-styles";
+import { reviewFieldLabelClass, reviewHeadingClass, reviewLinkClass, reviewPanelTextClass } from "@/components/professor/review-styles";
 
 export const metadata = { title: "Class Analytics | ThoraxScan" };
 
-const panelClass = `${glassPanelClass} border-[rgb(137_161_196/42%)] mt-[18px] overflow-hidden p-0`;
+const panelClass = `${glassPanelClass} border-(--border-shell) mt-6 overflow-hidden p-0`;
 const panelHeaderClass = "border-b border-b-(--border-subtle) px-[18px] py-[11px]";
-const tableClass = "w-full border-collapse text-left text-[0.75rem] [&_td]:px-[18px] [&_td]:py-2.5 [&_th]:px-[18px] [&_th]:py-2.5 [&_th]:font-extrabold [&_th]:text-[#b7c5d9] light:[&_th]:text-(--text-muted) [&_tbody_tr]:border-t [&_tbody_tr]:border-t-(--border-subtle)";
+const tableClass = "w-full border-collapse text-left text-[0.75rem] [&_td]:px-[18px] [&_td]:py-2.5 [&_th]:px-[18px] [&_th]:py-2.5 [&_th]:font-extrabold [&_th]:text-(--text-muted) [&_tbody_tr]:border-t [&_tbody_tr]:border-t-(--border-subtle)";
 const show = (value: number | null, suffix = "") => (value === null ? "—" : `${value}${suffix}`);
 
 export default async function AnalyticsPage({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
@@ -36,14 +37,14 @@ export default async function AnalyticsPage({ searchParams }: { searchParams: Pr
           <section className={`${panelClass} mt-0`} aria-labelledby="analytics-filters-heading">
             <div className={panelHeaderClass}><h2 className={reviewHeadingClass} id="analytics-filters-heading">Scope</h2></div>
             <form className="grid grid-cols-[repeat(2,minmax(0,1fr))_auto] gap-3 px-[18px] pt-3.5 pb-[17px] max-[600px]:grid-cols-1" method="get">
-              <label className={reviewFieldLabelClass}>Workspace<select className={reviewFieldClass} name="workspace" defaultValue={workspaceId}>{workspaces.data.map(workspace => <option key={workspace.id} value={workspace.id}>{workspace.name}</option>)}</select></label>
-              <label className={reviewFieldLabelClass}>Activity<select className={reviewFieldClass} name="activity" defaultValue={activityId}><option value="">All activities</option>{activities?.data.filter(activity => activity.status !== "draft").map(activity => <option key={activity.id} value={activity.id}>{activity.title}</option>)}</select></label>
-              <div className="flex items-end gap-2.5 pb-px"><button className={reviewButtonSolid} type="submit">Apply</button></div>
+              <label className={reviewFieldLabelClass}>Workspace<select className={field} name="workspace" defaultValue={workspaceId}>{workspaces.data.map(workspace => <option key={workspace.id} value={workspace.id}>{workspace.name}</option>)}</select></label>
+              <label className={reviewFieldLabelClass}>Activity<select className={field} name="activity" defaultValue={activityId}><option value="">All activities</option>{activities?.data.filter(activity => activity.status !== "draft").map(activity => <option key={activity.id} value={activity.id}>{activity.title}</option>)}</select></label>
+              <div className="flex items-end gap-2.5"><button className={button("primary")} type="submit">Apply</button></div>
             </form>
           </section>
-          {analytics?.error ? <p className="mt-[18px]" role="alert">{analytics.error}</p> : null}
+          {analytics?.error ? <p className="mt-6" role="alert">{analytics.error}</p> : null}
           {summary ? <>
-            <div className="mt-[18px]"><StatGrid>
+            <div className="mt-6"><StatGrid>
               <StatCard symbol="✓" value={show(summary.totals.completion, "%")} label="Completion" detail={`${summary.totals.submitted} of ${summary.totals.expected} final submissions · ${summary.totals.missing} missing`} />
               <StatCard symbol="⏱" value={show(summary.totals.onTime, "%")} label="On time" detail={`${summary.totals.late} submitted after the due date`} />
               <StatCard symbol="★" value={show(summary.totals.averageScore)} label="Average released score" detail={summary.totals.averageScore === null ? "No released evaluations yet" : `Range ${summary.totals.minScore}–${summary.totals.maxScore}`} />
@@ -59,7 +60,7 @@ export default async function AnalyticsPage({ searchParams }: { searchParams: Pr
                   const completion = row.roster ? Math.round((row.submitted / row.roster) * 100) : 0;
                   return <tr key={row.id}>
                     <th scope="row" className="font-normal! text-(--text-primary)!"><Link className={reviewLinkClass} href={`/professor/submissions?workspace=${workspaceId}&activity=${row.id}`}>{row.title}</Link>{row.dueAt ? <small className="block text-[0.6875rem] text-(--text-muted)">Due <time dateTime={row.dueAt}>{new Date(row.dueAt).toLocaleDateString()}</time></small> : null}</th>
-                    <td><span className="block min-w-[110px]">{row.submitted}/{row.roster} ({completion}%)</span><span className="mt-1 block h-1.5 rounded-full bg-(--border-subtle)" aria-hidden="true"><span className="block h-full rounded-full bg-[#087fff]" style={{ width: `${completion}%` }} /></span></td>
+                    <td><span className="block min-w-[110px]">{row.submitted}/{row.roster} ({completion}%)</span><span className="mt-1 block h-1.5 rounded-full bg-(--border-subtle)" aria-hidden="true"><span className="block h-full rounded-full bg-brand" style={{ width: `${completion}%` }} /></span></td>
                     <td>{row.late}</td><td>{row.missing}</td><td>{show(row.averageScore)}</td><td className="capitalize">{row.aiCall ?? "—"}</td><td>{show(row.agreement, "%")}</td>
                   </tr>;
                 })}</tbody>

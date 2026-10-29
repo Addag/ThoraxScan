@@ -28,7 +28,7 @@ export default async function ProfessorPage() {
 
   return (
     <ProfessorShell>
-      <PageMain bottom="pb-[60px]">
+      <PageMain>
         <PageHeading title="Home" subtitle={`Welcome back, ${profile.display_name}!`} />
 
         <StatGrid>
@@ -38,25 +38,25 @@ export default async function ProfessorPage() {
           <StatCard symbol="＋" value={activities.data.length} label="Activities" detail={`${activities.data.filter((activity) => activity.status === "published").length} published · ${activities.data.filter((activity) => activity.status === "draft").length} drafts`} />
         </StatGrid>
 
-        <Link className={activitiesCtaClass} href="/professor/activities">
-          <span className="grid gap-1"><strong>Manage activities</strong><small className="text-[0.6875rem] text-[#9fcfff] light:text-(--brand-blue-text)">Author, publish, and archive case-backed assignments</small></span>
-          <span className="text-[1.5rem] text-[#70bdff] light:text-(--brand-blue-text)" aria-hidden="true">→</span>
+        <Link className={`${activitiesCtaClass} mt-5`} href="/professor/activities">
+          <span className="grid gap-1"><strong>Manage activities</strong><small className="text-[0.6875rem] text-(--brand-blue-text)">Author, publish, and archive case-backed assignments</small></span>
+          <span className="text-[1.5rem] text-(--brand-blue-text)" aria-hidden="true">→</span>
         </Link>
 
-        <section className="mt-[22px] grid grid-cols-2 gap-[18px] max-[1000px]:grid-cols-1" aria-label="Workspace actions">
-          <article className="rounded-[10px] border border-(--border-shell) [background:var(--glass-surface)] p-[22px] backdrop-blur-[18px] backdrop-saturate-[135%] shadow-(--glass-shadow)">
+        <section className="mt-6 grid grid-cols-2 gap-[18px] max-[1000px]:grid-cols-1" aria-label="Workspace actions">
+          <article className="rounded-panel border border-(--border-shell) [background:var(--glass-surface)] p-6 backdrop-blur-[18px] backdrop-saturate-[135%] shadow-(--glass-shadow)">
             <p className={sectionKickerClass}>New class space</p>
             <h2 className="m-0 mb-[18px] text-[1.1875rem]">Create a workspace</h2>
             <CreateWorkspaceForm />
           </article>
-          <article className="rounded-[10px] border border-(--border-shell) [background:var(--glass-surface)] p-[22px] backdrop-blur-[18px] backdrop-saturate-[135%] shadow-(--glass-shadow)">
+          <article className="rounded-panel border border-(--border-shell) [background:var(--glass-surface)] p-6 backdrop-blur-[18px] backdrop-saturate-[135%] shadow-(--glass-shadow)">
             <p className={sectionKickerClass}>Teaching access</p>
             <h2 className="m-0 mb-[18px] text-[1.1875rem]">Join as co-professor</h2>
             <ProfessorRedeemForm />
           </article>
         </section>
 
-        <section className="mt-[22px] rounded-[10px] border border-(--border-shell) [background:var(--glass-surface)] p-[24px_28px_28px] backdrop-blur-[18px] backdrop-saturate-[135%] shadow-(--glass-shadow) max-[600px]:p-5" aria-labelledby="professor-workspaces-title">
+        <section className="mt-6 rounded-panel border border-(--border-shell) [background:var(--glass-surface)] p-6 backdrop-blur-[18px] backdrop-saturate-[135%] shadow-(--glass-shadow) max-[600px]:p-5" aria-labelledby="professor-workspaces-title">
           <SectionHeading kicker="Class management" title="Teaching workspaces" titleId="professor-workspaces-title" aside={<span className={countBadgeClass}>{workspaces.data.length} total</span>} />
 
           {workspaces.error ? (

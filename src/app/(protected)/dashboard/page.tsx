@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 
 import { logoutAction } from "@/app/(protected)/actions";
-import { primaryButton } from "@/components/primary-button";
+import { button } from "@/components/controls";
 import { getCurrentProfile } from "@/lib/auth/server";
 import { authEyebrowClass } from "@/components/field-error";
 
@@ -20,7 +20,7 @@ export default async function DashboardPage() {
           <h1 className="mx-0 mt-2.5 mb-[22px] text-[clamp(2rem,5vw,3.25rem)] leading-[1.05]">Profile setup failed</h1>
           <p className="leading-[1.6] text-(--text-secondary)">{result.error}</p>
           <form action={logoutAction}>
-            <button className={`${primaryButton} mt-[18px] min-h-12 min-w-[150px]`} type="submit">
+            <button className={`${button("primary", "lg")} mt-[18px] min-w-[150px]`} type="submit">
               Log out
             </button>
           </form>

@@ -39,7 +39,7 @@ export function AuthLayout({
   messageStatus?: "success" | "error";
 }) {
   const copy = authCopy[mode];
-  const cardClass = `w-[min(551px,100%)] border border-[rgb(177_208_255/32%)] rounded-[22px] [background:var(--glass-surface)] backdrop-blur-[24px] backdrop-saturate-[140%] shadow-(--glass-shadow) px-[38px] pt-[31px] pb-10 narrow:px-6 narrow:pt-[30px] narrow:pb-9 max-[420px]:px-[18px] ${mode === "register" ? "w-[min(547px,100%)]" : ""} not-supports-[backdrop-filter:blur(6px)]:bg-[rgba(8,18,61,0.94)]`;
+  const cardClass = `w-[min(551px,100%)] border border-[rgb(177_208_255/32%)] rounded-[22px] [background:var(--glass-surface)] backdrop-blur-[24px] backdrop-saturate-[140%] shadow-(--glass-shadow) px-[38px] pt-[31px] pb-10 narrow:px-6 narrow:pt-[30px] narrow:pb-9 max-[420px]:px-[18px] not-supports-[backdrop-filter:blur(6px)]:bg-[rgba(8,18,61,0.94)]`;
   const statusClass = messageStatus === "error" ? "border-[#8b2929] bg-[rgba(160,32,32,0.2)] text-[#ffb4b4]" : "border-[#17643a] bg-[rgba(33,135,78,0.2)] text-[#b8f3ce]";
 
   return (
@@ -49,7 +49,7 @@ export function AuthLayout({
         <Brand variant="auth" />
 
         <div className="absolute top-[194px] left-1/2 w-[min(610px,85%)] [transform:translateX(-50%)] narrow:static narrow:w-full narrow:[transform:none]">
-          <h1 className="m-0 font-(--font-inter) text-[48px] font-extrabold tracking-[-1.5px] leading-[1.2] max-[1200px]:text-[clamp(38px,4vw,48px)] narrow:text-[clamp(36px,10vw,48px)] narrow:leading-[1.12]">
+          <h1 className="m-0 font-brand text-[48px] font-extrabold tracking-[-1.5px] leading-[1.2] max-[1200px]:text-[clamp(38px,4vw,48px)] narrow:text-[clamp(36px,10vw,48px)] narrow:leading-[1.12]">
             AI-Assisted <span className="text-brand">Chest X-Ray</span> Learning Platform
           </h1>
           <p className="w-[340px] mt-7 mb-0 ml-[-5px] text-[16px] font-semibold leading-[1.25] text-[#d6e1f0] narrow:w-[min(100%,390px)] narrow:mt-6 narrow:ml-0">
@@ -70,7 +70,7 @@ export function AuthLayout({
         </div>
       </section>
 
-      <section className="flex items-start justify-center bg-transparent px-6 pt-[140px] pb-20 narrow:px-[18px] narrow:pt-0 narrow:pb-12" aria-labelledby={`${mode}-title`}>
+      <section className="flex items-start justify-center bg-transparent px-6 pt-[clamp(24px,calc(100svh_-_860px),140px)] pb-20 narrow:px-[18px] narrow:pt-0 narrow:pb-12" aria-labelledby={`${mode}-title`}>
         <div className={cardClass}>
           <h2 className="m-0 text-[32px] font-extrabold leading-[1.25]" id={`${mode}-title`}>{copy.title}</h2>
           <p className="mt-px mb-[31px] text-[13px] leading-[1.5] text-[#d6e1f0]">{copy.subtitle}</p>
