@@ -46,5 +46,28 @@ python model-export/export_fastvit.py `
 npm run model:validate -- --bundle "model-input/<release-id>"
 ```
 
+## Per-finding class activation maps (contract V3)
+
+`export_squeezevit_cam.py` exports a SqueezeViT checkpoint with unchanged logits
+and `class_activation`, float32[batch,14,14,14]: the `fc` weights for each label
+applied to the 256×14×14 `head_conv` features (exact CAM, because the head is a
+plain average pool), negative values clipped and each label scaled to its own
+maximum. `export_squeezevit.py` is left unchanged so V2 exporter evidence still
+matches. Copy the synthetic fixtures, thresholds and preprocessing reference from
+the source bundle; the exporter writes `fixtures/expected-class-activation.json`
+and `export-validation.json`.
+
+```powershell
+python model-export/export_squeezevit_cam.py `
+  --checkpoint "<training-directory>/Official_retrain_v5_squeezevit_kd/checkpoints/squeezevit_v5_best.pth" `
+  --output "model-input/<release-id>/model.onnx" `
+  --fixture-input "model-input/<release-id>/fixtures/model-input.f32" `
+  --baseline-logits "model-input/<release-id>/fixtures/expected-logits.json"
+npm run model:validate -- --bundle "model-input/<release-id>"
+```
+
+`test_cam.py` checks the CAM identity (`mean(raw map) + bias = logits`) and the
+normalization.
+
 Never commit checkpoints, patient images or generated artifacts.
 See [release operations](../docs/model-releases.md) for authorization and rollback.

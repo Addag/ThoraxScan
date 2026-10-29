@@ -43,3 +43,26 @@ describe("attention display", () => {
     expect(row.every((value, index) => index === 0 || value >= row[index - 1])).toBe(true);
   });
 });
+
+import { CLASS_ACTIVATION_DESCRIPTOR } from "./contract";
+import { labelActivation, readyClassActivation } from "./attention";
+it("parses V3 evidence and rejects a changed descriptor", () => {
+ const base = createTestManifest();
+ const v3 = { ...base, schemaVersion: 3, classActivation: CLASS_ACTIVATION_DESCRIPTOR, validation: { ...base.validation, expectedClassActivationSha256: "a".repeat(64), maxAbsoluteClassActivationError: 0, webGpuMaxAbsoluteClassActivationDifference: null } };
+ expect(parseModelManifest(v3).schemaVersion).toBe(3);
+ expect(() => parseModelManifest({ ...v3, classActivation: { ...v3.classActivation, grid: { width: 7, height: 7 } } })).toThrow();
+ expect(() => parseModelManifest({ ...v3, validation: { ...v3.validation, maxAbsoluteClassActivationError: 0.01 } })).toThrow();
+ expect(() => parseModelManifest({ ...v3, schemaVersion: 4 })).toThrow();
+});
+it("accepts 14 per-label 14x14 maps and slices one label", () => {
+  const values = Array.from({ length: 2744 }, (_, index) => Math.floor(index / 196) / 13);
+  const result = readyClassActivation(values);
+  expect(result).toMatchObject({ status: "ready", kind: "per-label" });
+  expect(labelActivation(values, 13)).toEqual(Array(196).fill(1));
+  expect(() => readyClassActivation(values.slice(1))).toThrowError(InferenceError);
+});
+it("upsamples a 14 grid", () => {
+  const smooth = upsampleAttention(Array.from({ length: 196 }, (_, index) => index / 195), 112, 14);
+  expect(smooth[0]).toBe(0);
+  expect(smooth.at(-1)).toBe(1);
+});

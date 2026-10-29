@@ -32,7 +32,7 @@ Consumes [Active model slot](active-model-slot.md), [Model manifest and configur
 
 ### Does not hit
 
-- Server-side image inference, direct analysis-table mutation, or submissions; the browser result, including an optional V2 attention map, crosses the application write boundary only through the activity analysis adapter.
+- Server-side image inference, direct analysis-table mutation, or submissions; the browser result, including an optional V2 or V3 heatmap, crosses the application write boundary only through the activity analysis adapter.
 
 ## Surfaces
 

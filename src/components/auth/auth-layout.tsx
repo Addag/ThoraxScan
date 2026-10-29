@@ -53,7 +53,7 @@ export function AuthLayout({
             AI-Assisted <span className="text-brand">Chest X-Ray</span> Learning Platform
           </h1>
           <p className="w-[340px] mt-7 mb-0 ml-[-5px] text-[16px] font-semibold leading-[1.25] text-[#d6e1f0] narrow:w-[min(100%,390px)] narrow:mt-6 narrow:ml-0">
-            ThoraxScan is an educational LMS for Radiologic Technology students. Practice chest X-ray interpretation through professor-guided activities, with AI-powered Attention Heatmap feedback after submission.
+            ThoraxScan is an educational LMS for Radiologic Technology students. Practice chest X-ray interpretation through professor-guided activities, with AI-powered finding heatmaps after submission.
           </p>
         </div>
 

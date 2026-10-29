@@ -9,6 +9,8 @@ import sharp from "sharp";
 import { Upload } from "tus-js-client";
 
 import {
+  ATTENTION_DESCRIPTOR,
+  CLASS_ACTIVATION_DESCRIPTOR,
   MODEL_BUCKET,
   MODEL_MAX_BYTES,
   THORAXSCAN_LABELS,
@@ -192,12 +194,22 @@ function assertOnnxEnvelope(model: Buffer) {
   }
 }
 
-function validateOutputs(outputs: Record<string, { type: string; dims: readonly number[]; data: unknown }>, v2: boolean) {
-  for (const [name, shape, length] of (v2 ? [["logits", "1,14", 14], ["attention_map", "1,1,7,7", 49]] : [["logits", "1,14", 14]]) as [string, string, number][]) {
+// The heatmap output each contract version carries: V2 global attention, V3 per-label class activation.
+interface HeatmapOutput { name: "attention_map" | "class_activation"; dims: string; length: number }
+const HEATMAP_OUTPUTS = {
+  2: { name: "attention_map", dims: "1,1,7,7", length: 49 },
+  3: { name: "class_activation", dims: "1,14,14,14", length: 14 * 14 * 14 },
+} as const satisfies Record<number, HeatmapOutput>;
+function heatmapOutput(schemaVersion: number): HeatmapOutput | null {
+  return schemaVersion === 2 || schemaVersion === 3 ? HEATMAP_OUTPUTS[schemaVersion] : null;
+}
+
+function validateOutputs(outputs: Record<string, { type: string; dims: readonly number[]; data: unknown }>, heatmap: HeatmapOutput | null) {
+  for (const [name, shape, length] of [["logits", "1,14", 14], ...(heatmap ? [[heatmap.name, heatmap.dims, heatmap.length]] : [])] as [string, string, number][]) {
     const output = outputs[name];
     if (!output || output.type !== "float32" || output.dims.join(",") !== shape) throw new Error(`Invalid ${name} tensor.`);
     const values = Array.from(output.data as ArrayLike<number>);
-    if (values.length !== length || values.some(v => !Number.isFinite(v) || (name === "attention_map" && (v < 0 || v > 1)))) throw new Error(`Invalid ${name} values.`);
+    if (values.length !== length || values.some(v => !Number.isFinite(v) || (name !== "logits" && (v < 0 || v > 1)))) throw new Error(`Invalid ${name} values.`);
   }
 }
 
@@ -206,7 +218,7 @@ async function validateOnnx(
   modelInput: Float32Array,
   expectedLogits: number[],
   expectedProbabilities: number[],
-  expectedAttention: number[] | null,
+  heatmap: (HeatmapOutput & { expected: number[] }) | null,
 ) {
   assertOnnxEnvelope(model);
   const ort = await import("onnxruntime-web");
@@ -215,27 +227,24 @@ async function validateOnnx(
     if (session.inputNames.length !== 1 || session.inputNames[0] !== "input") {
       throw new Error("The ONNX model must expose only the input tensor named input.");
     }
-    if (session.outputNames.length !== (expectedAttention ? 2 : 1) || session.outputNames[0] !== "logits" || (session.outputNames.length === 2 && session.outputNames[1] !== "attention_map")) {
-      throw new Error("The ONNX output names do not match the V1/V2 bundle evidence.");
+    if (session.outputNames.join(",") !== ["logits", ...(heatmap ? [heatmap.name] : [])].join(",")) {
+      throw new Error("The ONNX output names do not match the V1/V2/V3 bundle evidence.");
     }
     const tensor = new ort.Tensor("float32", modelInput, [1, 1, 224, 224]);
     const outputs = await session.run({ input: tensor }, session.outputNames);
-    validateOutputs(outputs, Boolean(expectedAttention));
+    validateOutputs(outputs, heatmap);
     const logits = Array.from(outputs.logits.data as ArrayLike<number>);
     if (logits.length !== THORAXSCAN_LABELS.length || logits.some((value) => !Number.isFinite(value))) {
       throw new Error("The ONNX model did not return 14 finite logits.");
     }
 
     let attentionParity = { maxAbsolute: 0 };
-    if (session.outputNames.length === 2) {
-      const attention = outputs.attention_map;
-      if (!attention || attention.dims.join(",") !== "1,1,7,7" || Array.from(attention.data as ArrayLike<number>).some((value) => !Number.isFinite(value) || value < 0 || value > 1)) {
-        throw new Error("The ONNX attention_map must be [1,1,7,7] with normalized finite values.");
-      }
+    if (heatmap) {
+      const attention = outputs[heatmap.name];
       const repeated = await session.run({ input: tensor }, session.outputNames);
-      if (Array.from(repeated.attention_map.data as ArrayLike<number>).some((value, index) => value !== (attention.data as ArrayLike<number>)[index])) throw new Error("Attention is not deterministic.");
-      attentionParity = compare(Array.from(attention.data as ArrayLike<number>), expectedAttention ?? []);
-      if (attentionParity.maxAbsolute > MAX_ABSOLUTE_ATTENTION_ERROR) throw new Error(`Attention fixture parity failed: abs=${attentionParity.maxAbsolute}.`);
+      if (Array.from(repeated[heatmap.name].data as ArrayLike<number>).some((value, index) => value !== (attention.data as ArrayLike<number>)[index])) throw new Error(`${heatmap.name} is not deterministic.`);
+      attentionParity = compare(Array.from(attention.data as ArrayLike<number>), heatmap.expected);
+      if (attentionParity.maxAbsolute > MAX_ABSOLUTE_ATTENTION_ERROR) throw new Error(`${heatmap.name} fixture parity failed: abs=${attentionParity.maxAbsolute}.`);
     }
     const logitError = compare(logits, expectedLogits);
     const probabilities = logits.map(sigmoid);
@@ -265,7 +274,7 @@ async function validateBrowserProviders(
   model: Buffer,
   modelInput: Float32Array,
   expectedLogits: number[],
-  expectedAttention: number[] | null,
+  heatmap: (HeatmapOutput & { expected: number[] }) | null,
 ) {
   const { chromium } = await import("playwright");
   const ortDistribution = resolve("node_modules/onnxruntime-web/dist");
@@ -321,7 +330,7 @@ async function validateBrowserProviders(
     await page.addScriptTag({ content: "globalThis.__name = (target) => target;" });
     await page.addScriptTag({ path: resolve(ortDistribution, "ort.webgpu.min.js") });
     const result = await page.evaluate(
-      async ({ wasmBaseUrl, inputValues, referenceLogits, expectedAttention }) => {
+      async ({ wasmBaseUrl, inputValues, referenceLogits, heatmap }) => {
         const browserWindow = window as typeof window & {
           ort: {
             env: { wasm: { wasmPaths: string; numThreads: number } };
@@ -362,9 +371,12 @@ async function validateBrowserProviders(
             );
             const outputs = await session.run({ input: tensor });
             const logits = outputs.logits;
-            const attention = outputs.attention_map;
+            const attention = heatmap ? outputs[heatmap.name] : undefined;
             if (!logits || logits.type !== "float32" || logits.dims.join(",") !== "1,14" || Array.from(logits.data).some(v => !Number.isFinite(v))) throw new Error("Invalid provider logits.");
-            if (expectedAttention && (!attention || attention.type !== "float32" || attention.dims.join(",") !== "1,1,7,7" || attention.data.length !== 49 || Array.from(attention.data).some(v => !Number.isFinite(v) || v < 0 || v > 1))) throw new Error("Invalid provider attention.");
+            if (heatmap && (!attention || attention.type !== "float32" || attention.dims.join(",") !== heatmap.dims || attention.data.length !== heatmap.length || Array.from(attention.data).some(v => !Number.isFinite(v) || v < 0 || v > 1))) {
+              const values = Array.from(attention?.data ?? []);
+              throw new Error(`Invalid provider heatmap (${attention?.type} [${attention?.dims.join(",")}], min ${Math.min(...values)}, max ${Math.max(...values)}, non-finite ${values.filter(v => !Number.isFinite(v)).length}).`);
+            }
             return { logits: Array.from(logits.data), attention: Array.from(attention?.data ?? []) };
           } finally {
             await session.release();
@@ -378,11 +390,8 @@ async function validateBrowserProviders(
         if (wasmError.maxAbsolute > 1e-4 || wasmError.maxRelative > 1e-3) {
           throw new Error("Browser WASM did not satisfy reference parity.");
         }
-        if (expectedAttention && (wasm.attention.length !== 49 || wasm.attention.some((value) => !Number.isFinite(value) || value < 0 || value > 1))) {
-          throw new Error("Browser WASM returned invalid attention.");
-        }
-        const wasmAttentionError = expectedAttention ? compareOutputs(wasm.attention, expectedAttention).maxAbsolute : 0;
-        if (wasmAttentionError > 1e-4) throw new Error("Browser WASM attention did not satisfy fixture parity.");
+        const wasmAttentionError = heatmap ? compareOutputs(wasm.attention, heatmap.expected).maxAbsolute : 0;
+        if (wasmAttentionError > 1e-4) throw new Error("Browser WASM heatmap did not satisfy fixture parity.");
         const disabled = (reason: string) => {
           console.warn(`WebGPU disabled: ${reason}`);
           return { webGpuEnabled: false, webGpuMaxAbsoluteDifference: null, webGpuMaxAbsoluteAttentionDifference: null };
@@ -393,7 +402,7 @@ async function validateBrowserProviders(
         try {
           const webGpu = await run("webgpu");
           const providerDifference = compareOutputs(webGpu.logits, wasm.logits).maxAbsolute;
-          const attentionDifference = expectedAttention ? compareOutputs(webGpu.attention, wasm.attention).maxAbsolute : null;
+          const attentionDifference = heatmap ? compareOutputs(webGpu.attention, wasm.attention).maxAbsolute : null;
           return providerDifference <= 1e-3
             && (attentionDifference === null || attentionDifference <= 1e-3)
             ? { webGpuEnabled: true, webGpuMaxAbsoluteDifference: providerDifference, webGpuMaxAbsoluteAttentionDifference: attentionDifference }
@@ -406,7 +415,7 @@ async function validateBrowserProviders(
         wasmBaseUrl: baseUrl,
         inputValues: Array.from(modelInput),
         referenceLogits: expectedLogits,
-        expectedAttention,
+        heatmap,
       },
     );
     return result;
@@ -430,6 +439,7 @@ async function validateBundle(directoryOption: string): Promise<ValidatedBundle>
     expectedLogits: resolve(directory, "fixtures", "expected-logits.json"),
     expectedProbabilities: resolve(directory, "fixtures", "expected-probabilities.json"),
     expectedAttention: resolve(directory, "fixtures", "expected-attention.json"),
+    expectedClassActivation: resolve(directory, "fixtures", "expected-class-activation.json"),
   };
 
   const directoryFiles = await readdir(directory);
@@ -448,6 +458,7 @@ async function validateBundle(directoryOption: string): Promise<ValidatedBundle>
     expectedLogitsValue,
     expectedProbabilitiesValue,
     expectedAttentionValue,
+    expectedClassActivationValue,
     possibleThresholdsValue,
   ] = await Promise.all([
     readFile(paths.model),
@@ -460,6 +471,7 @@ async function validateBundle(directoryOption: string): Promise<ValidatedBundle>
     readFile(paths.expectedLogits),
     readFile(paths.expectedProbabilities),
     readFile(paths.expectedAttention).catch((error: NodeJS.ErrnoException) => { if (error.code === "ENOENT") return null; throw error; }),
+    readFile(paths.expectedClassActivation).catch((error: NodeJS.ErrnoException) => { if (error.code === "ENOENT") return null; throw error; }),
     readFile(paths.possibleThresholds).catch((error: NodeJS.ErrnoException) => { if (error.code === "ENOENT") return null; throw error; }),
   ]);
 
@@ -486,18 +498,27 @@ async function validateBundle(directoryOption: string): Promise<ValidatedBundle>
     "expected-probabilities.json",
     THORAXSCAN_LABELS.length,
   );
-  const expectedAttention = expectedAttentionValue ? numberArray(jsonBuffer(expectedAttentionValue, paths.expectedAttention), "expected-attention.json", 49) : null;
+  // The fixture present decides the contract: expected-class-activation.json is V3, expected-attention.json V2, neither V1.
+  if (expectedAttentionValue && expectedClassActivationValue) throw new Error("A bundle may carry attention or class activation fixtures, not both.");
+  const schemaVersion = expectedClassActivationValue ? 3 : expectedAttentionValue ? 2 : 1;
+  const heatmapValue = expectedClassActivationValue ?? expectedAttentionValue;
+  const heatmapFile = expectedClassActivationValue ? "expected-class-activation.json" : "expected-attention.json";
+  const heatmapDescriptor = heatmapOutput(schemaVersion);
+  const heatmap = heatmapDescriptor && heatmapValue
+    ? { ...heatmapDescriptor, expected: numberArray(jsonBuffer(heatmapValue, resolve(directory, "fixtures", heatmapFile)), heatmapFile, heatmapDescriptor.length) }
+    : null;
 
-  if (expectedAttention?.some(value => value < 0 || value > 1)) throw new Error("Invalid attention fixture range.");
-  if (expectedAttention) {
+  if (heatmap?.expected.some(value => value < 0 || value > 1)) throw new Error("Invalid heatmap fixture range.");
+  if (heatmap) {
     const evidence = await jsonFile(resolve(directory, "export-validation.json")) as Record<string, unknown>;
+    const fixtureEvidence = schemaVersion === 3 ? evidence.classActivationFixtureSha256 : evidence.attentionFixtureSha256;
     if (evidence.onnxCheckerPassed !== true || evidence.deterministic !== true ||
         evidence.checkpointSha256 !== release.checkpoint.sha256 ||
         evidence.modelSha256 !== sha256(model) ||
-        evidence.attentionFixtureSha256 !== sha256(expectedAttentionValue!) ||
+        fixtureEvidence !== sha256(heatmapValue!) ||
         typeof evidence.maxAbsoluteLogitError !== "number" || !Number.isFinite(evidence.maxAbsoluteLogitError) || evidence.maxAbsoluteLogitError > MAX_ABSOLUTE_LOGIT_ERROR ||
         typeof evidence.maxRelativeLogitError !== "number" || !Number.isFinite(evidence.maxRelativeLogitError) || evidence.maxRelativeLogitError > MAX_RELATIVE_LOGIT_ERROR) {
-      throw new Error("V2 requires matching successful export, checker, and deterministic fixture evidence.");
+      throw new Error(`V${schemaVersion} requires matching successful export, checker, and deterministic fixture evidence.`);
     }
   }
   const metadata = await sharp(preprocessingInput).metadata();
@@ -533,12 +554,13 @@ async function validateBundle(directoryOption: string): Promise<ValidatedBundle>
     throw new Error("Browser-contract preprocessing does not match expected-tensor.f32.");
   }
 
-  const parity = await validateOnnx(model, modelInput, expectedLogits, expectedProbabilities, expectedAttention);
-  const browserProviders = await validateBrowserProviders(model, modelInput, expectedLogits, expectedAttention);
+  const parity = await validateOnnx(model, modelInput, expectedLogits, expectedProbabilities, heatmap);
+  const { webGpuMaxAbsoluteAttentionDifference: webGpuHeatmapDifference, ...browserProviders } = await validateBrowserProviders(model, modelInput, expectedLogits, heatmap);
+  const { maxAbsoluteAttentionError: heatmapError, ...logitParity } = parity;
   const modelSha256 = sha256(model);
   const modelPath = modelPathForSha256(modelSha256);
   const manifest = parseModelManifest({
-    schemaVersion: expectedAttention ? 2 : 1,
+    schemaVersion,
     release: {
       id: release.releaseId,
       modelFamily: release.modelFamily,
@@ -557,7 +579,8 @@ async function validateBundle(directoryOption: string): Promise<ValidatedBundle>
     },
     input: { name: "input", dtype: "float32", shape: ["batch", 1, 224, 224] },
     output: { name: "logits", dtype: "float32", shape: ["batch", 14] },
-    ...(expectedAttention ? { attention: { output: { name: "attention_map", dtype: "float32", shape: ["batch", 1, 7, 7] }, attribution: "global-self-attention", aggregation: "attention-rollout-mean-query-v1", normalization: "per-image-min-max-v1", grid: { width: 7, height: 7 } } } : {}),
+    ...(schemaVersion === 2 ? { attention: ATTENTION_DESCRIPTOR } : {}),
+    ...(schemaVersion === 3 ? { classActivation: CLASS_ACTIVATION_DESCRIPTOR } : {}),
     preprocessing: {
       colorSpace: "grayscale",
       colorConversion: "rec601-luma",
@@ -582,9 +605,10 @@ async function validateBundle(directoryOption: string): Promise<ValidatedBundle>
       expectedLogitsSha256: sha256(expectedLogitsValue),
       expectedProbabilitiesSha256: sha256(expectedProbabilitiesValue),
       preprocessingReferenceSha256: sha256(preprocessingReference),
-      ...parity,
+      ...logitParity,
       ...browserProviders,
-      ...(expectedAttention ? { expectedAttentionSha256: sha256(expectedAttentionValue!), maxAbsoluteAttentionError: parity.maxAbsoluteAttentionError ?? 0, webGpuMaxAbsoluteAttentionDifference: browserProviders.webGpuMaxAbsoluteAttentionDifference } : {}),
+      ...(schemaVersion === 2 ? { expectedAttentionSha256: sha256(heatmapValue!), maxAbsoluteAttentionError: heatmapError, webGpuMaxAbsoluteAttentionDifference: webGpuHeatmapDifference } : {}),
+      ...(schemaVersion === 3 ? { expectedClassActivationSha256: sha256(heatmapValue!), maxAbsoluteClassActivationError: heatmapError, webGpuMaxAbsoluteClassActivationDifference: webGpuHeatmapDifference } : {}),
     },
   });
   const manifestJson = canonicalJson(manifest);
@@ -722,8 +746,9 @@ async function smokeRemoteModel(manifest: ModelManifest) {
   const session = await ort.InferenceSession.create(model, { executionProviders: ["wasm"] });
   try {
     const tensor = new ort.Tensor("float32", new Float32Array(FLOAT_COUNT), [1, 1, 224, 224]);
-    const outputs = await session.run({ input: tensor }, manifest.schemaVersion === 2 ? ["logits", "attention_map"] : ["logits"]);
-    validateOutputs(outputs, manifest.schemaVersion === 2);
+    const heatmap = heatmapOutput(manifest.schemaVersion);
+    const outputs = await session.run({ input: tensor }, ["logits", ...(heatmap ? [heatmap.name] : [])]);
+    validateOutputs(outputs, heatmap);
     const logits = Array.from(outputs.logits.data as ArrayLike<number>);
     if (logits.length !== 14 || logits.some((value) => !Number.isFinite(value))) {
       throw new Error("Remote model smoke inference returned invalid logits.");
@@ -779,7 +804,7 @@ async function smokeBrowserModel(manifest: ModelManifest) {
     await page.addScriptTag({ content: "globalThis.__name = (target) => target;" });
     await page.addScriptTag({ path: resolve(ortDistribution, "ort.min.js") });
     const result = await page.evaluate(
-      async ({ artifactUrl, wasmBaseUrl, v2 }) => {
+      async ({ artifactUrl, wasmBaseUrl, heatmap }) => {
         const browserWindow = window as typeof window & {
           ort: {
             env: { wasm: { wasmPaths: string; numThreads: number } };
@@ -814,9 +839,9 @@ async function smokeBrowserModel(manifest: ModelManifest) {
             [1, 1, 224, 224],
           );
           const outputs = await session.run({ input });
-          if (v2) {
-            const attention = outputs.attention_map;
-            if (!attention || attention.type !== "float32" || attention.dims.join(",") !== "1,1,7,7" || attention.data.length !== 49 || Array.from(attention.data).some(v => !Number.isFinite(v) || v < 0 || v > 1)) throw new Error("Invalid remote browser attention.");
+          if (heatmap) {
+            const attention = outputs[heatmap.name];
+            if (!attention || attention.type !== "float32" || attention.dims.join(",") !== heatmap.dims || attention.data.length !== heatmap.length || Array.from(attention.data).some(v => !Number.isFinite(v) || v < 0 || v > 1)) throw new Error("Invalid remote browser heatmap.");
           }
           const logits = Array.from(outputs.logits?.data ?? []);
           return { count: logits.length, finite: logits.every(Number.isFinite) };
@@ -825,7 +850,7 @@ async function smokeBrowserModel(manifest: ModelManifest) {
         }
       },
       {
-        v2: manifest.schemaVersion === 2,
+        heatmap: heatmapOutput(manifest.schemaVersion),
         artifactUrl: publicArtifactUrl(
           process.env.MODEL_REGISTRY_SUPABASE_URL!,
           manifest.artifact.path,

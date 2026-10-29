@@ -46,7 +46,7 @@ This is a source-backed map of the ThoraxScan application repository one level a
 - Professor application status gates Professor workspace access; it does not replace the Professor profile role.
 - Role workspace surface covers the live Student and Professor workspace/activity routes; Workspace means the professor-owned tenant shared by both roles.
 - X-ray case means the live private activity object/audit row. X-ray sample means the unrelated static public presentation image. Built-in X-ray library means the bundled CheXpert gallery; Learning Mode keeps a selection in browser memory, while Professor activity authoring uploads a selection through the normal signed case flow.
-- Attention Heatmap is live for validated V2 releases: transient in Learning Mode, persisted and authorization-gated for activities. V1 remains unavailable. See [attention heatmap](objects/inference/attention-heatmap.md).
+- Attention Heatmap covers V2 global attention rollout (legacy) and V3 per-finding class activation maps ("finding heatmaps"), both stored in `ai_analyses.attention_map` and told apart by `attention_method`: transient in Learning Mode, persisted and authorization-gated for activities. V1 remains unavailable. See [attention heatmap](objects/inference/attention-heatmap.md).
 - Browser inference runtime is consumed by Student Learning Mode and the activity analysis boundary; Learning Mode results remain transient while activity results persist only through the authorized analysis RPC.
 
 ## Source rule

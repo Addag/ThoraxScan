@@ -1,4 +1,4 @@
-import { ATTENTION_DESCRIPTOR } from "./contract";
+import { ATTENTION_DESCRIPTOR, CLASS_ACTIVATION_DESCRIPTOR } from "./contract";
 import type { ActiveModelRelease } from "./contract";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -220,5 +220,32 @@ describe("V2 inference outputs", () => {
     ortMocks.run.mockResolvedValue(output());
     const result = await runModelInference(release,new Float32Array(224*224));
     expect(result.provider).toBe("wasm"); expect(result.attention.status).toBe("ready");
+  });
+});
+
+describe("V3 inference outputs", () => {
+  afterEach(() => { resetInferenceCachesForTests(); vi.unstubAllGlobals(); });
+  async function setup() {
+    const bytes = new Uint8Array([1, 7, 9]);
+    const release: ActiveModelRelease = await releaseFor(bytes);
+    release.manifest = { ...release.manifest, schemaVersion: 3, classActivation: CLASS_ACTIVATION_DESCRIPTOR,
+      validation: { ...release.manifest.validation, expectedClassActivationSha256: "a".repeat(64), maxAbsoluteClassActivationError: 0, webGpuMaxAbsoluteClassActivationDifference: null } };
+    vi.stubGlobal("fetch", vi.fn(async () => new Response(bytes)));
+    ortMocks.create.mockImplementation(async () => ({ run: ortMocks.run, release: ortMocks.release }));
+    return release;
+  }
+  const output = () => ({ logits: { type: "float32", dims: [1,14], size: 14, data: new Float32Array(14) }, class_activation: { type: "float32", dims: [1,14,14,14], size: 2744, data: new Float32Array(2744).fill(0.5) } });
+  it("fetches logits and per-label maps", async () => {
+    const release = await setup(); ortMocks.run.mockResolvedValue(output());
+    const result = await runModelInference(release, new Float32Array(224*224), true);
+    expect(ortMocks.run).toHaveBeenLastCalledWith(expect.anything(), ["logits", "class_activation"]);
+    expect(result.attention).toMatchObject({ status: "ready", kind: "per-label", width: 14, height: 14 });
+  });
+  it.each(["shape", "range", "missing"])("fails safely for invalid class activation %s", async kind => {
+    const release = await setup(); const outputs = output();
+    if (kind === "shape") outputs.class_activation.dims = [1,14,196];
+    if (kind === "range") outputs.class_activation.data[0] = -0.1;
+    ortMocks.run.mockResolvedValue(kind === "missing" ? { logits: outputs.logits } : outputs);
+    await expect(runModelInference(release,new Float32Array(224*224),true)).rejects.toMatchObject({ code: "INVALID_OUTPUT" });
   });
 });

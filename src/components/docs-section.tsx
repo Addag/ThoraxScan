@@ -62,8 +62,8 @@ const userTopics: Topic[] = [
     gist: "AI feedback after you submit, then your professor's evaluation.",
     body: (
       <ul className={bullets}>
-        <li><b>AI feedback</b> appears only after your final submission. It lists likely findings, possible findings (often false alarms), every label the model scores, and the attention heatmap.</li>
-        <li>The heatmap shows where the model&rsquo;s attention was concentrated. It doesn&rsquo;t mark a lesion or confirm a diagnosis.</li>
+        <li><b>AI feedback</b> appears only after your final submission. It lists likely findings, possible findings (often false alarms), every label the model scores, and a heatmap for each finding.</li>
+        <li>Pick a finding under the image to see where the model found the evidence for it. The heatmap doesn&rsquo;t outline a lesion or confirm a diagnosis.</li>
         <li><b>Faculty evaluation</b> shows your score and feedback once your professor releases it. Until then the activity shows as awaiting review.</li>
       </ul>
     ),
@@ -77,7 +77,7 @@ const userTopics: Topic[] = [
       <ol className={steps}>
         <li>Open <b>Learning mode</b> from the sidebar (Students and Professors).</li>
         <li>Pick an image from the built-in CheXpert library, or choose your own JPEG or PNG.</li>
-        <li>Select <b>Analyze</b>. The model runs in your browser and shows findings, every label, and the attention heatmap.</li>
+        <li>Select <b>Analyze</b>. The model runs in your browser and shows findings, every label, and a heatmap for each likely or possible finding.</li>
         <li>Nothing is saved: no submission, no upload, no stored result. <b>Reset</b> clears it.</li>
       </ol>
     ),
@@ -151,7 +151,7 @@ const devTopics: Topic[] = [
           <tr><td>src/lib</td><td>Server data access, validation, analytics, and the in-browser inference runtime</td></tr>
           <tr><td>supabase</td><td>SQL migrations, pgTAP database tests and email templates</td></tr>
           <tr><td>scripts</td><td>Model-release CLI, ONNX Runtime asset prep, CheXpert library import, guide rendering</td></tr>
-          <tr><td>model-export</td><td>ONNX export with the attention output, and view-detector training</td></tr>
+          <tr><td>model-export</td><td>ONNX export with the heatmap output, and view-detector training</td></tr>
           <tr><td>public</td><td>Images, the built-in X-ray library, guides and ONNX Runtime assets</td></tr>
           <tr><td>docs · map</td><td>Operator docs, and the source-backed system map</td></tr>
         </tbody>
@@ -167,7 +167,7 @@ const devTopics: Topic[] = [
       <ul className={bullets}>
         <li><b>Learning records:</b> browser → Next.js Server Components and Server Actions → Supabase Auth (cookie sessions), Postgres (row-level security, RPCs, triggers) and Storage (private cases behind short-lived signed URLs).</li>
         <li><b>Inference:</b> the browser asks for the active release, downloads and verifies the model, preprocesses the image and runs ONNX Runtime Web (WebGPU, falling back to WebAssembly).</li>
-        <li>Activity results (14 probabilities, the attention map and provenance) are saved once through an authorized RPC; Learning Mode results stay in memory.</li>
+        <li>Activity results (14 probabilities, the heatmaps and provenance) are saved once through an authorized RPC; Learning Mode results stay in memory.</li>
       </ul>
     ),
     sources: ["map/objects/inference/browser-inference-runtime.md", "map/processes/activity-ai-analysis.md", "map/CAPSTONE_CURRENT_STATE.md"],
@@ -206,7 +206,7 @@ const devTopics: Topic[] = [
         <pre className={`${pre} mt-3`}>{"npm run model:validate   # checksums, shapes, determinism, WASM and WebGPU parity\nnpm run model:stage      # upload as an inactive release\nnpm run model:status\nnpm run model:activate   # compare-and-swap the active pointer\nnpm run model:rollback"}</pre>
         <ul className={`${bullets} mt-3`}>
           <li>Contract v1: input <code className={code}>[batch, 1, 224, 224]</code>, Rec. 601 grayscale, bilinear resize, <code className={code}>(pixel / 255 − 0.5) / 0.25</code>; output 14 logits in a fixed label order.</li>
-          <li>Contract v2 adds a <code className={code}>[batch, 1, 7, 7]</code> attention map.</li>
+          <li>Contract v2 adds a global <code className={code}>[batch, 1, 7, 7]</code> attention map; contract v3 replaces it with per-finding class activation maps, <code className={code}>[batch, 14, 14, 14]</code>.</li>
           <li>Weights and thresholds can change without a deploy while the contract stays the same.</li>
           <li>Validate locally first. Publisher service-role keys belong only in the operator environment, never in Vercel.</li>
         </ul>

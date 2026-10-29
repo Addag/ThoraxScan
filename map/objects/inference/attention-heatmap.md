@@ -1,37 +1,45 @@
 ---
 node_type: object
 status: live
-audited: 2026-09-29
-snapshot: main @ 6af6c16
+audited: 2026-10-29
+snapshot: main @ b71d5f3 + working tree
 ---
 
 # Attention heatmap
 
-Validated V2 releases expose global, class-agnostic 7x7 attention rollout.
-V1 remains unavailable. Relative attention does not localize disease or provide
-diagnostic evidence.
+Two heatmap kinds share one `AttentionHeatmap` union in [attention.ts](../../../src/lib/inference/attention.ts), told apart by `kind`:
 
-Deployment status: The project owner reports (2026-10-18) that hosted production runs the app with the Learning Mode possible tier and release `squeezevit-v5-kd-cardio042-possible85-20261017.1`. This repository holds no production registry snapshot, so the release ID and revision are not independently verified.
+| Contract | `kind` | Output | Grid | Method / normalization |
+|---|---|---|---|---|
+| V3 (current) | `per-label` | `class_activation` `[batch,14,14,14]`, 2744 values in label order | 14×14 | `cam-fc-weights-v1` / `relu-per-label-max-v1` |
+| V2 (legacy) | `global` | `attention_map` `[batch,1,7,7]`, 49 values | 7×7 | `attention-rollout-mean-query-v1` / `per-image-min-max-v1` |
 
-Learning Mode keeps the map and object URL in browser memory and revokes the URL
-on replacement/unmount. Activity completion persists exactly 49 normalized values
-with method and normalization metadata. Ready rows are immutable. Students receive
-maps only after submission and feedback release. Approved Professors require
-workspace access through a separate heatmap RPC. Direct analysis table reads remain
-revoked. There is no saved-map history route.
+V1 releases have no heatmap (`unavailable`).
 
-The component draws a canvas overlay: the 49 values are bilinearly interpolated
-between patch centers (display only, `upsampleAttention`) and colored with the
-blue-to-red `ATTENTION_RAMP` in [attention.ts](../../../src/lib/inference/attention.ts),
-which also feeds the legend. It has a toggle, native keyboard opacity slider,
-legend and expandable numeric table of the raw 7x7 values. The PDF guide's
-inline script copies the ramp and interpolation; keep them in sync. Rollback to V1 affects new inference only; existing
-V2 analyses retain their maps.
+V3 is a class activation map: SqueezeViT's `fc` weights for each label applied to the 256×14×14 `head_conv` features. The head is a plain average pool, so `mean(raw map) + bias = logit` exactly ([test_cam.py](../../../model-export/test_cam.py)). Negative evidence is clipped, then each label is divided by its own maximum, so a map shows *where* the evidence is, not how likely the finding is. V2 rollout is class-agnostic and stays only for analyses saved before V3.
+
+Deployment status: the owner reports (2026-10-18) that hosted production runs the V2 release `squeezevit-v5-kd-cardio042-possible85-20261017.1`. The V3 bundle `squeezevit-v5-kd-cam-possible85-20261029.1` (same v5 checkpoint and thresholds) was exported 2026-10-29 and is not staged or activated yet.
+
+## Persistence and access
+
+Learning Mode keeps maps in browser memory and revokes the object URL on replacement/unmount. Activity completion persists the values in `ai_analyses.attention_map` with grid, method and normalization columns; V3 reuses the same columns (2744 values, 14×14, CAM method), so the read RPCs did not change. `storedHeatmap` rebuilds the right kind from `attention_method`. Ready rows are immutable. Students receive maps only after submission and feedback release. Approved Professors read them through the separate heatmap RPC, which carries no probabilities. Direct analysis table reads remain revoked.
+
+## Rendering
+
+The component draws a 112px canvas overlay, bilinearly interpolated between cell centers by `upsampleAttention(values, size, grid)` (display only), colored with the blue-to-red `ATTENTION_RAMP`. It has a toggle, a native opacity slider, a legend and an expandable numeric table of the raw grid.
+
+- V3 adds a native `Finding` select. With probabilities (Learning Mode, Student feedback, the sample) it lists likely then possible findings, most probable first, and shows a message when no finding met its threshold. Without probabilities (Professor review) it lists all 13 findings.
+- The attention guide page and the landing page show the real V3 maps for library case `cxp-001`, saved in [sample-heatmap.json](../../../src/components/learning/sample-heatmap.json).
+- The PDF guide's inline script copies the ramp and interpolation, now with a grid parameter, plus the sample's Cardiomegaly map; keep them in sync.
+
+Rollback to a V1/V2 release affects new inference only; existing analyses keep their maps.
 
 Sources: [component](../../../src/components/attention-heatmap.tsx),
 [runtime](../../../src/lib/inference/runtime.ts),
 [authorized projections](../../../src/lib/activity-ai/server.ts),
-[database contract](../../../supabase/migrations/20260922163225_attention_contract_hardening.sql),
-[SqueezeViT exporter](../../../model-export/export_squeezevit.py),
-[FastViT exporter](../../../model-export/export_fastvit.py) (rollout over its 2 stage-4 global attention blocks),
+[V3 database contract](../../../supabase/migrations/20261029120000_class_activation_maps.sql),
+[V2 database contract](../../../supabase/migrations/20260922163225_attention_contract_hardening.sql),
+[CAM exporter](../../../model-export/export_squeezevit_cam.py),
+[SqueezeViT rollout exporter](../../../model-export/export_squeezevit.py),
+[FastViT exporter](../../../model-export/export_fastvit.py) (rollout only; no FastViT CAM exporter),
 [release operations](../../../docs/model-releases.md).

@@ -12,7 +12,7 @@ import { InferenceError, asInferenceError } from "./errors";
 import { postprocessLogits, type PostprocessedPrediction } from "./postprocess";
 import { preprocessImage } from "./preprocess";
 
-import { readyAttention, UNAVAILABLE_ATTENTION, type AttentionHeatmap } from "./attention";
+import { readyAttention, readyClassActivation, UNAVAILABLE_ATTENTION, type AttentionHeatmap } from "./attention";
 
 type ExecutionProvider = "webgpu" | "wasm";
 type OrtModule = typeof Ort;
@@ -41,7 +41,7 @@ export interface InferenceResult extends PostprocessedPrediction {
   bundleSha256: string;
   preprocessingVersion: string;
   thresholdVersion: string;
-  manifestVersion: 1 | 2;
+  manifestVersion: 1 | 2 | 3;
   attention?: AttentionHeatmap;
   executionProvider: ExecutionProvider;
   applicationBuild: string;
@@ -59,7 +59,8 @@ function configureOrt(ort: OrtModule) {
   ort.env.wasm.wasmPaths = "/ort/1.27.0/";
   ort.env.wasm.numThreads = 1;
   // ORT prints harmless node-placement warnings (shape ops pinned to CPU)
-  // via console.error, which the Next dev overlay surfaces as errors.
+  // via console.error, which the Next dev overlay surfaces as errors. The session's
+  // native logger also needs logSeverityLevel 3 (errors only) at session creation.
   ort.env.logLevel = "error";
 }
 
@@ -168,6 +169,7 @@ export async function loadModelSession(
       configureOrt(ort);
       const session = await ort.InferenceSession.create(bytes, {
         executionProviders: ["webgpu"],
+        logSeverityLevel: 3,
       });
       return { ort, session };
     }
@@ -176,6 +178,7 @@ export async function loadModelSession(
     configureOrt(ort);
     const session = await ort.InferenceSession.create(bytes, {
       executionProviders: ["wasm"],
+      logSeverityLevel: 3,
     });
     return { ort, session };
   } catch (error) {
@@ -287,7 +290,7 @@ export async function runModelInference(
     try {
       outputs = await handle.session.run(
         { [release.manifest.input.name]: tensor },
-        release.manifest.schemaVersion === 2 ? ["logits", "attention_map"] : ["logits"],
+        release.manifest.schemaVersion === 3 ? ["logits", "class_activation"] : release.manifest.schemaVersion === 2 ? ["logits", "attention_map"] : ["logits"],
       );
     } catch (error) {
       if (handle.provider === "webgpu") throw new WebGpuExecutionError(error);
@@ -304,6 +307,12 @@ export async function runModelInference(
         throw new InferenceError("INVALID_OUTPUT", "The model returned invalid attention dimensions.");
       }
       attention = readyAttention(Array.from(map.data as ArrayLike<number>));
+    } else if (release.manifest.schemaVersion === 3) {
+      const map = outputs.class_activation;
+      if (!map || map.type !== "float32" || map.dims.join(",") !== "1,14,14,14") {
+        throw new InferenceError("INVALID_OUTPUT", "The model returned invalid class activation dimensions.");
+      }
+      attention = readyClassActivation(Array.from(map.data as ArrayLike<number>));
     }
     return {
       attention,

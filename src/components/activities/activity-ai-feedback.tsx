@@ -84,7 +84,7 @@ export function ActivityAIFeedback({ activityId, imageUrl, initial }: { activity
       <p className="border-l-[3px] border-l-(color:--disclaimer-yellow) pl-2.5 text-[#ffe28a] light:text-(--status-warning-text)">Educational use only. This result is not a diagnosis and should not guide medical decisions.</p>
       <AnalysisFindings state={result.state} labels={result.labels} findings={result.findings} possibleFindings={result.possibleFindings} idPrefix="activity" />
       <details className="mt-[18px] border-t border-t-[#3f5271] pt-3.5"><summary className="cursor-pointer font-bold">Release and execution provenance</summary><dl><dt>Model release</dt><dd>{result.provenance.releaseId}</dd><dt>Preprocessing</dt><dd>{result.provenance.preprocessingVersion}</dd><dt>Thresholds</dt><dd>{result.provenance.thresholdVersion}</dd><dt>Provider</dt><dd>{result.provenance.executionProvider.toUpperCase()}</dd><dt>Model SHA-256</dt><dd>{result.provenance.modelSha256}</dd><dt>Bundle SHA-256</dt><dd>{result.provenance.bundleSha256}</dd><dt>Application build</dt><dd>{result.provenance.applicationBuild}</dd></dl></details>
-      <AttentionHeatmap imageUrl={imageUrl} attention={result.attention ?? { status: "unavailable", reason: "legacy-model-release" }} title="Model attention" />
+      <AttentionHeatmap imageUrl={imageUrl} attention={result.attention ?? { status: "unavailable", reason: "legacy-model-release" }} labels={result.labels} title="Finding heatmap" />
     </div> : null}
   </section>;
 }

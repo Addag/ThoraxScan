@@ -1,16 +1,38 @@
 import { InferenceError } from "./errors";
 
+export const CAM_GRID = 14;
+export const CAM_CELLS = CAM_GRID * CAM_GRID;
+export const CAM_LABEL_COUNT = 14;
+
 export type AttentionHeatmap = { status: "unavailable"; reason: "legacy-model-release" } | {
-  status: "ready"; values: number[]; width: 7; height: 7; attribution: "global";
+  status: "ready"; kind: "global"; values: number[]; width: 7; height: 7; attribution: "global";
   aggregation: "attention-rollout-mean-query-v1"; normalization: "per-image-min-max-v1";
+} | {
+  // One 14×14 class activation map per label, concatenated in manifest label order.
+  status: "ready"; kind: "per-label"; values: number[]; width: 14; height: 14;
+  method: "cam-fc-weights-v1"; normalization: "relu-per-label-max-v1";
 };
 export const UNAVAILABLE_ATTENTION = { status: "unavailable", reason: "legacy-model-release" } as const;
-export function readyAttention(values: unknown): AttentionHeatmap {
-  if (!Array.isArray(values) || values.length !== 49 || values.some(value => typeof value !== "number" || !Number.isFinite(value) || value < 0 || value > 1)) {
-    throw new InferenceError("INVALID_OUTPUT", "Attention requires exactly 49 finite normalized values.");
+function normalizedValues(values: unknown, length: number, name: string): number[] {
+  if (!Array.isArray(values) || values.length !== length || values.some(value => typeof value !== "number" || !Number.isFinite(value) || value < 0 || value > 1)) {
+    throw new InferenceError("INVALID_OUTPUT", `${name} requires exactly ${length} finite normalized values.`);
   }
-  return { status: "ready", values: [...values], width: 7, height: 7, attribution: "global",
+  return [...values];
+}
+export function readyAttention(values: unknown): AttentionHeatmap {
+  return { status: "ready", kind: "global", values: normalizedValues(values, 49, "Attention"), width: 7, height: 7, attribution: "global",
     aggregation: "attention-rollout-mean-query-v1", normalization: "per-image-min-max-v1" };
+}
+export function readyClassActivation(values: unknown): AttentionHeatmap {
+  return { status: "ready", kind: "per-label", values: normalizedValues(values, CAM_LABEL_COUNT * CAM_CELLS, "Class activation"), width: 14, height: 14,
+    method: "cam-fc-weights-v1", normalization: "relu-per-label-max-v1" };
+}
+/** Rebuilds a persisted map; the stored method tells V3 class activation from V2 global attention. */
+export function storedHeatmap(values: unknown, method: string | null | undefined): AttentionHeatmap {
+  return method === "cam-fc-weights-v1" ? readyClassActivation(values) : readyAttention(values);
+}
+export function labelActivation(values: number[], labelIndex: number) {
+  return values.slice(labelIndex * CAM_CELLS, (labelIndex + 1) * CAM_CELLS);
 }
 
 // Blue (low) to red (high) display ramp shared by the overlay and its legend.
@@ -25,17 +47,18 @@ export function attentionColor(value: number): [number, number, number] {
   const t = Math.min(1, Math.max(0, (value - a) / (b - a)));
   return [0, 1, 2].map(i => Math.round(from[i] + (to[i] - from[i]) * t)) as [number, number, number];
 }
-// Display-only smoothing: bilinear interpolation between the 7×7 patch centers, clamped at the edges.
-export function upsampleAttention(values: number[], size: number): number[] {
+// Display-only smoothing: bilinear interpolation between the grid×grid patch centers, clamped at the edges.
+export function upsampleAttention(values: number[], size: number, grid = 7): number[] {
+  const last = grid - 1;
   const axis = (pixel: number) => {
-    const grid = Math.min(6, Math.max(0, (pixel + 0.5) * 7 / size - 0.5));
-    const low = Math.floor(grid);
-    return [low, Math.min(6, low + 1), grid - low] as const;
+    const position = Math.min(last, Math.max(0, (pixel + 0.5) * grid / size - 0.5));
+    const low = Math.floor(position);
+    return [low, Math.min(last, low + 1), position - low] as const;
   };
   return Array.from({ length: size * size }, (_, index) => {
     const [x0, x1, tx] = axis(index % size), [y0, y1, ty] = axis(Math.floor(index / size));
-    const top = values[y0 * 7 + x0] * (1 - tx) + values[y0 * 7 + x1] * tx;
-    const bottom = values[y1 * 7 + x0] * (1 - tx) + values[y1 * 7 + x1] * tx;
+    const top = values[y0 * grid + x0] * (1 - tx) + values[y0 * grid + x1] * tx;
+    const bottom = values[y1 * grid + x0] * (1 - tx) + values[y1 * grid + x1] * tx;
     return top * (1 - ty) + bottom * ty;
   });
 }

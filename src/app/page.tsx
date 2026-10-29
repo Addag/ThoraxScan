@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { AttentionHeatmap } from "@/components/attention-heatmap";
-import { illustrativeAttention } from "@/components/learning/attention-maps-content";
+import { sampleHeatmap, sampleHeatmapLabels } from "@/components/learning/attention-maps-content";
 import { primaryButtonBase } from "@/components/primary-button";
 import { RevealOnScroll } from "@/components/reveal-on-scroll";
 import { TechnicalOverview } from "@/components/technical-overview";
@@ -25,7 +25,7 @@ const calloutStyles = {
 const learningLoop = [
   { title: "Interpret first", body: "Study the case and record your findings, whether it looks normal or abnormal, and the relevant region.", ring: "border-[rgb(194_157_255/72%)] text-[#d9c4ff]" },
   { title: "Submit", body: "Your final answer locks. It can't be edited afterwards, so the feedback always answers your own reading.", ring: "border-[rgb(255_214_54/72%)] text-[#ffe082]" },
-  { title: "Review AI feedback", body: "Unlocks only after you submit: likely findings, possible findings, every label the model scores, and its attention heatmap.", ring: "border-[rgb(112_184_255/72%)] text-[#b9dbff]" },
+  { title: "Review AI feedback", body: "Unlocks only after you submit: likely findings, possible findings, every label the model scores, and a heatmap for each finding.", ring: "border-[rgb(112_184_255/72%)] text-[#b9dbff]" },
   { title: "Faculty evaluation", body: "Your professor reviews the submission and gives the evaluation that counts.", ring: "border-[rgb(103_222_179/72%)] text-[#a9f0d4]" },
 ] as const;
 
@@ -37,7 +37,7 @@ const roles = [
       "Join your class workspace with an invitation code from your professor.",
       "Complete activities and get AI feedback once you submit.",
       "Practice anytime in Learning Mode with the built-in X-ray library; practice results stay in your browser.",
-      "Learn what attention maps can and can't tell you.",
+      "Learn what finding heatmaps can and can't tell you.",
     ],
   },
   {
@@ -56,7 +56,7 @@ const modelFacts = [
   "SqueezeViT, a compact vision transformer, distilled from a larger FastViT teacher.",
   "Trained on CheXpert frontal and lateral chest X-rays to score 14 findings.",
   "Runs in your browser with ONNX Runtime Web: WebGPU where available, WebAssembly otherwise.",
-  "The attention heatmap is a 7×7 patch grid from four-layer attention rollout. It is global and class-agnostic, not a lesion locator.",
+  "Finding heatmaps are class activation maps: one 14×14 map per finding, showing where the evidence for that finding sits. They guide the eye; they don't outline lesions.",
 ] as const;
 
 // From map/objects/inference/model-training.md (v5 release). Update when the active release changes.
@@ -78,7 +78,7 @@ export default function Home() {
         <section className="relative min-h-[max(819px,calc(100svh-81px))] overflow-hidden stacked:flex stacked:min-h-[calc(100svh-81px)] stacked:flex-col stacked:overflow-visible narrow:min-h-[calc(100svh-73px)]" aria-labelledby="landing-title">
           <div className="relative mx-auto min-h-[820px] max-w-[1440px] stacked:min-h-0 stacked:w-full tablet:grid tablet:grid-cols-[minmax(0,1fr)_minmax(320px,507px)] tablet:items-start tablet:gap-[clamp(24px,3vw,48px)] tablet:px-[clamp(24px,5vw,72px)] tablet:pt-[clamp(64px,7vw,88px)] tablet:pb-14 narrow:flex narrow:flex-col narrow:px-6 narrow:pt-[72px] narrow:pb-[52px]">
             <div className="absolute top-[108px] left-[6.25%] flex h-[25px] w-[479px] items-center justify-center rounded-[15px] border border-[rgb(123_185_255/38%)] [background:linear-gradient(120deg,rgb(92_155_255/20%),rgb(37_75_145/14%))] text-[1rem] font-semibold leading-[1.4375rem] text-[#b9dbff] text-center backdrop-blur-[20px] backdrop-saturate-[140%] shadow-(--glass-inset-shadow) stacked:static stacked:h-auto stacked:min-h-[25px] stacked:w-[min(100%,479px)] stacked:px-2.5 stacked:py-1 stacked:leading-[1.2] tablet:min-w-0 tablet:col-span-full tablet:justify-self-start tablet:text-[clamp(0.75rem,1.2vw,1rem)] narrow:self-center narrow:text-[0.75rem] no-backdrop:[background:#14243e]">
-              SqueezeViT | ONNX Runtime Web | Attention Heatmap XAI
+              SqueezeViT | ONNX Runtime Web | Finding Heatmap XAI
             </div>
 
             <div className="absolute top-[214px] left-[8.0556%] w-[604px] stacked:static stacked:w-full tablet:min-w-0 tablet:mt-0 narrow:mt-[54px]">
@@ -88,7 +88,7 @@ export default function Home() {
                 <span className="block">Learning Platform</span>
               </h1>
               <p className="mt-[22px] w-[390px] text-[1rem] font-semibold leading-[1.35] text-[#c3d0e2] stacked:mt-[26px] stacked:leading-[1.25] tablet:w-[min(100%,340px)] narrow:w-[min(100%,390px)]">
-                ThoraxScan is an educational LMS for Radiologic Technology students. Practice chest X-ray interpretation through professor-guided activities, with AI-powered Attention Heatmap feedback after submission.
+                ThoraxScan is an educational LMS for Radiologic Technology students. Practice chest X-ray interpretation through professor-guided activities, with AI-powered finding heatmaps after submission.
               </p>
               <Link className={`${loginButton} mt-[42px] ml-2 stacked:mt-[34px] stacked:ml-0 stacked:w-[min(206px,100%)] stacked:text-[1.4rem]`} href="/login">
                 Log in <span aria-hidden="true">→</span>
@@ -197,9 +197,9 @@ export default function Home() {
               <AttentionHeatmap
                 className={`${glassCard} p-5 [&_label]:flex-wrap`}
                 imageUrl="/images/chexpert/cxp-001.jpg"
-                attention={illustrativeAttention}
-                title="Illustrative example — not model output"
-                illustrative
+                attention={sampleHeatmap}
+                labels={sampleHeatmapLabels}
+                title="Sample case: real model output"
               />
             </div>
           </div>

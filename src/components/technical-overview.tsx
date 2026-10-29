@@ -32,7 +32,7 @@ const features = [
   { module: "Workspaces", items: ["Professor-owned class workspaces", "Expiring, use-limited invitation codes for students and co-professors", "Membership-scoped access to every activity and case"] },
   { module: "Activities", items: ["Draft → published → archived lifecycle", "One X-ray case per activity: JPEG or PNG upload, or a pick from the built-in library", "A private reference evaluation students never receive", "Optional due dates and a notification bell"] },
   { module: "Submissions and feedback", items: ["Drafts, then one immutable final answer: findings, normal or abnormal, and region", "AI feedback released only after submission", "Faculty evaluation with a score and feedback, released explicitly"] },
-  { module: "Learning Mode", items: ["Practice on a 234-image CheXpert library or your own image", "Likely and possible findings across all 14 labels", "Attention heatmap and a printable attention maps guide", "Practice results stay in browser memory"] },
+  { module: "Learning Mode", items: ["Practice on a 234-image CheXpert library or your own image", "Likely and possible findings across all 14 labels", "Finding heatmaps and a printable heatmap guide", "Practice results stay in browser memory"] },
   { module: "Administration", items: ["Review Professor applications", "Grant and revoke administrator access; the last administrator can't remove themselves"] },
 ] as const;
 
@@ -42,7 +42,7 @@ const modelDetails = [
   ["Training data", "CheXpert v1.0, frontal and lateral views. Checkpoint and thresholds are chosen on a held-out patient split, so the 234-image official validation set stays unseen."],
   ["Input", "Grayscale, resized to 224×224 and normalized, with the same transform in training and in the browser."],
   ["Thresholds", "Per-label F1 on the held-out split. Cardiomegaly is lowered to reach 80% held-out sensitivity. A \"possible\" tier flags the five competition labels at 85% sensitivity."],
-  ["Explainability", "Four-layer attention rollout, averaged over queries and normalized per image into a 7×7 map. Global and class-agnostic, not Grad-CAM, and it doesn't locate lesions."],
+  ["Explainability", "Class activation maps: the classifier's weights for each finding applied to the final 14×14 feature map, clipped at zero and scaled per finding. Exact for this architecture and computed in the same forward pass. A guide to where the evidence is, not a lesion outline."],
   ["Limits", "Learning Mode accepts frontal and lateral images; activities accept frontal only. Lateral held-out competition AUC is 0.80 (frontal 0.79), but lateral mean AUC is lower (0.74 vs 0.78). Cardiomegaly sensitivity is 0.49 on the official set even after tuning. Not clinically validated."],
 ] as const;
 
@@ -70,7 +70,7 @@ const status = {
     "Workspaces, invitation codes and membership",
     "Activities with private cases and reference evaluations",
     "Draft and final submissions",
-    "In-browser AI analysis with attention heatmaps, released after submission",
+    "In-browser AI analysis with finding heatmaps, released after submission",
     "Faculty evaluation and notifications",
     "Class analytics with CSV export",
     "Learning Mode with the built-in X-ray library, frontal and lateral",

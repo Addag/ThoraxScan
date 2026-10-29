@@ -1,4 +1,4 @@
-import { readyAttention } from "@/lib/inference/attention";
+import { readyAttention, readyClassActivation } from "@/lib/inference/attention";
 import type { InferenceResult } from "@/lib/inference/runtime";
 import { ACTIVITY_AI_LABELS, type ActivityAIProvenance } from "./types";
 
@@ -21,8 +21,9 @@ export function toActivityAIPersistencePayload(result: InferenceResult): Activit
     }
   });
   const attention = result.attention ?? { status: "unavailable", reason: "legacy-model-release" as const };
-  if ((result.manifestVersion === 2) !== (attention.status === "ready")) throw new Error("Attention does not match the release contract.");
-  const attentionMap = attention.status === "ready" ? readyAttention(attention.values) : null;
+  const expectedKind = result.manifestVersion === 3 ? "per-label" : result.manifestVersion === 2 ? "global" : null;
+  if ((attention.status === "ready" ? attention.kind : null) !== expectedKind) throw new Error("Attention does not match the release contract.");
+  const attentionMap = attention.status !== "ready" ? null : attention.kind === "per-label" ? readyClassActivation(attention.values) : readyAttention(attention.values);
   return {
     attentionMap: attentionMap?.status === "ready" ? attentionMap.values : null,
     probabilities: result.labels.map((item) => item.probability),

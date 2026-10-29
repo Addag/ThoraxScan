@@ -38,7 +38,7 @@ The [authentication surface](auth-surface.md), [design tokens](design-tokens.md)
 - `modelScore` and the technical overview's `modelDetails` must follow [Model training](../inference/model-training.md) when the active release changes.
 - The technical overview's features, security and status copy must follow the cards it restates (a new control, a ghost feature that ships).
 - A docs topic must follow the files in its Source line. A changed user flow (process card), npm script, env variable or release command changes that topic.
-- Changing the illustrative attention values or `AttentionHeatmap` changes both this page and the Attention maps surface.
+- Changing the sample heatmap (`sample-heatmap.json`) or `AttentionHeatmap` changes both this page and the Attention maps surface.
 
 ### Does not hit
 

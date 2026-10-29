@@ -1,4 +1,4 @@
-import { readyAttention, UNAVAILABLE_ATTENTION } from "@/lib/inference/attention";
+import { storedHeatmap, UNAVAILABLE_ATTENTION } from "@/lib/inference/attention";
 import { createClient } from "@/lib/supabase/server";
 import { ACTIVITY_AI_LABELS, isActivityAILabel, type ActivityAIFeedback, type ActivityAIProvenance, type ActivityAIStatusProjection } from "./types";
 
@@ -14,7 +14,7 @@ type FeedbackRow = {
   provenance: ActivityAIProvenance | null;
   attention_status: "ready" | "unavailable";
   attention_map: number[] | null;
-  attention_grid_width: 7 | null; attention_grid_height: 7 | null; attention_method: string | null; attention_normalization: string | null;
+  attention_grid_width: 7 | 14 | null; attention_grid_height: 7 | 14 | null; attention_method: string | null; attention_normalization: string | null;
 };
 
 export async function getStudentActivityAIFeedback(activityId: string): Promise<ActivityAIFeedback> {
@@ -41,7 +41,7 @@ export async function getStudentActivityAIFeedback(activityId: string): Promise<
         }),
         possibleFindings: labels.filter((item) => item.possible),
         provenance: data.provenance,
-        attention: data.attention_status === "ready" && data.attention_map ? readyAttention(data.attention_map) : UNAVAILABLE_ATTENTION,
+        attention: data.attention_status === "ready" && data.attention_map ? storedHeatmap(data.attention_map, data.attention_method) : UNAVAILABLE_ATTENTION,
         attentionStatus: data.attention_status,
       }
     : null;
@@ -56,14 +56,14 @@ type StatusRow = {
   claim_expires_at: string | null;
   completed_at: string | null;
   release_id: string | null;
-  manifest_version: 1 | 2 | null;
+  manifest_version: 1 | 2 | 3 | null;
   preprocessing_version: string | null;
   threshold_version: string | null;
   execution_provider: ActivityAIStatusProjection["executionProvider"];
   application_build: string | null;
   attention_status: "ready" | "unavailable";
   attention_map: number[] | null;
-  attention_grid_width: 7 | null; attention_grid_height: 7 | null; attention_method: string | null; attention_normalization: string | null;
+  attention_grid_width: 7 | 14 | null; attention_grid_height: 7 | 14 | null; attention_method: string | null; attention_normalization: string | null;
 };
 
 export async function getProfessorActivityAIStatus(activityId: string): Promise<ActivityAIStatusProjection> {
@@ -75,7 +75,7 @@ export async function getProfessorActivityAIStatus(activityId: string): Promise<
 
 export async function getProfessorActivityAIHeatmap(activityId: string) {
   const supabase = await createClient();
-  const { data, error } = await supabase.rpc("get_professor_activity_ai_heatmap", { target_activity_id: activityId }).maybeSingle<{ attention_status: "ready" | "unavailable"; attention_map: number[] | null }>();
+  const { data, error } = await supabase.rpc("get_professor_activity_ai_heatmap", { target_activity_id: activityId }).maybeSingle<{ attention_status: "ready" | "unavailable"; attention_map: number[] | null; attention_method: string | null }>();
   if (error || !data || data.attention_status !== "ready" || !data.attention_map) return UNAVAILABLE_ATTENTION;
-  return readyAttention(data.attention_map);
+  return storedHeatmap(data.attention_map, data.attention_method);
 }

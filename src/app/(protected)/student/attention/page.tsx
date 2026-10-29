@@ -9,7 +9,7 @@ export const metadata: Metadata = { title: "Attention maps | ThoraxScan" };
 export default async function StudentAttentionPage() {
   await requireRole("student");
   return (
-    <StudentShell activeItem="attention" sectionLabel="Attention maps" sectionDescription="Understanding patch attention">
+    <StudentShell activeItem="attention" sectionLabel="Attention maps" sectionDescription="Understanding finding heatmaps">
       <AttentionMapsContent role="student" />
     </StudentShell>
   );

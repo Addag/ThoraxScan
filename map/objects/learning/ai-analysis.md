@@ -8,7 +8,7 @@ snapshot: main @ 76f6977 + working tree
 
 # AI analysis
 
-One immutable prediction-only analysis per activity. The browser resolves the active verified ONNX release and sends the fixed 14-probability vector, optional validated V2 attention map, and provenance to the completion RPC.
+One immutable prediction-only analysis per activity. The browser resolves the active verified ONNX release and sends the fixed 14-probability vector, optional validated V2 attention map or V3 per-label class activation maps, and provenance to the completion RPC.
 
 ## Shape
 

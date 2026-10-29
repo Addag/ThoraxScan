@@ -8,15 +8,15 @@ snapshot: main @ 6af6c16
 
 # Model manifest and configuration
 
-`ModelManifestV1` and `ModelManifestV2` are the replaceable-model boundary containing the ONNX artifact contract, ordered labels and thresholds, preprocessing, postprocessing, provenance, and parity evidence hashes. V2 additionally describes the normalized 7 x 7 attention output and provider parity evidence.
+`ModelManifestV1`, `ModelManifestV2` and `ModelManifestV3` are the replaceable-model boundary containing the ONNX artifact contract, ordered labels and thresholds, preprocessing, postprocessing, provenance, and parity evidence hashes. V2 additionally describes the normalized 7 x 7 attention output and provider parity evidence; V3 instead describes the per-label 14 x 14 class activation output and its parity evidence.
 
 ## Why this shape
 
-Weights and thresholds can be replaced without an application deployment while the fixed V1 or V2 parser accepts the bundle.
+Weights and thresholds can be replaced without an application deployment while the fixed V1, V2 or V3 parser accepts the bundle.
 
 ## Shape
 
-Both versions fix a single-file opset-17 artifact, float32 `[batch,1,224,224]` input, 14 logits, grayscale normalization, the 14-label order, inclusive thresholds, `No Finding` suppression, and explicit no-match behavior. V2 adds `attention_map` with float32 `[batch,1,7,7]` output and the fixed rollout/normalization descriptor.
+Both versions fix a single-file opset-17 artifact, float32 `[batch,1,224,224]` input, 14 logits, grayscale normalization, the 14-label order, inclusive thresholds, `No Finding` suppression, and explicit no-match behavior. V2 adds `attention_map` with float32 `[batch,1,7,7]` output and the fixed rollout/normalization descriptor. V3 adds `classActivation` (`CLASS_ACTIVATION_DESCRIPTOR`): `class_activation` float32 `[batch,14,14,14]`, method `cam-fc-weights-v1`, normalization `relu-per-label-max-v1`, grid 14×14, plus `expectedClassActivationSha256`, `maxAbsoluteClassActivationError` (≤1e-4) and `webGpuMaxAbsoluteClassActivationDifference` (≤1e-3 or null). Both heatmap versions share `mapParity` in the parser.
 
 Optionally, every label also carries `possibleThreshold`, from the bundle's `possible-thresholds.json`.
 - All 14 labels have it or none do, and each value is at or below the label's threshold.

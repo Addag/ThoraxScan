@@ -3,7 +3,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>ThoraxScan – Attention Maps Student Guide</title>
+<title>ThoraxScan – Finding Heatmaps Student Guide</title>
 <style>
   /* Letter, matching the LPU headerfooter.docx; top/bottom margins leave room for the banners. */
   @page { size: Letter; margin: 1.6in 0.75in 1.55in; }
@@ -43,44 +43,44 @@
 
 <section class="page">
   <div class="brand">THORAXSCAN · STUDENT GUIDE</div>
-  <h1>Reading attention maps</h1>
-  <p class="lead">What ThoraxScan's attention heatmap shows, where you will find it, and how to use it responsibly while learning chest X-ray interpretation.</p>
+  <h1>Reading finding heatmaps</h1>
+  <p class="lead">What ThoraxScan's finding heatmaps show, where you will find them, and how to use them responsibly while learning chest X-ray interpretation.</p>
 
   <div class="legend">
     <div class="bar"></div>
-    <div class="legend-labels"><span>Blue: lower relative attention</span><span>Red: higher relative attention</span></div>
+    <div class="legend-labels"><span>Blue: little or no evidence for the finding</span><span>Red: most evidence for the finding</span></div>
   </div>
 
   <div class="callout warn">
-    <p><b>Key idea:</b> the attention map shows where the model's internal attention was concentrated across the image. <b>It doesn't show where disease is.</b> It is a learning aid, not a diagnosis, and it never replaces your own image review.</p>
+    <p><b>Key idea:</b> each heatmap shows where the model found the evidence for <i>one</i> finding. It points you to where to look; <b>it does not outline a lesion or confirm disease.</b> It is a learning aid, not a diagnosis, and it never replaces your own image review.</p>
   </div>
 
   <h2>1. What the map is</h2>
   <div class="row">
     <div class="demo" aria-hidden="true">
-      <figure><canvas class="raw" width="7" height="7"></canvas>The 49 values</figure>
+      <figure><canvas class="raw" width="14" height="14"></canvas>The 196 values</figure>
       <figure><canvas class="smooth" width="112" height="112"></canvas>As displayed (smoothed)</figure>
     </div>
     <script>
       // Copies of ATTENTION_RAMP, attentionColor and upsampleAttention in src/lib/inference/attention.ts; keep them in sync.
       const ramp = [[0,[30,60,200]],[0.25,[0,170,230]],[0.5,[60,200,90]],[0.75,[255,200,0]],[1,[220,30,30]]];
       const color = v => { const u = Math.max(1, ramp.findIndex(([at]) => at >= v)); const [a, f] = ramp[u-1], [b, t] = ramp[u]; const k = (v-a)/(b-a); return f.map((c, i) => Math.round(c + (t[i]-c)*k)); };
-      const upsample = (values, size) => { const axis = p => { const g = Math.min(6, Math.max(0, (p+0.5)*7/size - 0.5)); const l = Math.floor(g); return [l, Math.min(6, l+1), g-l]; };
+      const upsample = (values, size, grid) => { const axis = p => { const g = Math.min(grid-1, Math.max(0, (p+0.5)*grid/size - 0.5)); const l = Math.floor(g); return [l, Math.min(grid-1, l+1), g-l]; };
         return Array.from({ length: size*size }, (_, i) => { const [x0, x1, tx] = axis(i % size), [y0, y1, ty] = axis(Math.floor(i / size));
-          const top = values[y0*7+x0]*(1-tx) + values[y0*7+x1]*tx, bottom = values[y1*7+x0]*(1-tx) + values[y1*7+x1]*tx; return top*(1-ty) + bottom*ty; }); };
+          const top = values[y0*grid+x0]*(1-tx) + values[y0*grid+x1]*tx, bottom = values[y1*grid+x0]*(1-tx) + values[y1*grid+x1]*tx; return top*(1-ty) + bottom*ty; }); };
       const paint = (canvas, values) => { const ctx = canvas.getContext("2d"), img = ctx.createImageData(canvas.width, canvas.height);
         values.forEach((v, i) => img.data.set([...color(v), 255], i*4)); ctx.putImageData(img, 0, 0); };
-      // 7×7 values from the Attention Maps page sample.
-      const v = [0,.05,.12,.18,.14,.06,.02,.04,.2,.38,.46,.34,.18,.05,.1,.36,.62,.74,.58,.28,.08,.14,.44,.78,1,.82,.4,.12,.12,.38,.68,.86,.7,.32,.1,.06,.22,.42,.54,.4,.2,.04,.01,.08,.16,.24,.18,.08,0];
+      // Cardiomegaly map (14×14) for the sample case on the heatmap guide page: real model output, rounded.
+      const v = [.01,.02,.01,0,0,0,0,0,.01,0,0,0,0,0,.01,.04,.05,0,0,0,0,0,.02,0,0,0,0,0,0,0,.03,.01,0,.02,.01,0,0,0,0,0,0,0,0,0,0,0,0,0,0,.12,.01,0,0,.07,.11,.05,0,0,0,0,0,0,0,0,.21,0,0,0,0,0,0,0,0,0,0,0,0,.06,.38,.11,0,0,.11,.07,0,0,.09,.07,0,.11,0,0,.33,.15,0,0,.24,.24,0,0,.06,0,0,.1,0,0,.22,.17,0,0,.17,.21,.04,0,0,0,0,.2,.21,.08,.54,.72,.14,0,.05,.07,.02,0,0,0,0,.02,.09,.08,.73,1,.34,0,.15,.12,0,0,0,0,0,0,0,0,.71,.74,.25,.1,.26,.07,0,0,0,0,.02,.04,0,0,.41,.26,.18,.22,.08,.09,0,0,0,0,.1,.05,0,0,0,0,.03,.2,.05,.11,0,0,0,.06,.07,.05,.01,.01,0,0,.04,.17,.07,.09];
       paint(document.querySelector(".demo .raw"), v);
-      paint(document.querySelector(".demo .smooth"), upsample(v, 112));
+      paint(document.querySelector(".demo .smooth"), upsample(v, 112, 14));
     </script>
     <div>
       <ol>
-        <li><b>7×7 grid.</b> The Vision Transformer splits the X-ray into a 7×7 grid of patches, so every map has 49 values.</li>
-        <li><b>Four-layer attention rollout.</b> Attention from four of the model's layers is combined and averaged over queries into one map.</li>
-        <li><b>Normalized per image.</b> The 49 values are scaled from 0 to 1 within that single image. Warmer (red) means higher <i>relative</i> attention.</li>
-        <li><b>Smoothed for display.</b> ThoraxScan blends the colors between patch centers so the overlay reads as a smooth heatmap. The data underneath is still those 49 values; the smoothing adds no detail.</li>
+        <li><b>One map per finding.</b> The model's last feature map covers the X-ray as a 14×14 grid, so every finding's map has 196 values. The example is the sample case's Cardiomegaly map, centred on the heart.</li>
+        <li><b>Class activation map (CAM).</b> The model scores a finding by averaging that grid with the finding's own weights. Applying the same weights cell by cell shows which parts of the image raised the score.</li>
+        <li><b>Scaled per finding.</b> Negative evidence is set to zero and each map is scaled from 0 to 1. Warmer (red) means more evidence for that finding <i>relative to the rest of this image</i>.</li>
+        <li><b>Smoothed for display.</b> ThoraxScan blends the colors between cell centers so the overlay reads as a smooth heatmap. The data underneath is still those 196 values; the smoothing adds no detail.</li>
       </ol>
     </div>
   </div>
@@ -88,13 +88,13 @@
   <h3>What the colors do and do not mean</h3>
   <table>
     <tr><th style="width:32%">On the map</th><th>Meaning</th></tr>
-    <tr><td>Red / warmer areas</td><td>The model attended more to these patches than to others <i>in this image</i>.</td></tr>
-    <tr><td>Blue / cooler areas</td><td>Less relative attention. This does <b>not</b> mean the area is normal or irrelevant.</td></tr>
-    <tr><td>Comparing two images</td><td>Not meaningful. Each map is scaled on its own, so a red area in one image is not "stronger" than one in another.</td></tr>
+    <tr><td>Red / warmer areas</td><td>Where the model found most of its evidence for the selected finding <i>in this image</i>.</td></tr>
+    <tr><td>Blue / cooler areas</td><td>Little or no evidence for that finding. This does <b>not</b> mean the area is normal.</td></tr>
+    <tr><td>Comparing two images or two findings</td><td>Not meaningful. Each map is scaled on its own, so a red area is not "stronger" than red on another map.</td></tr>
   </table>
 
   <div class="callout">
-    <p><b>Global and class-agnostic.</b> ThoraxScan produces one map per image. It is <b>not</b> specific to any predicted finding, so it cannot tell you where a particular finding is or why the model predicted it. Attention values are not probabilities and not a measure of model confidence.</p>
+    <p><b>Read it with the probability.</b> A heatmap shows <i>where</i> the evidence is, not <i>how likely</i> the finding is. A finding with a low probability can still have a bright map, because every map is scaled to its own peak. Heatmap values are not probabilities.</p>
   </div>
 </section>
 
@@ -102,14 +102,14 @@
   
   <h2>2. Where you will see it</h2>
 
-  <h3>Attention Maps page</h3>
-  <p>Opened from the main menu. It explains the method and shows a sample chest X-ray with an overlay labelled <i>"Illustrative example – not model output"</i>. The sample uses hand-picked values to demonstrate the display. No model was run on it.</p>
+  <h3>Attention maps page</h3>
+  <p>Opened from the main menu. It explains the method and shows a sample chest X-ray with the model's real heatmaps for its likely findings. Switch findings to see how each map moves.</p>
 
   <h3>Learning Mode (ungraded practice)</h3>
   <ol>
     <li>Choose or drop a local chest X-ray (JPEG or PNG, up to 6 MiB).</li>
     <li>Select <b>Analyze</b>. The model runs in your browser, and your image stays in browser memory.</li>
-    <li>The analysis result shows the findings and a <b>Model attention</b> overlay together.</li>
+    <li>The analysis result shows the findings and a <b>Finding heatmap</b>. Choose a likely or possible finding under the image to see its map.</li>
   </ol>
   <p>Tip: write down your own observations <i>before</i> you select Analyze, so you can compare them honestly afterwards.</p>
 
@@ -117,23 +117,24 @@
   <ol>
     <li>Review the case X-ray and submit your final evaluation.</li>
     <li>AI feedback is <b>locked until you submit</b>. After submission it shows "Analysis pending" until the analysis runs and is released.</li>
-    <li>Once released, the <b>AI feedback</b> panel shows the findings and the <b>Model attention</b> overlay. If analysis fails, select <b>Retry analysis</b>.</li>
+    <li>Once released, the <b>AI feedback</b> panel shows the findings and the <b>Finding heatmap</b>. If analysis fails, select <b>Retry analysis</b>.</li>
     <li>Your professor's evaluation, grade and comments remain the assessment. Use the map for reflection.</li>
   </ol>
 
   <h3>Professor submission review</h3>
-  <p>Professors see a <b>Relative global attention</b> overlay next to the case X-ray while reviewing student submissions. They can use it to discuss agreement and disagreement with student observations.</p>
+  <p>Professors see the <b>Finding heatmap</b> next to the case X-ray while reviewing student submissions, with every finding available to choose. They can use it to discuss where students looked for a finding. Analyses saved before heatmaps were added still show the older <b>Relative global attention</b> map.</p>
 
   <h3>Overlay controls</h3>
   <table>
     <tr><th style="width:32%">Control</th><th>Use it to</th></tr>
-    <tr><td>Show attention overlay</td><td>Toggle the heatmap off to see the original X-ray unobstructed.</td></tr>
+    <tr><td>Finding</td><td>Choose which finding's heatmap to show. Likely findings come first, then possible ones.</td></tr>
+    <tr><td>Show heatmap overlay</td><td>Toggle the heatmap off to see the original X-ray unobstructed.</td></tr>
     <tr><td>Overlay opacity (default 55%)</td><td>Fade the colors so the anatomy underneath stays visible.</td></tr>
-    <tr><td>Method and 7×7 data</td><td>Expand to read the exact 49 normalized values, by row and column.</td></tr>
+    <tr><td>Method and 14×14 data</td><td>Expand to read the exact 196 normalized values for the selected finding, by row and column.</td></tr>
   </table>
 
   <div class="callout">
-    <p><b>No map shown?</b> If you see <i>"This model release does not export attention data,"</i> the active model version does not produce attention maps. The prediction results are still available.</p>
+    <p><b>No map shown?</b> If no finding met its threshold, there is no finding to map. If you see <i>"This model release does not export attention data,"</i> the active model version does not produce heatmaps. The prediction results are still available either way.</p>
   </div>
 </section>
 
@@ -143,35 +144,35 @@
 
   <div class="steps">
     <div><b>1. Observe</b>Describe what is visible on the X-ray yourself.</div>
-    <div><b>2. Locate</b>State where the overlay is warmest, using anatomical location words.</div>
+    <div><b>2. Locate</b>For each finding, state where its map is warmest, using anatomical location words.</div>
     <div><b>3. Compare</b>Check the model's focus against your own observations.</div>
-    <div><b>4. Qualify</b>Note agreement or mismatch, and don't treat attention as evidence.</div>
+    <div><b>4. Qualify</b>Note agreement or mismatch, and don't treat the map as proof.</div>
   </div>
 
   <table>
     <tr><th style="width:50%">Do</th><th>Avoid</th></tr>
-    <tr><td>Use the map as one visual cue alongside the original image and your course knowledge.</td><td>Calling a red area a confirmed abnormality.</td></tr>
-    <tr><td>Describe location carefully, e.g. "attention is concentrated over the lower right lung field."</td><td>Assuming blue areas are disease-free.</td></tr>
-    <tr><td>Treat a mismatch as a reason to re-check the image.</td><td>Reading the map as the reason for a specific predicted finding.</td></tr>
-    <tr><td>Keep reviewing the whole image, including areas with low attention.</td><td>Comparing color intensity between different images.</td></tr>
+    <tr><td>Use the map as one visual cue alongside the original image, the probability and your course knowledge.</td><td>Calling a red area a confirmed abnormality.</td></tr>
+    <tr><td>Describe location carefully, e.g. "the Pleural Effusion map is warmest over the left costophrenic angle."</td><td>Assuming blue areas are disease-free.</td></tr>
+    <tr><td>Treat a mismatch as a reason to re-check the image.</td><td>Reading the map as an outline of the lesion's size or edges.</td></tr>
+    <tr><td>Keep reviewing the whole image, including cool areas.</td><td>Comparing color intensity between different images or findings.</td></tr>
   </table>
 
   <h3>Discussion prompts</h3>
   <ul>
-    <li>Which anatomy or region received the most relative attention?</li>
-    <li>Does that region correspond to something you can see on the X-ray?</li>
+    <li>For each likely finding, which anatomy or region does its map highlight?</li>
+    <li>Does that region match where you would expect that finding, and can you see it on the X-ray?</li>
     <li>What did you observe outside the highlighted area?</li>
-    <li>Where does your interpretation differ from the model's focus, and what should you re-check?</li>
+    <li>Where does your interpretation differ from the model's evidence, and what should you re-check?</li>
   </ul>
 
   <h2 style="margin-top:3.5mm">4. Use limits</h2>
-  <p>ThoraxScan is an assistive learning tool for Radiologic Technology students. Its AI output, including attention maps, is for educational use only. It is not a diagnosis and must not guide clinical decisions or patient care. Follow your instructor's directions and course-approved interpretation methods.</p>
+  <p>ThoraxScan is an assistive learning tool for Radiologic Technology students. Its AI output, including finding heatmaps, is for educational use only. It is not a diagnosis and must not guide clinical decisions or patient care. Follow your instructor's directions and course-approved interpretation methods.</p>
 
   <div class="callout">
-    <p><b>Quick reference.</b> 7×7 grid, 49 values · four-layer attention rollout · normalized per image · red = higher, blue = lower <i>relative</i> attention · smoothed for display · global and class-agnostic · not a probability · not a disease location.</p>
+    <p><b>Quick reference.</b> One map per finding · 14×14 grid, 196 values · class activation map · scaled per finding · red = more, blue = less evidence <i>in this image</i> · smoothed for display · read with the probability · not a lesion outline.</p>
   </div>
 
-  <div class="foot">ThoraxScan · Attention Maps student guide</div>
+  <div class="foot">ThoraxScan · Finding heatmaps student guide</div>
 </section>
 
 </body>
