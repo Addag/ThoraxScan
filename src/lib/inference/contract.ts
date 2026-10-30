@@ -4,6 +4,9 @@ export const MODEL_SLOT = "thoraxscan-classifier" as const;
 export const MODEL_BUCKET = "model-artifacts" as const;
 export const MODEL_MAX_BYTES = 50 * 1024 * 1024;
 export const MODEL_INPUT_SIZE = 224;
+/** "shortside320-…" first shrinks images whose short side exceeds 320 to short side 320, as CheXpert-small was made. */
+export const RESIZE_INTERPOLATIONS = ["bilinear-center", "shortside320-bilinear-center"] as const;
+export type ResizeInterpolation = (typeof RESIZE_INTERPOLATIONS)[number];
 
 export const THORAXSCAN_LABELS = [
   "No Finding",
@@ -34,6 +37,7 @@ export interface ReleaseSourceV1 {
   sourceVersion: string;
   preprocessingVersion: string;
   thresholdVersion: string;
+  resizeInterpolation: ResizeInterpolation;
 }
 
 export interface ModelManifestV1 {
@@ -73,7 +77,7 @@ export interface ModelManifestV1 {
     resize: {
       width: 224;
       height: 224;
-      interpolation: "bilinear-center";
+      interpolation: ResizeInterpolation;
     };
     alpha: "reject";
     pixelRange: [0, 1];
@@ -196,6 +200,13 @@ function exactArray(value: unknown, expected: readonly unknown[], name: string) 
   }
 }
 
+function resizeInterpolation(value: unknown, name: string): ResizeInterpolation {
+  if (!RESIZE_INTERPOLATIONS.includes(value as ResizeInterpolation)) {
+    fail(`${name} must be one of ${RESIZE_INTERPOLATIONS.join(", ")}.`);
+  }
+  return value as ResizeInterpolation;
+}
+
 export function parseReleaseSource(value: unknown): ReleaseSourceV1 {
   const source = objectValue(value, "release.json");
   const checkpoint = objectValue(source.checkpoint, "release.checkpoint");
@@ -213,6 +224,10 @@ export function parseReleaseSource(value: unknown): ReleaseSourceV1 {
       "preprocessingVersion",
     ),
     thresholdVersion: stringValue(source.thresholdVersion, "thresholdVersion"),
+    resizeInterpolation:
+      source.resizeInterpolation === undefined
+        ? "bilinear-center"
+        : resizeInterpolation(source.resizeInterpolation, "resizeInterpolation"),
   };
 }
 
@@ -342,7 +357,7 @@ function parseV1(value: unknown): ModelManifestV1 {
     preprocessing.layout !== "NCHW" ||
     resize.width !== 224 ||
     resize.height !== 224 ||
-    resize.interpolation !== "bilinear-center"
+    !RESIZE_INTERPOLATIONS.includes(resize.interpolation as ResizeInterpolation)
   ) {
     fail("The preprocessing configuration does not match contract version 1.");
   }
@@ -455,7 +470,7 @@ function parseV1(value: unknown): ModelManifestV1 {
     preprocessing: {
       colorSpace: "grayscale",
       colorConversion: "rec601-luma",
-      resize: { width: 224, height: 224, interpolation: "bilinear-center" },
+      resize: { width: 224, height: 224, interpolation: resize.interpolation as ResizeInterpolation },
       alpha: "reject",
       pixelRange: [0, 1],
       mean: 0.5,

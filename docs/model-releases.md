@@ -74,9 +74,20 @@ V2 and V3 bundles also carry the exporter's `export-validation.json` next to `mo
   },
   "sourceVersion": "training-code-commit-or-release",
   "preprocessingVersion": "preprocessing-v1",
-  "thresholdVersion": "thresholds-v1"
+  "thresholdVersion": "thresholds-v1",
+  "resizeInterpolation": "bilinear-center"
 }
 ```
+
+`resizeInterpolation` is optional and defaults to `bilinear-center`, one resize
+straight to 224. `shortside320-bilinear-center` first shrinks images whose short
+side exceeds 320 to short side 320 (long side floored) with the same bilinear
+math, the way CheXpert-small was made, so full-size uploads match the training
+images. Such a bundle needs `model-export/preprocessing_shortside320.py` as its
+`preprocessing-reference.py` and a fixture larger than 320 from its
+`--write-fixture` option. The value becomes the manifest's
+`preprocessing.resize.interpolation`; app builds that predate it reject such a
+manifest, so deploy the app before activating the release.
 
 `thresholds.json` must contain all 14 labels in the exact contract order, each
 with a finite value from 0 through 1. The optional `possible-thresholds.json` has

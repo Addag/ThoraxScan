@@ -539,6 +539,7 @@ async function validateBundle(directoryOption: string): Promise<ValidatedBundle>
     ),
     decoded.info.width,
     decoded.info.height,
+    release.resizeInterpolation,
   );
   const actualTensorBytes = Buffer.from(
     actualTensor.buffer,
@@ -584,7 +585,7 @@ async function validateBundle(directoryOption: string): Promise<ValidatedBundle>
     preprocessing: {
       colorSpace: "grayscale",
       colorConversion: "rec601-luma",
-      resize: { width: 224, height: 224, interpolation: "bilinear-center" },
+      resize: { width: 224, height: 224, interpolation: release.resizeInterpolation },
       alpha: "reject",
       pixelRange: [0, 1],
       mean: 0.5,

@@ -90,5 +90,20 @@ logits include the rule and ECM shows the Cardiomegaly map where the rule decide
 
 `eval_localization.py --arch tinyvit` scores its maps in the NIH pointing game.
 
+## Short-side-320 preprocessing
+
+CheXpert-small, every model's training data, was made by shrinking originals to
+short side 320 with plain bilinear (no antialias). Releases with
+`"resizeInterpolation": "shortside320-bilinear-center"` in `release.json` repeat
+that step for larger uploads before the 224 resize. Copy
+`preprocessing_shortside320.py` into the bundle as `preprocessing-reference.py`
+and write its fixture (480×400, so the first stage runs):
+
+```powershell
+python model-export/preprocessing_shortside320.py --write-fixture "model-input/<release-id>/fixtures"
+```
+
+`test_preprocessing.py` checks the stage sizes and both paths.
+
 Never commit checkpoints, patient images or generated artifacts.
 See [release operations](../docs/model-releases.md) for authorization and rollback.

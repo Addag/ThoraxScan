@@ -10,7 +10,7 @@ import {
 } from "./contract";
 import { InferenceError, asInferenceError } from "./errors";
 import { postprocessLogits, type PostprocessedPrediction } from "./postprocess";
-import { preprocessImage } from "./preprocess";
+import { decodeImage, preprocessRgba } from "./preprocess";
 
 import { readyAttention, readyClassActivation, UNAVAILABLE_ATTENTION, type AttentionHeatmap } from "./attention";
 
@@ -328,11 +328,17 @@ export async function analyzeImage(
   blob: Blob,
   options: { signal?: AbortSignal; supabase?: SupabaseClient } = {},
 ): Promise<InferenceResult> {
-  const [release, tensorData] = await Promise.all([
+  const [release, image] = await Promise.all([
     resolveActiveModel(options.supabase),
-    preprocessImage(blob, options.signal),
+    decodeImage(blob, options.signal),
   ]);
   if (options.signal?.aborted) throw new DOMException("The operation was aborted.", "AbortError");
+  const tensorData = preprocessRgba(
+    image.data,
+    image.width,
+    image.height,
+    release.manifest.preprocessing.resize.interpolation,
+  );
 
   let inference: Awaited<ReturnType<typeof runModelInference>>;
   try {
