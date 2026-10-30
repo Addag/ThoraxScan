@@ -1,7 +1,8 @@
 """Pointing game on NIH ChestX-ray14 radiologist boxes: does the heatmap's peak fall inside the box?
 
 Compares the V3 per-label class activation map against the V2 global attention rollout for one SqueezeViT
-checkpoint, plus an image-centre baseline. Boxes are in the original 1024x1024 pixel space, so both maps are
+checkpoint, plus an image-centre baseline. TinyViT checkpoints (--arch tinyvit) have no global attention, so only
+their CAM is scored. Boxes are in the original 1024x1024 pixel space, so both maps are
 bilinearly upsampled there (cell-centre aligned, like the app's overlay) before taking the peak.
 
     python eval_localization.py --checkpoint <path>/squeezevit_v5_best.pth --nih-dir C:/Users/MSI/Downloads/nih-chest-xray
@@ -17,6 +18,8 @@ from PIL import Image
 
 from export_squeezevit import ExportModel as RolloutModel
 from export_squeezevit_cam import ExportModel as CamModel
+from export_tinyvit_cam import ExportModel as TinyViTCamModel
+from tinyvit_thoraxscan import TinyViTThoraxScan
 
 LABELS = ["No Finding", "Enlarged Cardiomediastinum", "Cardiomegaly", "Lung Opacity", "Lung Lesion", "Edema",
           "Consolidation", "Pneumonia", "Atelectasis", "Pneumothorax", "Pleural Effusion", "Pleural Other", "Fracture",
@@ -52,14 +55,20 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--checkpoint", type=Path, required=True)
     parser.add_argument("--nih-dir", type=Path, required=True)
+    parser.add_argument("--arch", choices=["squeezevit", "tinyvit"], default="squeezevit")
     parser.add_argument("--output", type=Path, help="CSV of per-label hit rates (default: next to the checkpoint)")
     args = parser.parse_args()
     torch.backends.mha.set_fastpath_enabled(False)
     state = torch.load(args.checkpoint, map_location="cpu", weights_only=True)
     state = state.get("model_state_dict", state)
-    cam_model, rollout_model = CamModel().eval(), RolloutModel().eval()
-    cam_model.load_state_dict(state)
-    rollout_model.load_state_dict(state)
+    if args.arch == "tinyvit":
+        trained = TinyViTThoraxScan(pretrained=False).eval()
+        trained.load_state_dict(state)
+        cam_model, rollout_model = TinyViTCamModel(trained).eval(), None
+    else:
+        cam_model, rollout_model = CamModel().eval(), RolloutModel().eval()
+        cam_model.load_state_dict(state)
+        rollout_model.load_state_dict(state)
 
     boxes = pd.read_csv(args.nih_dir / "BBox_List_2017.csv").iloc[:, :6]
     boxes.columns = ["image", "finding", "x", "y", "w", "h"]
@@ -69,14 +78,13 @@ def main():
         for image, group in boxes.groupby("image"):
             tensor, size = preprocess(paths[image])
             _, cam = cam_model(tensor[None])
-            _, rollout = rollout_model(tensor[None])
-            rollout_peak = peak(rollout[0, 0], size)
+            rollout_peak = rollout_model and peak(rollout_model(tensor[None])[1][0, 0], size)
             for box in group.itertuples():
                 label = BOX_TO_LABEL[box.finding]
                 rect = (box.x, box.y, box.w, box.h)
                 rows.append({"finding": box.finding, "label": label,
                              "cam": hit(peak(cam[0, LABELS.index(label)], size), rect),
-                             "rollout": hit(rollout_peak, rect),
+                             "rollout": hit(rollout_peak, rect) if rollout_peak else float("nan"),
                              "centre": hit((size[1] / 2, size[0] / 2), rect)})
 
     results = pd.DataFrame(rows)

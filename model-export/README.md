@@ -69,5 +69,26 @@ npm run model:validate -- --bundle "model-input/<release-id>"
 `test_cam.py` checks the CAM identity (`mean(raw map) + bias = logits`) and the
 normalization.
 
+`export_tinyvit_cam.py` does the same for TinyViT-11M (`tinyvit_thoraxscan.py`).
+Its head is avg pool → LayerNorm → fc, so each cell gets the head's per-image
+LayerNorm mean and scale before the fc weights (still exact). The 7×7 features
+are bilinearly upsampled to the contract's 14×14 grid. It writes the fixture
+logits and probabilities from the trained model, like the FastViT exporter; copy
+only the synthetic preprocessing fixtures, thresholds and preprocessing reference.
+
+```powershell
+python model-export/export_tinyvit_cam.py `
+  --checkpoint "<training-directory>/Official_retrain_v7_tinyvit/checkpoints/tinyvit_v7_best.pth" `
+  --output "model-input/<release-id>/model.onnx" `
+  --fixture-input "model-input/<release-id>/fixtures/model-input.f32"
+npm run model:validate -- --bundle "model-input/<release-id>"
+```
+
+`--ecm-rule-thresholds <bundle>/thresholds.json` also flags Enlarged Cardiomediastinum whenever
+Cardiomegaly is flagged (CheXpert's label hierarchy) by raising the ECM logit inside the graph; the fixture
+logits include the rule and ECM shows the Cardiomegaly map where the rule decides.
+
+`eval_localization.py --arch tinyvit` scores its maps in the NIH pointing game.
+
 Never commit checkpoints, patient images or generated artifacts.
 See [release operations](../docs/model-releases.md) for authorization and rollback.
