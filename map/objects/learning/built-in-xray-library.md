@@ -31,7 +31,7 @@ A static manifest plus public JPEGs gives Learning Mode and Professor activity a
 
 ## Connected to
 
-Feeds [Local Learning Mode image](local-learning-mode-image.md) and the [X-ray case](xray-case.md) upload in [activity authoring](../../processes/activity-authoring-publication.md). Unrelated to the [X-ray sample asset](../ui/xray-sample-asset.md).
+Feeds [Local Learning Mode image](local-learning-mode-image.md), keys [Learning case notes](learning-case-note.md) by case id (renaming ids orphans saved notes), and the [X-ray case](xray-case.md) upload in [activity authoring](../../processes/activity-authoring-publication.md). Unrelated to the [X-ray sample asset](../ui/xray-sample-asset.md).
 
 ## If you change this
 

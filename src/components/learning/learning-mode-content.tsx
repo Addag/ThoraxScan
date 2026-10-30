@@ -1,9 +1,14 @@
 import Image from "next/image";
 
 import { PageHeading, PageMain } from "@/components/dashboard-ui";
+import { createClient } from "@/lib/supabase/server";
 import { LearningModeAnalyzer } from "./learning-mode-analyzer";
 
-export function LearningModeContent() {
+export async function LearningModeContent() {
+  // RLS returns only the viewer's own notes.
+  const supabase = await createClient();
+  const { data } = await supabase.from("learning_case_notes").select("case_id, body").returns<{ case_id: string; body: string }[]>();
+  const notes = Object.fromEntries((data ?? []).map((note) => [note.case_id, note.body]));
   return (
     <PageMain>
       <PageHeading title="Learning Mode" subtitle="Practice with the active model on built-in or local chest X-rays" />
@@ -22,7 +27,7 @@ export function LearningModeContent() {
       </section>
       {/* The result heading takes focus after analysis, so headings and summaries need a visible focus ring here. */}
       <div className="[&_:is(summary,h2):focus-visible]:outline-3 [&_:is(summary,h2):focus-visible]:outline-offset-4 [&_:is(summary,h2):focus-visible]:outline-(--focus-ring)">
-        <LearningModeAnalyzer />
+        <LearningModeAnalyzer initialNotes={notes} />
       </div>
     </PageMain>
   );

@@ -8,8 +8,9 @@ import { createTestManifest } from "@/lib/inference/test-manifest";
 import { postprocessLogits } from "@/lib/inference/postprocess";
 import "@/app/globals.css";
 
-const mocks = vi.hoisted(() => ({ analyze: vi.fn() }));
+const mocks = vi.hoisted(() => ({ analyze: vi.fn(), saveNote: vi.fn() }));
 vi.mock("@/lib/inference/runtime", () => ({ analyzeImage: mocks.analyze }));
+vi.mock("@/app/(protected)/actions", () => ({ saveLearningNoteAction: mocks.saveNote }));
 const manifest = createTestManifest();
 function prediction(logits = manifest.labels.map((_, index) => index === 2 ? 2 : -2)): InferenceResult {
   return { ...postprocessLogits(logits, manifest), releaseId: "test-release", modelReleaseId: 1,
@@ -34,6 +35,28 @@ test("built-in case loads real JPEG bytes and can be analyzed and reset", async 
   expect(Array.from(new Uint8Array(await file.arrayBuffer()).slice(0, 2))).toEqual([255, 216]);
   await page.getByRole("button", { name: "Reset", exact: true }).click();
   await expect.element(page.getByRole("button", { name: "Analyze", exact: true })).toBeDisabled();
+});
+
+test("gallery cases keep private notes; local uploads do not", async () => {
+  mocks.saveNote.mockImplementation(async (_state, formData: FormData) => ({ status: "success", message: "Notes saved.", caseId: formData.get("caseId"), body: formData.get("body") }));
+  await render(<LearningModeAnalyzer initialNotes={{ "cxp-001": "Earlier note." }} />);
+  await page.getByRole("button", { name: "Use case 01", exact: true }).click();
+  await page.getByRole("button", { name: "Analyze", exact: true }).click();
+  const notes = page.getByLabelText(/Your own notes/);
+  await expect.element(notes).toHaveValue("Earlier note.");
+  await notes.fill("Recheck the right base.");
+  await page.getByRole("button", { name: "Save notes", exact: true }).click();
+  await expect.element(page.getByText("Notes saved.", { exact: true })).toBeVisible();
+  expect((mocks.saveNote.mock.calls[0][1] as FormData).get("caseId")).toBe("cxp-001");
+
+  await page.getByRole("button", { name: "Reset", exact: true }).click();
+  await page.getByRole("button", { name: "Use case 01", exact: true }).click();
+  await page.getByRole("button", { name: "Analyze", exact: true }).click();
+  await expect.element(page.getByLabelText(/Your own notes/)).toHaveValue("Recheck the right base.");
+
+  await start();
+  await expect.element(page.getByText(/Notes can be saved for sample gallery cases/)).toBeVisible();
+  await expect.element(page.getByLabelText(/Your own notes/)).not.toBeInTheDocument();
 });
 
 test("library filters by a positive dataset label", async () => {

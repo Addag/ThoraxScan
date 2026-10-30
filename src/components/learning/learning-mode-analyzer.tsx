@@ -6,6 +6,7 @@ import { InferenceError, type InferenceErrorCode } from "@/lib/inference/errors"
 import type { InferenceResult } from "@/lib/inference/runtime";
 import { AttentionHeatmap } from "@/components/attention-heatmap";
 import { AnalysisFindings } from "@/components/analysis-findings";
+import { LearningNotes } from "./learning-notes";
 import { XrayLibrary } from "./xray-library";
 
 const MAX_BYTES = 6 * 1024 * 1024;
@@ -36,9 +37,11 @@ function validate(file: File) {
   return null;
 }
 
-export function LearningModeAnalyzer() {
+export function LearningModeAnalyzer({ initialNotes = {} }: { initialNotes?: Record<string, string> }) {
   const [state, setState] = useState<AnalyzerState>("idle");
   const [file, setFile] = useState<File | null>(null);
+  const [caseId, setCaseId] = useState<string | null>(null);
+  const [notes, setNotes] = useState(initialNotes);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [result, setResult] = useState<InferenceResult | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -51,10 +54,10 @@ export function LearningModeAnalyzer() {
   useEffect(() => () => { runRef.current?.abort(); }, []);
   useEffect(() => { if (state === "success") resultHeadingRef.current?.focus(); }, [state]);
 
-  function choose(next: File | null) {
+  function choose(next: File | null, nextCaseId: string | null = null) {
     runRef.current?.abort();
     runRef.current = null;
-    setResult(null); setError(null); setFile(next); setPreviewUrl(null);
+    setResult(null); setError(null); setFile(next); setPreviewUrl(null); setCaseId(nextCaseId);
     if (!next) { setState("idle"); return; }
     const validationError = validate(next);
     if (validationError) { setState("error"); setError(validationError); return; }
@@ -126,9 +129,11 @@ export function LearningModeAnalyzer() {
       <h2 className="mb-[18px] text-display font-extrabold" id="learning-empty-title">{state === "running" ? "Analyzing your X-ray" : "Select an X-ray to begin"}</h2>
       <p className="m-0 text-body leading-relaxed text-(--text-muted)">{state === "running" ? "Resolving the active release, verifying the model, and analyzing in your browser. You can reset at any time." : "Choose a built-in case or a local JPEG or PNG image, review the preview, then select Analyze to explore the model’s findings."}</p>
     </section>}
+    {result && <LearningNotes key={caseId ?? "local"} className={`${panelClass} mt-7 p-6 max-[480px]:p-5`} caseId={caseId} savedBody={caseId ? notes[caseId] ?? "" : ""}
+      onSaved={(id, body) => setNotes((current) => ({ ...current, [id]: body }))} />}
     <section className={`${panelClass} mt-7 min-h-[220px] p-7 max-[480px]:p-5`} aria-labelledby="learning-gallery-title">
       <h2 className="mb-6 flex items-center gap-[18px] text-title font-extrabold" id="learning-gallery-title"><img src="/images/learning/book.svg" alt="" width="28" height="28" /> Sample gallery</h2>
-      <XrayLibrary onSelect={(next) => { if (inputRef.current) inputRef.current.value = ""; choose(next); }} />
+      <XrayLibrary onSelect={(next, nextCaseId) => { if (inputRef.current) inputRef.current.value = ""; choose(next, nextCaseId); }} />
     </section>
     </div>
   </section>;

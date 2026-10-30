@@ -12,6 +12,8 @@ The protected `/student/learning` and `/professor/learning` Server Components re
 
 Results show "Likely findings" (at or above the threshold). When the release supplies possible thresholds, they also show "Possible findings" (abnormal labels in the band below the threshold), with a note that many of them will be false alarms.
 
+After an analysis of a built-in library case, a "My notes" panel lets the viewer save a private [Learning case note](../learning/learning-case-note.md). Local uploads show a line saying notes need a gallery case.
+
 ## Connected to
 
 Uses [Built-in X-ray library](../learning/built-in-xray-library.md) as its sample gallery, [Browser inference runtime](../inference/browser-inference-runtime.md), [Local Learning Mode image](../learning/local-learning-mode-image.md), and the Student or Professor shell.
@@ -25,7 +27,7 @@ Uses [Built-in X-ray library](../learning/built-in-xray-library.md) as its sampl
 
 ### Does not hit
 
-- Activity submissions, grading, uploads, or saved results. Learning Mode heatmaps remain transient in browser memory.
+- Activity submissions, grading, uploads, or saved results. Learning Mode images, results and heatmaps remain transient in browser memory; the only write is the viewer's own [Learning case note](../learning/learning-case-note.md).
 
 ## See
 
