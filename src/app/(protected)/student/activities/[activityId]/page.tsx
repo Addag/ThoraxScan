@@ -52,8 +52,8 @@ export default async function StudentActivityPage({
         <ActivityStepRail role="student" submissionStatus={submissionLabel(activity.submissionStatus, activity.dueAt)} aiStatus={activity.aiFeedback.status} />
 
         <section className="rounded-panel border border-(--border-shell) [background:var(--glass-surface)] backdrop-blur-[18px] backdrop-saturate-[135%] shadow-(--glass-shadow) mb-6 pb-6" aria-labelledby="assignment-title">
-          <ActivityPanelTitle icon="▤" title="Activity Assignment" titleId="assignment-title" />
-          <div className="mx-[25px] mt-[22px] mb-0 rounded-panel border border-brand bg-[rgba(0,119,255,0.24)] p-4 [&>p]:m-0 [&>p]:whitespace-pre-wrap [&>p]:leading-[1.55] [&_dl]:mx-0 [&_dl]:mt-[18px] [&_dl]:mb-0 [&_dl]:grid [&_dl]:grid-cols-2 [&_dl]:gap-3 max-[520px]:[&_dl]:grid-cols-1 [&_dl_div]:rounded-control [&_dl_div]:bg-[rgba(0,0,0,0.18)] [&_dl_div]:p-2.5 [&_dt]:text-[0.6875rem] [&_dt]:uppercase [&_dt]:text-(--brand-blue-text) [&_dd]:mx-0 [&_dd]:mt-1 [&_dd]:mb-0 [&_dd]:text-[0.6875rem]">
+          <ActivityPanelTitle icon="▤" title="Activity assignment" titleId="assignment-title" />
+          <div className="mx-[25px] mt-[22px] mb-0 rounded-panel border border-brand bg-[rgba(0,119,255,0.24)] p-4 [&>p]:m-0 [&>p]:whitespace-pre-wrap [&>p]:leading-normal [&_dl]:mx-0 [&_dl]:mt-[18px] [&_dl]:mb-0 [&_dl]:grid [&_dl]:grid-cols-2 [&_dl]:gap-3 max-[520px]:[&_dl]:grid-cols-1 [&_dl_div]:rounded-control [&_dl_div]:bg-[rgba(0,0,0,0.18)] [&_dl_div]:p-2.5 [&_dt]:text-label [&_dt]:uppercase [&_dt]:text-(--brand-blue-text) [&_dd]:mx-0 [&_dd]:mt-1 [&_dd]:mb-0 [&_dd]:text-label">
             <p>{activity.instructions}</p>
             <dl>
               <div><dt>Workspace</dt><dd>{activity.workspaceName}</dd></div>

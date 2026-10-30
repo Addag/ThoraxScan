@@ -30,11 +30,11 @@ const tabOrder = ["profile", "security", "privacy", "accessibility"] as const;
 type SettingsTab = (typeof tabOrder)[number];
 
 const panelClass = "border border-(--border-strong) rounded-panel [background:var(--glass-surface)] backdrop-blur-[18px] backdrop-saturate-[135%] shadow-(--glass-shadow)";
-const panelHeadingClass = "mb-[26px] [&_h2]:m-0 [&_h2]:text-[1.25rem] [&_h2]:capitalize [&_p]:m-0 [&_p]:mt-[3px] [&_p]:text-[0.8125rem] [&_p]:text-(--text-muted)";
-const fieldClass = "grid content-start gap-[7px] text-[0.8125rem] text-(--text-primary) [&>span>small]:ml-[5px] [&>span>small]:text-(--text-disabled) [&>small:not([data-error])]:text-[0.6875rem] [&>small:not([data-error])]:leading-[1.4] [&>small:not([data-error])]:text-(--text-secondary)";
-const fieldErrorClass = "text-[0.6875rem] text-(--status-error-text)";
+const panelHeadingClass = "mb-[26px] [&_h2]:m-0 [&_h2]:text-title [&_h2]:capitalize [&_p]:m-0 [&_p]:mt-[3px] [&_p]:text-small [&_p]:text-(--text-muted)";
+const fieldClass = "grid content-start gap-[7px] text-small text-(--text-primary) [&>span>small]:ml-[5px] [&>span>small]:text-(--text-disabled) [&>small:not([data-error])]:text-label [&>small:not([data-error])]:leading-snug [&>small:not([data-error])]:text-(--text-secondary)";
+const fieldErrorClass = "text-label text-(--status-error-text)";
 const iconClass = "size-6 fill-none stroke-current stroke-[1.6] [stroke-linecap:round] [stroke-linejoin:round]";
-const messageBaseClass = "-mt-[9px] rounded-control px-3 py-2.5 text-[0.75rem]";
+const messageBaseClass = "-mt-[9px] rounded-control px-3 py-2.5 text-caption";
 const submitButtonClass = `${button("primary")} min-w-[135px] max-[600px]:w-full`;
 
 function statusMessageClass(status: SettingsActionState["status"]) {
@@ -148,7 +148,7 @@ export function SettingsForm({
             <button
               aria-controls={`settings-panel-${tab}`}
               aria-selected={activeTab === tab}
-              className={`transition-colors duration-160 flex min-h-11 w-full cursor-pointer items-center justify-center gap-2 rounded-control border px-3 text-[0.9375rem] font-semibold text-(--text-primary) ${activeTab === tab ? "border-brand bg-[rgba(70,193,255,0.49)]" : "border-transparent bg-transparent hover:bg-(--hover-overlay)"}`}
+              className={`transition-colors duration-160 flex min-h-11 w-full cursor-pointer items-center justify-center gap-2 rounded-control border px-3 text-lead font-semibold text-(--text-primary) ${activeTab === tab ? "border-brand bg-[rgba(70,193,255,0.49)]" : "border-transparent bg-transparent hover:bg-(--hover-overlay)"}`}
               id={`settings-tab-${tab}`}
               key={tab}
               onClick={() => setActiveTab(tab)}
@@ -259,15 +259,15 @@ export function SettingsForm({
             <article className="grid min-h-[54px] grid-cols-[26px_minmax(0,1fr)] items-center gap-3 rounded-control border border-[#007623] bg-[rgba(0,224,93,0.32)] px-3 py-2.5 max-[600px]:items-start">
               <SettingsIcon tab="privacy" />
               <div>
-                <strong className="text-[0.8125rem]">Private teaching-case storage</strong>
-                <p className="m-0 mt-0.5 text-[0.75rem] leading-[1.35] text-(--text-secondary)">Approved, de-identified cases use private Supabase Storage with short-lived signed access for authorized activity pages.</p>
+                <strong className="text-small">Private teaching-case storage</strong>
+                <p className="m-0 mt-0.5 text-caption leading-snug text-(--text-secondary)">Approved, de-identified cases use private Supabase Storage with short-lived signed access for authorized activity pages.</p>
               </div>
             </article>
             <article className="grid min-h-[54px] grid-cols-[26px_minmax(0,1fr)] items-center gap-3 rounded-control border border-[#0d5fc7] bg-[rgba(0,132,255,0.38)] px-3 py-2.5 max-[600px]:items-start">
               <span className="grid size-6 place-items-center rounded-full border border-current" aria-hidden="true">✓</span>
               <div>
-                <strong className="text-[0.8125rem]">Browser inference foundation</strong>
-                <p className="m-0 mt-0.5 text-[0.75rem] leading-[1.35] text-(--text-secondary)">Learning Mode can run the active ONNX release in this browser. Authorized activity analysis may persist model results and feedback according to the <Link className="font-semibold underline underline-offset-2" href="/privacy-policy">Privacy Policy</Link>.</p>
+                <strong className="text-small">Browser inference foundation</strong>
+                <p className="m-0 mt-0.5 text-caption leading-snug text-(--text-secondary)">Learning Mode can run the active ONNX release in this browser. Authorized activity analysis may persist model results and feedback according to the <Link className="font-semibold underline underline-offset-2" href="/privacy-policy">Privacy Policy</Link>.</p>
               </div>
             </article>
           </div>
@@ -342,11 +342,11 @@ function AccessibilityPanel({ hidden }: { hidden: boolean }) {
       </div>
       <div className="grid gap-[26px]">
         <fieldset className="m-0 grid gap-[7px] border-0 p-0">
-          <legend className="mb-[7px] p-0 text-[0.8125rem] text-(--text-primary)">Text size</legend>
+          <legend className="mb-[7px] p-0 text-small text-(--text-primary)">Text size</legend>
           <div className="flex flex-wrap gap-2.5">
             {textSizes.map((size) => (
               <label
-                className="transition-colors duration-160 flex min-h-10 cursor-pointer items-center gap-2 rounded-control border border-(--border-field) px-3.5 text-[0.8125rem] text-(--text-primary) hover:bg-(--hover-overlay) has-checked:border-brand has-checked:bg-[rgba(70,193,255,0.25)]"
+                className="transition-colors duration-160 flex min-h-10 cursor-pointer items-center gap-2 rounded-control border border-(--border-field) px-3.5 text-small text-(--text-primary) hover:bg-(--hover-overlay) has-checked:border-brand has-checked:bg-[rgba(70,193,255,0.25)]"
                 key={size.value}
               >
                 <input
@@ -370,8 +370,8 @@ function AccessibilityPanel({ hidden }: { hidden: boolean }) {
             type="checkbox"
           />
           <span className="grid gap-0.5">
-            <span className="text-[0.8125rem] text-(--text-primary)">High contrast</span>
-            <small className="text-[0.6875rem] leading-[1.4] text-(--text-secondary)">Solid panels, stronger borders and brighter secondary text.</small>
+            <span className="text-small text-(--text-primary)">High contrast</span>
+            <small className="text-label leading-snug text-(--text-secondary)">Solid panels, stronger borders and brighter secondary text.</small>
           </span>
         </label>
       </div>
@@ -470,29 +470,29 @@ function PasswordPanel() {
           <p>Enter your current password, then choose a new one. Other signed-in devices will be logged out.</p>
         </div>
         <div className="grid grid-cols-2 gap-x-[84px] gap-y-[26px] max-[600px]:grid-cols-1 max-[600px]:gap-y-5">
-          {passwordFields.map((field) => (
-            <label className={`${fieldClass} ${field.name === "newPassword" ? "col-start-1" : ""}`} key={field.name}>
-              <span>{field.label}</span>
+          {passwordFields.map((input) => (
+            <label className={`${fieldClass} ${input.name === "newPassword" ? "col-start-1" : ""}`} key={input.name}>
+              <span>{input.label}</span>
               <div className="relative">
                 <input
                   className={`${field} pr-10`}
-                  aria-invalid={Boolean(state.fieldErrors?.[field.name])}
-                  autoComplete={field.autoComplete}
+                  aria-invalid={Boolean(state.fieldErrors?.[input.name])}
+                  autoComplete={input.autoComplete}
                   disabled={pending}
-                  name={field.name}
+                  name={input.name}
                   required
-                  type={visible[field.name] ? "text" : "password"}
+                  type={visible[input.name] ? "text" : "password"}
                 />
                 <PasswordToggle
                   className="right-1 size-8"
-                  visible={Boolean(visible[field.name])}
-                  onToggle={() => setVisible((v) => ({ ...v, [field.name]: !v[field.name] }))}
+                  visible={Boolean(visible[input.name])}
+                  onToggle={() => setVisible((v) => ({ ...v, [input.name]: !v[input.name] }))}
                 />
               </div>
-              {state.fieldErrors?.[field.name] ? (
-                <small data-error="true" className={fieldErrorClass} role="alert">{state.fieldErrors[field.name]}</small>
-              ) : "hint" in field ? (
-                <small>{field.hint}</small>
+              {state.fieldErrors?.[input.name] ? (
+                <small data-error="true" className={fieldErrorClass} role="alert">{state.fieldErrors[input.name]}</small>
+              ) : "hint" in input ? (
+                <small>{input.hint}</small>
               ) : null}
             </label>
           ))}

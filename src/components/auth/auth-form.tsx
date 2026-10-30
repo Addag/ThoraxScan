@@ -290,7 +290,7 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
       )}
 
       <button
-        className={`${button("primary", "lg")} mt-6 w-full`}
+        className={`${button("primary", "lg")} mt-6 w-full rounded-full!`}
         type="submit"
         disabled={pending || !captchaReady}
         aria-busy={pending}
@@ -348,7 +348,7 @@ function RoleSelector({
               height={88}
               aria-hidden="true"
             />
-            <span className={`absolute right-3 left-3 font-extrabold leading-[1.2] ${mode === "login" ? "bottom-6 text-[17px] max-sm:inset-x-1 max-sm:bottom-3 max-sm:text-[13px]" : "bottom-[27px] text-[20px]"}`}>Student</span>
+            <span className={`absolute right-3 left-3 font-extrabold leading-[1.2] ${mode === "login" ? "bottom-6 text-[17px] max-sm:inset-x-1 max-sm:bottom-3 max-sm:text-[11px]" : "bottom-[27px] text-[20px]"}`}>Student</span>
             <span className={`absolute right-3 left-3 mx-auto max-w-[170px] leading-[1.3] text-[#d0d4e6] ${mode === "login" ? "bottom-[7px] text-[11px] max-sm:hidden" : "bottom-[9px] text-[12px]"}`}>Learning workspace</span>
           </label>
         </div>
@@ -370,7 +370,7 @@ function RoleSelector({
               height={83}
               aria-hidden="true"
             />
-            <span className={`absolute right-3 left-3 font-extrabold leading-[1.2] ${mode === "login" ? "bottom-6 text-[17px] max-sm:inset-x-1 max-sm:bottom-3 max-sm:text-[13px]" : "bottom-[27px] text-[20px]"}`}>Professor</span>
+            <span className={`absolute right-3 left-3 font-extrabold leading-[1.2] ${mode === "login" ? "bottom-6 text-[17px] max-sm:inset-x-1 max-sm:bottom-3 max-sm:text-[11px]" : "bottom-[27px] text-[20px]"}`}>Professor</span>
             <span className={`absolute right-3 left-3 mx-auto max-w-[170px] leading-[1.3] text-[#d0d4e6] ${mode === "login" ? "bottom-[7px] text-[11px] max-sm:hidden" : "bottom-[9px] text-[12px]"}`}>
               {mode === "register" ? "Approval required" : "Teaching workspace"}
             </span>
@@ -388,7 +388,7 @@ function RoleSelector({
             />
             <label className="relative flex h-32 cursor-pointer flex-col items-center justify-center overflow-hidden rounded-panel border border-[rgb(153_191_240/32%)] bg-(--glass-inset) text-center text-(--text-primary) shadow-(--glass-inset-shadow) transition-[background-color,border-color,transform] duration-[160ms] hover:bg-[rgba(0,119,255,0.28)] peer-checked:border-[#0077ff] peer-checked:bg-[rgba(0,119,255,0.6)] peer-focus-visible:outline-3 peer-focus-visible:outline-white peer-focus-visible:outline-offset-4 peer-active:[transform:translateY(1px)]" htmlFor="login-role-administrator">
               <span className="absolute top-[13px] grid size-[66px] place-items-center rounded-[18px] border-2 border-[#8bc9ff] text-[42px] leading-none text-[#d5edff]" aria-hidden="true">◇</span>
-              <span className="absolute right-3 bottom-6 left-3 text-[17px] font-extrabold leading-[1.2] max-sm:inset-x-1 max-sm:bottom-3 max-sm:text-[13px]">Administrator</span>
+              <span className="absolute right-3 bottom-6 left-3 text-[17px] font-extrabold leading-[1.2] max-sm:inset-x-1 max-sm:bottom-3 max-sm:text-[11px]">Administrator</span>
               <span className="absolute right-3 bottom-[7px] left-3 mx-auto max-w-[170px] text-[11px] leading-[1.3] text-[#d0d4e6] max-sm:hidden">Professor approvals</span>
             </label>
           </div>

@@ -52,17 +52,17 @@ const roles = [
 ] as const;
 
 const modelFacts = [
-  "SqueezeViT, a compact vision transformer, distilled from a larger FastViT teacher.",
+  "TinyViT-11M, a hybrid vision transformer pretrained on ImageNet-22k and distilled from a FastViT teacher.",
   "Trained on CheXpert frontal and lateral chest X-rays plus NIH ChestX-ray14 to score 14 findings.",
   "Runs in your browser with ONNX Runtime Web: WebGPU where available, WebAssembly otherwise.",
   "Finding heatmaps are class activation maps: one 14×14 map per finding, showing where the evidence for that finding sits. They guide the eye; they don't outline lesions.",
 ] as const;
 
-// From map/objects/inference/model-training.md (v6 release). Update when the active release changes.
+// From map/objects/inference/model-training.md (v7 release). Update when the active release changes.
 const modelScore = {
-  value: "0.877",
+  value: "0.880",
   label: "mean AUC across the five CheXpert competition labels",
-  source: "Release v6, measured on the 234-image CheXpert validation set, which the model was neither trained nor tuned on.",
+  source: "Release v7, measured on the 234-image CheXpert validation set, which the model was neither trained nor tuned on.",
 };
 
 const loginButton = "inline-flex min-h-12 items-center justify-center gap-2 rounded-full border border-[rgb(168_211_255/48%)] px-7 text-[1rem] font-extrabold text-white no-underline [background:var(--landing-login-bg)] shadow-(--landing-login-shadow) [transition:transform_160ms_ease] hover:[background:var(--landing-login-bg-hover)] active:translate-y-px focus-visible:outline-3 focus-visible:outline-[#c5e3ff] focus-visible:outline-offset-[5px]";
@@ -74,27 +74,26 @@ export default function Home() {
       <LandingHeader />
 
       <main>
-        <section className="relative min-h-[max(819px,calc(100svh-81px))] overflow-hidden stacked:flex stacked:min-h-[calc(100svh-81px)] stacked:flex-col stacked:overflow-visible narrow:min-h-[calc(100svh-73px)]" aria-labelledby="landing-title">
-          <div className="relative mx-auto min-h-[820px] max-w-[1440px] stacked:min-h-0 stacked:w-full tablet:grid tablet:grid-cols-[minmax(0,1fr)_minmax(320px,507px)] tablet:items-start tablet:gap-[clamp(24px,3vw,48px)] tablet:px-[clamp(24px,5vw,72px)] tablet:pt-[clamp(64px,7vw,88px)] tablet:pb-14 narrow:flex narrow:flex-col narrow:px-6 narrow:pt-[72px] narrow:pb-[52px]">
-            <div className="absolute top-[108px] left-[8.0556%] flex h-[25px] w-[479px] items-center justify-center rounded-[15px] border border-[rgb(123_185_255/38%)] [background:linear-gradient(120deg,rgb(92_155_255/20%),rgb(37_75_145/14%))] text-[1rem] font-semibold leading-[1.4375rem] text-[#b9dbff] text-center backdrop-blur-[20px] backdrop-saturate-[140%] shadow-(--glass-inset-shadow) stacked:static stacked:h-auto stacked:min-h-[25px] stacked:w-[min(100%,479px)] stacked:px-2.5 stacked:py-1 stacked:leading-[1.2] tablet:min-w-0 tablet:col-span-full tablet:justify-self-start tablet:text-[clamp(0.75rem,1.2vw,1rem)] narrow:self-center narrow:text-[0.75rem] no-backdrop:[background:#14243e]">
-              SqueezeViT | ONNX Runtime Web | Finding Heatmap XAI
-            </div>
-
-            <div className="absolute top-[214px] left-[8.0556%] w-[604px] stacked:static stacked:w-full tablet:min-w-0 tablet:mt-0 narrow:mt-[54px]">
-              <h1 className="m-0 [font-family:var(--font-inter),Arial,sans-serif] text-[4rem] font-extrabold tracking-[-2.6px] leading-[1.28] text-(--text-primary) stacked:leading-[1.15] tablet:text-[clamp(2.875rem,5.3vw,4rem)] tablet:tracking-[-2px] narrow:text-[clamp(2.625rem,11vw,4rem)] narrow:tracking-[-1.8px]" id="landing-title">
+        <section className="flex min-h-[calc(100svh-81px)] flex-col narrow:min-h-[calc(100svh-73px)]" aria-labelledby="landing-title">
+          <div className="mx-auto grid w-full max-w-[1440px] flex-1 grid-cols-[minmax(0,1fr)_auto] stacked:grid-cols-[minmax(0,1fr)_minmax(320px,507px)] content-center items-center gap-[clamp(24px,4vw,64px)] px-[clamp(24px,5vw,72px)] py-[clamp(48px,7vh,88px)] narrow:flex narrow:flex-col narrow:items-stretch narrow:px-6">
+            <div className="grid min-w-0 justify-items-start gap-[22px]">
+              <p className="m-0 rounded-full border border-[rgb(123_185_255/38%)] [background:linear-gradient(120deg,rgb(92_155_255/20%),rgb(37_75_145/14%))] px-4 py-1 text-center text-[clamp(0.75rem,1.2vw,1rem)] font-semibold leading-[1.3] text-[#b9dbff] backdrop-blur-[20px] backdrop-saturate-[140%] shadow-(--glass-inset-shadow) narrow:justify-self-center no-backdrop:[background:#14243e]">
+                TinyViT | ONNX Runtime Web | Finding Heatmap XAI
+              </p>
+              <h1 className="m-0 mt-2 [font-family:var(--font-inter),Arial,sans-serif] text-[clamp(2.625rem,5.3vw,4rem)] font-extrabold tracking-[-2px] leading-[1.2] text-(--text-primary) narrow:mt-6 narrow:tracking-[-1.8px]" id="landing-title">
                 <span className="block">AI-Assisted</span>
                 <span className="block text-brand">Chest X-Ray</span>
                 <span className="block">Learning Platform</span>
               </h1>
-              <p className="mt-[22px] w-[390px] text-[1rem] font-semibold leading-[1.35] text-[#c3d0e2] stacked:mt-[26px] stacked:leading-[1.25] tablet:w-[min(100%,340px)] narrow:w-[min(100%,390px)]">
+              <p className="m-0 max-w-[390px] text-[1rem] font-semibold leading-[1.35] text-[#c3d0e2]">
                 ThoraxScan is an educational LMS for Radiologic Technology students. Practice chest X-ray interpretation through professor-guided activities, with AI-powered finding heatmaps after submission.
               </p>
-              <Link className={`${loginButton} mt-[42px] stacked:mt-[34px]`} href="/login">
+              <Link className={`${loginButton} mt-5`} href="/login">
                 Log in <span aria-hidden="true">→</span>
               </Link>
             </div>
 
-            <figure className="absolute top-[186px] left-[55.5556%] m-0 h-[430px] w-[580px] stacked:h-auto stacked:w-[min(100%,507px)] tablet:static tablet:min-w-0 tablet:justify-self-end narrow:relative narrow:top-auto narrow:left-auto narrow:mx-auto narrow:mt-[82px] narrow:transform-none" aria-labelledby="xray-caption">
+            <figure className="relative m-0 h-[430px] w-[580px] justify-self-end stacked:h-auto stacked:w-full stacked:max-w-[507px] narrow:mx-auto narrow:mt-12" aria-labelledby="xray-caption">
               <div className="absolute top-10 left-0 h-[361px] w-[507px] overflow-hidden rounded-[22px] border border-[rgb(175_207_255/32%)] [background:linear-gradient(135deg,rgb(207_228_255/18%),rgb(66_100_166/8%))] backdrop-blur-[20px] backdrop-saturate-[140%] shadow-(--landing-xray-shadow) stacked:relative stacked:top-auto stacked:left-auto stacked:h-auto stacked:w-full stacked:aspect-[507/361] no-backdrop:[background:#14243e]">
                 <Image
                   className="absolute top-[14px] left-[14px] block h-[calc(100%-28px)] w-[calc(100%-28px)] rounded-[12px] object-cover"
@@ -102,7 +101,7 @@ export default function Home() {
                   alt="Illustrative frontal chest X-ray preview"
                   width={507}
                   height={338}
-                  priority
+                  preload
                 />
               </div>
               <figcaption id="xray-caption" className="sr-only">
@@ -119,11 +118,11 @@ export default function Home() {
             </figure>
           </div>
 
-          <a className={`${secondaryPill} absolute bottom-[78px] left-1/2 z-[2] -translate-x-1/2 stacked:static stacked:mt-auto stacked:mb-8 stacked:translate-x-0 stacked:self-center`} href="#how-it-works">
+          <a className={`${secondaryPill} mb-8 self-center`} href="#how-it-works">
             See how it works <span aria-hidden="true">↓</span>
           </a>
 
-          <aside className="absolute inset-x-0 bottom-0 z-[2] flex min-h-[54px] items-start border border-[rgb(244_195_1/38%)] bg-[rgb(38_33_18/78%)] px-[31px] pt-1.5 pb-[5px] text-[1rem] font-semibold leading-[1.15] text-[#ffe082] backdrop-blur-[20px] backdrop-saturate-[140%] shadow-[inset_0_1px_0_rgb(244_195_1/8%)] stacked:static stacked:min-h-0 stacked:px-[18px] stacked:py-2.5 stacked:text-[0.8125rem] stacked:leading-[1.2] no-backdrop:[background:#262112]" aria-label="Educational disclaimer">
+          <aside className="flex items-start border border-[rgb(244_195_1/38%)] bg-[rgb(38_33_18/78%)] px-[31px] py-2.5 text-[1rem] font-semibold leading-[1.15] text-[#ffe082] backdrop-blur-[20px] backdrop-saturate-[140%] shadow-[inset_0_1px_0_rgb(244_195_1/8%)] stacked:px-[18px] stacked:text-[0.8125rem] stacked:leading-[1.2] no-backdrop:[background:#262112]" aria-label="Educational disclaimer">
             <Image
               className="mt-2 mr-[18px] h-6 w-6 flex-[0_0_24px] stacked:mt-[5px] stacked:mr-[13px] stacked:h-5 stacked:w-5 stacked:basis-5"
               src="/images/danger-triangle.svg"
@@ -195,7 +194,7 @@ export default function Home() {
             <div className="min-w-0" data-reveal>
               <AttentionHeatmap
                 className={`${glassCard} p-5 [&_label]:flex-wrap`}
-                imageUrl="/images/chexpert/cxp-001.jpg"
+                imageUrl="/images/chexpert/cxp-232.jpg"
                 attention={sampleHeatmap}
                 labels={sampleHeatmapLabels}
                 title="Sample case: real model output"

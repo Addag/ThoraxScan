@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { FilterForm } from "@/components/filter-form";
 
 import {
   ActivityStatusBadge,
@@ -60,10 +61,10 @@ export default async function ProfessorActivitiesPage({
       <PageMain>
         <PageHeading title="Activities" subtitle="Create, publish, and archive chest X-ray activities" />
 
-        <section className="mb-5 flex items-end justify-between gap-6 rounded-panel border border-(--border-shell) bg-(--surface-field) px-5 py-[18px] max-[760px]:flex-col max-[760px]:items-stretch" aria-label="Activity filters">
-          <form className="flex items-end gap-3 max-[760px]:flex-col max-[760px]:items-stretch">
+        <section className="mb-5 flex items-end justify-between gap-6 rounded-panel border border-(--border-shell) [background:var(--glass-surface)] shadow-(--glass-shadow) px-5 py-[18px] max-[760px]:flex-col max-[760px]:items-stretch" aria-label="Activity filters">
+          <FilterForm>
             {status ? <input type="hidden" name="status" value={status} /> : null}
-            <label className="grid w-[250px] gap-[7px] text-[0.6875rem] text-(--text-muted) max-[760px]:w-full">
+            <label className="grid w-[250px] gap-[7px] text-label text-(--text-muted) max-[760px]:w-full">
               Workspace
               <select className={field} name="workspace" defaultValue={workspaceId}>
                 <option value="">All teaching workspaces</option>
@@ -72,15 +73,14 @@ export default async function ProfessorActivitiesPage({
                 ))}
               </select>
             </label>
-            <button className={button("secondary")} type="submit">Apply filter</button>
-          </form>
+          </FilterForm>
           <Link className={button("primary")} href="/professor/activities/new">＋ New activity</Link>
         </section>
 
         <nav className="mb-5 flex gap-2 overflow-x-auto" aria-label="Activity status">
-          <Link className={`transition-colors duration-160 inline-flex min-h-10 items-center gap-2 rounded-control border px-[13px] text-[0.75rem] font-extrabold capitalize no-underline ${!status ? "border-brand bg-[rgba(0,119,255,0.18)] text-(--text-primary)" : "border-(--border-subtle) text-(--text-muted) hover:bg-(--hover-overlay)"}`} href={hrefForStatus(null)}>All <span className="rounded-full bg-(--hover-overlay) px-[7px] py-[3px]">{activitiesResult.data.length}</span></Link>
+          <Link className={`transition-colors duration-160 inline-flex min-h-10 items-center gap-2 rounded-control border px-[13px] text-caption font-extrabold capitalize no-underline ${!status ? "border-brand bg-[rgba(0,119,255,0.18)] text-(--text-primary)" : "border-(--border-subtle) text-(--text-muted) hover:bg-(--hover-overlay)"}`} href={hrefForStatus(null)}>All <span className="rounded-full bg-(--hover-overlay) px-[7px] py-[3px]">{activitiesResult.data.length}</span></Link>
           {(["draft", "published", "archived"] as const).map((item) => (
-            <Link className={`transition-colors duration-160 inline-flex min-h-10 items-center gap-2 rounded-control border px-[13px] text-[0.75rem] font-extrabold capitalize no-underline ${status === item ? "border-brand bg-[rgba(0,119,255,0.18)] text-(--text-primary)" : "border-(--border-subtle) text-(--text-muted) hover:bg-(--hover-overlay)"}`} href={hrefForStatus(item)} key={item}>
+            <Link className={`transition-colors duration-160 inline-flex min-h-10 items-center gap-2 rounded-control border px-[13px] text-caption font-extrabold capitalize no-underline ${status === item ? "border-brand bg-[rgba(0,119,255,0.18)] text-(--text-primary)" : "border-(--border-subtle) text-(--text-muted) hover:bg-(--hover-overlay)"}`} href={hrefForStatus(item)} key={item}>
               {item} <span className="rounded-full bg-(--hover-overlay) px-[7px] py-[3px]">{activitiesResult.data.filter((activity) => activity.status === item).length}</span>
             </Link>
           ))}
@@ -96,15 +96,15 @@ export default async function ProfessorActivitiesPage({
               <article className={`${glassPanelClass} border-(--border-shell) p-5`} key={activity.id}>
                 <div className="flex items-center justify-between gap-3">
                   <ActivityStatusBadge status={activity.status} />
-                  <span className="text-[0.6875rem] leading-[1.4] text-(--text-secondary)">{activity.hasCase ? "Case attached" : "Case required"}</span>
+                  <span className="text-label leading-snug text-(--text-secondary)">{activity.hasCase ? "Case attached" : "Case required"}</span>
                 </div>
-                <p className="mx-0 mt-[22px] mb-[5px] text-[0.6875rem] leading-[1.4] text-(--text-secondary)">{activity.workspaceName}</p>
-                <h2 className="m-0 min-h-12 text-[1.25rem] leading-[1.2]">{activity.title}</h2>
+                <p className="mx-0 mt-[22px] mb-[5px] text-label leading-snug text-(--text-secondary)">{activity.workspaceName}</p>
+                <h2 className="m-0 min-h-12 text-title leading-tight">{activity.title}</h2>
                 <dl className="my-5 grid grid-cols-2 gap-2.5 max-[520px]:grid-cols-1">
-                  <div className="rounded-control bg-(--surface-sunken) p-2.5"><dt className="text-[0.6875rem] uppercase leading-[1.4] tracking-[0.06em] text-(--text-secondary)">Due</dt><dd className="mx-0 mt-1 mb-0 text-[0.6875rem] leading-[1.4]">{formatDueDate(activity.dueAt)}</dd></div>
-                  <div className="rounded-control bg-(--surface-sunken) p-2.5"><dt className="text-[0.6875rem] uppercase leading-[1.4] tracking-[0.06em] text-(--text-secondary)">Updated</dt><dd className="mx-0 mt-1 mb-0 text-[0.6875rem] leading-[1.4]">{new Intl.DateTimeFormat("en-US", { dateStyle: "medium" }).format(new Date(activity.updatedAt))}</dd></div>
+                  <div className="rounded-control bg-(--surface-sunken) p-2.5"><dt className="text-label uppercase leading-snug tracking-[0.08em] text-(--text-secondary) font-extrabold">Due</dt><dd className="mx-0 mt-1 mb-0 text-label leading-snug">{formatDueDate(activity.dueAt)}</dd></div>
+                  <div className="rounded-control bg-(--surface-sunken) p-2.5"><dt className="text-label uppercase leading-snug tracking-[0.08em] text-(--text-secondary) font-extrabold">Updated</dt><dd className="mx-0 mt-1 mb-0 text-label leading-snug">{new Intl.DateTimeFormat("en-US", { dateStyle: "medium" }).format(new Date(activity.updatedAt))}</dd></div>
                 </dl>
-                <Link className="transition-colors duration-160 hover:text-(--text-primary) flex items-center justify-between text-[0.75rem] font-extrabold text-(--brand-blue-text) no-underline" href={`/professor/activities/${activity.id}`}>Open activity <span aria-hidden="true">→</span></Link>
+                <Link className="transition-colors duration-160 hover:text-(--text-primary) flex items-center justify-between text-caption font-extrabold text-(--brand-blue-text) no-underline" href={`/professor/activities/${activity.id}`}>Open activity <span aria-hidden="true">→</span></Link>
               </article>
             ))}
           </div>

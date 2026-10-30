@@ -39,19 +39,19 @@ export default async function ProfessorPage() {
         </StatGrid>
 
         <Link className={`${activitiesCtaClass} mt-5`} href="/professor/activities">
-          <span className="grid gap-1"><strong>Manage activities</strong><small className="text-[0.6875rem] text-(--brand-blue-text)">Author, publish, and archive case-backed assignments</small></span>
-          <span className="text-[1.5rem] text-(--brand-blue-text)" aria-hidden="true">→</span>
+          <span className="grid gap-1"><strong>Manage activities</strong><small className="text-label text-(--brand-blue-text)">Author, publish, and archive case-backed assignments</small></span>
+          <span className="text-display text-(--brand-blue-text)" aria-hidden="true">→</span>
         </Link>
 
         <section className="mt-6 grid grid-cols-2 gap-[18px] max-[1000px]:grid-cols-1" aria-label="Workspace actions">
           <article className="rounded-panel border border-(--border-shell) [background:var(--glass-surface)] p-6 backdrop-blur-[18px] backdrop-saturate-[135%] shadow-(--glass-shadow)">
             <p className={sectionKickerClass}>New class space</p>
-            <h2 className="m-0 mb-[18px] text-[1.1875rem]">Create a workspace</h2>
+            <h2 className="m-0 mb-[18px] text-title">Create a workspace</h2>
             <CreateWorkspaceForm />
           </article>
           <article className="rounded-panel border border-(--border-shell) [background:var(--glass-surface)] p-6 backdrop-blur-[18px] backdrop-saturate-[135%] shadow-(--glass-shadow)">
             <p className={sectionKickerClass}>Teaching access</p>
-            <h2 className="m-0 mb-[18px] text-[1.1875rem]">Join as co-professor</h2>
+            <h2 className="m-0 mb-[18px] text-title">Join as co-professor</h2>
             <ProfessorRedeemForm />
           </article>
         </section>

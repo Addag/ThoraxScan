@@ -44,19 +44,19 @@ export function XrayLibrary({ onSelect, disabled = false, selectedCaseId, onLoad
     }
   }
 
-  return <section className="grid min-w-0 gap-3.5 [&_p]:m-0 [&_p]:text-[0.8125rem] [&_p]:leading-[1.6] [&_p]:text-(--text-muted)" aria-label="Built-in X-ray library">
-    <h3 className="m-0 text-[1.125rem]">Built-in X-ray library</h3>
+  return <section className="grid min-w-0 gap-3.5 [&_p]:m-0 [&_p]:text-small [&_p]:leading-relaxed [&_p]:text-(--text-muted)" aria-label="Built-in X-ray library">
+    <h3 className="m-0 text-title">Built-in X-ray library</h3>
     {frontalOnly
       ? <p>Frontal JPEG images from CheXpert Small’s validation folder. Choose a case to use it. Activities accept frontal views only.</p>
       : <p>All JPEG images from CheXpert Small’s validation folder, including frontal and lateral views. Choose a case to use it. Lateral results are less tested than frontal results.</p>}
-    {frontalOnly ? null : <label className="grid gap-2 text-[0.8125rem]">Filter by view
+    {frontalOnly ? null : <label className="grid gap-2 text-small">Filter by view
       <select className={field} value={view} onChange={(event) => setView(event.target.value)}>
         <option value="">All views</option>
         <option value="Frontal">Frontal</option>
         <option value="Lateral">Lateral</option>
       </select>
     </label>}
-    <label className="grid gap-2 text-[0.8125rem]">Filter by dataset label
+    <label className="grid gap-2 text-small">Filter by dataset label
       <select className={field} value={filter} onChange={(event) => setFilter(event.target.value)}>
         <option value="">All findings</option>
         {findings.map((finding) => <option key={finding}>{finding}</option>)}
@@ -68,8 +68,8 @@ export function XrayLibrary({ onSelect, disabled = false, selectedCaseId, onLoad
         {/* Serve the original small dataset JPEG without image transformation. */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img className="h-40 w-full rounded-control bg-[#080b10] object-contain" src={item.imageUrl} alt={`${item.title}, ${item.view}${item.projection ? ` ${item.projection}` : ""} chest X-ray`} width={320} height={320} loading="lazy" />
-        <div className="flex flex-wrap justify-between gap-1.5 text-[0.8125rem]"><strong>{item.title}</strong><span className="text-(--text-muted)">{item.view}{item.projection ? ` · ${item.projection}` : ""}</span></div>
-        <details className="text-[0.75rem]"><summary className="cursor-pointer">Dataset reference labels</summary>
+        <div className="flex flex-wrap justify-between gap-1.5 text-small"><strong>{item.title}</strong><span className="text-(--text-muted)">{item.view}{item.projection ? ` · ${item.projection}` : ""}</span></div>
+        <details className="text-caption"><summary className="cursor-pointer">Dataset reference labels</summary>
           <p>{Object.entries(item.labels).filter(([, value]) => value === 1).map(([label]) => label).join(", ") || "No positive labels recorded"}</p>
         </details>
         <button className={`${button("secondary")} mt-auto`} type="button" disabled={disabled || loading !== null} onClick={() => void select(item)}>

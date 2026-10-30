@@ -18,9 +18,9 @@ const navLinks = [
 
 export function LandingHeader() {
   return (
-    <header className="relative h-[81px] bg-(--glass-shell) backdrop-blur-[12px] shadow-[inset_0_-1px_0_rgb(255_255_255/8%)] narrow:h-[73px] no-backdrop:[background:#14243e]">
+    <header className="relative flex h-[81px] items-center justify-between gap-4 px-9 bg-(--glass-shell) backdrop-blur-[12px] shadow-[inset_0_-1px_0_rgb(255_255_255/8%)] narrow:h-[73px] narrow:px-5 no-backdrop:[background:#14243e]">
       <Brand variant="landing" />
-      <nav className="absolute top-1/2 right-9 flex -translate-y-1/2 gap-1 narrow:right-5" aria-label="On this page">
+      <nav className="flex gap-1" aria-label="On this page">
         {navLinks.map((link) => (
           // Phones keep only Docs beside the brand; the hero's button reaches How it works and the footer links Technical.
           <a

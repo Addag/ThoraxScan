@@ -32,16 +32,16 @@ export default async function StudentActivitiesPage() {
         ) : (
           <div className="grid gap-3.5">
             {activities.data.map((activity) => (
-              <article className="grid grid-cols-[56px_minmax(0,1fr)_auto] items-center gap-[18px] rounded-panel border border-(--border-shell) bg-(--surface-field) px-5 py-[18px] max-[760px]:grid-cols-[50px_minmax(0,1fr)]" key={activity.id}>
-                <div className="grid size-[50px] place-items-center rounded-full bg-brand text-[1.375rem]" aria-hidden="true">◉</div>
+              <article className="grid grid-cols-[48px_minmax(0,1fr)_auto] items-center gap-[18px] rounded-panel border border-(--border-shell) [background:var(--glass-surface)] shadow-(--glass-shadow) px-5 py-[18px] max-[760px]:grid-cols-[48px_minmax(0,1fr)]" key={activity.id}>
+                <div className="grid size-12 place-items-center rounded-full bg-brand text-title" aria-hidden="true">◉</div>
                 <div>
-                  <p className="mx-0 mt-0 mb-1 text-[0.6875rem] font-extrabold uppercase text-(--text-muted)">{activity.workspaceName}</p>
-                  <h2 className="mx-0 mt-0 mb-[7px] text-[1.1875rem]">{activity.title}</h2>
-                  <span className={`text-[0.6875rem] ${dueStateColor(activity.dueAt)}`}>
+                  <p className="mx-0 mt-0 mb-1 text-label font-extrabold uppercase text-(--text-muted) tracking-[0.08em]">{activity.workspaceName}</p>
+                  <h2 className="mx-0 mt-0 mb-[7px] text-title">{activity.title}</h2>
+                  <span className={`text-label ${dueStateColor(activity.dueAt)}`}>
                     {submissionLabel(activity.submissionStatus, activity.dueAt)} · {activity.aiStatus === "ready" ? "Feedback available" : activity.aiStatus === "pending" ? "Analysis pending" : activity.aiStatus === "failed" ? "Analysis failed · retry available" : "AI feedback locked"} · {formatDueDate(activity.dueAt)}
                   </span>
                 </div>
-                <Link className="transition-colors duration-160 hover:text-(--text-primary) text-[0.75rem] font-extrabold text-(--brand-blue-text) no-underline max-[760px]:col-span-full max-[760px]:border-t max-[760px]:border-(--border-subtle) max-[760px]:pt-[13px]" href={`/student/activities/${activity.id}`}>Review activity <span aria-hidden="true">→</span></Link>
+                <Link className="transition-colors duration-160 hover:text-(--text-primary) text-caption font-extrabold text-(--brand-blue-text) no-underline max-[760px]:col-span-full max-[760px]:border-t max-[760px]:border-(--border-subtle) max-[760px]:pt-[13px]" href={`/student/activities/${activity.id}`}>Review activity <span aria-hidden="true">→</span></Link>
               </article>
             ))}
           </div>

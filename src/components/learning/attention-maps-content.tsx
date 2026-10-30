@@ -19,9 +19,9 @@ export function AttentionMapsContent({ role }: { role: "student" | "professor" }
       />
 
       <section className="mb-6 rounded-panel border border-brand bg-[rgba(0,119,255,0.12)] p-6 max-[600px]:p-4" aria-labelledby="attention-how-title">
-        <h2 className="mt-0 mb-4 text-[1.0625rem] font-extrabold text-(--brand-blue-text)" id="attention-how-title">How Finding Heatmaps Work</h2>
-        <ol className="m-0 grid list-inside list-decimal grid-cols-3 gap-5 p-0 text-[0.8125rem] leading-[1.65] text-(--text-secondary) max-[800px]:grid-cols-1 max-[800px]:gap-2">
-          <li>The model’s last feature map covers the image as a 14×14 grid.</li>
+        <h2 className="mt-0 mb-4 text-lead font-extrabold text-(--brand-blue-text)" id="attention-how-title">How finding heatmaps work</h2>
+        <ol className="m-0 grid list-inside list-decimal grid-cols-3 gap-5 p-0 text-small leading-relaxed text-(--text-secondary) max-[800px]:grid-cols-1 max-[800px]:gap-2">
+          <li>The model’s last feature map covers the image as a 7×7 grid, smoothed to 14×14 for the heatmap.</li>
           <li>For each finding, the classifier’s own weights for that finding score every cell (a class activation map).</li>
           <li>Negative evidence is clipped and each map is scaled 0–1. Warmer colors mean more evidence for the selected finding.</li>
         </ol>
@@ -31,12 +31,12 @@ export function AttentionMapsContent({ role }: { role: "student" | "professor" }
         <div className="min-w-0 space-y-6">
           <section className="overflow-hidden rounded-panel border border-(--border-strong) bg-(--glass-inset)" aria-labelledby="attention-example-title">
             <div className="flex flex-wrap items-center justify-between gap-3 border-b border-(--border-subtle) px-4 py-3.5">
-              <h2 className="m-0 text-[1rem]" id="attention-example-title">Finding Heatmap Example</h2>
-              <span className="rounded-full bg-(--surface-raised) px-5 py-1 text-[0.75rem]">Sample Case</span>
+              <h2 className="m-0 text-lead" id="attention-example-title">Finding heatmap example</h2>
+              <span className="rounded-full bg-(--surface-raised) px-5 py-1 text-caption">Sample case</span>
             </div>
             <AttentionHeatmap
               className="p-4 [&_label]:flex-wrap"
-              imageUrl="/images/chexpert/cxp-001.jpg"
+              imageUrl="/images/chexpert/cxp-232.jpg"
               attention={sampleHeatmap}
               labels={sampleHeatmapLabels}
               title="Sample case: real model output"
@@ -44,11 +44,8 @@ export function AttentionMapsContent({ role }: { role: "student" | "professor" }
           </section>
 
           <section className="rounded-panel border border-(--border-strong) bg-(--glass-inset) p-5" aria-labelledby="attention-reference-title">
-            <h2 className="mt-0 mb-4 flex items-center gap-3 text-[1rem]" id="attention-reference-title">
-              <span className="grid size-6 shrink-0 place-items-center rounded-full border-2 border-[#09f7ff] text-(--brand-blue-text)" aria-hidden="true">?</span>
-              Quick Reference
-            </h2>
-            <ul className="m-0 list-disc space-y-2.5 pl-5 text-[0.8125rem] leading-[1.65] text-(--text-secondary)">
+            <h2 className="mt-0 mb-4 text-lead" id="attention-reference-title">Quick reference</h2>
+            <ul className="m-0 list-disc space-y-2.5 pl-5 text-small leading-relaxed text-(--text-secondary)">
               <li>One 14×14 map per finding; pick the finding from the list under the image.</li>
               <li>Relative evidence within one image, not a disease probability or a scale for comparing images.</li>
               <li>A hot region shows where the model looked for that finding, not a lesion outline or a measurement.</li>
@@ -60,12 +57,12 @@ export function AttentionMapsContent({ role }: { role: "student" | "professor" }
 
         <div className="min-w-0 space-y-3.5">
           <section className="overflow-hidden rounded-panel border border-[#09f7ff] bg-(--glass-inset)" aria-labelledby="attention-definition-title">
-            <h2 className="m-0 border-b border-(--border-subtle) px-5 py-4 text-[1rem]" id="attention-definition-title">What is a Finding Heatmap</h2>
-            <div className="space-y-5 px-5 py-6 text-[0.875rem] leading-[1.75] text-(--text-secondary)">
-              <p>A finding heatmap is a class activation map (CAM). The model averages its final 14×14 feature map and weighs it to score each finding; applying that finding’s weights to every cell instead shows which parts of the image pushed its score up.</p>
-              <p>Each finding gets its own map, so Cardiomegaly lights up around the heart while Support Devices follows the line or port. Values are scaled from 0 to 1 within each map. The sample shows the model’s real output for this case.</p>
+            <h2 className="m-0 border-b border-(--border-subtle) px-5 py-4 text-lead" id="attention-definition-title">What is a finding heatmap?</h2>
+            <div className="space-y-5 px-5 py-6 text-body leading-relaxed text-(--text-secondary)">
+              <p>A finding heatmap is a class activation map (CAM). The model averages its final 7×7 feature map and weighs it to score each finding; applying that finding’s weights to every cell instead shows which parts of the image pushed its score up.</p>
+              <p>Each finding gets its own map, so in this sample Cardiomegaly lights up over the heart, Edema across the lung fields, and Support Devices along the tube in the upper chest. Values are scaled from 0 to 1 within each map. The sample shows the model’s real output for this case.</p>
               <aside className="mt-8 rounded-lg border border-[#0077ff] bg-(--surface-raised) p-4" aria-labelledby="attention-friendly-title">
-                <h3 className="mt-0 mb-3 text-[0.9375rem] font-semibold text-(--brand-blue-text)" id="attention-friendly-title">Student-Friendly Explanation</h3>
+                <h3 className="mt-0 mb-3 text-lead font-semibold text-(--brand-blue-text)" id="attention-friendly-title">Student-friendly explanation</h3>
                 <p className="m-0">Think of it as the model pointing at where it saw the evidence for one finding. Warmer colors (red) = more evidence. Cooler colors (blue) = little or none.</p>
                 <p className="mt-3 mb-0 font-semibold text-(--text-primary)">It is a guide for where to look, not a diagnosis or a lesion outline.</p>
               </aside>

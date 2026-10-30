@@ -21,11 +21,11 @@ export async function StudentShell({
       navLabel="Main menu"
       navAriaLabel="Student navigation"
       navItems={[
-        { label: "Home", href: "/student", icon: "dashboard", active: activeItem === "dashboard" },
-        { label: "Activities", href: "/student/activities", icon: "activities", active: activeItem === "activities" },
-        { label: "Learning mode", href: "/student/learning", icon: "learning", active: activeItem === "learning" },
-        { label: "Attention maps", href: "/student/attention", icon: "attention", active: activeItem === "attention" },
-        { label: "User Profile", href: "/student/settings", icon: "settings", active: activeItem === "settings" },
+        { label: "Home", href: "/student", icon: "dashboard.png", active: activeItem === "dashboard" },
+        { label: "Activities", href: "/student/activities", icon: "activities.png", active: activeItem === "activities" },
+        { label: "Learning Mode", href: "/student/learning", icon: "learning.png", active: activeItem === "learning" },
+        { label: "Attention Maps", href: "/student/attention", icon: "attention.png", active: activeItem === "attention" },
+        { label: "User Profile", href: "/student/settings", icon: "settings.png", active: activeItem === "settings" },
       ]}
       sectionLabel={sectionLabel}
       sectionDescription={sectionDescription}

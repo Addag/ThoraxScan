@@ -155,6 +155,15 @@
   /* rounded-control: buttons, inputs, small cells. rounded-panel: panels and cards. */
   --radius-control: 6px;
   --radius-panel: 10px;
+  /* Type scale for the app (landing and auth keep their own). No line-heights here, so text-* keeps the inherited one. */
+  --text-label: 0.6875rem;   /* 11px: small-caps labels, badges */
+  --text-caption: 0.75rem;   /* 12px: meta, hints */
+  --text-small: 0.8125rem;   /* 13px: form labels, secondary copy */
+  --text-body: 0.875rem;     /* 14px: body, buttons, fields */
+  --text-lead: 1rem;         /* 16px: panel bar titles, emphasis */
+  --text-title: 1.25rem;     /* 20px: section and panel titles */
+  --text-display: 1.5rem;    /* 24px: large glyphs, stand-out headings */
+  --text-page: clamp(1.75rem, 4vw, 2.375rem); /* page h1 */
 }
 
 /* Landing/auth breakpoints, matching the original inclusive media queries exactly. */

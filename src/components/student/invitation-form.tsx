@@ -15,8 +15,8 @@ export function InvitationForm() {
 
   return (
     <form action={formAction} noValidate>
-      <label className="block text-[0.8125rem] font-extrabold" htmlFor="student-invitation-code">Student invitation code</label>
-      <p className="mt-[3px] mb-[9px] text-[0.6875rem] text-(--text-muted)">Enter the private code shared by your professor.</p>
+      <label className="block text-small font-extrabold" htmlFor="student-invitation-code">Student invitation code</label>
+      <p className="mt-[3px] mb-[9px] text-label text-(--text-muted)">Enter the private code shared by your professor.</p>
       <div className="grid grid-cols-[minmax(0,1fr)_auto] gap-2.5 max-[600px]:grid-cols-1">
         <input
           id="student-invitation-code"
@@ -38,7 +38,7 @@ export function InvitationForm() {
       {state.message && (
         <p
           id="student-invitation-status"
-          className={`mt-[9px] text-[0.75rem] leading-[1.4] ${formStatusColor(state.status)}`}
+          className={`mt-[9px] text-caption leading-snug ${formStatusColor(state.status)}`}
           role={state.status === "success" ? "status" : "alert"}
         >
           {state.message}

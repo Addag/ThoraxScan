@@ -26,7 +26,7 @@ import { ConfirmDialog } from "@/components/confirm-dialog";
 import { activityFormHeadingClass, activityFormHeadingIconClass, activityFormHeadingKickerClass, activityFormHeadingTitleClass, activityFormMessageClass } from "@/components/activities/activity-form-styles";
 
 function FieldError({ children }: { children?: string }) {
-  return children ? <small className="text-[0.6875rem] text-(--status-error-text)">{children}</small> : null;
+  return children ? <small className="text-label text-(--status-error-text)">{children}</small> : null;
 }
 
 export function ActivityDetailsForm({
@@ -52,7 +52,7 @@ export function ActivityDetailsForm({
         </div>
       </div>
 
-      <label className="mt-3.5 grid gap-[7px] text-[0.75rem] text-(--text-muted)">
+      <label className="mt-3.5 grid gap-[7px] text-caption text-(--text-muted)">
         Workspace
         {activity ? (
           <>
@@ -70,7 +70,7 @@ export function ActivityDetailsForm({
         <FieldError>{state.fieldErrors?.workspaceId}</FieldError>
       </label>
 
-      <label className="mt-3.5 grid gap-[7px] text-[0.75rem] text-(--text-muted)">
+      <label className="mt-3.5 grid gap-[7px] text-caption text-(--text-muted)">
         Activity title
         <input
           className={`${field} disabled:opacity-55`}
@@ -85,7 +85,7 @@ export function ActivityDetailsForm({
         <FieldError>{state.fieldErrors?.title}</FieldError>
       </label>
 
-      <label className="mt-3.5 grid gap-[7px] text-[0.75rem] text-(--text-muted)">
+      <label className="mt-3.5 grid gap-[7px] text-caption text-(--text-muted)">
         Instructions for students
         <textarea
           className={`${textarea} disabled:opacity-55`}
@@ -101,7 +101,7 @@ export function ActivityDetailsForm({
         <FieldError>{state.fieldErrors?.instructions}</FieldError>
       </label>
 
-      <label className="mt-3.5 grid gap-[7px] text-[0.75rem] text-(--text-muted) [&>small:first-child]:text-(--text-muted)">
+      <label className="mt-3.5 grid gap-[7px] text-caption text-(--text-muted) [&>small:first-child]:text-(--text-muted)">
         Due date <small>Optional</small>
         <input
           className={`${field} disabled:opacity-55`}
@@ -114,7 +114,7 @@ export function ActivityDetailsForm({
         <FieldError>{state.fieldErrors?.dueAt}</FieldError>
       </label>
 
-      <label className="mt-3.5 grid gap-[7px] text-[0.75rem] text-(--text-muted)">
+      <label className="mt-3.5 grid gap-[7px] text-caption text-(--text-muted)">
         Private reference evaluation
         <textarea
           className={`${textarea} disabled:opacity-55`}
@@ -125,7 +125,7 @@ export function ActivityDetailsForm({
           disabled={isArchived}
           aria-invalid={Boolean(state.fieldErrors?.referenceEvaluation)}
         />
-        <span className="text-[0.6875rem] text-(--text-muted)">Visible to teaching staff only. Required before publishing.</span>
+        <span className="text-label text-(--text-muted)">Visible to teaching staff only. Required before publishing.</span>
         <FieldError>{state.fieldErrors?.referenceEvaluation}</FieldError>
       </label>
 
@@ -194,7 +194,7 @@ export function CaseUploadForm({ activityId, caseId = null }: { activityId: stri
           setSelectionMessage("Selected case removed.");
         }}
       />
-      <p className="m-0 text-[0.6875rem] text-(--text-muted)" role="status">{selectionMessage}</p>
+      <p className="m-0 text-label text-(--text-muted)" role="status">{selectionMessage}</p>
     </div>
   );
 }
@@ -302,11 +302,11 @@ function CaseUploadFields({ activityId, disabled, onBusyChange, onCaseReserved, 
             </button>
           ) : null}
         </div>
-        <small className="text-[0.6875rem] text-(--text-muted)">JPEG or PNG · maximum 6 MB · private storage</small>
+        <small className="text-label text-(--text-muted)">JPEG or PNG · maximum 6 MB · private storage</small>
         <input
           ref={fileInputRef}
           id={fileInputId}
-          className="w-full max-w-[250px] text-[0.6875rem] text-(--text-muted)"
+          className="w-full max-w-[250px] text-label text-(--text-muted)"
           type="file"
           aria-label="Choose a chest X-ray file"
           accept="image/jpeg,image/png"
@@ -321,7 +321,7 @@ function CaseUploadFields({ activityId, disabled, onBusyChange, onCaseReserved, 
         />
       </div>
       <FieldError>{prepareState.fieldErrors?.file}</FieldError>
-      <label className="my-4 grid grid-cols-[18px_minmax(0,1fr)] gap-[9px] text-[0.6875rem] leading-[1.4] text-(--text-muted)">
+      <label className="my-4 grid grid-cols-[18px_minmax(0,1fr)] gap-[9px] text-label leading-snug text-(--text-muted)">
         <input className="size-4 accent-brand" type="checkbox" name="attestation" disabled={busy} required />
         <span>I attest this is a de-identified image approved for this class activity.</span>
       </label>
@@ -373,7 +373,7 @@ function LifecycleForm({
 
 export function ActivityLifecycleControls({ activity }: { activity: ProfessorActivityDetails }) {
   if (activity.status === "archived") {
-    return <p className="m-0 rounded-control border border-(--border-subtle) bg-(--hover-overlay) p-3.5 text-[0.75rem] text-(--text-muted)">Archived activities are read-only and cannot be restored.</p>;
+    return <p className="m-0 rounded-control border border-(--border-subtle) bg-(--hover-overlay) p-3.5 text-caption text-(--text-muted)">Archived activities are read-only and cannot be restored.</p>;
   }
 
   return (

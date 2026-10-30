@@ -22,14 +22,14 @@ export const metadata: Metadata = {
 
 const panelBase = "rounded-panel border [background:var(--glass-surface)] backdrop-blur-[18px] backdrop-saturate-[135%] shadow-(--glass-shadow)";
 const panelHeadingClass = "flex items-center justify-between gap-5 border-b border-(--border-strong) pb-4";
-const sectionTitleClass = "m-0 text-[1.1875rem]";
-const columnHeadingClass = "mx-0 mt-0 mb-2.5 text-[0.75rem] text-(--text-muted) uppercase";
+const sectionTitleClass = "m-0 text-title";
+const columnHeadingClass = "mx-0 mt-0 mb-2.5 text-caption text-(--text-muted) uppercase tracking-[0.08em] font-extrabold";
 const listResetClass = "m-0 list-none p-0";
-const avatarClass = "grid size-[34px] place-items-center rounded-full border border-(--border-shell) bg-[rgba(0,119,255,0.2)] font-extrabold text-(--brand-blue-text)";
-const memberRowClass = "grid min-h-[58px] grid-cols-[34px_minmax(0,1fr)_auto] items-center gap-2.5 border-b border-(--border-subtle) py-2";
-const memberNameClass = "overflow-hidden text-[0.75rem] text-ellipsis whitespace-nowrap";
+const avatarClass = "grid size-10 place-items-center rounded-full border border-(--border-shell) bg-[rgba(0,119,255,0.2)] font-extrabold text-(--brand-blue-text)";
+const memberRowClass = "grid min-h-[58px] grid-cols-[40px_minmax(0,1fr)_auto] items-center gap-2.5 border-b border-(--border-subtle) py-2";
+const memberNameClass = "overflow-hidden text-caption text-ellipsis whitespace-nowrap";
 const memberDetailClass = "flex min-w-0 flex-col gap-[3px]";
-const accessItemClass = "relative pl-[18px] text-[0.6875rem] leading-[1.45] text-(--text-muted) before:absolute before:top-[3px] before:left-0 before:text-(--brand-blue-text) before:content-['✓']";
+const accessItemClass = "relative pl-[18px] text-label leading-snug text-(--text-muted) before:absolute before:top-[3px] before:left-0 before:text-(--brand-blue-text) before:content-['✓']";
 
 const uuidPattern =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
@@ -59,8 +59,8 @@ function InvitationList({
         return (
           <li className="flex min-h-[55px] items-center justify-between gap-4 rounded-control border border-(--border-shell) bg-(--surface-sunken) p-3" key={invitation.id}>
             <div className={memberDetailClass}>
-              <strong className="text-[0.6875rem] text-(--brand-blue-text)">{status}</strong>
-              <span className="text-[0.6875rem] text-(--text-muted)">
+              <strong className="text-label text-(--brand-blue-text)">{status}</strong>
+              <span className="text-label text-(--text-muted)">
                 {invitation.uses_count}/{invitation.max_uses} uses · expires{" "}
                 {new Intl.DateTimeFormat("en-US", { dateStyle: "medium" }).format(
                   new Date(invitation.expires_at),
@@ -107,8 +107,8 @@ export default async function ProfessorWorkspacePage({
             <p className={sectionKickerClass}>
               {workspace.is_owner ? "Owned workspace" : "Co-professor workspace"}
             </p>
-            <h1 className="m-0 text-[clamp(1.6875rem,4vw,2.375rem)] leading-[1.12]">{workspace.name}</h1>
-            <p className="mt-2 mb-0 text-[0.75rem] text-(--text-muted)">{students.length} students · {professors.length} teaching staff</p>
+            <h1 className="m-0 text-page leading-[1.1]">{workspace.name}</h1>
+            <p className="mt-2 mb-0 text-caption text-(--text-muted)">{students.length} students · {professors.length} teaching staff</p>
           </div>
           <div className="flex flex-wrap items-end gap-3">
             {workspace.is_owner && (
@@ -135,7 +135,7 @@ export default async function ProfessorWorkspacePage({
                 <p className={sectionKickerClass}>Membership</p>
                 <h2 className={sectionTitleClass} id="roster-title">Workspace roster</h2>
               </div>
-              <span className="rounded-full border border-(--border-shell) px-2.5 py-1.5 text-[0.6875rem] text-(--text-muted)">{workspace.members.length} members</span>
+              <span className="rounded-full border border-(--border-shell) px-2.5 py-1.5 text-label text-(--text-muted)">{workspace.members.length} members</span>
             </div>
             <div className="grid grid-cols-2 gap-6 pt-[18px] max-[700px]:grid-cols-1">
               <div>
@@ -146,7 +146,7 @@ export default async function ProfessorWorkspacePage({
                       <span className={avatarClass} aria-hidden="true">
                         {member.display_name.slice(0, 1).toUpperCase()}
                       </span>
-                      <div className={memberDetailClass}><strong className={memberNameClass}>{member.display_name}</strong><small className="text-[0.6875rem] text-(--text-muted)">{member.is_owner ? "Owner" : "Co-professor"}</small></div>
+                      <div className={memberDetailClass}><strong className={memberNameClass}>{member.display_name}</strong><small className="text-label text-(--text-muted)">{member.is_owner ? "Owner" : "Co-professor"}</small></div>
                       {workspace.is_owner &&
                         !member.is_owner &&
                         member.user_id !== profile.id && (
@@ -167,7 +167,7 @@ export default async function ProfessorWorkspacePage({
                         <span className={avatarClass} aria-hidden="true">
                           {member.display_name.slice(0, 1).toUpperCase()}
                         </span>
-                        <div className={memberDetailClass}><strong className={memberNameClass}>{member.display_name}</strong><small className="text-[0.6875rem] text-(--text-muted)">Student</small></div>
+                        <div className={memberDetailClass}><strong className={memberNameClass}>{member.display_name}</strong><small className="text-label text-(--text-muted)">Student</small></div>
                         <RemoveMemberButton workspaceId={workspace.id} memberUserId={member.user_id} />
                       </li>
                     ))}

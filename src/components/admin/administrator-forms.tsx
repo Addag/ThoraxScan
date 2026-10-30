@@ -16,7 +16,7 @@ export function AddAdministratorForm() {
 
   return (
     <form className="mt-4 grid gap-2 border-t border-(--border-shell) pt-4" action={formAction} noValidate>
-      <label className="text-[0.75rem] font-extrabold text-(--text-primary)" htmlFor="administrator-email">Add an administrator</label>
+      <label className="text-caption font-extrabold text-(--text-primary)" htmlFor="administrator-email">Add an administrator</label>
       <div className="grid grid-cols-[minmax(0,1fr)_auto] gap-2.5 max-[560px]:grid-cols-1">
         <input
           ref={emailRef}
@@ -44,7 +44,7 @@ export function AddAdministratorForm() {
         </ConfirmDialog>
       ) : null}
       {state.message && (
-        <p className={`m-0 text-[0.6875rem] leading-[1.35] ${formStatusColor(state.status)}`} role={state.status === "success" ? "status" : "alert"}>
+        <p className={`m-0 text-label leading-snug ${formStatusColor(state.status)}`} role={state.status === "success" ? "status" : "alert"}>
           {state.message}
         </p>
       )}
@@ -73,7 +73,7 @@ export function RemoveAdministratorForm({ userId, displayName }: { userId: strin
         </ConfirmDialog>
       ) : null}
       {state.status !== "idle" && state.status !== "success" && (
-        <p className={`m-0 text-[0.6875rem] leading-[1.35] ${formStatusColor(state.status)}`} role="alert">{state.message}</p>
+        <p className={`m-0 text-label leading-snug ${formStatusColor(state.status)}`} role="alert">{state.message}</p>
       )}
     </form>
   );

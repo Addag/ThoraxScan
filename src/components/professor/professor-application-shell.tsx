@@ -10,7 +10,7 @@ export function ProfessorApplicationShell({ children }: { children: ReactNode })
       accessTone="warning"
       navLabel="Professor account"
       navAriaLabel="Professor application navigation"
-      navItems={[{ label: "Application status", glyph: "◷", active: true }]}
+      navItems={[{ label: "Application status", icon: "application.svg", active: true }]}
       sectionLabel="Professor application"
       sectionDescription="Account review status"
       footerNotes={["Workspace access requires approval", "Review results appear on this page"]}

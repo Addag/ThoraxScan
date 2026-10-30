@@ -4,12 +4,12 @@ import { AttentionMapsContent } from "@/components/learning/attention-maps-conte
 import { ProfessorShell } from "@/components/professor/professor-shell";
 import { requireRole } from "@/lib/auth/server";
 
-export const metadata: Metadata = { title: "Attention maps | ThoraxScan" };
+export const metadata: Metadata = { title: "Attention Maps | ThoraxScan" };
 
 export default async function ProfessorAttentionPage() {
   await requireRole("professor");
   return (
-    <ProfessorShell activeItem="attention" sectionLabel="Attention maps" sectionDescription="Understanding finding heatmaps">
+    <ProfessorShell activeItem="attention" sectionLabel="Attention Maps" sectionDescription="Understanding finding heatmaps">
       <AttentionMapsContent role="professor" />
     </ProfessorShell>
   );

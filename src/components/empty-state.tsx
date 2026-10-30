@@ -25,8 +25,8 @@ export function EmptyState({
         role={role}
       >
         {icon ? <span className="text-[2.125rem] text-(--brand-blue-text)" aria-hidden="true">{icon}</span> : null}
-        <h2 className="mx-0 mt-3 mb-1 text-[1.3125rem]">{title}</h2>
-        <p className="m-0 text-[0.8125rem] text-(--text-muted)">{children}</p>
+        <h2 className="mx-0 mt-3 mb-1 text-title">{title}</h2>
+        <p className="m-0 text-small text-(--text-muted)">{children}</p>
       </div>
     );
   }
@@ -34,10 +34,10 @@ export function EmptyState({
   return (
     <div className={`grid min-h-[250px] place-items-center content-center text-center ${error ? "text-(--status-error-text)" : "text-(--text-muted)"}`} role={role}>
       {icon ? (
-        <span className="grid size-[50px] place-items-center rounded-full border border-(--border-shell) text-[1.625rem] text-(--brand-blue-text)" aria-hidden="true">{icon}</span>
+        <span className="grid size-12 place-items-center rounded-full border border-(--border-shell) text-display text-(--brand-blue-text)" aria-hidden="true">{icon}</span>
       ) : null}
-      <h3 className="mx-0 mt-[13px] mb-[3px] text-[1.0625rem] text-(--text-primary)">{title}</h3>
-      <p className="m-0 max-w-[360px] text-[0.75rem]">{children}</p>
+      <h3 className="mx-0 mt-[13px] mb-[3px] text-lead text-(--text-primary)">{title}</h3>
+      <p className="m-0 max-w-[360px] text-caption">{children}</p>
     </div>
   );
 }

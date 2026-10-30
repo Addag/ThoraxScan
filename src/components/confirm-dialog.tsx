@@ -45,8 +45,8 @@ export function ConfirmDialog({
       onClose={onClose}
       className="m-auto w-[min(440px,calc(100vw-32px))] rounded-panel border border-(--border-shell) bg-(--surface-raised) [background-image:var(--glass-surface)] p-6 text-left text-(--text-primary) shadow-(--glass-shadow) backdrop:bg-[rgb(0_4_18/60%)] backdrop:backdrop-blur-[3px] max-[520px]:p-5"
     >
-      <h2 id={titleId} className="m-0 text-[1rem] font-extrabold">{title}</h2>
-      <div className="mt-2.5 text-[0.8125rem] leading-[1.5] text-(--text-secondary)">{children}</div>
+      <h2 id={titleId} className="m-0 text-lead font-extrabold">{title}</h2>
+      <div className="mt-2.5 text-small leading-normal text-(--text-secondary)">{children}</div>
       <div className="mt-5 flex flex-wrap justify-end gap-2.5 max-[520px]:flex-col-reverse max-[520px]:items-stretch">
         <button className={button("secondary")} type="button" onClick={onClose}>{cancelLabel}</button>
         <button className={button(danger ? "danger" : "primary")} type="submit" name={name} value={value}>{confirmLabel}</button>

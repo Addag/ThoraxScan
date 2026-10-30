@@ -52,12 +52,12 @@ export default async function ProfessorActivityPage({
           subtitle={`${activity.workspaceName} · ${formatDueDate(activity.dueAt)}`}
           back={{ href: "/professor/activities", label: "Back to activities" }}
         />
-        <div className="-mt-2 mb-[18px] flex items-center gap-3 text-[0.75rem] text-(--text-muted)">
+        <div className="-mt-2 mb-[18px] flex items-center gap-3 text-caption text-(--text-muted)">
           <ActivityStatusBadge status={activity.status} />
           <span>{activity.status === "published" ? "Visible to current and future workspace students" : activity.status === "archived" ? "No longer visible to students" : "Visible to teaching staff only"}</span>
         </div>
         <ActivityStepRail role="professor" caseReady={activity.caseUploadStatus === "ready"} published={activity.status !== "draft"} aiStatus={activity.aiStatus.status} />
-        <Link className={`${activitiesCtaClass} mb-6`} href={`/professor/submissions?activity=${activity.id}`}>Review submissions</Link>
+        <Link className={`${activitiesCtaClass} mb-6`} href={`/professor/submissions?activity=${activity.id}`}><span className="grid gap-1"><strong>Review submissions</strong><small className="text-label text-(--brand-blue-text)">Final responses for this activity, with AI output and your reference</small></span><span className="text-display text-(--brand-blue-text)" aria-hidden="true">→</span></Link>
 
         <div className={activityLayoutClass("default")}>
           <div className={activityCaseColumnClass}>

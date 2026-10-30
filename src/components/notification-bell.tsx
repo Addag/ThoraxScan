@@ -21,7 +21,7 @@ export function NotificationBellButton({ unread, className = "size-10" }: { unre
     >
       <svg className="size-5 fill-none stroke-current stroke-[1.6] [stroke-linecap:round] [stroke-linejoin:round]" aria-hidden="true" viewBox="0 0 24 24"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" /><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" /></svg>
       {unread ? (
-        <span className="absolute -top-1 -right-1 grid h-[18px] min-w-[18px] place-items-center rounded-full bg-[#ff5457] px-1 text-[0.6875rem] leading-none font-extrabold text-white" aria-hidden="true">
+        <span className="absolute -top-1 -right-1 grid h-[18px] min-w-[18px] place-items-center rounded-full bg-[#ff5457] px-1 text-label leading-none font-extrabold text-white" aria-hidden="true">
           {unread > 9 ? "9+" : unread}
         </span>
       ) : null}
@@ -41,24 +41,24 @@ export function NotificationPanel({ notifications }: { notifications: Notificati
       popover="auto"
     >
       <div className="flex items-center justify-between gap-3 border-b border-b-(--border-subtle) px-4 py-3">
-        <strong className="text-[0.875rem]">Notifications</strong>
+        <strong className="text-body">Notifications</strong>
         {unread.length ? (
           <form action={markAllNotificationsReadAction}>
             {unread.map((item) => <input key={item.refId} name="notification" type="hidden" value={`${item.kind}:${item.refId}`} />)}
-            <button className="cursor-pointer border-0 bg-transparent p-0 text-[0.75rem] font-extrabold text-(--brand-blue-text) hover:underline" type="submit">Mark all read</button>
+            <button className="cursor-pointer border-0 bg-transparent p-0 text-caption font-extrabold text-(--brand-blue-text) hover:underline" type="submit">Mark all read</button>
           </form>
         ) : null}
       </div>
       {notifications.error ? (
-        <p className="m-0 px-4 py-3 text-[0.75rem] text-(--text-muted)" role="alert">{notifications.error}</p>
+        <p className="m-0 px-4 py-3 text-caption text-(--text-muted)" role="alert">{notifications.error}</p>
       ) : (
         groups.filter((group) => role === "professor" || group.kind === "activity_due").map((group) => {
           const items = notifications.data.filter((item) => item.kind === group.kind);
           return (
             <section aria-label={group.label} key={group.kind}>
-              <h3 className="m-0 px-4 pt-3 pb-1 text-[0.6875rem] font-extrabold tracking-[0.08em] text-(--text-secondary) uppercase">{group.label}</h3>
+              <h3 className="m-0 px-4 pt-3 pb-1 text-label font-extrabold tracking-[0.08em] text-(--text-secondary) uppercase">{group.label}</h3>
               {items.length === 0 ? (
-                <p className="m-0 px-4 pb-2 text-[0.75rem] text-(--text-muted)">{group.empty}</p>
+                <p className="m-0 px-4 pb-2 text-caption text-(--text-muted)">{group.empty}</p>
               ) : (
                 <ul className="m-0 list-none p-0">
                   {items.map((item) => (
@@ -69,11 +69,11 @@ export function NotificationPanel({ notifications }: { notifications: Notificati
                         <button className="transition-colors duration-160 grid w-full cursor-pointer grid-cols-[8px_minmax(0,1fr)] gap-x-2.5 border-0 bg-transparent px-4 py-2.5 text-left text-(--text-primary) hover:bg-(--hover-overlay)" type="submit">
                           <span className={`mt-1.5 size-2 rounded-full ${item.read ? "" : "bg-brand"}`} aria-hidden="true" />
                           <span className="flex min-w-0 flex-col gap-0.5">
-                            <span className={`truncate text-[0.8125rem] ${item.read ? "font-semibold text-(--text-secondary)" : "font-extrabold"}`}>
+                            <span className={`truncate text-small ${item.read ? "font-semibold text-(--text-secondary)" : "font-extrabold"}`}>
                               {item.title}{item.read ? null : <span className="sr-only"> (unread)</span>}
                             </span>
-                            <span className="truncate text-[0.6875rem] text-(--text-muted)">{item.detail}</span>
-                            <span className="text-[0.6875rem] text-(--text-muted)">{item.kind === "activity_due" ? "Due" : "Submitted"} {formatDueDate(item.at)}</span>
+                            <span className="truncate text-label text-(--text-muted)">{item.detail}</span>
+                            <span className="text-label text-(--text-muted)">{item.kind === "activity_due" ? "Due" : "Submitted"} {formatDueDate(item.at)}</span>
                           </span>
                         </button>
                       </form>

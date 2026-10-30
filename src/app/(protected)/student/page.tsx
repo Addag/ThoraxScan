@@ -27,8 +27,8 @@ export default async function StudentPage() {
       <PageMain>
         <PageHeading title="Home" subtitle={`Welcome back, ${profile.display_name}!`} />
 
-        <section className="rounded-panel border border-(--border-shell) bg-(--surface-field) p-6 max-[600px]:p-5" aria-labelledby="recent-activities-title">
-          <SectionHeading kicker="Published assignments" title="Recent activities" titleId="recent-activities-title" aside={<Link className="transition-colors duration-160 hover:text-(--text-primary) text-[0.75rem] font-extrabold text-(--brand-blue-text) no-underline" href="/student/activities">View all</Link>} />
+        <section className="rounded-panel border border-(--border-shell) [background:var(--glass-surface)] shadow-(--glass-shadow) p-6 max-[600px]:p-5" aria-labelledby="recent-activities-title">
+          <SectionHeading kicker="Published assignments" title="Recent activities" titleId="recent-activities-title" aside={<Link className="transition-colors duration-160 hover:text-(--text-primary) text-caption font-extrabold text-(--brand-blue-text) no-underline" href="/student/activities">View all</Link>} />
           {recentActivities.error ? (
             <p className={listEmptyClass}>Recent activities are unavailable.</p>
           ) : recentActivities.data.length === 0 ? (
@@ -37,9 +37,9 @@ export default async function StudentPage() {
             <div className="grid grid-cols-3 gap-3.5 pt-[18px] max-[760px]:grid-cols-1">
               {recentActivities.data.map((activity) => (
                 <Link className="transition-colors duration-160 hover:bg-(--hover-overlay) flex min-h-[130px] flex-col justify-between rounded-panel border border-(--border-shell) bg-(--glass-inset) p-4 no-underline shadow-(--glass-inset-shadow)" href={`/student/activities/${activity.id}`} key={activity.id}>
-                  <span className="text-[0.6875rem] font-extrabold uppercase tracking-[0.06em] text-(--brand-blue-text)">{activity.workspaceName}</span>
-                  <strong className="mt-2 text-[0.9375rem] leading-[1.25] text-(--text-primary)">{activity.title}</strong>
-                  <small className="mt-3 text-[0.6875rem] leading-[1.4] text-(--text-muted)">{submissionLabel(activity.submissionStatus, activity.dueAt)} · {activity.aiStatus === "ready" ? "Feedback available" : activity.aiStatus === "pending" ? "Analysis pending" : activity.aiStatus === "failed" ? "Analysis failed" : "AI feedback locked"} · {formatDueDate(activity.dueAt)}</small>
+                  <span className="text-label font-extrabold uppercase tracking-[0.08em] text-(--brand-blue-text)">{activity.workspaceName}</span>
+                  <strong className="mt-2 text-lead leading-tight text-(--text-primary)">{activity.title}</strong>
+                  <small className="mt-3 text-label leading-snug text-(--text-muted)">{submissionLabel(activity.submissionStatus, activity.dueAt)} · {activity.aiStatus === "ready" ? "Feedback available" : activity.aiStatus === "pending" ? "Analysis pending" : activity.aiStatus === "failed" ? "Analysis failed" : "AI feedback locked"} · {formatDueDate(activity.dueAt)}</small>
                 </Link>
               ))}
             </div>
@@ -49,7 +49,7 @@ export default async function StudentPage() {
         <section className="mt-6 grid grid-cols-[minmax(210px,0.75fr)_minmax(320px,1.25fr)] items-center gap-9 rounded-panel border border-(--border-shell) [background:var(--glass-surface)] p-6 backdrop-blur-[18px] backdrop-saturate-[135%] shadow-(--glass-shadow) max-[850px]:grid-cols-1 max-[850px]:gap-5" aria-labelledby="join-workspace-title">
           <div>
             <p className={sectionKickerClass}>Workspace access</p>
-            <h2 className="m-0 text-[1.25rem]" id="join-workspace-title">Join your class workspace</h2>
+            <h2 className="m-0 text-title" id="join-workspace-title">Join your class workspace</h2>
           </div>
           <InvitationForm />
         </section>
@@ -70,9 +70,9 @@ export default async function StudentPage() {
           )}
         </section>
 
-        <aside className="mt-6 flex items-baseline gap-4 rounded-panel border border-(--brand-blue) bg-[rgba(0,119,255,0.18)] px-6 py-4 leading-[1.4] max-[600px]:flex-col max-[600px]:items-start">
-          <strong className="shrink-0 text-[0.875rem] uppercase">Privacy notice</strong>
-          <p className="m-0 text-[0.75rem] text-(--brand-blue-text)">Published case images use private storage and short-lived signed access.</p>
+        <aside className="mt-6 flex items-baseline gap-4 rounded-panel border border-(--brand-blue) bg-[rgba(0,119,255,0.18)] px-6 py-4 leading-snug max-[600px]:flex-col max-[600px]:items-start">
+          <strong className="shrink-0 text-body uppercase tracking-[0.08em] font-extrabold">Privacy notice</strong>
+          <p className="m-0 text-caption text-(--brand-blue-text)">Published case images use private storage and short-lived signed access.</p>
         </aside>
       </PageMain>
     </StudentShell>
