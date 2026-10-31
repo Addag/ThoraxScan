@@ -18,6 +18,8 @@ Weights and thresholds can be replaced without an application deployment while t
 
 Both versions fix a single-file opset-17 artifact, float32 `[batch,1,224,224]` input, 14 logits, grayscale normalization, the 14-label order, inclusive thresholds, `No Finding` suppression, and explicit no-match behavior. V2 adds `attention_map` with float32 `[batch,1,7,7]` output and the fixed rollout/normalization descriptor. V3 adds `classActivation` (`CLASS_ACTIVATION_DESCRIPTOR`): `class_activation` float32 `[batch,14,14,14]`, method `cam-fc-weights-v1`, normalization `relu-per-label-max-v1`, grid 14×14, plus `expectedClassActivationSha256`, `maxAbsoluteClassActivationError` (≤1e-4) and `webGpuMaxAbsoluteClassActivationDifference` (≤1e-3 or null). Both heatmap versions share `mapParity` in the parser.
 
+`preprocessing.resize.interpolation` is one of `RESIZE_INTERPOLATIONS` in [contract.ts](<../../../src/lib/inference/contract.ts>): `bilinear-center` (one resize to 224) or `shortside320-bilinear-center` (images with a short side over 320 first shrink to short side 320, as CheXpert-small was made). It comes from the optional `resizeInterpolation` in `release.json`, which defaults to `bilinear-center`. The runtime preprocesses with the active release's value; see [Preprocessing tensor](preprocessing-tensor.md).
+
 Optionally, every label also carries `possibleThreshold`, from the bundle's `possible-thresholds.json`.
 - All 14 labels have it or none do, and each value is at or below the label's threshold.
 - Checked by `withPossibleThresholds` in [contract.ts](<../../../src/lib/inference/contract.ts>).
@@ -32,6 +34,7 @@ Describes a [Model release](model-release.md), drives the [Preprocessing tensor]
 ### Hits
 
 - Validator, CLI bundle evidence, browser runtime, preprocessing, postprocessing, parity tests, and registry manifest checks.
+- A new accepted value (for example a new resize interpolation) is rejected by app builds that predate it: deploy the app before activating a release that uses it.
 
 ### Does not hit
 
