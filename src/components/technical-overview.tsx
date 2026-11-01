@@ -32,15 +32,15 @@ const features = [
   { module: "Workspaces", items: ["Professor-owned class workspaces", "Expiring, use-limited invitation codes for students and co-professors", "Membership-scoped access to every activity and case"] },
   { module: "Activities", items: ["Draft → published → archived lifecycle", "One X-ray case per activity: JPEG or PNG upload, or a pick from the built-in library", "A private reference evaluation students never receive", "Optional due dates and a notification bell"] },
   { module: "Submissions and feedback", items: ["Drafts, then one immutable final answer: findings, normal or abnormal, and region", "AI feedback released only after submission", "Faculty evaluation with a score and feedback, released explicitly"] },
-  { module: "Learning Mode", items: ["Practice on a 234-image CheXpert library or your own image", "Likely and possible findings across all 14 labels", "Finding heatmaps and a printable heatmap guide", "Practice results stay in browser memory"] },
+  { module: "Learning Mode", items: ["Practice on a 234-image CheXpert library or your own image", "Likely and possible findings across all 14 labels", "Finding heatmaps and a printable heatmap guide", "Practice results stay in browser memory", "Private notes on library cases, visible only to you"] },
   { module: "Administration", items: ["Review Professor applications", "Grant and revoke administrator access; the last administrator can't remove themselves"] },
 ] as const;
 
 const modelDetails = [
-  ["Release", "tinyvit-v7-nih-cam-ecm-possible85-20261030.1"],
+  ["Release", "tinyvit-v7-nih-cam-ecm-possible85-sr320-20261030.1"],
   ["Model", "TinyViT-11M, a hybrid vision transformer (convolution stage, then attention stages) pretrained on ImageNet-22k and distilled from a FastViT-SA12 teacher."],
   ["Training data", "CheXpert v1.0 (frontal and lateral views) plus the NIH ChestX-ray14 training split (frontal). Labels NIH does not report are left out of the loss for its images. Checkpoint and thresholds are chosen on a held-out patient split, so the 234-image official validation set stays unseen."],
-  ["Input", "Grayscale, resized to 224×224 and normalized, with the same transform in training and in the browser."],
+  ["Input", "Grayscale. Full-size uploads are first shrunk to a 320-pixel short side, the way the CheXpert-small training images were made; then every image is resized to 224×224 and normalized. Built-in library images are already at that size, so their results are unchanged."],
   ["Thresholds", "Per-label F1 on the held-out split. Cardiomegaly is lowered to reach 80% held-out sensitivity. A \"possible\" tier flags the five competition labels at 85% sensitivity. Enlarged Cardiomediastinum is also flagged whenever Cardiomegaly is, following CheXpert's label hierarchy, and then shows the Cardiomegaly heatmap."],
   ["Explainability", "Class activation maps: the classifier's weights for each finding applied to the final 7×7 feature map (with the head's normalization), smoothed to 14×14, clipped at zero and scaled per finding. Exact for this architecture and computed in the same forward pass. A guide to where the evidence is, not a lesion outline."],
   ["Limits", "Learning Mode accepts frontal and lateral images; activities accept frontal only. Lateral held-out competition AUC is 0.82 (frontal 0.80), but lateral mean AUC is lower (0.77 vs 0.81). Cardiomegaly sensitivity is 0.47 on the official set even after tuning. Not clinically validated."],
@@ -73,7 +73,7 @@ const status = {
     "In-browser AI analysis with finding heatmaps, released after submission",
     "Faculty evaluation and notifications",
     "Class analytics with CSV export",
-    "Learning Mode with the built-in X-ray library, frontal and lateral",
+    "Learning Mode with the built-in X-ray library, frontal and lateral, and private case notes",
     "Model registry with validation, staging, activation and rollback",
     "Privacy notice consent recording and accessibility settings",
   ],

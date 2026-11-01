@@ -72,16 +72,17 @@ const userTopics: Topic[] = [
   {
     id: "doc-learning",
     title: "Practice in Learning Mode",
-    gist: "Run the model on any X-ray without saving anything.",
+    gist: "Run the model on any X-ray; results aren't saved.",
     body: (
       <ol className={steps}>
         <li>Open <b>Learning mode</b> from the sidebar (Students and Professors).</li>
-        <li>Pick an image from the built-in CheXpert library, or choose your own JPEG or PNG.</li>
+        <li>Pick an image from the built-in CheXpert library, or choose your own JPEG or PNG, frontal or lateral.</li>
         <li>Select <b>Analyze</b>. The model runs in your browser and shows findings, every label, and a heatmap for each likely or possible finding.</li>
-        <li>Nothing is saved: no submission, no upload, no stored result. <b>Reset</b> clears it.</li>
+        <li>Results aren&rsquo;t saved: no submission, no upload, no stored result. <b>Reset</b> clears them.</li>
+        <li>On a library case you can keep a private note for your own review. Notes are saved to your account and nobody else can see them.</li>
       </ol>
     ),
-    sources: ["map/processes/student-learning-mode-inference.md", "map/objects/ui/student-learning-mode-surface.md"],
+    sources: ["map/processes/student-learning-mode-inference.md", "map/objects/ui/student-learning-mode-surface.md", "map/objects/learning/learning-case-note.md"],
   },
   {
     id: "doc-class",
@@ -207,12 +208,13 @@ const devTopics: Topic[] = [
         <ul className={`${bullets} mt-3`}>
           <li>Contract v1: input <code className={code}>[batch, 1, 224, 224]</code>, Rec. 601 grayscale, bilinear resize, <code className={code}>(pixel / 255 − 0.5) / 0.25</code>; output 14 logits in a fixed label order.</li>
           <li>Contract v2 adds a global <code className={code}>[batch, 1, 7, 7]</code> attention map; contract v3 replaces it with per-finding class activation maps, <code className={code}>[batch, 14, 14, 14]</code>.</li>
-          <li>Weights and thresholds can change without a deploy while the contract stays the same.</li>
+          <li>A release picks its resize: straight to 224, or <code className={code}>shortside320-bilinear-center</code>, which first shrinks images with a short side over 320 to 320, the way CheXpert-small was made.</li>
+          <li>Weights and thresholds can change without a deploy while the contract and resize mode stay the same. A release that needs a newer contract or resize mode only runs on an app built to accept it, so deploy first.</li>
           <li>Validate locally first. Publisher service-role keys belong only in the operator environment, never in Vercel.</li>
         </ul>
       </>
     ),
-    sources: ["docs/model-releases.md", "map/processes/model-validation.md", "map/processes/model-activation.md"],
+    sources: ["docs/model-releases.md", "map/objects/inference/preprocessing-tensor.md", "map/processes/model-validation.md", "map/processes/model-activation.md"],
   },
   {
     id: "doc-admins",
@@ -237,9 +239,10 @@ const devTopics: Topic[] = [
         <li>Vercel Production points only at the hosted Supabase project, using its public URL and publishable key. There is no separate preview or staging database.</li>
         <li>Deploy the CAPTCHA-aware app before turning on CAPTCHA in hosted Supabase. To roll back, turn CAPTCHA off first.</li>
         <li>Before a production migration: run a linked dry run, review the Supabase Security and Performance Advisors, and take a backup.</li>
+        <li>Rolling out a model that needs app changes goes in this order: apply the migration, deploy the app, <code className={code}>model:stage</code>, check <code className={code}>model:status</code>, then <code className={code}>model:activate</code>. Activating before the deploy breaks inference until the deploy lands.</li>
       </ul>
     ),
-    sources: ["README.md", "supabase/README.md"],
+    sources: ["README.md", "supabase/README.md", "docs/model-releases.md", "map/objects/inference/attention-heatmap.md"],
   },
 ];
 
