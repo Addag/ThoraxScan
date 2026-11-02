@@ -1,4 +1,36 @@
-# Attention V2 export
+# Model export
+
+Python tools that turn a trained PyTorch checkpoint into a ThoraxScan release
+bundle: `model.onnx`, its fixtures, and `export-validation.json`, written into
+the ignored `model-input/<release-id>/` folder. The app then validates and
+publishes the bundle (see [release operations](../docs/model-releases.md)).
+
+The live release, `tinyvit-v7-nih-cam-ecm-possible85-sr320-20261030.1`, was
+built with [`export_tinyvit_cam.py`](#per-finding-class-activation-maps-contract-v3)
+using `--ecm-rule-thresholds` and
+[short-side-320 preprocessing](#short-side-320-preprocessing). The SqueezeViT
+V2 and FastViT sections describe earlier releases and remain so their evidence
+can be reproduced.
+
+| File | Purpose |
+|---|---|
+| `export_tinyvit_cam.py`, `tinyvit_thoraxscan.py` | TinyViT-11M, contract V3 (live) |
+| `export_squeezevit_cam.py` | SqueezeViT, contract V3 |
+| `export_squeezevit.py`, `squeezevit.py` | SqueezeViT, contract V2 attention rollout |
+| `export_fastvit.py`, `fastvit_thoraxscan.py` | FastViT-SA12, contract V2 attention rollout |
+| `preprocessing_shortside320.py` | Short-side-320 reference preprocessing and fixture |
+| `eval_localization.py` | NIH pointing-game score for the maps |
+| `train_view_detector.py` | Frontal/lateral detector for Professor case upload |
+| `test_*.py` | Exporter, CAM, rollout, and preprocessing checks |
+
+Install with `requirements.txt`; `requirements-lock.txt` pins the verified
+environment. Run every check with:
+
+```powershell
+python -m unittest discover -s model-export -p "test_*.py"
+```
+
+## SqueezeViT attention (contract V2)
 
 Exports the official best checkpoint with unchanged 14 logits and global,
 class-agnostic attention. Four head-averaged attention matrices receive identity
@@ -29,7 +61,7 @@ fixture or checkpoint evidence, checks preprocessing and repeated WASM inference
 and measures browser providers. WebGPU remains disabled unless logits and attention
 both pass provider parity. Review the generated 49 values before staging.
 
-## FastViT-SA12 (retrain v3)
+## FastViT-SA12 attention (retrain v3, contract V2)
 
 `export_fastvit.py` reparameterizes the trained `fastvit_thoraxscan.py` model and
 rolls out its two stage-4 global attention blocks (7x7 tokens, heads averaged) with

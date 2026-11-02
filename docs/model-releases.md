@@ -6,6 +6,8 @@ project is production and has its own independent `thoraxscan-classifier`
 pointer. A staged release is inactive until an explicit compare-and-swap
 activation succeeds.
 
+For what each release contains and how it performed, see [models.md](models.md).
+
 Learning Mode runs inference in browser memory. Activity analyses persist through authorized RPCs; Students see maps only after submission and feedback release. Approved Professors with workspace access use a separate heatmap RPC. Direct analysis table reads remain revoked.
 
 ## Contract version 3
