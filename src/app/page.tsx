@@ -6,6 +6,7 @@ import { sampleHeatmap, sampleHeatmapLabels } from "@/components/learning/attent
 import { RevealOnScroll } from "@/components/reveal-on-scroll";
 import { TechnicalOverview } from "@/components/technical-overview";
 import { DocsSection } from "@/components/docs-section";
+import { getCurrentProfile } from "@/lib/auth/server";
 import { LandingFooter, LandingHeader, glassCard, secondaryPill, sectionLead, sectionShell, sectionTitle } from "@/components/landing-ui";
 
 const workflowCallouts = [
@@ -67,7 +68,11 @@ const modelScore = {
 
 const loginButton = "inline-flex min-h-12 items-center justify-center gap-2 rounded-full border border-[rgb(168_211_255/48%)] px-7 text-[1rem] font-extrabold text-white no-underline [background:var(--landing-login-bg)] shadow-(--landing-login-shadow) [transition:transform_160ms_ease] hover:[background:var(--landing-login-bg-hover)] active:translate-y-px focus-visible:outline-3 focus-visible:outline-[#c5e3ff] focus-visible:outline-offset-[5px]";
 
-export default function Home() {
+export default async function Home() {
+  const { authenticated } = await getCurrentProfile();
+  const startHref = authenticated ? "/dashboard" : "/login";
+  const startLabel = authenticated ? "Go to dashboard" : "Log in";
+
   return (
     <div data-theme="dark" data-landing className="relative overflow-x-clip">
       <RevealOnScroll />
@@ -88,8 +93,8 @@ export default function Home() {
               <p className="m-0 max-w-[390px] text-[1rem] font-semibold leading-[1.35] text-[#c3d0e2]">
                 ThoraxScan is an educational LMS for Radiologic Technology students. Practice chest X-ray interpretation through professor-guided activities, with AI-powered finding heatmaps after submission.
               </p>
-              <Link className={`${loginButton} mt-5`} href="/login">
-                Log in <span aria-hidden="true">→</span>
+              <Link className={`${loginButton} mt-5`} href={startHref}>
+                {startLabel} <span aria-hidden="true">→</span>
               </Link>
             </div>
 
@@ -209,12 +214,12 @@ export default function Home() {
 
         <section className={`${sectionShell} text-center`} aria-labelledby="start-title">
           <h2 className={sectionTitle} id="start-title" data-reveal>Ready to practice?</h2>
-          <p className={`${sectionLead} mx-auto`} data-reveal>Sign in with your ThoraxScan account, or create one as a student or professor.</p>
+          <p className={`${sectionLead} mx-auto`} data-reveal>{authenticated ? "Pick up where you left off in your workspace." : "Sign in with your ThoraxScan account, or create one as a student or professor."}</p>
           <div className="mt-10 flex flex-wrap items-center justify-center gap-4" data-reveal>
-            <Link className={loginButton} href="/login">
-              Log in <span aria-hidden="true">→</span>
+            <Link className={loginButton} href={startHref}>
+              {startLabel} <span aria-hidden="true">→</span>
             </Link>
-            <Link className={secondaryPill} href="/register">Create an account</Link>
+            {!authenticated && <Link className={secondaryPill} href="/register">Create an account</Link>}
           </div>
         </section>
       </main>

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { ContactEmails } from "@/components/contact-emails";
+import { getCurrentProfile } from "@/lib/auth/server";
 import {
   PRIVACY_INSTITUTION,
   PRIVACY_CONTROLLER_ADDRESS,
@@ -18,12 +19,14 @@ export const metadata: Metadata = {
 const sectionClass = "grid gap-2.5 [&>h2]:text-title [&>h2]:font-extrabold";
 const linkClass = "font-semibold text-(--brand-blue-text) underline underline-offset-2";
 
-export default function PrivacyPolicyPage() {
+export default async function PrivacyPolicyPage() {
+  const { authenticated } = await getCurrentProfile();
+
   return (
     <main className="min-h-svh bg-(--app-background) px-5 py-10 text-foreground max-[600px]:px-4">
       <article className="mx-auto grid w-[min(900px,100%)] gap-8 rounded-[16px] border border-(--border-shell) bg-(--surface-field) p-[clamp(24px,5vw,58px)] shadow-(--glass-shadow)">
         <header className="grid gap-3 border-b border-(--border-shell) pb-6">
-          <Link className={linkClass} href="/">← Back to ThoraxScan</Link>
+          <Link className={linkClass} href={authenticated ? "/dashboard" : "/"}>← Back to ThoraxScan</Link>
           <p className="m-0 text-caption font-extrabold tracking-[0.08em] text-(--brand-blue-text) uppercase">Privacy and data</p>
           <h1 className="m-0 text-page font-extrabold leading-[1.1]">ThoraxScan Privacy Policy</h1>
           <p className="m-0 text-body leading-relaxed text-(--text-secondary)">Version {PRIVACY_POLICY_VERSION} · Effective {PRIVACY_POLICY_EFFECTIVE_DATE}</p>
@@ -40,7 +43,7 @@ export default function PrivacyPolicyPage() {
         <section className={sectionClass}><h2>9. Your choices and rights</h2><p>Depending on your location and applicable law, you may request access, correction, deletion, restriction, objection, portability, or withdrawal of consent where consent is the processing basis.</p><p>Send a request to <ContactEmails className={linkClass} />. If your request is not handled properly, you may contact the relevant privacy regulator, including the Philippine National Privacy Commission where Philippine law applies.</p></section>
         <section className={sectionClass}><h2>10. Medical and research limitations</h2><p>ThoraxScan outputs are for guided learning only. They are not diagnoses, medical advice, treatment recommendations, or a substitute for a qualified clinician. ThoraxScan is not a patient-record repository. The app does not authorize uploading identifiable patient data.</p></section>
         <section className={sectionClass}><h2>11. Changes</h2><p>We will update the version and effective date when this policy changes. Material changes should be presented before the affected processing begins or when required by applicable law.</p></section>
-        <footer className="border-t border-(--border-shell) pt-5 text-small leading-relaxed text-(--text-secondary)"><Link className={linkClass} href="/login">Log in</Link> · <Link className={linkClass} href="/register">Create an account</Link> · <Link className={linkClass} href="/terms">Terms</Link></footer>
+        <footer className="border-t border-(--border-shell) pt-5 text-small leading-relaxed text-(--text-secondary)">{!authenticated && <><Link className={linkClass} href="/login">Log in</Link> · <Link className={linkClass} href="/register">Create an account</Link> · </>}<Link className={linkClass} href="/terms">Terms</Link></footer>
       </article>
     </main>
   );
