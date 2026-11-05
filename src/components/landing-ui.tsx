@@ -18,13 +18,13 @@ const navLinks = [
 
 export function LandingHeader() {
   return (
-    <header className="relative flex h-[81px] items-center justify-between gap-4 px-9 bg-(--glass-shell) backdrop-blur-[12px] shadow-[inset_0_-1px_0_rgb(255_255_255/8%)] narrow:h-[73px] narrow:px-5 no-backdrop:[background:#14243e]">
+    <header className="relative flex h-[81px] items-center justify-between gap-4 px-9 bg-(--glass-shell) backdrop-blur-[12px] shadow-[inset_0_-1px_0_rgb(255_255_255/8%)] narrow:h-[73px] narrow:px-5 max-[480px]:h-auto max-[480px]:flex-wrap max-[480px]:justify-center max-[480px]:py-2 no-backdrop:[background:#14243e]">
       <Brand variant="landing" />
+      {/* Below 480px the links no longer fit beside the brand, so the nav wraps to its own row. */}
       <nav className="flex gap-1" aria-label="On this page">
         {navLinks.map((link) => (
-          // Phones keep only Docs beside the brand; the hero's button reaches How it works and the footer links Technical.
           <a
-            className={`rounded-panel px-3.5 py-2 text-[0.9375rem] font-semibold text-[#c3d0e2] no-underline hover:bg-[rgb(92_155_255/20%)] hover:text-[#e7f1ff] ${link.href === "#docs" ? "" : "max-[480px]:hidden"}`}
+            className="rounded-panel px-3.5 py-2 text-[0.9375rem] font-semibold text-[#c3d0e2] no-underline hover:bg-[rgb(92_155_255/20%)] hover:text-[#e7f1ff]"
             href={link.href}
             key={link.href}
           >
