@@ -16,7 +16,7 @@ The terms define educational use, account responsibilities, content permissions,
 
 ## Shape
 
-- The page identifies version `1.1`, effective date `2026-10-22`, operator/contact placeholders, educational limits, account eligibility (no age question; under-18 use only as the institution allows), acceptable use, role responsibilities, research kept outside registration, intellectual property, availability, termination, liability, and a governing-law placeholder in [page.tsx](<../../../src/app/terms/page.tsx>).
+- The page identifies version `1.2`, effective date `2026-11-07`, operator/contact placeholders, educational limits, account eligibility (no age question; under-18 use only as the institution allows), acceptable use, role responsibilities, research kept outside registration, intellectual property, data retention (section 8, matching Privacy Policy section 6, plus "Learning Mode images never leave the browser"), availability, termination, liability, and a governing-law placeholder in [page.tsx](<../../../src/app/terms/page.tsx>).
 - Shared legal constants and existing operator/contact placeholders are owned by [privacy.ts](<../../../src/lib/legal/privacy.ts>).
 - Landing, authentication, protected-shell, and Privacy Policy navigation link to the page in [page.tsx](<../../../src/app/page.tsx>), [auth-layout.tsx](<../../../src/components/auth/auth-layout.tsx>), [app-shell.tsx](<../../../src/components/app-shell.tsx>), and [privacy-policy/page.tsx](<../../../src/app/privacy-policy/page.tsx>).
 - The registration checkbox and server validation require `termsAccepted=yes`; sign-up includes `terms_version` and `terms_effective_date` in [auth-form.tsx](<../../../src/components/auth/auth-form.tsx>) and [actions.ts](<../../../src/app/(auth)/actions.ts>).

@@ -55,8 +55,8 @@ describe("registration terms agreement", () => {
       options: expect.objectContaining({
         data: expect.objectContaining({
           requested_role: role,
-          terms_version: "1.1",
-          terms_effective_date: "2026-10-30",
+          terms_version: "1.2",
+          terms_effective_date: "2026-11-07",
           privacy_policy_version: "1.1",
           privacy_policy_effective_date: "2026-10-30",
         }),

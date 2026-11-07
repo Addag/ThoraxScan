@@ -1,8 +1,8 @@
 export const PRIVACY_POLICY_VERSION = "1.1";
 export const PRIVACY_POLICY_EFFECTIVE_DATE = "2026-10-30";
 
-export const TERMS_VERSION = "1.1";
-export const TERMS_EFFECTIVE_DATE = "2026-10-30";
+export const TERMS_VERSION = "1.2";
+export const TERMS_EFFECTIVE_DATE = "2026-11-07";
 
 export const PRIVACY_CONTROLLER_NAME = "Siegfred A. Addag, Luke Andrew S. Casas, Ma. Kyle Nicole P. Leus, and Aldwin Jose D. Perez";
 export const PRIVACY_INSTITUTION = "Lyceum of the Philippines University – Batangas";
