@@ -4,17 +4,19 @@ import { submissionLabel } from "./types";
 
 const blank = { visibleFindings: "", classification: "", relevantRegion: "" };
 describe("submission validation", () => {
-  test("trims fields and clears normal regions", () => {
-    expect(normalizeSubmission({ visibleFindings: " \nClear\t", classification: " normal ", relevantRegion: "left" })).toEqual({ visibleFindings: "Clear", classification: "normal", relevantRegion: "" });
+  test("trims fields and clears normal text", () => {
+    expect(normalizeSubmission({ visibleFindings: " \nClear\t", classification: " normal ", relevantRegion: "left" })).toEqual({ visibleFindings: "", classification: "normal", relevantRegion: "" });
+    expect(normalizeSubmission({ visibleFindings: " \nOpacity\t", classification: "abnormal", relevantRegion: " left " })).toEqual({ visibleFindings: "Opacity", classification: "abnormal", relevantRegion: "left" });
   });
   test("rejects empty drafts but accepts partial ones", () => {
-    expect(validateSubmission(blank, false).visibleFindings).toBeTruthy();
+    expect(validateSubmission(blank, false).classification).toBeTruthy();
     for (const key of Object.keys(blank)) expect(validateSubmission({ ...blank, [key]: key === "classification" ? "abnormal" : "Entered" }, false)).toEqual({});
   });
-  test("final requires findings, classification and abnormal region", () => {
-    expect(Object.keys(validateSubmission(blank, true))).toEqual(["visibleFindings", "classification"]);
+  test("final requires classification, and findings plus region only when abnormal", () => {
+    expect(Object.keys(validateSubmission(blank, true))).toEqual(["classification"]);
+    expect(Object.keys(validateSubmission({ ...blank, classification: "abnormal" }, true))).toEqual(["visibleFindings", "relevantRegion"]);
     expect(validateSubmission({ ...blank, visibleFindings: "Opacity", classification: "abnormal" }, true).relevantRegion).toBeTruthy();
-    expect(validateSubmission({ ...blank, visibleFindings: "Clear", classification: "normal" }, true)).toEqual({});
+    expect(validateSubmission({ ...blank, classification: "normal" }, true)).toEqual({});
   });
   test("enforces exact Unicode character limits and known classification", () => {
     const values = { visibleFindings: "🫁".repeat(5000), classification: "abnormal", relevantRegion: "a".repeat(200) };

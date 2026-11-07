@@ -6,20 +6,26 @@ import type { StudentSubmission, SubmissionActionState } from "@/lib/submissions
 
 const draft: StudentSubmission = { id: "id", visibleFindings: "Saved findings", classification: "abnormal", relevantRegion: "Left lung", status: "draft", createdAt: "2026-01-01T00:00:00Z", updatedAt: "2026-01-01T00:00:00Z", submittedAt: null };
 const props = { submission: null, dueAt: null, deadlinePassed: false };
-test("abnormal enables region; normal clears it", async () => {
+test("findings and region appear only for abnormal; normal clears them", async () => {
   await render(<StudentSubmissionForm {...props} action={vi.fn()} />);
+  const findings = page.getByLabelText("What visible findings do you observe?");
   const region = page.getByLabelText("Which region appears most relevant?");
-  await expect.element(region).toBeDisabled();
+  await expect.element(findings).not.toBeInTheDocument();
+  await expect.element(region).not.toBeInTheDocument();
   await page.getByRole("radio", { name: "Abnormal", exact: true }).click();
+  await findings.fill("Opacity");
   await region.fill("Left lung");
   await page.getByRole("radio", { name: "Normal", exact: true }).click();
-  await expect.element(region).toBeDisabled();
+  await expect.element(findings).not.toBeInTheDocument();
+  await page.getByRole("radio", { name: "Abnormal", exact: true }).click();
+  await expect.element(findings).toHaveValue("");
   await expect.element(region).toHaveValue("");
 });
 test("save keeps entered values, reports status, and disables pending controls", async () => {
   let finish!: (state: SubmissionActionState) => void;
   const action = vi.fn(() => new Promise<SubmissionActionState>(resolve => { finish = resolve; }));
   await render(<StudentSubmissionForm {...props} action={action} />);
+  await page.getByRole("radio", { name: "Abnormal", exact: true }).click();
   await page.getByLabelText("What visible findings do you observe?").fill("My findings");
   await page.getByRole("button", { name: "Save draft" }).click();
   await expect.element(page.getByRole("button", { name: "Save draft" })).toBeDisabled();
@@ -50,6 +56,7 @@ test.each(["unauthorized", "deadline_passed"] as const)("locks on %s server resp
 });
 test("shows accessible field errors", async () => {
   await render(<StudentSubmissionForm {...props} action={async () => ({ status: "error", message: "Check fields", fieldErrors: { visibleFindings: "Enter a response" } })} />);
+  await page.getByRole("radio", { name: "Abnormal", exact: true }).click();
   await page.getByRole("button", { name: "Save draft" }).click();
   await expect.element(page.getByLabelText("What visible findings do you observe?")).toHaveAttribute("aria-invalid", "true");
   await expect.element(page.getByRole("alert")).toHaveTextContent("Enter a response");
@@ -59,6 +66,12 @@ test("expired drafts are explicitly not submitted and read only", async () => {
   await expect.element(page.getByRole("status")).toHaveTextContent("Not submitted");
   await expect.element(page.getByText("Saved findings", { exact: true })).toBeVisible();
   await expect.element(page.getByRole("textbox")).not.toBeInTheDocument();
+});
+test("a submitted normal response shows no findings or region rows", async () => {
+  await render(<StudentSubmissionForm {...props} submission={{ ...draft, visibleFindings: "", classification: "normal", relevantRegion: "", status: "submitted", submittedAt: "2026-01-01T00:00:00Z" }} action={vi.fn()} />);
+  await expect.element(page.getByText("normal", { exact: true })).toBeVisible();
+  await expect.element(page.getByText("Visible findings")).not.toBeInTheDocument();
+  await expect.element(page.getByText("Relevant region")).not.toBeInTheDocument();
 });
 test("submitted summary includes timestamp without controls", async () => {
   await render(<StudentSubmissionForm {...props} submission={{ ...draft, status: "submitted", submittedAt: "2026-01-01T00:00:00Z" }} action={vi.fn()} />);

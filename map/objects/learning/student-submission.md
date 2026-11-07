@@ -7,7 +7,7 @@ snapshot: working tree
 
 # Student submission
 
-One private editable draft or immutable final response per Student/activity. The record contains visible findings, normal/abnormal classification, optional relevant region, and lifecycle timestamps. Final abnormal responses require a region; normal responses clear it. Expired drafts remain unsubmitted. No due date means editable until finalization.
+One private editable draft or immutable final response per Student/activity. The record contains normal/abnormal classification, visible findings, relevant region, and lifecycle timestamps. The form shows the findings and region fields only after Abnormal is chosen; final abnormal responses require both. Normal is a one-click answer: the action and the RPC clear both text fields ([migration](<../../../supabase/migrations/20261107120000_normal_submissions_without_findings.sql>)). Older Normal finals may still hold findings text and keep showing it. Expired drafts remain unsubmitted. No due date means editable until finalization.
 
 ## See source
 

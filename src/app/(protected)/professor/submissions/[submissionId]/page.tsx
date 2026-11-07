@@ -31,7 +31,7 @@ export default async function SubmissionPage({ params }: { params: Promise<{ sub
       </section>
       <div className="grid grid-cols-[minmax(0,1.45fr)_minmax(310px,.75fr)] items-start gap-6 max-[900px]:grid-cols-1">
         <div className="grid gap-6">
-          <div className="grid gap-3.5"><XrayCasePreview imageUrl={activity.imageUrl} imageError={activity.imageError} title={activity.title} /><AttentionHeatmap className={`${reviewSurfaceClass} border-(--border-shell) p-4`} imageUrl={activity.imageUrl} attention={attention} title={attention.status === "ready" && attention.kind === "per-label" ? "Finding heatmap" : "Relative global attention"} /></div>
+          <div className="grid gap-3.5"><XrayCasePreview imageUrl={activity.imageUrl} imageError={activity.imageError} title={activity.title} /><AttentionHeatmap className={`${reviewSurfaceClass} border-(--border-shell) p-4`} imageUrl={activity.imageUrl} attention={attention} title={attention.status === "ready" && attention.kind === "per-label" ? "AI finding heatmap" : "AI relative global attention"} /></div>
           <div className={`${reviewSurfaceClass} border-(--border-shell) [&_h2]:mb-3.5 [&_h2]:flex [&_h2]:items-center [&_h2]:gap-[9px] [&_h2]:text-lead [&_h2]:font-extrabold`}><FacultyEvaluationForm key={submission.faculty_evaluations?.updated_at ?? submission.id} evaluation={submission.faculty_evaluations}
             saveAction={saveFacultyEvaluationAction.bind(null, submissionId)} releaseAction={releaseFacultyEvaluationAction.bind(null, submissionId)} />
           </div>
@@ -39,7 +39,7 @@ export default async function SubmissionPage({ params }: { params: Promise<{ sub
         <div className="grid gap-3.5">
           <section className={`${reviewCardClass} text-(--text-primary)`}><h2 className={reviewCardTitleClass}><span className="text-(--status-accent-text)" aria-hidden="true">▣</span> Student evaluation</h2><dl className="m-0 grid grid-cols-[minmax(120px,.35fr)_minmax(0,1fr)] gap-x-4 gap-y-[9px]">
             <dt className="text-label text-(--text-muted)">Student ID</dt><dd className="m-0 text-small">{submission.student_id}</dd>
-            <dt className="text-label text-(--text-muted)">Visible findings</dt><dd className="m-0 whitespace-pre-wrap text-small leading-normal">{submission.visible_findings}</dd>
+            <dt className="text-label text-(--text-muted)">Visible findings</dt><dd className="m-0 whitespace-pre-wrap text-small leading-normal">{submission.visible_findings || "Not applicable"}</dd>
             <dt className="text-label text-(--text-muted)">Classification</dt><dd className="m-0 text-small">{submission.classification}</dd>
             <dt className="text-label text-(--text-muted)">Relevant region</dt><dd className="m-0 text-small">{submission.relevant_region || "Not applicable"}</dd>
           </dl></section>

@@ -33,29 +33,34 @@ export function StudentSubmissionForm({ submission, dueAt, deadlinePassed, actio
     : submitted ? state.message || "Submitted · This response is permanently locked."
     : closed ? "Deadline passed · Not submitted. Your draft is read-only."
     : state.message || (submission ? "Draft · Not submitted. Save changes or submit your final evaluation." : "Not started · Save a private draft or submit your final evaluation.");
+  const lockedClassification = submission?.classification || classification;
+  const lockedFindings = submission?.visibleFindings || findings;
   const fieldError = (field: "visibleFindings" | "classification" | "relevantRegion") => errors?.[field] ? <small className="text-caption text-(--status-error-text)" id={`${field}-error`} role="alert">{errors[field]}</small> : null;
   return <section className="rounded-panel border border-(--border-shell) [background:var(--glass-surface)] backdrop-blur-[18px] backdrop-saturate-[135%] shadow-(--glass-shadow) p-6 max-[520px]:p-5">
     <div className={activityFormHeadingClass}><span className={activityFormHeadingIconClass} aria-hidden="true">➤</span><div><p className={activityFormHeadingKickerClass}>Student response</p><h2 className={activityFormHeadingTitleClass}>Your evaluation</h2></div></div>
     <p className="my-3 text-small leading-normal" role="status" aria-live="polite">{message}</p>
     {submission?.submittedAt ? <p className="my-3 text-small leading-normal">Submitted <time dateTime={submission.submittedAt}>{new Date(submission.submittedAt).toLocaleString()}</time></p> : null}
     {locked ? <dl className="grid gap-4 [overflow-wrap:anywhere]">
-      <div><dt className="font-semibold">Visible findings</dt><dd className="mx-0 mt-1 mb-0 whitespace-pre-wrap">{submission?.visibleFindings || findings || "No findings entered"}</dd></div>
-      <div><dt className="font-semibold">Classification</dt><dd className="mx-0 mt-1 mb-0 whitespace-pre-wrap">{submission?.classification || classification || "Not selected"}</dd></div>
-      {(submission?.classification || classification) === "abnormal" ? <div><dt className="font-semibold">Relevant region</dt><dd className="mx-0 mt-1 mb-0 whitespace-pre-wrap">{submission?.relevantRegion || region || "Not entered"}</dd></div> : null}
+      <div><dt className="font-semibold">Classification</dt><dd className="mx-0 mt-1 mb-0 whitespace-pre-wrap">{lockedClassification || "Not selected"}</dd></div>
+      {/* Older Normal responses may still carry findings text, so show it whenever it exists. */}
+      {lockedClassification !== "normal" || lockedFindings ? <div><dt className="font-semibold">Visible findings</dt><dd className="mx-0 mt-1 mb-0 whitespace-pre-wrap">{lockedFindings || "No findings entered"}</dd></div> : null}
+      {lockedClassification === "abnormal" ? <div><dt className="font-semibold">Relevant region</dt><dd className="mx-0 mt-1 mb-0 whitespace-pre-wrap">{submission?.relevantRegion || region || "Not entered"}</dd></div> : null}
     </dl> : <form action={formAction}>
       <fieldset disabled={pending} className="m-0 grid min-w-0 gap-3 border-0 p-0 [&>label]:text-small [&>label]:text-(--text-secondary) [&_legend]:text-small [&_legend]:text-(--text-secondary) [&>small]:text-caption [&>small]:text-(--text-muted)">
-        <label htmlFor="visibleFindings">What visible findings do you observe?</label>
-        <textarea className={`${textarea} disabled:opacity-55`} id="visibleFindings" name="visibleFindings" rows={5} value={findings} onChange={(event) => { setFindings(event.target.value); setConfirming(false); }} aria-invalid={Boolean(errors?.visibleFindings)} aria-describedby={errors?.visibleFindings ? "visibleFindings-error" : undefined} />
-        {fieldError("visibleFindings")}
         <fieldset className="border-0 p-0 aria-invalid:outline-2 aria-invalid:outline-(--status-error-text)" aria-describedby={errors?.classification ? "classification-error" : undefined} aria-invalid={Boolean(errors?.classification)}>
           <legend>Normal or abnormal?</legend>
-          <div className="flex flex-wrap gap-4">{["normal", "abnormal"].map((value) => <label className="flex items-center gap-2" key={value}><input className="size-4 accent-brand" type="radio" name="classification" value={value} checked={classification === value} onChange={() => { setClassification(value); if (value === "normal") setRegion(""); setConfirming(false); }} />{value === "normal" ? "Normal" : "Abnormal"}</label>)}</div>
+          <div className="flex flex-wrap gap-4">{["normal", "abnormal"].map((value) => <label className="flex items-center gap-2" key={value}><input className="size-4 accent-brand" type="radio" name="classification" value={value} checked={classification === value} onChange={() => { setClassification(value); if (value === "normal") { setFindings(""); setRegion(""); } setConfirming(false); }} />{value === "normal" ? "Normal" : "Abnormal"}</label>)}</div>
         </fieldset>
         {fieldError("classification")}
-        <label htmlFor="relevantRegion">Which region appears most relevant?</label>
-        <input className={`${field} disabled:cursor-not-allowed disabled:opacity-55`} id="relevantRegion" name="relevantRegion" disabled={classification !== "abnormal"} value={region} onChange={(event) => { setRegion(event.target.value); setConfirming(false); }} aria-invalid={Boolean(errors?.relevantRegion)} aria-describedby={errors?.relevantRegion ? "relevantRegion-error" : "region-hint"} />
-        <small className="text-caption text-(--text-muted)" id="region-hint">{classification === "abnormal" ? "Required for a final abnormal response." : "Select Abnormal to enter a region."} Maximum 200 characters.</small>
-        {fieldError("relevantRegion")}
+        {classification === "abnormal" ? <>
+          <label htmlFor="visibleFindings">What visible findings do you observe?</label>
+          <textarea className={`${textarea} disabled:opacity-55`} id="visibleFindings" name="visibleFindings" rows={5} value={findings} onChange={(event) => { setFindings(event.target.value); setConfirming(false); }} aria-invalid={Boolean(errors?.visibleFindings)} aria-describedby={errors?.visibleFindings ? "visibleFindings-error" : undefined} />
+          {fieldError("visibleFindings")}
+          <label htmlFor="relevantRegion">Which region appears most relevant?</label>
+          <input className={field} id="relevantRegion" name="relevantRegion" value={region} onChange={(event) => { setRegion(event.target.value); setConfirming(false); }} aria-invalid={Boolean(errors?.relevantRegion)} aria-describedby={errors?.relevantRegion ? "relevantRegion-error" : "region-hint"} />
+          <small className="text-caption text-(--text-muted)" id="region-hint">Required for a final abnormal response. Maximum 200 characters.</small>
+          {fieldError("relevantRegion")}
+        </> : null}
         <div className="flex flex-wrap gap-4">
           <button className={button("secondary")} type="submit" name="intent" value="draft" onClick={() => setConfirming(false)}>Save draft</button>
           <button className={button("primary")} type="button" onClick={() => setConfirming(true)}>Submit final evaluation</button>
