@@ -36,6 +36,7 @@ One line per important noun. live cards are source-backed; ghost entries are doc
 | Built-in X-ray library | live | [built-in-xray-library.md](learning/built-in-xray-library.md) | Bundled CheXpert `valid` JPEGs, `cases.json` manifest, and shared gallery component |
 | Learning case note | live | [learning-case-note.md](learning/learning-case-note.md) | `public.learning_case_notes`: private per-user notes on built-in library cases in Learning Mode |
 | View detector | live | [view-detector.md](learning/view-detector.md) | Server-side frontal/lateral classifier on `sharp` thumbnails, used by Professor case confirmation |
+| Chest X-ray gate | live | [chest-gate.md](learning/chest-gate.md) | Browser and server chest/not-chest MLP on raw-RGBA 32×32 features, used by Learning Mode and Professor case upload |
 | Bell notification | live | [notification.md](learning/notification.md) | Derived due/submission feed, `public.notification_reads`, and popover bell |
 | Class analytics | live | [analytics.md](learning/analytics.md) | Read-time Professor projection, AI-call RPC, `/professor/analytics` page and CSV route |
 

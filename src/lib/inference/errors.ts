@@ -4,7 +4,8 @@ export type InferenceErrorCode =
   | "ARTIFACT_INTEGRITY_FAILED"
   | "PREPROCESSING_FAILED"
   | "MODEL_LOAD_FAILED"
-  | "INVALID_OUTPUT";
+  | "INVALID_OUTPUT"
+  | "NOT_CHEST_XRAY";
 
 export class InferenceError extends Error {
   readonly code: InferenceErrorCode;

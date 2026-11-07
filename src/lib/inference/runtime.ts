@@ -12,6 +12,7 @@ import { InferenceError, asInferenceError } from "./errors";
 import { postprocessLogits, type PostprocessedPrediction } from "./postprocess";
 import { decodeImage, preprocessRgba } from "./preprocess";
 
+import { isChestXray } from "@/lib/chest-gate";
 import { readyAttention, readyClassActivation, UNAVAILABLE_ATTENTION, type AttentionHeatmap } from "./attention";
 
 type ExecutionProvider = "webgpu" | "wasm";
@@ -326,13 +327,17 @@ export async function runModelInference(
 
 export async function analyzeImage(
   blob: Blob,
-  options: { signal?: AbortSignal; supabase?: SupabaseClient } = {},
+  options: { signal?: AbortSignal; supabase?: SupabaseClient; requireChestXray?: boolean } = {},
 ): Promise<InferenceResult> {
   const [release, image] = await Promise.all([
     resolveActiveModel(options.supabase),
     decodeImage(blob, options.signal),
   ]);
   if (options.signal?.aborted) throw new DOMException("The operation was aborted.", "AbortError");
+  // Learning Mode accepts any local file; activity cases were already gated at upload.
+  if (options.requireChestXray && !isChestXray(image.data, image.width, image.height)) {
+    throw new InferenceError("NOT_CHEST_XRAY", "The image does not look like a chest X-ray.");
+  }
   const tensorData = preprocessRgba(
     image.data,
     image.width,

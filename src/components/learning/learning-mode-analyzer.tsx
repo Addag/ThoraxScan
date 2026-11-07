@@ -19,6 +19,7 @@ const errorCopy: Record<InferenceErrorCode, string> = {
   PREPROCESSING_FAILED: "This image could not be prepared. Select a non-empty JPEG or PNG chest X-ray.",
   MODEL_LOAD_FAILED: "The model could not be loaded or run in this browser. Try again.",
   INVALID_OUTPUT: "The model returned an invalid result. Try again later.",
+  NOT_CHEST_XRAY: "This doesn't look like a chest X-ray, so it wasn't analyzed. Choose a chest X-ray image.",
 };
 
 const panelClass = "overflow-hidden rounded-panel border border-(--border-subtle) [background:var(--glass-surface)] shadow-(--glass-shadow)";
@@ -72,7 +73,7 @@ export function LearningModeAnalyzer({ initialNotes = {} }: { initialNotes?: Rec
     try {
       const { analyzeImage } = await import("@/lib/inference/runtime");
       if (controller.signal.aborted) return;
-      const next = await analyzeImage(file, { signal: controller.signal });
+      const next = await analyzeImage(file, { signal: controller.signal, requireChestXray: true });
       if (controller.signal.aborted || runRef.current !== controller) return;
       setResult(next); setState("success");
     } catch (caught) {
@@ -122,8 +123,7 @@ export function LearningModeAnalyzer({ initialNotes = {} }: { initialNotes?: Rec
       <h2 className="mb-5 text-display font-extrabold" tabIndex={-1} ref={resultHeadingRef}>Analysis result</h2>
       <AnalysisFindings state={result.state} labels={result.labels} findings={result.findings} possibleFindings={result.possibleFindings} idPrefix="learning" />
       <details className={detailsClass}><summary className={summaryClass}>Release and execution provenance</summary><dl className="grid grid-cols-[minmax(0,.8fr)_minmax(0,1.2fr)] gap-2.5 text-small max-[480px]:grid-cols-1 [&>dd]:m-0 [&>dd]:[overflow-wrap:anywhere] [&>dt]:text-(--text-muted)"><dt>Release ID</dt><dd>{result.releaseId}</dd><dt>Execution provider</dt><dd>{result.executionProvider.toUpperCase()}</dd><dt>Manifest version</dt><dd>{result.manifestVersion}</dd><dt>Preprocessing version</dt><dd>{result.preprocessingVersion}</dd><dt>Threshold version</dt><dd>{result.thresholdVersion}</dd><dt>Application build</dt><dd>{result.applicationBuild}</dd><dt>Model SHA-256</dt><dd>{result.modelSha256}</dd><dt>Bundle SHA-256</dt><dd>{result.bundleSha256}</dd></dl></details>
-      <AttentionHeatmap imageUrl={previewUrl} attention={result.attention ?? { status: "unavailable", reason: "legacy-model-release" }} labels={result.labels} title="Finding heatmap" />
-      <p className="mt-5 text-caption leading-normal text-(--text-muted)">Educational use only. This result is not a diagnosis and should not guide medical decisions.</p>
+      <AttentionHeatmap imageUrl={previewUrl} attention={result.attention ?? { status: "unavailable", reason: "legacy-model-release" }} labels={result.labels} title="AI finding heatmap" />
     </div> : <section className={`${panelClass} flex min-h-[327px] flex-col items-center justify-center p-8 text-center max-[480px]:p-5`} aria-labelledby="learning-empty-title">
       <div className="mb-6 grid size-16 flex-none place-items-center rounded-md border border-[#5925a7] bg-[#2e1677]"><img src="/images/learning/scan.svg" alt="" width="36" height="36" /></div>
       <h2 className="mb-[18px] text-display font-extrabold" id="learning-empty-title">{state === "running" ? "Analyzing your X-ray" : "Select an X-ray to begin"}</h2>

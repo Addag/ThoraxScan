@@ -185,7 +185,7 @@ test("possible tier is hidden for releases without possible thresholds", async (
   await expect.element(page.getByRole("region", { name: "Possible findings" })).not.toBeInTheDocument();
 });
 
-const errorCodes: InferenceErrorCode[] = ["NO_ACTIVE_MODEL", "UNSUPPORTED_MANIFEST", "ARTIFACT_INTEGRITY_FAILED", "PREPROCESSING_FAILED", "MODEL_LOAD_FAILED", "INVALID_OUTPUT"];
+const errorCodes: InferenceErrorCode[] = ["NO_ACTIVE_MODEL", "UNSUPPORTED_MANIFEST", "ARTIFACT_INTEGRITY_FAILED", "PREPROCESSING_FAILED", "MODEL_LOAD_FAILED", "INVALID_OUTPUT", "NOT_CHEST_XRAY"];
 test.each(errorCodes)("safe error and retry for %s", async (code) => {
   mocks.analyze.mockRejectedValue(new InferenceError(code, "private internal diagnostic"));
   await render(<LearningModeAnalyzer />); await start();

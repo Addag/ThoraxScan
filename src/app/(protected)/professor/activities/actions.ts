@@ -15,6 +15,8 @@ import type {
 import type { AppRole, ProfessorApplicationStatus } from "@/lib/auth/types";
 import { createClient } from "@/lib/supabase/server";
 import { looksLateral } from "@/lib/view-detector";
+import { passesChestGate } from "@/lib/chest-gate";
+import { chestFeaturesFile } from "@/lib/chest-gate/server";
 
 const uuidPattern =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
@@ -410,6 +412,11 @@ export async function confirmCaseUploadAction(
   } catch {
     await session.supabase.storage.from("activity-cases").remove([xrayCase.storage_path]);
     return caseError("The file is not a valid, decodable JPEG or PNG. Choose a different image.");
+  }
+
+  if (!passesChestGate(await chestFeaturesFile(imageBytes))) {
+    await session.supabase.storage.from("activity-cases").remove([xrayCase.storage_path]);
+    return caseError("This image doesn't look like a chest X-ray. Activities accept frontal chest X-rays only.");
   }
 
   if (await looksLateral(imageBytes)) {
