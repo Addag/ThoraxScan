@@ -28,6 +28,12 @@ test("shows likely, possible, and all labels like Learning Mode", async () => {
   await render(<ActivityAIFeedback activityId="a" imageUrl={null} initial={initial} />);
   await expect.element(page.getByRole("region", { name: "Likely findings" })).toHaveTextContent("Cardiomegaly");
   await expect.element(page.getByRole("region", { name: "Possible findings" })).toHaveTextContent("Edema");
+  const popup = page.getByRole("dialog", { name: /possible finding/ });
+  await expect.element(popup).toHaveTextContent("many will be false alarms");
+  await page.getByRole("button", { name: "I understand" }).click();
+  await expect.element(popup).not.toBeInTheDocument();
+  await expect.element(page.getByText("AI-generated result.", { exact: false })).toBeVisible();
+  await expect.element(page.getByRole("region", { name: "AI-generated radiographic report" })).toHaveTextContent("Impression");
   await page.getByText("All 14 labels", { exact: true }).click();
   const list = page.getByText("All 14 labels", { exact: true }).element().closest("details")!.textContent;
   expect(list).toContain("Likely");

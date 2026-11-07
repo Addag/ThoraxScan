@@ -10,7 +10,7 @@ snapshot: main @ 6af6c16
 
 The protected `/student/learning` and `/professor/learning` Server Components recheck their respective roles and render the focused Learning Mode analyzer. It presents browser-only practice results, all manifest labels, release/execution provenance, and a V2 attention map when the active release supplies one.
 
-Results show "Likely findings" (at or above the threshold). When the release supplies possible thresholds, they also show "Possible findings" (abnormal labels in the band below the threshold), with a note that many of them will be false alarms.
+Results show "Likely findings" (at or above the threshold). When the release supplies possible thresholds, they also show "Possible findings" (abnormal labels in the band below the threshold), with a warning callout that many of them will be false alarms; a modal with the same caveat opens once per result. Every result opens with an "AI-generated result" banner, an AI-generated radiographic report (type of exam, interpretation, impression from `analysisReport()` in [postprocess.ts](<../../../src/lib/inference/postprocess.ts>); it states only what the 14 labels cover), and a bar chart of all label probabilities with threshold marks. Learning Mode runs the [chest X-ray gate](../learning/chest-gate.md) before inference and refuses images that fail it.
 
 After an analysis of a built-in library case, a "My notes" panel lets the viewer save a private [Learning case note](../learning/learning-case-note.md). Local uploads show a line saying notes need a gallery case.
 
