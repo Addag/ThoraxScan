@@ -18,6 +18,7 @@ import {
   initialCaseRemovalFormState,
   type ProfessorActivityDetails,
 } from "@/lib/activities/types";
+import { shrinkCaseImage } from "@/lib/activities/shrink-case-image";
 import { createClient } from "@/lib/supabase/client";
 import type { ProfessorWorkspace } from "@/lib/workspaces/types";
 import { XrayLibrary } from "@/components/learning/xray-library";
@@ -210,6 +211,7 @@ function CaseUploadFields({ activityId, disabled, onBusyChange, onCaseReserved, 
   const [file, setFile] = useState<File | null>(null);
   const [selectedCaseId, setSelectedCaseId] = useState<string | null>(null);
   const [libraryLoading, setLibraryLoading] = useState(false);
+  const [shrinking, setShrinking] = useState(false);
   const [clientError, setClientError] = useState("");
   const [uploading, setUploading] = useState(false);
   const [prepareState, prepareAction, preparing] = useActionState(
@@ -273,7 +275,7 @@ function CaseUploadFields({ activityId, disabled, onBusyChange, onCaseReserved, 
   }, [confirmAction, file, onCaseReserved, prepareState, startConfirmation]);
 
   const visibleState = confirmState.status !== "idle" ? confirmState : prepareState;
-  const uploadBusy = preparing || uploading || confirming || libraryLoading;
+  const uploadBusy = preparing || uploading || confirming || libraryLoading || shrinking;
   const busy = disabled || uploadBusy;
 
   useEffect(() => {
@@ -302,7 +304,7 @@ function CaseUploadFields({ activityId, disabled, onBusyChange, onCaseReserved, 
             </button>
           ) : null}
         </div>
-        <small className="text-label text-(--text-muted)">JPEG or PNG · maximum 6 MB · private storage</small>
+        <small className="text-label text-(--text-muted)">JPEG or PNG · larger images are resized · private storage</small>
         <input
           ref={fileInputRef}
           id={fileInputId}
@@ -311,11 +313,17 @@ function CaseUploadFields({ activityId, disabled, onBusyChange, onCaseReserved, 
           aria-label="Choose a chest X-ray file"
           accept="image/jpeg,image/png"
           disabled={busy}
-          onChange={(event) => {
-            setFile(event.target.files?.[0] ?? null);
+          onChange={async (event) => {
+            const selected = event.target.files?.[0] ?? null;
+            setShrinking(Boolean(selected));
             setSelectedCaseId(null);
             setClientError("");
             onSelect();
+            try {
+              setFile(selected ? await shrinkCaseImage(selected) : null);
+            } finally {
+              setShrinking(false);
+            }
           }}
           required={!file}
         />
@@ -327,7 +335,7 @@ function CaseUploadFields({ activityId, disabled, onBusyChange, onCaseReserved, 
       </label>
       <FieldError>{prepareState.fieldErrors?.attestation}</FieldError>
       <button className={`${button("secondary")} w-full`} type="submit" disabled={!file || busy}>
-        {preparing ? "Authorizing…" : uploading ? "Uploading directly…" : confirming ? "Verifying…" : "Upload and verify case"}
+        {shrinking ? "Preparing image…" : preparing ? "Authorizing…" : uploading ? "Uploading directly…" : confirming ? "Verifying…" : "Upload and verify case"}
       </button>
       {clientError ? <p className={activityFormMessageClass("error")} role="alert">{clientError}</p> : null}
       {visibleState.message ? <p className={activityFormMessageClass(visibleState.status)} role="status">{visibleState.message}</p> : null}
