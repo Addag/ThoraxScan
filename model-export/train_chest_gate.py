@@ -3,7 +3,8 @@
 Features come from scripts/dump-chest-features.mts, which calls the same
 chestFeatures() the browser and server use, so every input path matches.
 Each split is a "<label>\t<path>" list (1 = chest X-ray): CheXpert images for
-1, and photos, other medical images and rendered documents for 0.
+1, and photos, other medical images, non-chest X-rays (FracAtlas) and rendered
+documents for 0.
 
     python model-export/train_chest_gate.py <featureDir> src/lib/chest-gate/weights.json
 """
@@ -14,7 +15,7 @@ import numpy as np
 from sklearn.neural_network import MLPClassifier
 
 FEATURES = 32 * 32
-HIDDEN = 32
+HIDDEN = 64
 # Highest share of held-out chest X-rays the gate may reject.
 MAX_CHEST_REJECT = 0.001
 # CheXpert images are pure greyscale; leave room for tinted scans and phone photos of films.
@@ -62,7 +63,7 @@ def main(feature_dir, out_path):
 
     with open(out_path, "w") as file:
         json.dump({
-            "version": f"chest-mlp{HIDDEN}-32px-v1",
+            "version": f"chest-mlp{HIDDEN}-32px-v2",
             "threshold": round(threshold, 6),
             "maxColourfulness": round(colour_limit, 6),
             # hidden[j] = relu(hiddenBias[j] + sum_i features[i] * hiddenWeights[i][j])
