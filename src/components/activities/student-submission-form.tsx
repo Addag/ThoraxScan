@@ -2,6 +2,7 @@
 
 import { useActionState, useEffect, useState } from "react";
 import { initialSubmissionState, type StudentSubmission, type SubmissionActionState } from "@/lib/submissions/types";
+import { normalizeSubmission, validateSubmission } from "@/lib/submissions/validation";
 import { ConfirmDialog } from "@/components/confirm-dialog";
 import { button, field, textarea } from "@/components/controls";
 import { activityFormHeadingClass, activityFormHeadingIconClass, activityFormHeadingKickerClass, activityFormHeadingTitleClass } from "@/components/activities/activity-form-styles";
@@ -17,6 +18,10 @@ export function StudentSubmissionForm({ submission, dueAt, deadlinePassed, actio
   const [classification, setClassification] = useState(submission?.classification ?? "");
   const [region, setRegion] = useState(submission?.relevantRegion ?? "");
   const [confirming, setConfirming] = useState(false);
+  const [incomplete, setIncomplete] = useState(false);
+  const edited = () => { setConfirming(false); setIncomplete(false); };
+  // Same rules the server applies, so an unfinished answer is caught before the confirmation opens.
+  const startFinal = () => Object.keys(validateSubmission(normalizeSubmission({ visibleFindings: findings, classification, relevantRegion: region }), true)).length ? setIncomplete(true) : setConfirming(true);
   const [expired, setExpired] = useState(deadlinePassed);
   useEffect(() => {
     if (!dueAt) return;
@@ -49,22 +54,23 @@ export function StudentSubmissionForm({ submission, dueAt, deadlinePassed, actio
       <fieldset disabled={pending} className="m-0 grid min-w-0 gap-3 border-0 p-0 [&>label]:text-small [&>label]:text-(--text-secondary) [&_legend]:text-small [&_legend]:text-(--text-secondary) [&>small]:text-caption [&>small]:text-(--text-muted)">
         <fieldset className="border-0 p-0 aria-invalid:outline-2 aria-invalid:outline-(--status-error-text)" aria-describedby={errors?.classification ? "classification-error" : undefined} aria-invalid={Boolean(errors?.classification)}>
           <legend>Normal or abnormal?</legend>
-          <div className="flex flex-wrap gap-4">{["normal", "abnormal"].map((value) => <label className="flex items-center gap-2" key={value}><input className="size-4 accent-brand" type="radio" name="classification" value={value} checked={classification === value} onChange={() => { setClassification(value); if (value === "normal") { setFindings(""); setRegion(""); } setConfirming(false); }} />{value === "normal" ? "Normal" : "Abnormal"}</label>)}</div>
+          <div className="flex flex-wrap gap-4">{["normal", "abnormal"].map((value) => <label className="flex items-center gap-2" key={value}><input className="size-4 accent-brand" type="radio" name="classification" value={value} checked={classification === value} onChange={() => { setClassification(value); if (value === "normal") { setFindings(""); setRegion(""); } edited(); }} />{value === "normal" ? "Normal" : "Abnormal"}</label>)}</div>
         </fieldset>
         {fieldError("classification")}
         {classification === "abnormal" ? <>
           <label htmlFor="visibleFindings">What visible findings do you observe?</label>
-          <textarea className={`${textarea} disabled:opacity-55`} id="visibleFindings" name="visibleFindings" rows={5} value={findings} onChange={(event) => { setFindings(event.target.value); setConfirming(false); }} aria-invalid={Boolean(errors?.visibleFindings)} aria-describedby={errors?.visibleFindings ? "visibleFindings-error" : undefined} />
+          <textarea className={`${textarea} disabled:opacity-55`} id="visibleFindings" name="visibleFindings" rows={5} value={findings} onChange={(event) => { setFindings(event.target.value); edited(); }} aria-invalid={Boolean(errors?.visibleFindings)} aria-describedby={errors?.visibleFindings ? "visibleFindings-error" : undefined} />
           {fieldError("visibleFindings")}
           <label htmlFor="relevantRegion">Which region appears most relevant?</label>
-          <input className={field} id="relevantRegion" name="relevantRegion" value={region} onChange={(event) => { setRegion(event.target.value); setConfirming(false); }} aria-invalid={Boolean(errors?.relevantRegion)} aria-describedby={errors?.relevantRegion ? "relevantRegion-error" : "region-hint"} />
+          <input className={field} id="relevantRegion" name="relevantRegion" value={region} onChange={(event) => { setRegion(event.target.value); edited(); }} aria-invalid={Boolean(errors?.relevantRegion)} aria-describedby={errors?.relevantRegion ? "relevantRegion-error" : "region-hint"} />
           <small className="text-caption text-(--text-muted)" id="region-hint">Required for a final abnormal response. Maximum 200 characters.</small>
           {fieldError("relevantRegion")}
         </> : null}
         <div className="flex flex-wrap gap-4">
-          <button className={button("secondary")} type="submit" name="intent" value="draft" onClick={() => setConfirming(false)}>Save draft</button>
-          <button className={button("primary")} type="button" onClick={() => setConfirming(true)}>Submit final evaluation</button>
+          <button className={button("secondary")} type="submit" name="intent" value="draft" onClick={edited}>Save draft</button>
+          <button className={button("primary")} type="button" onClick={startFinal}>Submit final evaluation</button>
         </div>
+        {incomplete ? <p className="m-0 rounded-control border border-(--status-error-text) px-3 py-2 text-small font-semibold text-(--status-error-text)" role="alert">Enter your answer before submitting.</p> : null}
         {confirming ? <ConfirmDialog title="Confirm final submission" cancelLabel="Keep editing" confirmLabel="Confirm and submit" name="intent" value="final" onClose={() => setConfirming(false)}>
           Your final evaluation cannot be edited. Review your response before confirming.
           <input type="hidden" name="confirmed" value="yes" />

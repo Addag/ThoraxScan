@@ -21,6 +21,23 @@ test("findings and region appear only for abnormal; normal clears them", async (
   await expect.element(findings).toHaveValue("");
   await expect.element(region).toHaveValue("");
 });
+test("submitting an unfinished answer prompts instead of confirming", async () => {
+  const action = vi.fn();
+  await render(<StudentSubmissionForm {...props} action={action} />);
+  const submit = page.getByRole("button", { name: "Submit final evaluation" });
+  const prompt = page.getByText("Enter your answer before submitting.");
+  await submit.click();
+  await expect.element(prompt).toBeVisible();
+  await page.getByRole("radio", { name: "Abnormal", exact: true }).click();
+  await expect.element(prompt).not.toBeInTheDocument();
+  await submit.click();
+  await expect.element(prompt).toBeVisible();
+  await expect.element(page.getByRole("button", { name: "Confirm and submit" })).not.toBeInTheDocument();
+  await page.getByRole("radio", { name: "Normal", exact: true }).click();
+  await submit.click();
+  await expect.element(page.getByRole("button", { name: "Confirm and submit" })).toBeVisible();
+  expect(action).not.toHaveBeenCalled();
+});
 test("save keeps entered values, reports status, and disables pending controls", async () => {
   let finish!: (state: SubmissionActionState) => void;
   const action = vi.fn(() => new Promise<SubmissionActionState>(resolve => { finish = resolve; }));
