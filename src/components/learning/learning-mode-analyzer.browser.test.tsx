@@ -21,6 +21,7 @@ async function select(file = new File([new Uint8Array([1])], "practice.png", { t
   await page.getByLabelText("Image file", { exact: true }).upload(file);
 }
 async function start() { await select(); await page.getByRole("button", { name: "Analyze", exact: true }).click(); }
+const closeResult = () => page.getByRole("button", { name: "Close result", exact: true }).click();
 beforeEach(() => { mocks.analyze.mockReset(); mocks.analyze.mockResolvedValue(prediction()); });
 
 test("built-in case loads real JPEG bytes and can be analyzed and reset", async () => {
@@ -33,6 +34,7 @@ test("built-in case loads real JPEG bytes and can be analyzed and reset", async 
   expect(file.name).toBe("cxp-001.jpg");
   expect(file.type).toBe("image/jpeg");
   expect(Array.from(new Uint8Array(await file.arrayBuffer()).slice(0, 2))).toEqual([255, 216]);
+  await closeResult();
   await page.getByRole("button", { name: "Reset", exact: true }).click();
   await expect.element(page.getByRole("button", { name: "Analyze", exact: true })).toBeDisabled();
 });
@@ -42,6 +44,7 @@ test("gallery cases keep private notes; local uploads do not", async () => {
   await render(<LearningModeAnalyzer initialNotes={{ "cxp-001": "Earlier note." }} />);
   await page.getByRole("button", { name: "Use case 01", exact: true }).click();
   await page.getByRole("button", { name: "Analyze", exact: true }).click();
+  await closeResult();
   const notes = page.getByLabelText(/Your own notes/);
   await expect.element(notes).toHaveValue("Earlier note.");
   await notes.fill("Recheck the right base.");
@@ -52,9 +55,11 @@ test("gallery cases keep private notes; local uploads do not", async () => {
   await page.getByRole("button", { name: "Reset", exact: true }).click();
   await page.getByRole("button", { name: "Use case 01", exact: true }).click();
   await page.getByRole("button", { name: "Analyze", exact: true }).click();
+  await closeResult();
   await expect.element(page.getByLabelText(/Your own notes/)).toHaveValue("Recheck the right base.");
 
   await start();
+  await closeResult();
   await expect.element(page.getByText(/Notes can be saved for sample gallery cases/)).toBeVisible();
   await expect.element(page.getByLabelText(/Your own notes/)).not.toBeInTheDocument();
 });
@@ -150,6 +155,30 @@ test("findings, contract order, focus, and provenance", async () => {
     await expect.element(page.getByText(value, { exact: true })).toBeVisible();
   }
   expect(page.getByText("Release and execution provenance", { exact: true }).element().closest("details")?.textContent).toContain("Manifest version1");
+});
+
+test("the result pops up, stays on the page after closing, and pops up again on the next run", async () => {
+  await render(<LearningModeAnalyzer />); await start();
+  const dialog = page.getByRole("dialog", { name: "Analysis result" });
+  await expect.element(dialog).toBeVisible();
+  const element = dialog.element() as HTMLDialogElement;
+  expect(element.open).toBe(true);
+  await closeResult();
+  expect(element.open).toBe(false);
+  await expect.element(page.getByRole("heading", { name: "Analysis result" })).toBeVisible();
+  await expect.element(page.getByRole("region", { name: "Likely findings" })).toHaveTextContent("Cardiomegaly");
+  await page.getByRole("button", { name: "Analyze", exact: true }).click();
+  await expect.element(page.getByRole("button", { name: "Close result", exact: true })).toBeVisible();
+});
+
+test("the Possible findings warning opens above the result and closes on its own", async () => {
+  const tiered = { ...manifest, labels: manifest.labels.map((item) => ({ ...item, threshold: 0.6, possibleThreshold: 0.3 })) };
+  mocks.analyze.mockResolvedValue({ ...prediction(), ...postprocessLogits(manifest.labels.map((_, i) => (i === 2 ? 2 : i === 5 ? 0 : -4)), tiered) });
+  await render(<LearningModeAnalyzer />); await start();
+  await page.getByRole("button", { name: "I understand" }).click();
+  expect((page.getByRole("dialog", { name: "Analysis result" }).element() as HTMLDialogElement).open).toBe(true);
+  await closeResult();
+  await expect.element(page.getByRole("region", { name: "Possible findings" })).toHaveTextContent("Edema");
 });
 
 test("no label meets threshold", async () => {

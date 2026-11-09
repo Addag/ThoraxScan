@@ -6,6 +6,7 @@ import { InferenceError, type InferenceErrorCode } from "@/lib/inference/errors"
 import type { InferenceResult } from "@/lib/inference/runtime";
 import { AttentionHeatmap } from "@/components/attention-heatmap";
 import { AnalysisFindings } from "@/components/analysis-findings";
+import { ResultDialog } from "@/components/result-dialog";
 import { LearningNotes } from "./learning-notes";
 import { XrayLibrary } from "./xray-library";
 
@@ -119,12 +120,12 @@ export function LearningModeAnalyzer({ initialNotes = {} }: { initialNotes?: Rec
       <p className="mt-4 text-small leading-relaxed text-(--text-muted)">Your selected image stays in browser memory. The application contacts Supabase for the active release and downloads the model artifact.</p>
     </div>
     <div className="min-w-0">
-    {result ? <div className={`${panelClass} p-6 max-[480px]:p-5`} aria-live="polite">
+    {result ? <ResultDialog popUp label="Analysis result"><div className={`${panelClass} p-6 max-[480px]:p-5`} aria-live="polite">
       <h2 className="mb-5 text-display font-extrabold" tabIndex={-1} ref={resultHeadingRef}>Analysis result</h2>
       <AnalysisFindings state={result.state} labels={result.labels} findings={result.findings} possibleFindings={result.possibleFindings} idPrefix="learning" />
       <details className={detailsClass}><summary className={summaryClass}>Release and execution provenance</summary><dl className="grid grid-cols-[minmax(0,.8fr)_minmax(0,1.2fr)] gap-2.5 text-small max-[480px]:grid-cols-1 [&>dd]:m-0 [&>dd]:[overflow-wrap:anywhere] [&>dt]:text-(--text-muted)"><dt>Release ID</dt><dd>{result.releaseId}</dd><dt>Execution provider</dt><dd>{result.executionProvider.toUpperCase()}</dd><dt>Manifest version</dt><dd>{result.manifestVersion}</dd><dt>Preprocessing version</dt><dd>{result.preprocessingVersion}</dd><dt>Threshold version</dt><dd>{result.thresholdVersion}</dd><dt>Application build</dt><dd>{result.applicationBuild}</dd><dt>Model SHA-256</dt><dd>{result.modelSha256}</dd><dt>Bundle SHA-256</dt><dd>{result.bundleSha256}</dd></dl></details>
       <AttentionHeatmap imageUrl={previewUrl} attention={result.attention ?? { status: "unavailable", reason: "legacy-model-release" }} labels={result.labels} title="AI finding heatmap" />
-    </div> : <section className={`${panelClass} flex min-h-[327px] flex-col items-center justify-center p-8 text-center max-[480px]:p-5`} aria-labelledby="learning-empty-title">
+    </div></ResultDialog> : <section className={`${panelClass} flex min-h-[327px] flex-col items-center justify-center p-8 text-center max-[480px]:p-5`} aria-labelledby="learning-empty-title">
       <div className="mb-6 grid size-16 flex-none place-items-center rounded-md border border-[#5925a7] bg-[#2e1677]"><img src="/images/learning/scan.svg" alt="" width="36" height="36" /></div>
       <h2 className="mb-[18px] text-display font-extrabold" id="learning-empty-title">{state === "running" ? "Analyzing your X-ray" : "Select an X-ray to begin"}</h2>
       <p className="m-0 text-body leading-relaxed text-(--text-muted)">{state === "running" ? "Resolving the active release, verifying the model, and analyzing in your browser. You can reset at any time." : "Choose a built-in case or a local JPEG or PNG image, review the preview, then select Analyze to explore the model’s findings."}</p>
