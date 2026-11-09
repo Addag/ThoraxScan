@@ -14,6 +14,13 @@ test("chest gate accepts every library case", async () => {
   expect(rejected).toEqual([]);
 });
 
+test("chest gate refuses shapes no chest film has, whatever the classifier says", async () => {
+  const chest = await chestFeaturesFile(path.join("public", cases[0].imageUrl));
+  expect(passesChestGate(chest)).toBe(true);
+  expect(passesChestGate({ ...chest, aspect: 0.46 })).toBe(false);
+  expect(passesChestGate({ ...chest, aspect: 2 })).toBe(false);
+});
+
 test("chest gate rejects app artwork and a text report", async () => {
   const report = await sharp(Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" width="1060" height="600"><rect width="100%" height="100%" fill="white"/>
     <text x="430" y="40" font-size="28" font-weight="bold">RADIOGRAPHIC REPORT</text>

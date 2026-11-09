@@ -2,7 +2,7 @@
 node_type: object
 universe: live
 status: verified
-audited: 2026-11-08
+audited: 2026-11-09
 snapshot: main @ 902eae2 + working tree
 ---
 
@@ -16,8 +16,8 @@ The disease model scores any image it is given, so photos and documents produced
 
 ## Shape
 
-- [features.ts](<../../../src/lib/chest-gate/features.ts>): `chestFeatures(rgba, w, h)` returns a 32×32 greyscale box average (Rec. 601 luma) and a colourfulness score (mean max−min channel spread).
-- [index.ts](<../../../src/lib/chest-gate/index.ts>): `passesChestGate()` requires colourfulness ≤ `maxColourfulness`, then runs the 1024 → 64 (ReLU) → 1 (sigmoid) MLP from [weights.json](<../../../src/lib/chest-gate/weights.json>) (~1.4 MB, bundled into the lazily loaded inference chunk) and requires a score ≥ `threshold`.
+- [features.ts](<../../../src/lib/chest-gate/features.ts>): `chestFeatures(rgba, w, h)` returns a 32×32 greyscale box average (Rec. 601 luma), a colourfulness score (mean max−min channel spread), and the width/height `aspect`.
+- [index.ts](<../../../src/lib/chest-gate/index.ts>): `passesChestGate()` requires `aspect` within 0.72–1.6 (constants in `index.ts`), then colourfulness ≤ `maxColourfulness`, then runs the 1024 → 64 (ReLU) → 1 (sigmoid) MLP from [weights.json](<../../../src/lib/chest-gate/weights.json>) (~1.4 MB, bundled into the lazily loaded inference chunk) and requires a score ≥ `threshold`.
 - Browser: `analyzeImage(..., { requireChestXray: true })` in [runtime.ts](<../../../src/lib/inference/runtime.ts>) checks right after `decodeImage` and throws `NOT_CHEST_XRAY`. Only Learning Mode passes the flag. Activity analysis skips it because its case already passed the server check.
 - Server: [server.ts](<../../../src/lib/chest-gate/server.ts>) decodes with sharp (`rotate`, `ensureAlpha`, `raw`) into the same function. `confirmCaseUploadAction` rejects failing uploads before the lateral check and deletes the object.
 
@@ -28,11 +28,13 @@ The disease model scores any image it is given, so photos and documents produced
 - Threshold: the lower of 0.5 and the score that rejects at most 0.1% of held-out chest X-rays (0.0653). Colour limit: the higher of 0.08 and the 99.9th-percentile chest colourfulness (0.08).
 - Held out (v2): 5 of 5,000 chest X-rays rejected; 5,653 of 5,761 others caught (documents, ultrasound and fundus 100%, FracAtlas X-rays 98.3%, photos 98.5%, abdominal CT 95.5%). Official 234: none rejected. Before FracAtlas (v1), 26% of all FracAtlas images passed. [index.test.ts](<../../../src/lib/chest-gate/index.test.ts>) checks the library and a few non-chest images.
 
+- Shape rule: the features squash every image square, so a tall crop of a foot or arm fills the frame like a chest (a 0.46-wide foot scored 0.98). Retraining with anatomy-tight crops of FracAtlas and CheXpert (v3) did not close this and made abdominal CT worse (4.5% → 6.7% passing), so v2 weights stay and the shape limit does the work. Held-out images cropped tight to the anatomy now pass 1.1% of the time.
+
 ## Known gaps
 
 - Only limb, hip and shoulder X-rays were in training. Spine, skull, abdomen and pelvis films are untested and may pass. Abdominal CT slices pass about 1 in 22.
 - FracAtlas was split by image, not by patient, so its held-out rate may be slightly optimistic.
-- About 1 in 1,000 chest X-rays is refused, with no override.
+- About 1 in 400 chest X-rays is refused (12 of 5,000 held out, including 7 narrower than 0.72), with no override.
 - Browser and sharp JPEG decoders can differ slightly; at 32×32 this has not mattered on the library.
 - Retraining is manual: rebuild the lists, rerun both scripts, and commit `weights.json`.
 

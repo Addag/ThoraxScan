@@ -11,9 +11,14 @@ export function chestProbability(features: Float32Array) {
   return 1 / (1 + Math.exp(-logit));
 }
 
-/** Colour photos fail the colourfulness rule; greyscale non-X-rays fail the classifier. */
-export function passesChestGate({ features, colourfulness }: ReturnType<typeof chestFeatures>) {
-  return colourfulness <= gate.maxColourfulness && chestProbability(features) >= gate.threshold;
+// Width / height. 7 of 5,000 held-out chest X-rays (about 1 in 700) are narrower than 0.72. Features squash every image square,
+// so a tall crop of a foot or arm would otherwise fill the frame like a chest.
+const MIN_ASPECT = 0.72;
+const MAX_ASPECT = 1.6;
+
+/** Odd shapes fail first, colour photos fail the colourfulness rule, greyscale non-X-rays fail the classifier. */
+export function passesChestGate({ features, colourfulness, aspect }: ReturnType<typeof chestFeatures>) {
+  return aspect >= MIN_ASPECT && aspect <= MAX_ASPECT && colourfulness <= gate.maxColourfulness && chestProbability(features) >= gate.threshold;
 }
 
 export function isChestXray(rgba: ArrayLike<number>, width: number, height: number) {

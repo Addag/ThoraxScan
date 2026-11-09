@@ -24,5 +24,5 @@ export function chestFeatures(rgba: ArrayLike<number>, width: number, height: nu
   const features = new Float32Array(size * size);
   // Images under 32 px leave empty bins; they read as black rather than NaN.
   for (let bin = 0; bin < features.length; bin += 1) features[bin] = counts[bin] ? sums[bin] / counts[bin] / 255 : 0;
-  return { features, colourfulness: colour / (width * height * 255) };
+  return { features, colourfulness: colour / (width * height * 255), aspect: width / height };
 }
