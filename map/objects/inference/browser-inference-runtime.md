@@ -18,7 +18,7 @@ Runtime replacement must fail closed and must not silently use a cached older mo
 
 It attempts WebGPU and falls back to WASM on WebGPU load or execution failure, caches at most two sessions keyed by bundle and provider, protects loading/in-use sessions from eviction, and emits typed failures.
 
-ORT's `wasmPaths` is the folder prefix `/ort/1.27.0/`, not fixed file names, so each build loads its own binary; the WebGPU build needs the `.asyncify` file ([runtime.ts](<../../../src/lib/inference/runtime.ts:59>)).
+ORT's `wasmPaths` is the folder prefix `/ort/1.27.0/`, not fixed file names, so each build loads its own binary; the WebGPU build needs the `.asyncify` file ([runtime.ts](<../../../src/lib/inference/runtime.ts:59>)). The WASM path imports `onnxruntime-web/wasm`, which loads the plain files; the default `onnxruntime-web` bundle asks for `.jsep` files the app does not serve.
 
 ## Connected to
 

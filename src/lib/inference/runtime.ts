@@ -175,7 +175,7 @@ export async function loadModelSession(
       return { ort, session };
     }
 
-    const ort = await import("onnxruntime-web");
+    const ort = (await import("onnxruntime-web/wasm")) as OrtModule;
     configureOrt(ort);
     const session = await ort.InferenceSession.create(bytes, {
       executionProviders: ["wasm"],

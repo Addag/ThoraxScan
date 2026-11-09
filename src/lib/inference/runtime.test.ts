@@ -27,7 +27,7 @@ const ortMocks = vi.hoisted(() => {
   return { create, release, run, Tensor };
 });
 
-vi.mock("onnxruntime-web", () => ({
+vi.mock("onnxruntime-web/wasm", () => ({
   env: { wasm: {} },
   InferenceSession: { create: ortMocks.create },
   Tensor: ortMocks.Tensor,
