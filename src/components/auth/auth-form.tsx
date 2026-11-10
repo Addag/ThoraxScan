@@ -45,6 +45,13 @@ const turnstileSiteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
 const inputClass = "h-12 w-full rounded-control border border-[rgb(153_191_240/38%)] bg-[rgb(7_18_39/56%)] px-3.5 text-foreground aria-invalid:border-[#ff6b6b]";
 const fieldClass = "mt-4 flex flex-col [&>label]:mb-[6px] [&>label]:text-[16px] [&>label]:font-extrabold [&>label]:leading-5";
 
+// Mirrors the server check in (auth)/actions.ts: 8+ characters, a letter and a number.
+const passwordRules = [
+  ["At least 8 characters", (p: string) => p.length >= 8],
+  ["A letter", (p: string) => /[a-z]/i.test(p)],
+  ["A number", (p: string) => /\d/.test(p)],
+] as const;
+
 export function AuthForm({ mode }: { mode: AuthMode }) {
   const [state, formAction, pending] = useActionState(
     actions[mode],
@@ -57,6 +64,8 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
   const turnstileRef = useRef<TurnstileInstance | null>(null);
   const [captchaToken, setCaptchaToken] = useState("");
   const [captchaError, setCaptchaError] = useState("");
+  const [password, setPassword] = useState("");
+  const showRules = mode === "register" || mode === "reset";
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [confirmVisible, setConfirmVisible] = useState(false);
 
@@ -77,7 +86,7 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
   const captchaReady = !requiresCaptcha || Boolean(captchaToken);
 
   return (
-    <form className="flex flex-col" action={formAction} noValidate>
+    <form className="flex flex-col" action={formAction} onReset={() => setPassword("")} noValidate>
       {mode === "login" && (
         <RoleSelector mode="login" error={state.fieldErrors?.expectedRole} />
       )}
@@ -157,13 +166,28 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
               type={passwordVisible ? "text" : "password"}
               autoComplete={mode === "login" ? "current-password" : "new-password"}
               minLength={mode === "login" ? undefined : 8}
+              onChange={showRules ? (e) => setPassword(e.target.value) : undefined}
               aria-invalid={Boolean(state.fieldErrors?.password)}
               aria-describedby={
-                state.fieldErrors?.password ? `${mode}-password-error` : undefined
+                [showRules && `${mode}-password-rules`, state.fieldErrors?.password && `${mode}-password-error`].filter(Boolean).join(" ") || undefined
               }
             />
             <PasswordToggle visible={passwordVisible} onToggle={() => setPasswordVisible((v) => !v)} />
           </div>
+          {showRules && (
+            <ul className="m-0 mt-2 grid list-none gap-1 p-0 text-[13px] leading-[1.4]" id={`${mode}-password-rules`}>
+              {passwordRules.map(([label, test]) => {
+                const met = test(password);
+                return (
+                  <li className={`flex items-center gap-2 ${met ? "text-[#b8f3ce]" : "text-[#d6e1f0]"}`} key={label}>
+                    <span aria-hidden="true" className={`grid size-4 flex-none place-items-center rounded-full border text-[11px] font-extrabold leading-none ${met ? "border-[#67deb3] bg-[#17643a] text-white" : "border-[rgb(153_191_240/50%)]"}`}>{met ? "✓" : ""}</span>
+                    {label}
+                    <span className="sr-only">{met ? "(met)" : "(not met)"}</span>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
           {state.fieldErrors?.password && (
             <p
               className={fieldErrorClass}
