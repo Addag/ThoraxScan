@@ -8,7 +8,7 @@
 
 | Part | Contents |
 |---|---|
-| Chapters 1–3 | The defended pre-oral record. They stay SqueezeViT; nothing there is rewritten to match the live model. |
+| Chapters 1–3 | The defended pre-oral record. SqueezeViT stays as the study's starting point, and only the five wording edits listed below change, once your adviser approves them. |
 | **Chapter 4.0** | DFD, ERD, System Architecture, Screen Layout, Gantt Chart |
 | **Chapter 5.0, Conclusion and Recommendation** | Two paragraphs of client-focused findings: how the system is used and how it benefits professors and students. Then the Conclusion, then the Recommendation. |
 | **References** | Every entry ends with a period, like a sentence. |
@@ -47,6 +47,20 @@
 **Follow-up commit 286a947 (11-08):** the chest gate was retrained with 64 hidden units and FracAtlas limb, hip and shoulder X-rays as negatives. Report this version (v2): it catches 5,653 of 5,761 non-chest images and wrongly refuses 5 of 5,000 chest X-rays.
 
 ---
+
+## Chapters 1 and 3: five wording edits for the TinyViT change
+
+These edits avoid revising the whole paper. SqueezeViT really was built and hosted first (v1, v5, v6), so the rest of Chapters 2 and 3 stays true as the starting point. They touch defended chapters, so get your adviser's approval first. Chapter 5 must still report the change (see "The model change" and item 20).
+
+| | Location | Current wording | Replace with |
+|---|---|---|---|
+| A | Objective 1 | "utilizing the SqueezeViT architecture" | "utilizing a Vision Transformer architecture, first built on SqueezeViT and finalized as TinyViT through iterative testing" |
+| B | Objective 2 | "by extracting internal self-attention weights from SqueezeViT and mapping them into spatial heatmaps" | "by generating class activation maps from the Vision Transformer model and presenting them as spatial heatmaps" |
+| C | Scope, first paragraph | "The artificial intelligence component is limited to a SqueezeViT-based model trained on publicly available CheXpert v1.0-small chest radiograph data." | "The artificial intelligence component is limited to a Vision Transformer model, first built on SqueezeViT and finalized as TinyViT, trained on the publicly available CheXpert v1.0-small and NIH ChestX-ray14 chest radiograph data." |
+| D | Limitations, dataset paragraph | "limited by the dataset used to train and validate the model. Since the model is trained on CheXpert v1.0-small, it may not…" | "limited by the datasets used to train and validate the model. Since the model is trained on CheXpert v1.0-small and NIH ChestX-ray14, it may not…" |
+| E | Chapter 3, end of the Testing & Iteration paragraph | (new sentence) | "The results of this phase led to the final selection of TinyViT, trained on CheXpert v1.0-small and NIH ChestX-ray14 with knowledge distillation and a per-label policy for uncertain labels, and to additional evaluation on the official CheXpert validation set and the NIH test set, as discussed in Chapter 5." |
+
+**Leave unchanged:** the title, the SqueezeViT literature review, Maurya et al. in the references, the "will be trained" sentences in Chapter 3, and the validation limitation (the CheXpert patient-level split was still used).
 
 ## Chapter 4.0: DFD, ERD, System Architecture, Screen Layout
 
@@ -131,15 +145,17 @@ These should describe how professors and students use ThoraxScan and what it giv
 
   | | SqueezeViT v6 | TinyViT v7 |
   |---|---|---|
-  | Competition AUC | 0.877 | 0.880 |
-  | Mean AUC | 0.775 | 0.834 |
+  | Competition AUC (official 234 images) | 0.877 | 0.880 |
+  | Mean AUC (official 234 images) | 0.775 | 0.834 |
   | Heatmap pointing game | 35.5% | 47.9% |
 
-  It also gives a heatmap per finding instead of one general map. Add what the professor's testing showed; the repository doesn't record that.
+  Both runs used the same data, teacher model and training recipe, so the comparison is like-for-like. Competition AUC barely moved, so claim improvement across the 14 findings overall. Per-finding class activation maps arrived while the model was still SqueezeViT (v5), so don't present them as a TinyViT benefit.
+
+  **Professors' evaluation** (two professors, 20 items, 4 to 1, identical ratings on all 20 items): Functional Suitability 2.33, Performance Efficiency 3.67, Compatibility 3.00, Interaction Capability 3.13, Reliability 3.00, overall 3.05. The second professor gave no comments. The first professor's comments: the AI needs additional training and comparison of radiographs, the accuracy threshold must be improved, and the heatmaps must be adjusted to better demonstrate pathological processes.
 
 **IT expert review and the changes it led to (Chapter 5 findings)**
 
-An IT expert reviewed the application, and every item was addressed in the 7 November 2026 commits, with two follow-ups on 8 November. Present it as review → problem or request → what was changed, so the findings show the system improved in response to evaluation.
+Two IT experts evaluated the system with a 20-item Google Form based on ISO/IEC 25010, on a four-point scale, and both rated all 20 items Strongly Agree (4), for an overall mean of 4.00. The first evaluated it before the changes and gave the requests below, and every item was addressed in the 7 November 2026 commits, with two follow-ups on 8 November. The second evaluated the revised system, reported no further issues, and asked only whether the SUS had been done with students. Present it as review → problem or request → what was changed, so the findings show the system improved in response to evaluation. Add the questionnaire as an appendix.
 
 | Expert's item | What was changed | Commit |
 |---|---|---|
@@ -149,7 +165,7 @@ An IT expert reviewed the application, and every item was addressed in the 7 Nov
 | Tweak: give a visual (e.g. bar graph) to the result | A bar chart shows every finding's probability, with its threshold marked. | 191bd04 |
 | Tweak: always make clear that it is AI | Every result opens with the banner "AI-generated result. Not a diagnosis; it should not guide medical decisions." The heatmap is titled "AI finding heatmap". | 191bd04 |
 | Tweak: put data retention in the Terms and Conditions | Terms section 8, "Data retention": account records are kept until deletion; teaching cases, activities, submissions, evaluations and AI results for one academic term; Learning Mode images are never uploaded. Terms became version 1.2, effective 7 Nov 2026. | 9d4cd56 |
-| Problem: the AI gives results even for images that aren't chest X-rays | Solution as the expert suggested: a second AI filter, the chest-X-ray gate. A small neural network checks each image first and refuses non-chest images in Learning Mode and in Professor uploads. The first version (7 Nov) caught 4,709 of 4,955 non-chest images (photos, documents, CT, ultrasound, fundus) on held-out data. It was retrained on 8 Nov to also catch limb, hip and shoulder X-rays: it now catches 5,653 of 5,761 non-chest images and wrongly refuses 5 of 5,000 chest X-rays. | c16b0f6, 286a947 |
+| Problem: the AI gives results even for images that aren't chest X-rays | Solution as the expert suggested: a second AI filter, the chest-X-ray gate. A small neural network checks each image first and refuses non-chest images in Learning Mode and in Professor uploads. The first version (7 Nov) caught 4,709 of 4,955 non-chest images (photos, documents, CT, ultrasound, fundus) on held-out data. It was retrained on 8 Nov to also catch limb, hip and shoulder X-rays: it caught 5,653 of 5,761 non-chest images. A shape check for narrow crops was added on 9 Nov, and the gate now wrongly refuses 12 of 5,000 chest X-rays. | c16b0f6, 286a947, 00388b1 |
 | Emphasize: a pop-up for possible findings | When a result has possible findings, a pop-up opens once per result with the warning: "Below the likely threshold but above a lower, more sensitive one. Check these against the image yourself; many will be false alarms." The same text stays on the result as a warning box. | 191bd04 |
 
 For Chapter 5:
@@ -162,7 +178,7 @@ For Chapter 5:
 20. Answer each Chapter 1 objective in turn:
     - **Objective 1:** a browser-based classifier across 14 labels was built and deployed. Say it is TinyViT, not SqueezeViT, and why.
     - **Objective 2:** an XAI heatmap module was built. Say it uses class activation maps, not self-attention weights.
-    - **Objective 3:** SUS usability. Report the result if the evaluation has been run, otherwise state its status.
+    - **Objective 3:** SUS usability. Not yet run as of 9 November 2026. Run it before final submission and report the result. If it can't be run in time, say plainly that Objective 3 is not yet achieved and make no claims about measured usability.
 
 **Recommendation**
 
@@ -172,20 +188,19 @@ For Chapter 5:
     - Evaluate lateral views properly (only 32 official images).
     - Validate on local Philippine radiographs.
     - Confirm redistribution permission for the CheXpert library images.
-    - Add a professor override for the roughly 1 in 1,000 chest X-rays the gate refuses.
+    - Add a professor override for the roughly 1 in 400 chest X-rays the gate refuses.
 
 ## References
 
 22. End every entry with a period, like a sentence. Several entries currently end with a bare DOI or URL and no period; that is APA 7 style, so confirm your adviser wants the period. Example: `…https://doi.org/10.2147/amep.s514876.`
-23. Brooke (1996) is cited but missing from the list.
+23. Replace citations older than 2021, keeping each sentence's meaning: Chefer et al. (2020) becomes Mondal et al. (2022), Linaker (2015) becomes Altun et al. (2025), and Brooke (1996) becomes Hyzy et al. (2022). The wording is in the Word file of changes.
 24. Ribeiro et al. 2025, Sloan 2025, Xie 2025, Yanar 2025 and DTI NAISR are listed but never cited. Cite or remove them. Ribeiro (an AI chest X-ray training tool for radiographers) is the closest related work.
 25. Add the sources for what Chapters 4 and 5 now describe:
     - TinyViT (Wu et al., 2022)
-    - FastViT (Vasu et al., 2023)
-    - CAM (Zhou et al., 2016)
-    - NIH ChestX-ray14 (Wang et al., 2017)
-    - CheXpert (Irvin et al., 2019)
-    - FracAtlas (Abedeen et al., 2023), if the chest gate is described.
+    - FastViT (Anasosalu Vasu et al., 2023)
+    - CAM (Saporta et al., 2022)
+    - NIH ChestX-ray14 and CheXpert (Rafferty & Rajan, 2026)
+    - FracAtlas (Abedeen et al., 2023).
 
 ## Other fixes (any chapter)
 
@@ -224,5 +239,4 @@ For Chapter 5:
 
 ## Still open for you
 
-- What the professor's testing found that led to TinyViT (Chapter 5 findings).
-- Whether the SUS evaluation has been run (Conclusion, Objective 3).
+- Whether the professors have evaluated the final TinyViT version. Both professors' evaluations came before the change (Chapter 5).- Run the SUS evaluation, or agree with your adviser how to report it as not yet done (Conclusion, Objective 3).
