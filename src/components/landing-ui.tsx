@@ -16,21 +16,44 @@ const navLinks = [
   { href: "#docs", label: "Docs" },
 ] as const;
 
+// Sub-sections of the technical overview; also the header's hover shortcuts.
+export const technicalToc = [
+  ["architecture", "Architecture"],
+  ["features", "Features"],
+  ["model-details", "Model details"],
+  ["stack", "Stack"],
+  ["security", "Security"],
+  ["status", "Status"],
+  ["academic", "Academic project"],
+] as const;
+
+const navLinkClass = "block rounded-panel px-3.5 py-2 text-[0.9375rem] font-semibold text-[#c3d0e2] no-underline hover:bg-[rgb(92_155_255/20%)] hover:text-[#e7f1ff]";
+
 export function LandingHeader() {
   return (
     <header className="relative flex h-[81px] items-center justify-between gap-4 px-9 bg-(--glass-shell) backdrop-blur-[12px] shadow-[inset_0_-1px_0_rgb(255_255_255/8%)] narrow:h-[73px] narrow:px-5 max-[480px]:h-auto max-[480px]:flex-wrap max-[480px]:justify-center max-[480px]:py-2 no-backdrop:[background:#14243e]">
       <Brand variant="landing" />
       {/* Below 480px the links no longer fit beside the brand, so the nav wraps to its own row. */}
       <nav className="flex gap-1" aria-label="On this page">
-        {navLinks.map((link) => (
-          <a
-            className="rounded-panel px-3.5 py-2 text-[0.9375rem] font-semibold text-[#c3d0e2] no-underline hover:bg-[rgb(92_155_255/20%)] hover:text-[#e7f1ff]"
-            href={link.href}
-            key={link.href}
-          >
-            {link.label}
-          </a>
-        ))}
+        {navLinks.map((link) =>
+          link.href === "#technical" ? (
+            // Hover or keyboard focus reveals shortcut bullets to the overview's sub-sections.
+            <div className="group relative z-20" key={link.href}>
+              <a className={navLinkClass} href={link.href}>{link.label}</a>
+              <div className="invisible absolute top-full left-0 pt-1 opacity-0 [transition:opacity_140ms_ease,visibility_140ms] group-focus-within:visible group-focus-within:opacity-100 group-hover:visible group-hover:opacity-100">
+                <ul className="m-0 min-w-[190px] list-disc rounded-panel border border-[rgb(175_207_255/32%)] bg-[#14243e] py-2 pr-3 pl-8 shadow-(--glass-shadow) marker:text-brand">
+                  {technicalToc.map(([id, label]) => (
+                    <li key={id}>
+                      <a className="block py-1 text-[0.875rem] font-semibold text-[#c3d0e2] no-underline hover:text-[#e7f1ff]" href={`#${id}`}>{label}</a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          ) : (
+            <a className={navLinkClass} href={link.href} key={link.href}>{link.label}</a>
+          ),
+        )}
       </nav>
       <span className="absolute inset-x-0 bottom-0 block h-px w-full [background:url('/images/header-divider.svg')_center/100%_1px_no-repeat]" aria-hidden="true" />
     </header>

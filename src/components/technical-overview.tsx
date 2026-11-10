@@ -1,17 +1,8 @@
-import { glassCard, sectionLead, sectionShell, sectionTitle } from "@/components/landing-ui";
+import { glassCard, sectionLead, sectionShell, sectionTitle, technicalToc as toc } from "@/components/landing-ui";
 
 // The landing page's technical overview, after parada-landing's technical tab. Every fact comes from the system map
 // (map/objects, map/processes) or package.json; update both together. The headline model figures live in the page's
 // "Under the hood" section, so this one carries only the details.
-const toc = [
-  ["architecture", "Architecture"],
-  ["features", "Features"],
-  ["model-details", "Model details"],
-  ["stack", "Stack"],
-  ["security", "Security"],
-  ["status", "Status"],
-  ["academic", "Academic project"],
-] as const;
 
 const architecture = [
   { name: "Browser", tech: "Next.js 16 · React 19 · Tailwind CSS 4" },
