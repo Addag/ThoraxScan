@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Brand } from "@/components/brand";
 import { AuthForm, AuthMode } from "@/components/auth/auth-form";
 import { authEyebrowClass } from "@/components/field-error";
+import { SiteAnnouncements } from "@/components/site-announcements";
 
 const authCopy = {
   login: {
@@ -71,6 +72,9 @@ export function AuthLayout({
       </section>
 
       <section className="flex flex-col items-center px-6 py-6 narrow:px-[18px] narrow:pt-0 narrow:pb-12" aria-labelledby={`${mode}-title`}>
+        <div className="w-[min(551px,100%)] overflow-hidden rounded-control empty:hidden">
+          <SiteAnnouncements />
+        </div>
         <div className={cardClass}>
           <h2 className="m-0 text-[32px] font-extrabold leading-[1.25]" id={`${mode}-title`}>{copy.title}</h2>
           <p className="mt-px mb-6 text-[13px] leading-[1.5] text-[#d6e1f0]">{copy.subtitle}</p>

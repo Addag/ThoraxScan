@@ -2,203 +2,140 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { AdminShell } from "@/components/admin/admin-shell";
-import { ApplicationReviewForm } from "@/components/admin/application-review-form";
+import { reviewPanelClass } from "@/components/admin/review-styles";
+import { button } from "@/components/controls";
+import { PageHeading, PageMain, SectionHeading, StatCard, StatGrid, countBadgeClass } from "@/components/dashboard-ui";
 import { EmptyState } from "@/components/empty-state";
-import { rejectionReasonClass, reviewPanelClass } from "@/components/admin/review-styles";
-import { AddAdministratorForm, RemoveAdministratorForm } from "@/components/admin/administrator-forms";
-import { badgeClass, button, field } from "@/components/controls";
-import { getPlatformAdmins, getProfessorApplications } from "@/lib/admin/server";
-import type { ProfessorApplicationProjection } from "@/lib/admin/types";
-import type { ProfessorApplicationStatus } from "@/lib/auth/types";
+import { getAdminActions, getPlatformEvents, getPlatformStats, getProfessorReport } from "@/lib/admin/server";
 import { requirePlatformAdmin } from "@/lib/auth/server";
-import { PageHeading, SectionHeading, countBadgeClass , PageMain} from "@/components/dashboard-ui";
 
 export const metadata: Metadata = {
-  title: "Professor approvals | ThoraxScan",
+  title: "Administrator home | ThoraxScan",
 };
 
-const filters = ["pending", "approved", "rejected", "all"] as const;
+const eventSymbol: Record<string, string> = { account: "+", workspace: "▦", activity: "▶", submission: "✓", feedback: "★" };
+const cellClass = "border-b border-(--border-subtle) px-3 py-2.5 text-left";
 
-const statusBadgeColor: Record<ProfessorApplicationStatus, string> = {
-  pending: "text-(--status-warning-text)",
-  approved: "text-(--status-success-text)",
-  rejected: "text-(--status-error-text)",
-};
-type ApplicationFilter = (typeof filters)[number];
-
-function isFilter(value: string | undefined): value is ApplicationFilter {
-  return filters.includes(value as ApplicationFilter);
+function formatDateTime(value: string) {
+  return new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }).format(new Date(value));
 }
 
-function formatDate(value: string) {
-  return new Intl.DateTimeFormat("en-US", {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-  }).format(new Date(value));
-}
-
-function reviewSummary({ reviewed_at, reviewer_name }: ProfessorApplicationProjection) {
-  if (!reviewed_at) return "—";
-  return reviewer_name ? `${formatDate(reviewed_at)} by ${reviewer_name}` : formatDate(reviewed_at);
-}
-
-export default async function AdminPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ status?: string; q?: string }>;
-}) {
+export default async function AdminPage() {
   const profile = await requirePlatformAdmin();
-  const [applications, administrators] = await Promise.all([getProfessorApplications(), getPlatformAdmins()]);
-  const { status, q } = await searchParams;
-  const selectedFilter = isFilter(status) ? status : "pending";
-  const query = q?.trim().toLowerCase() ?? "";
-
-  const counts = applications.data.reduce(
-    (result, application) => {
-      result[application.status] += 1;
-      return result;
-    },
-    { pending: 0, approved: 0, rejected: 0, all: applications.data.length } satisfies Record<ApplicationFilter, number>,
-  );
-
-  const visibleApplications = applications.data.filter((application) => {
-    const matchesStatus =
-      selectedFilter === "all" || application.status === selectedFilter;
-    const matchesQuery =
-      !query ||
-      application.display_name.toLowerCase().includes(query) ||
-      application.email.toLowerCase().includes(query);
-    return matchesStatus && matchesQuery;
-  });
+  const [stats, report, events, actions] = await Promise.all([getPlatformStats(), getProfessorReport(), getPlatformEvents(), getAdminActions()]);
+  const totals = stats.data[0];
 
   return (
-    <AdminShell>
+    <AdminShell activeItem="home">
       <PageMain>
         <PageHeading title="Administrator home" subtitle={`Welcome back, ${profile.display_name}.`} />
 
-        <section className={`${reviewPanelClass} p-6 max-[560px]:p-5`} aria-labelledby="applications-title">
-          <div className="mb-5"><SectionHeading kicker="Account provisioning" title="Professor applications" titleId="applications-title" aside={<span className={countBadgeClass}>{visibleApplications.length} shown</span>} /></div>
+        {stats.error || !totals ? (
+          <EmptyState error role="alert" title="Platform totals are unavailable">Refresh the page or try again later.</EmptyState>
+        ) : (
+          <StatGrid>
+            <StatCard symbol="S" value={totals.students} label="Students" detail={`${totals.new_accounts_30d} new accounts in the last 30 days`} />
+            <StatCard symbol="P" value={totals.professors_approved} label="Professors" detail={totals.professors_pending ? `${totals.professors_pending} waiting for approval` : "No pending applications"} />
+            <StatCard symbol="▦" value={totals.workspaces} label="Workspaces" detail={`${totals.administrators} administrator${totals.administrators === 1 ? "" : "s"}`} />
+            <StatCard symbol="▶" value={totals.activities_published} label="Published activities" detail={`${totals.activities_draft} draft${totals.activities_draft === 1 ? "" : "s"}`} />
+            <StatCard symbol="✓" value={totals.final_submissions} label="Final submissions" detail={`${totals.feedback_released} with released feedback`} />
+          </StatGrid>
+        )}
 
-          <form className="grid grid-cols-[minmax(0,1fr)_auto] items-end gap-3" method="get">
-            <label className="col-span-full text-caption font-extrabold text-(--text-primary)" htmlFor="application-search">Search applicants</label>
-            <div className="col-span-full grid grid-cols-[minmax(0,1fr)_auto] gap-2.5 max-[560px]:grid-cols-1">
-              <input
-                id="application-search"
-                name="q"
-                type="search"
-                defaultValue={q}
-                className={field}
-                placeholder="Name or email"
-              />
-              <input type="hidden" name="status" value={selectedFilter} />
-              <button className={button("primary")} type="submit">Search</button>
-            </div>
-          </form>
+        {totals?.professors_pending ? (
+          <p className="mt-4 mb-0 text-small">
+            <Link className="font-extrabold text-(--brand-blue-text)" href="/admin/applications">Review {totals.professors_pending} pending Professor application{totals.professors_pending === 1 ? "" : "s"} →</Link>
+          </p>
+        ) : null}
 
-          <nav className="my-[18px] flex gap-2 overflow-x-auto pb-0.5" aria-label="Application status filters">
-            {filters.map((filter) => (
-              <Link
-                key={filter}
-                className={`transition-colors duration-160 whitespace-nowrap rounded-full border px-[14px] py-2 text-caption font-extrabold no-underline ${selectedFilter === filter ? "border-brand bg-[rgba(44,174,255,0.18)] text-(--text-primary)" : "border-(--border-subtle) text-(--text-secondary) hover:bg-(--hover-overlay)"}`}
-                href={{ pathname: "/admin", query: { status: filter, ...(q ? { q } : {}) } }}
-              >
-                {filter[0].toUpperCase() + filter.slice(1)} <span className="ml-1 tabular-nums opacity-75">{counts[filter]}</span>
-              </Link>
-            ))}
-          </nav>
-
-          {applications.error ? (
-            <EmptyState error role="alert" title="Applications are unavailable">Refresh the page or try again later.</EmptyState>
-          ) : visibleApplications.length === 0 ? (
-            <EmptyState icon="✓" title="No matching applications">There are no Professor applications in this view.</EmptyState>
+        <section className={`${reviewPanelClass} mt-6 p-6 max-[560px]:p-5`} aria-labelledby="report-title">
+          <div className="mb-5">
+            <SectionHeading
+              kicker="Detailed report"
+              title="Professors"
+              titleId="report-title"
+              aside={<a className={button("secondary")} href="/admin/report" download>Download CSV</a>}
+            />
+          </div>
+          {report.error ? (
+            <EmptyState error role="alert" title="The report is unavailable">Refresh the page or try again later.</EmptyState>
+          ) : report.data.length === 0 ? (
+            <EmptyState icon="✓" title="No approved Professors yet">Approved Professors appear here with their workspace totals.</EmptyState>
           ) : (
-            <div className="grid gap-[14px]">
-              {visibleApplications.map((application) => (
-                <ApplicationCard key={application.user_id} application={application} />
-              ))}
+            <div className="overflow-x-auto">
+              <table className="w-full min-w-[640px] border-collapse text-small">
+                <thead className="text-label uppercase tracking-[0.08em] text-(--text-muted)">
+                  <tr>
+                    <th className={cellClass} scope="col">Professor</th>
+                    <th className={`${cellClass} text-right`} scope="col">Workspaces</th>
+                    <th className={`${cellClass} text-right`} scope="col">Students</th>
+                    <th className={`${cellClass} text-right`} scope="col">Activities</th>
+                    <th className={`${cellClass} text-right`} scope="col">Submissions</th>
+                    <th className={`${cellClass} text-right`} scope="col">Feedback released</th>
+                  </tr>
+                </thead>
+                <tbody className="tabular-nums">
+                  {report.data.map((row) => (
+                    <tr key={row.user_id}>
+                      <th className={cellClass} scope="row">
+                        <span className="block font-extrabold">{row.display_name}</span>
+                        <span className="block text-label font-normal text-(--text-muted)">{row.email}</span>
+                      </th>
+                      <td className={`${cellClass} text-right`}>{row.workspaces}</td>
+                      <td className={`${cellClass} text-right`}>{row.students}</td>
+                      <td className={`${cellClass} text-right`}>{row.activities}</td>
+                      <td className={`${cellClass} text-right`}>{row.final_submissions}</td>
+                      <td className={`${cellClass} text-right`}>{row.feedback_released}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           )}
         </section>
 
-        <section className={`${reviewPanelClass} mt-6 p-6 max-[560px]:p-5`} aria-labelledby="administrators-title">
-          <div className="mb-5"><SectionHeading kicker="Platform access" title="Administrators" titleId="administrators-title" aside={<span className={countBadgeClass}>{administrators.data.length}</span>} /></div>
-          {administrators.error ? (
-            <EmptyState error role="alert" title="Administrators are unavailable">Refresh the page or try again later.</EmptyState>
-          ) : (
-            <ul className="m-0 grid list-none gap-2.5 p-0">
-              {administrators.data.map((administrator) => (
-                <li key={administrator.user_id} className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 rounded-panel border border-(--border-shell) bg-(--glass-inset) px-[18px] py-3.5 max-[560px]:grid-cols-1">
-                  <div className="min-w-0">
-                    <p className="m-0 font-extrabold">{administrator.display_name}</p>
-                    <p className="mt-[3px] truncate text-caption text-(--text-muted)">{administrator.email}</p>
-                    <p className="mt-[3px] text-label text-(--text-muted)">
-                      Added {formatDate(administrator.created_at)}{administrator.created_by_name ? ` by ${administrator.created_by_name}` : ""}
-                    </p>
-                  </div>
-                  {administrator.user_id === profile.id ? (
-                    <span className={`${countBadgeClass} w-fit`}>You</span>
-                  ) : (
-                    <RemoveAdministratorForm userId={administrator.user_id} displayName={administrator.display_name} />
-                  )}
-                </li>
-              ))}
-            </ul>
-          )}
-          <AddAdministratorForm />
-        </section>
+        <div className="mt-6 grid grid-cols-2 gap-6 max-[1100px]:grid-cols-1">
+          <section className={`${reviewPanelClass} p-6 max-[560px]:p-5`} aria-labelledby="events-title">
+            <div className="mb-4"><SectionHeading kicker="Overview" title="Platform activity" titleId="events-title" aside={<span className={countBadgeClass}>Latest {events.data.length}</span>} /></div>
+            {events.error ? (
+              <EmptyState error role="alert" title="Activity is unavailable">Refresh the page or try again later.</EmptyState>
+            ) : events.data.length === 0 ? (
+              <EmptyState icon="✓" title="Nothing yet">Sign-ups, workspaces, activities, submissions, and feedback appear here.</EmptyState>
+            ) : (
+              <ol className="m-0 grid list-none gap-1 p-0">
+                {events.data.map((event, index) => (
+                  <li key={`${event.at}-${index}`} className="grid grid-cols-[28px_minmax(0,1fr)] gap-2.5 rounded-control px-1 py-2">
+                    <span className="grid size-7 place-items-center rounded-full bg-(--surface-sunken) text-label font-extrabold" aria-hidden="true">{eventSymbol[event.kind] ?? "•"}</span>
+                    <span className="min-w-0">
+                      <span className="block text-small">{event.summary}</span>
+                      <time className="block text-label text-(--text-muted)" dateTime={event.at}>{formatDateTime(event.at)}</time>
+                    </span>
+                  </li>
+                ))}
+              </ol>
+            )}
+          </section>
+
+          <section className={`${reviewPanelClass} p-6 max-[560px]:p-5`} aria-labelledby="actions-title">
+            <div className="mb-4"><SectionHeading kicker="Audit" title="Admin actions" titleId="actions-title" aside={<span className={countBadgeClass}>Latest {actions.data.length}</span>} /></div>
+            {actions.error ? (
+              <EmptyState error role="alert" title="The log is unavailable">Refresh the page or try again later.</EmptyState>
+            ) : actions.data.length === 0 ? (
+              <EmptyState icon="✓" title="No admin actions yet">Approvals, account changes, and notices are recorded here.</EmptyState>
+            ) : (
+              <ol className="m-0 grid list-none gap-1 p-0">
+                {actions.data.map((entry, index) => (
+                  <li key={`${entry.created_at}-${index}`} className="rounded-control px-1 py-2">
+                    <span className="block text-small"><strong>{entry.actor_name}</strong> · {entry.action}{entry.target_label ? ` · ${entry.target_label}` : ""}</span>
+                    {entry.detail ? <span className="block truncate text-label text-(--text-secondary)">{entry.detail}</span> : null}
+                    <time className="block text-label text-(--text-muted)" dateTime={entry.created_at}>{formatDateTime(entry.created_at)}</time>
+                  </li>
+                ))}
+              </ol>
+            )}
+          </section>
+        </div>
       </PageMain>
     </AdminShell>
-  );
-}
-
-function ApplicationCard({
-  application,
-}: {
-  application: ProfessorApplicationProjection;
-}) {
-  return (
-    <article className="rounded-panel border border-(--border-shell) bg-(--glass-inset) p-4 shadow-(--glass-inset-shadow) [&_h3]:m-0">
-      <div className="grid grid-cols-[40px_minmax(0,1fr)_auto] items-center gap-3 max-[560px]:grid-cols-1">
-        <span className="grid size-10 place-items-center rounded-full bg-[rgba(44,174,255,0.19)] font-extrabold text-(--brand-blue-text) max-[560px]:hidden" aria-hidden="true">{application.display_name.slice(0, 1).toUpperCase()}</span>
-        <div>
-          <h3>{application.display_name}</h3>
-          <p className="mt-[3px] text-caption text-(--text-muted)">{application.email}</p>
-        </div>
-        <strong className={`${badgeClass} ${statusBadgeColor[application.status]}`}>
-          {application.status}
-        </strong>
-      </div>
-      <dl className="mt-4 grid grid-cols-3 gap-2.5 max-[760px]:grid-cols-1">
-        <div className="rounded-control bg-(--surface-sunken) p-2.5"><dt className="text-label text-(--text-muted) uppercase tracking-[0.08em] font-extrabold">Requested</dt><dd className="mt-1 text-caption font-extrabold">{formatDate(application.requested_at)}</dd></div>
-        <div className="rounded-control bg-(--surface-sunken) p-2.5">
-          <dt className="text-label text-(--text-muted) uppercase tracking-[0.08em] font-extrabold">Email</dt>
-          <dd className="mt-1 text-caption font-extrabold">{application.email_confirmed ? "Confirmed" : "Unconfirmed"}</dd>
-        </div>
-        {application.status === "approved" ? (
-          <div className="rounded-control bg-(--surface-sunken) p-2.5">
-            <dt className="text-label text-(--text-muted) uppercase tracking-[0.08em] font-extrabold">Reviewed</dt>
-            <dd className="mt-1 text-caption font-extrabold">{reviewSummary(application)}</dd>
-          </div>
-        ) : (
-          <div className="rounded-control bg-(--surface-sunken) p-2.5">
-            <dt className="text-label text-(--text-muted) uppercase tracking-[0.08em] font-extrabold">Memberships</dt>
-            <dd className="mt-1 text-caption font-extrabold">{application.membership_count}</dd>
-          </div>
-        )}
-      </dl>
-      {application.status === "rejected" && application.reviewed_at && (
-        <p className="mt-3 text-label text-(--text-muted)">Rejected {reviewSummary(application)}</p>
-      )}
-      {application.status === "rejected" && application.rejection_reason && (
-        <div className={rejectionReasonClass}>
-          <strong>Rejection reason</strong>
-          <p className="mt-[5px]">{application.rejection_reason}</p>
-        </div>
-      )}
-      {application.status !== "approved" && (
-        <ApplicationReviewForm application={application} />
-      )}
-    </article>
   );
 }

@@ -45,3 +45,12 @@ export type ProfessorApplication = {
   rejection_reason: string | null;
   updated_at: string;
 };
+
+/** Shared by registration, password reset, and administrator temporary passwords. */
+export function validatePassword(password: string) {
+  if (!password) return "Enter your password.";
+  if (password.length < 8) return "Use at least 8 characters.";
+  if (!/[a-z]/i.test(password) || !/\d/.test(password)) {
+    return "Include at least one letter and one number.";
+  }
+}

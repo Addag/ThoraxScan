@@ -8,7 +8,7 @@ import type {
   AuthField,
   LoginPortal,
 } from "@/lib/auth/types";
-import { emailPattern } from "@/lib/auth/types";
+import { emailPattern, validatePassword } from "@/lib/auth/types";
 import { createClient } from "@/lib/supabase/server";
 import {
   PRIVACY_POLICY_EFFECTIVE_DATE,
@@ -33,14 +33,6 @@ function validateEmail(email: string) {
   if (!emailPattern.test(email)) return "Enter a valid email address.";
 }
 
-function validatePassword(password: string) {
-  if (!password) return "Enter your password.";
-  if (password.length < 8) return "Use at least 8 characters.";
-  if (!/[a-z]/i.test(password) || !/\d/.test(password)) {
-    return "Include at least one letter and one number.";
-  }
-}
-
 function validateCaptchaToken(captchaToken: string) {
   if (!captchaToken) return "Complete the security verification.";
 }
@@ -55,6 +47,7 @@ function isLoginPortal(portal: string): portal is LoginPortal {
 
 function authMessage(code: string | undefined, fallback: string) {
   if (code === "invalid_credentials") return "Email or password is incorrect.";
+  if (code === "user_banned") return "This account is disabled. Contact an administrator.";
   if (code === "email_not_confirmed") {
     return "Confirm your email address before logging in.";
   }

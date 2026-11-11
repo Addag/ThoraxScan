@@ -5,6 +5,7 @@ import type { ReactNode } from "react";
 import { logoutAction } from "@/app/(protected)/actions";
 import { AppSidebar } from "@/components/app-sidebar";
 import { NotificationBellButton, NotificationPanel } from "@/components/notification-bell";
+import { SiteAnnouncements } from "@/components/site-announcements";
 import { ThemeIconButton } from "@/components/theme-toggle";
 import type { NotificationsResult } from "@/lib/notifications/types";
 
@@ -88,6 +89,7 @@ export function AppShell({
         </form>
       </AppSidebar>
       <div className="flex min-h-svh min-w-0 flex-col">
+        <SiteAnnouncements />
         <header className="flex min-h-20 items-center justify-between gap-4 border-b border-b-(--border-shell) bg-(--glass-shell) px-[clamp(22px,4vw,54px)] backdrop-blur-[12px] max-[850px]:hidden">
           <div className="flex flex-col gap-1">
             <strong className="text-small">{sectionLabel}</strong>

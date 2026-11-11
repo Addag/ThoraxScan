@@ -22,6 +22,8 @@ Administrator authority is stored separately from `Profile.role`, preserving the
 - The first capability is inserted by an operator using the documented bootstrap statement in [README.md](<../../../README.md:47>); no public self-provisioning path exists.
 - After that, administrators list, grant (by email of a confirmed account), and revoke capabilities through `list_platform_admins`, `grant_platform_admin`, and `revoke_platform_admin` in [the admin management migration](<../../../supabase/migrations/20261024130000_platform_admin_management.sql>). Revoke refuses the caller's own row, so at least one administrator always remains; it share-locks the caller's row so two administrators cannot remove each other at once.
 
+- Since [the admin console migration](<../../../supabase/migrations/20261111120000_admin_console.sql>), administrators can also rename accounts, set a temporary password, sign accounts out, disable or enable sign-in, delete accounts without restricted records, and post site notices. Each function share-locks the caller's capability row and refuses the caller as a target where it would lock them out. Changes go to the [admin action log](../runtime/admin-action-log.md).
+
 ## Connected to
 
 Connected to the [Professor application](professor-application.md), the `LoginPortal` administrator option, the review RPC, and the [Administrator approval surface](../ui/administrator-approval-surface.md). It looks like an application role but is not part of `AppRole` or workspace membership.

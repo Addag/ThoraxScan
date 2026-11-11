@@ -61,7 +61,7 @@ One line per important noun. live cards are source-backed; ghost entries are doc
 | Landing surface | live | [landing-surface.md](ui/landing-surface.md) | src/app/page.tsx || Authentication surface | live | [auth-surface.md](ui/auth-surface.md) | auth pages, layout, form, and actions |
 | Privacy policy surface | live | [privacy-policy.md](ui/privacy-policy.md) | public `/privacy-policy` page and shared legal navigation |
 | Terms and conditions surface | live | [terms.md](ui/terms.md) | public `/terms` page, registration agreement, and signup metadata version/date |
-| Administrator approval surface | live | [administrator-approval-surface.md](ui/administrator-approval-surface.md) | /admin, review actions, and administrator shell |
+| Administrator console | live | [administrator-approval-surface.md](ui/administrator-approval-surface.md) | /admin home, applications, accounts, notices, report, and administrator shell |
 | Shared settings surface | live | [shared-settings-surface.md](ui/shared-settings-surface.md) | Shared role-gated settings wrapper, form, and navigation |
 | Design tokens | live | [design-tokens.md](ui/design-tokens.md) | src/app/globals.css |
 | X-ray sample asset | live | [xray-sample-asset.md](ui/xray-sample-asset.md) | public/images/xray-sample.png |
@@ -75,3 +75,5 @@ One line per important noun. live cards are source-backed; ghost entries are doc
 | Account settings | live | [account-settings.md](runtime/account-settings.md) | Self-private settings table and atomic authenticated RPC |
 | Supabase auth boundary | live | [supabase-auth-boundary.md](runtime/supabase-auth-boundary.md) | client/server adapters and environment contract |
 | Legal consent record | live | [legal-consent.md](runtime/legal-consent.md) | `public.legal_consents` and consent RPCs |
+| Site notice | live | [site-notice.md](runtime/site-notice.md) | `public.site_announcements`, admin Notices page, and the shell/auth banner |
+| Admin action log | live | [admin-action-log.md](runtime/admin-action-log.md) | `public.admin_actions`, logging helper, and triggers |

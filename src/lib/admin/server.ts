@@ -1,33 +1,40 @@
 import type { ProfessorApplication } from "@/lib/auth/types";
-import type { PlatformAdminProjection, ProfessorApplicationProjection } from "@/lib/admin/types";
+import type {
+  AccountProjection,
+  AdminActionEntry,
+  PlatformAdminProjection,
+  PlatformEvent,
+  PlatformStats,
+  ProfessorApplicationProjection,
+  ProfessorReportRow,
+  SiteAnnouncement,
+} from "@/lib/admin/types";
 import { createClient } from "@/lib/supabase/server";
 
-export async function getProfessorApplications() {
+// Administrator RPCs re-check the caller and raise for anyone else.
+async function adminRpc<T>(name: string, args?: Record<string, unknown>) {
   const supabase = await createClient();
-  const { data, error } = await supabase.rpc("list_professor_applications");
-
-  if (error) {
-    return { data: [] as ProfessorApplicationProjection[], error: error.message };
-  }
-
-  return {
-    data: (data ?? []) as ProfessorApplicationProjection[],
-    error: null,
-  };
+  const { data, error } = await supabase.rpc(name, args);
+  return error ? { data: [] as T[], error: error.message } : { data: (data ?? []) as T[], error: null };
 }
 
-export async function getPlatformAdmins() {
+export const getProfessorApplications = () => adminRpc<ProfessorApplicationProjection>("list_professor_applications");
+export const getPlatformAdmins = () => adminRpc<PlatformAdminProjection>("list_platform_admins");
+export const getAccounts = () => adminRpc<AccountProjection>("list_accounts");
+export const getPlatformStats = () => adminRpc<PlatformStats>("get_platform_stats");
+export const getProfessorReport = () => adminRpc<ProfessorReportRow>("list_professor_report");
+export const getPlatformEvents = () => adminRpc<PlatformEvent>("list_platform_events", { max_rows: 30 });
+export const getAdminActions = () => adminRpc<AdminActionEntry>("list_admin_actions", { max_rows: 30 });
+
+/** Active notices only; RLS hides expired ones. Readable signed out too. */
+export async function getActiveAnnouncements() {
   const supabase = await createClient();
-  const { data, error } = await supabase.rpc("list_platform_admins");
-
-  if (error) {
-    return { data: [] as PlatformAdminProjection[], error: error.message };
-  }
-
-  return {
-    data: (data ?? []) as PlatformAdminProjection[],
-    error: null,
-  };
+  const { data } = await supabase
+    .from("site_announcements")
+    .select("id, message, tone, ends_at")
+    .order("created_at", { ascending: false })
+    .returns<SiteAnnouncement[]>();
+  return data ?? [];
 }
 
 export async function getOwnProfessorApplication(userId: string) {
