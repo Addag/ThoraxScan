@@ -1,16 +1,17 @@
 import type { AppRole } from "@/lib/auth/types";
 
-export type NotificationKind = "activity_due" | "submission";
+export type NotificationKind = "activity_due" | "submission" | "feedback";
 export type AppNotification = {
   kind: NotificationKind;
   refId: string;
   title: string;
   detail: string;
-  /** due_at for activity_due, submitted_at for submission. */
+  /** due_at for activity_due, submitted_at for submission, released_at for feedback. */
   at: string;
   read: boolean;
 };
-export type NotificationsResult = { role: AppRole; data: AppNotification[]; error: string | null };
+/** `now` is the request time the feed was built at, so the panel can tell missed from upcoming without its own clock. */
+export type NotificationsResult = { role: AppRole; data: AppNotification[]; error: string | null; now: number };
 
 export const notificationWindowMs = 7 * 86_400_000;
 
@@ -19,7 +20,7 @@ const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}
 /** Form value is `kind:refId`; anything else is dropped. */
 export function parseNotificationKey(value: unknown) {
   const [kind, refId = ""] = String(value).split(":");
-  return (kind === "activity_due" || kind === "submission") && uuidPattern.test(refId)
+  return (kind === "activity_due" || kind === "submission" || kind === "feedback") && uuidPattern.test(refId)
     ? { kind: kind as NotificationKind, refId }
     : null;
 }

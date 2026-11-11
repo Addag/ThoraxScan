@@ -21,4 +21,4 @@ The review list, detail page, grading form, Student evaluation panel, and attent
 
 ## Does not do
 
-No revisions, appeals, assignment model, notifications, prediction arrays, or heatmaps.
+No revisions, appeals, assignment model, prediction arrays, or heatmaps. Released evaluations appear in the Student [bell](notification.md).

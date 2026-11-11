@@ -40,6 +40,32 @@ select lives_ok($$insert into public.notification_reads(user_id,kind,ref_id) sel
 select lives_ok($$insert into public.notification_reads(user_id,kind,ref_id) values ('41000000-0000-4000-8000-000000000003','activity_due','42000000-0000-4000-8000-000000000001')$$,'professor marks a workspace due read');
 select is((select count(*) from public.notification_reads),2::bigint,'professor sees only own reads');
 select throws_ok($$insert into public.notification_reads(user_id,kind,ref_id) values ('41000000-0000-4000-8000-000000000003','submission','49000000-0000-4000-8000-000000000001')$$,'42501',null,'unknown submissions cannot be marked');
+select is(
+  (select public.save_faculty_evaluation(id, 90, '', 'Good read.', true) from public.student_submissions),
+  'released',
+  'professor releases feedback'
+);
+
+select set_config('request.jwt.claim.sub','41000000-0000-4000-8000-000000000001',true);
+select is(
+  (select array_agg(title) from public.get_student_feedback_notifications(now() - interval '7 days')),
+  array['Notify activity'],
+  'student sees released feedback'
+);
+select is(
+  (select count(*) from public.get_student_feedback_notifications(now() + interval '1 minute')),
+  0::bigint,
+  'feedback older than the window is left out'
+);
+select lives_ok($$insert into public.notification_reads(user_id,kind,ref_id) values ('41000000-0000-4000-8000-000000000001','feedback','42000000-0000-4000-8000-000000000001')$$,'student marks feedback read');
+
+select set_config('request.jwt.claim.sub','41000000-0000-4000-8000-000000000002',true);
+select is(
+  (select count(*) from public.get_student_feedback_notifications(now() - interval '7 days')),
+  0::bigint,
+  'outsider sees no feedback'
+);
+select throws_ok($$insert into public.notification_reads(user_id,kind,ref_id) values ('41000000-0000-4000-8000-000000000002','feedback','42000000-0000-4000-8000-000000000001')$$,'42501',null,'outsider cannot mark invisible feedback');
 reset role;
 
 select * from finish();

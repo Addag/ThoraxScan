@@ -12,21 +12,27 @@ type SubmissionRow = {
   activities: { title: string; workspaces: { name: string } };
 };
 
-/** Activities due in the next 7 days (Students: not yet submitted), plus Professors' final submissions from the last 7 days. */
+type FeedbackRow = { activity_id: string; title: string; workspace_name: string; released_at: string };
+
+/**
+ * Activities due in the next 7 days (Students: not yet submitted, plus ones missed in the last 7 days),
+ * Students' newly released feedback, and Professors' final submissions from the last 7 days.
+ */
 export async function getNotifications(role: AppRole): Promise<NotificationsResult> {
-  const unavailable = { role, data: [], error: "Notifications are unavailable." };
+  const now = Date.now();
+  const unavailable = { role, data: [], error: "Notifications are unavailable.", now };
   const supabase = await createClient();
   const { data: claimsData } = await supabase.auth.getClaims();
   const userId = claimsData?.claims?.sub;
   if (!userId) return unavailable;
 
-  const now = Date.now();
-  const [dues, submissions] = await Promise.all([
+  const [dues, submissions, feedback] = await Promise.all([
     supabase
       .from("activities")
       .select("id, title, due_at, workspaces!inner(name), student_submissions(status)")
       .eq("status", "published")
-      .gt("due_at", new Date(now).toISOString())
+      // Students also see deadlines they missed in the last 7 days; late submissions are refused, so it is a heads-up only.
+      .gt("due_at", new Date(role === "student" ? now - notificationWindowMs : now).toISOString())
       .lte("due_at", new Date(now + notificationWindowMs).toISOString())
       .eq("student_submissions.student_id", userId)
       .order("due_at")
@@ -42,8 +48,11 @@ export async function getNotifications(role: AppRole): Promise<NotificationsResu
         .limit(20)
         .returns<SubmissionRow[]>()
       : { data: [] as SubmissionRow[], error: null },
+    role === "student"
+      ? supabase.rpc("get_student_feedback_notifications", { since: new Date(now - notificationWindowMs).toISOString() })
+      : { data: [] as FeedbackRow[], error: null },
   ]);
-  if (dues.error || submissions.error) return unavailable;
+  if (dues.error || submissions.error || feedback.error || !feedback.data) return unavailable;
 
   const items: Omit<AppNotification, "read">[] = [
     ...dues.data
@@ -56,11 +65,18 @@ export async function getNotifications(role: AppRole): Promise<NotificationsResu
       detail: `${row.profiles?.display_name ?? "A Student"} submitted · ${row.activities.workspaces.name}`,
       at: row.submitted_at,
     })),
+    ...(feedback.data as FeedbackRow[]).map((row) => ({
+      kind: "feedback" as const,
+      refId: row.activity_id,
+      title: row.title,
+      detail: `Professor feedback released · ${row.workspace_name}`,
+      at: row.released_at,
+    })),
   ];
-  if (items.length === 0) return { role, data: [], error: null };
+  if (items.length === 0) return { role, data: [], error: null, now };
 
   const reads = await supabase.from("notification_reads").select("kind, ref_id").in("ref_id", items.map((item) => item.refId));
   if (reads.error) return unavailable;
   const readKeys = new Set(reads.data.map((row) => `${row.kind}:${row.ref_id}`));
-  return { role, data: items.map((item) => ({ ...item, read: readKeys.has(`${item.kind}:${item.refId}`) })), error: null };
+  return { role, data: items.map((item) => ({ ...item, read: readKeys.has(`${item.kind}:${item.refId}`) })), error: null, now };
 }
