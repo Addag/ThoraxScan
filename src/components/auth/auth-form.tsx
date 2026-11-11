@@ -45,7 +45,7 @@ const turnstileSiteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
 const inputClass = "h-12 w-full rounded-control border border-[rgb(153_191_240/38%)] bg-[rgb(7_18_39/56%)] px-3.5 text-foreground aria-invalid:border-[#ff6b6b]";
 const fieldClass = "mt-4 flex flex-col [&>label]:mb-[6px] [&>label]:text-[16px] [&>label]:font-extrabold [&>label]:leading-5";
 
-// Mirrors the server check in (auth)/actions.ts: 8+ characters, a letter and a number.
+// Mirrors the server check `validatePassword` in lib/auth/types.ts: 8+ characters, a letter and a number.
 const passwordRules = [
   ["At least 8 characters", (p: string) => p.length >= 8],
   ["A letter", (p: string) => /[a-z]/i.test(p)],
