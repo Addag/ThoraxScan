@@ -38,10 +38,12 @@ const modelDetails = [
 ] as const;
 
 const stack = [
-  { group: "Frontend", items: ["Next.js 16 (App Router)", "React 19", "Tailwind CSS 4", "TypeScript"] },
+  { group: "Frontend", items: ["Next.js 16 (App Router)", "React 19", "Tailwind CSS 4", "TypeScript 5"] },
   { group: "Data and auth", items: ["Supabase Auth", "Postgres with row-level security", "Supabase Storage", "sharp for server-side image checks"] },
-  { group: "AI", items: ["PyTorch training", "ONNX export", "ONNX Runtime Web 1.27", "WebGPU and WebAssembly"] },
-  { group: "Operations", items: ["Cloudflare Turnstile", "Vercel Analytics and Speed Insights", "Vitest unit and Playwright browser tests"] },
+  { group: "In-browser AI", items: ["ONNX Runtime Web 1.27", "WebGPU, with a WebAssembly fallback", "Content-addressed model files"] },
+  { group: "Model training", items: ["Python 3.14 and PyTorch with CUDA 12.8", "timm vision models", "ONNX export (opset 17)","ONNX Runtime GPU parity checks"] },
+  { group: "Hardware", items: ["NVIDIA GPU workstation for training and export", "The user's own device runs the model", "Vercel and Supabase cloud servers"] },
+  { group: "Operations", items: ["Cloudflare Turnstile", "Vercel Analytics and Speed Insights", "Vitest unit and Playwright browser tests", "pgTAP database tests"] },
 ] as const;
 
 const security = [
@@ -140,7 +142,7 @@ export function TechnicalOverview() {
 
       <section id="stack" className={subSection} aria-labelledby="stack-title">
         <h3 className={subTitle} id="stack-title" data-reveal>What it&rsquo;s built with</h3>
-        <div className="mt-8 grid grid-cols-4 gap-5 stacked:grid-cols-2 max-[640px]:grid-cols-1">
+        <div className="mt-8 grid grid-cols-3 gap-5 stacked:grid-cols-2 max-[640px]:grid-cols-1">
           {stack.map((s) => (
             <div className={`${glassCard} p-6`} key={s.group} data-reveal>
               <h4 className={`${cardTitle} mb-4`}>{s.group}</h4>

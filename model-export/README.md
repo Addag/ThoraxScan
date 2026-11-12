@@ -38,6 +38,7 @@ and row normalization. Later layers multiply on the left; query averaging and
 per-image min-max normalization produce float32[batch,1,7,7]. Constant maps are zeros.
 
 Use Python with requirements.txt (verified with torch 2.11.0+cu128 on CPU).
+requirements-lock.txt pins the full environment, including indirect packages.
 Copy the existing V1 synthetic fixtures and thresholds into a new ignored bundle;
 do not replace baseline logits with V2 outputs. Give release.json a new immutable
 release ID and the official checkpoint checksum.

@@ -38,8 +38,59 @@ them only after they submit and the professor releases feedback. The active
 model is read from a Supabase registry slot, so a model can be replaced without
 redeploying the app (see [The model](#the-model)).
 
-Stack: Next.js 16, React 19, Tailwind CSS 4, Supabase, onnxruntime-web 1.27,
-Vitest with Playwright, and Vercel.
+## Tech stack
+
+### Hardware
+
+| Where | What runs there |
+|---|---|
+| Training workstation (NVIDIA GPU, CUDA 12.8) | Model training, ONNX export, and PyTorch-to-ONNX parity checks |
+| The user's device | Model inference in the browser: WebGPU on the GPU when a release enables it, otherwise WebAssembly on the CPU. Speed depends on the device. |
+| Vercel | Next.js server rendering, Server Actions, and Route Handlers |
+| Supabase | Postgres, Auth, and Storage |
+
+### Software and services
+
+- **Web app:** Next.js 16 (App Router), React 19, TypeScript 5, Tailwind CSS 4,
+  on Node.js
+- **Hosting:** Vercel, with Vercel Analytics and Speed Insights
+- **Backend:** Supabase Postgres (row-level security, RPCs, triggers), Auth, and
+  Storage
+- **Bot protection:** Cloudflare Turnstile
+- **In-browser AI:** ONNX Runtime Web (WebGPU, WebAssembly fallback)
+- **Model training and export:** Python 3.14, PyTorch with CUDA, timm, ONNX
+- **Testing:** Vitest for unit tests, Vitest Browser with Playwright and
+  Chromium for model tests, pgTAP for the database
+
+### npm dependencies
+
+Versions are pinned in [`package.json`](package.json); `package-lock.json`
+records the full tree.
+
+| Package | Used for |
+|---|---|
+| `next`, `react`, `react-dom` | The web app |
+| `@supabase/supabase-js`, `@supabase/ssr` | Supabase client and cookie sessions |
+| `onnxruntime-web` | In-browser inference; pinned to 1.27.0 (see `prepare:ort` below) |
+| `sharp` | Server-side checks on uploaded case images |
+| `@marsidev/react-turnstile` | The Turnstile CAPTCHA widget |
+| `@vercel/analytics`, `@vercel/speed-insights` | Usage and performance metrics |
+| `tailwindcss`, `@tailwindcss/postcss` | Styling (dev) |
+| `typescript`, `eslint`, `eslint-config-next` | Types and linting (dev) |
+| `vitest`, `@vitest/browser-playwright`, `vitest-browser-react`, `playwright` | Tests (dev) |
+| `supabase` | Supabase CLI for the local stack and migrations (dev) |
+| `tsx`, `tus-js-client` | The model release CLI and its resumable uploads (dev) |
+
+### Python dependencies
+
+[`model-export/requirements.txt`](model-export/requirements.txt) pins the
+packages installed directly: `torch` and `torchvision` (CUDA 12.8 builds),
+`timm`, `safetensors`, `numpy`, `pandas`, `pillow`, `opencv-python`,
+`scikit-learn`, `scipy`, `matplotlib`, `tqdm`, `onnx`, `onnxruntime-gpu`,
+`onnxsim`, and `onnxscript`.
+[`model-export/requirements-lock.txt`](model-export/requirements-lock.txt)
+records every package in the environment with its exact version. Python runs
+only offline; the deployed app does not use it.
 
 ## Getting started
 
