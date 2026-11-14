@@ -15,6 +15,8 @@ insert into public.student_submissions(activity_id,student_id,visible_findings,c
 select public.register_model_release('v2-behavior',repeat('a',64),repeat('c',64),1024,'artifacts/sha256/'||repeat('a',64)||'/model.onnx','bundles/sha256/'||repeat('c',64)||'/manifest.json','{"schemaVersion": 2, "release": {"id": "v2-behavior", "preprocessingVersion": "prep", "thresholdVersion": "threshold"}, "artifact": {"sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "path": "artifacts/sha256/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/model.onnx"}, "attention": {"output": {"name": "attention_map", "dtype": "float32", "shape": ["batch", 1, 7, 7]}, "attribution": "global-self-attention", "aggregation": "attention-rollout-mean-query-v1", "normalization": "per-image-min-max-v1", "grid": {"width": 7, "height": 7}}, "labels": [{"name": "No Finding", "threshold": 0.5}, {"name": "Enlarged Cardiomediastinum", "threshold": 0.5}, {"name": "Cardiomegaly", "threshold": 0.5}, {"name": "Lung Opacity", "threshold": 0.5}, {"name": "Lung Lesion", "threshold": 0.5}, {"name": "Edema", "threshold": 0.5}, {"name": "Consolidation", "threshold": 0.5}, {"name": "Pneumonia", "threshold": 0.5}, {"name": "Atelectasis", "threshold": 0.5}, {"name": "Pneumothorax", "threshold": 0.5}, {"name": "Pleural Effusion", "threshold": 0.5}, {"name": "Pleural Other", "threshold": 0.5}, {"name": "Fracture", "threshold": 0.5}, {"name": "Support Devices", "threshold": 0.5}]}'::jsonb,'{"passed":true}'::jsonb,'test');
 select public.activate_model_release((select id from public.model_releases where release_id='v2-behavior'),(select revision from public.model_slots where slot='thoraxscan-classifier'),'test','behavior test');
 select set_config('request.jwt.claim.sub',pg_temp.uid(2)::text,true);
+select is((select count(*) from public.claim_activity_ai_analysis(pg_temp.uid(30))),0::bigint,'student cannot claim the analysis');
+select set_config('request.jwt.claim.sub',pg_temp.uid(1)::text,true);
 create temp table claim as select * from public.claim_activity_ai_analysis(pg_temp.uid(30));
 create function pg_temp.complete(map jsonb) returns text language sql as $$
  select public.complete_activity_ai_analysis(pg_temp.uid(30),(select attempt_id from claim),to_jsonb(array_fill(0.6::numeric,array[14])),jsonb_build_object('releaseId','v2-behavior','bundleSha256',repeat('c',64),'modelSha256',repeat('a',64),'manifestVersion',2,'preprocessingVersion','prep','thresholdVersion','threshold'),'wasm','test',map);
@@ -25,6 +27,7 @@ select is(pg_temp.complete(to_jsonb(array_fill('bad'::text,array[49]))),'invalid
 select is(pg_temp.complete(to_jsonb(array_fill(2::numeric,array[49]))),'invalid_payload','out of range rejected');
 select is(pg_temp.complete(to_jsonb(array_fill(0.5::numeric,array[49]))),'ready','valid V2 completes');
 select is(pg_temp.complete(to_jsonb(array_fill(0.5::numeric,array[49]))),'ready','completion retry is idempotent');
+select set_config('request.jwt.claim.sub',pg_temp.uid(2)::text,true);
 select is((select attention_status from public.get_student_activity_ai_feedback(pg_temp.uid(30))),'ready','submitted student receives released map');
 select is((select jsonb_array_length(attention_map) from public.get_student_activity_ai_feedback(pg_temp.uid(30))),49,'released map has 49 values');
 select set_config('request.jwt.claim.sub',pg_temp.uid(3)::text,true);
@@ -55,18 +58,21 @@ insert into public.xray_cases(id,workspace_id,storage_path,uploaded_by,mime_type
 insert into public.activities(id,workspace_id,case_id,created_by,title,instructions) values(pg_temp.uid(31),pg_temp.uid(10),pg_temp.uid(21),pg_temp.uid(1),'Legacy activity','Synthetic testing instructions');
 insert into public.activity_reference_evaluations(activity_id,evaluation) values(pg_temp.uid(31),'Private reference') on conflict(activity_id) do update set evaluation=excluded.evaluation;
 update public.activities set status='published' where id=pg_temp.uid(31);
-insert into public.student_submissions(activity_id,student_id,visible_findings,classification,status,submitted_at,created_at,updated_at) values(pg_temp.uid(31),pg_temp.uid(2),'Synthetic findings','normal','submitted',now(),now(),now());
 select public.register_model_release('v1-behavior',repeat('b',64),repeat('d',64),1024,'artifacts/sha256/'||repeat('b',64)||'/model.onnx','bundles/sha256/'||repeat('d',64)||'/manifest.json',
  (select jsonb_set(jsonb_set(jsonb_set(manifest - 'attention','{schemaVersion}','1'),'{release,id}','"v1-behavior"'),'{artifact}',jsonb_build_object('sha256',repeat('b',64),'path','artifacts/sha256/'||repeat('b',64)||'/model.onnx')) from public.model_releases where release_id='v2-behavior'),'{"passed":true}','test');
 select public.activate_model_release((select id from public.model_releases where release_id='v1-behavior'),(select revision from public.model_slots where slot='thoraxscan-classifier'),'test','V1 compatibility');
-select set_config('request.jwt.claim.sub',pg_temp.uid(2)::text,true);
+select set_config('request.jwt.claim.sub',pg_temp.uid(1)::text,true);
 create temp table claim_v1 as select * from public.claim_activity_ai_analysis(pg_temp.uid(31));
+select is((select count(*) from claim_v1),1::bigint,'professor claims before any submission');
+insert into public.student_submissions(activity_id,student_id,visible_findings,classification,status,submitted_at,created_at,updated_at) values(pg_temp.uid(31),pg_temp.uid(2),'Synthetic findings','normal','submitted',now(),now(),now());
 create function pg_temp.complete_v1(map jsonb) returns text language sql as $$
  select public.complete_activity_ai_analysis(pg_temp.uid(31),(select attempt_id from claim_v1),to_jsonb(array_fill(0.6::numeric,array[14])),jsonb_build_object('releaseId','v1-behavior','bundleSha256',repeat('d',64),'modelSha256',repeat('b',64),'manifestVersion',1,'preprocessingVersion','prep','thresholdVersion','threshold'),'wasm','test',map);
 $$;
 select is(pg_temp.complete_v1(to_jsonb(array_fill(0.5,array[49]))),'invalid_payload','V1 rejects attention');
 select is(pg_temp.complete_v1(null),'ready','V1 null attention completes');
+select set_config('request.jwt.claim.sub',pg_temp.uid(2)::text,true);
 select is((select attention_status from public.get_student_activity_ai_feedback(pg_temp.uid(31))),'unavailable','old release remains unavailable');
+select set_config('request.jwt.claim.sub',pg_temp.uid(1)::text,true);
 select is(public.complete_activity_ai_analysis(pg_temp.uid(31),(select attempt_id from claim_v1),to_jsonb(array_fill(0.6,array[14])),'{}','wasm','test'),'ready','six-argument retry remains compatible');
 select * from finish();
 rollback;

@@ -38,7 +38,7 @@ export default async function StudentActivitiesPage() {
                   <p className="mx-0 mt-0 mb-1 text-label font-extrabold uppercase text-(--text-muted) tracking-[0.08em]">{activity.workspaceName}</p>
                   <h2 className="mx-0 mt-0 mb-[7px] text-title">{activity.title}</h2>
                   <span className={`text-label ${dueStateColor(activity.dueAt)}`}>
-                    {submissionLabel(activity.submissionStatus, activity.dueAt)} · {activity.aiStatus === "ready" ? "Feedback available" : activity.aiStatus === "pending" ? "Analysis pending" : activity.aiStatus === "failed" ? "Analysis failed · retry available" : "AI feedback locked"} · {formatDueDate(activity.dueAt)}
+                    {submissionLabel(activity.submissionStatus, activity.dueAt)} · {activity.aiStatus === "ready" ? "Feedback available" : activity.aiStatus === "pending" ? "Analysis pending" : activity.aiStatus === "failed" ? "Analysis failed" : "AI feedback locked"} · {formatDueDate(activity.dueAt)}
                   </span>
                 </div>
                 <Link className="transition-colors duration-160 hover:text-(--text-primary) text-caption font-extrabold text-(--brand-blue-text) no-underline max-[760px]:col-span-full max-[760px]:border-t max-[760px]:border-(--border-subtle) max-[760px]:pt-[13px]" href={`/student/activities/${activity.id}`}>Review activity <span aria-hidden="true">→</span></Link>

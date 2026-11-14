@@ -24,7 +24,7 @@ select throws_ok($$select public.register_model_release('v3-bad',repeat('e',64),
 select public.register_model_release('v3-behavior',repeat('e',64),repeat('f',64),1024,'artifacts/sha256/'||repeat('e',64)||'/model.onnx','bundles/sha256/'||repeat('f',64)||'/manifest.json',(select manifest from v3_manifest),'{"passed":true}','test');
 select is((select contract_version from public.model_releases where release_id = 'v3-behavior'),3::smallint,'V3 registers as contract 3');
 select public.activate_model_release((select id from public.model_releases where release_id='v3-behavior'),(select revision from public.model_slots where slot='thoraxscan-classifier'),'test','V3 behavior test');
-select set_config('request.jwt.claim.sub',pg_temp.uid(2)::text,true);
+select set_config('request.jwt.claim.sub',pg_temp.uid(1)::text,true);
 create temp table claim as select * from public.claim_activity_ai_analysis(pg_temp.uid(30));
 create function pg_temp.complete(map jsonb) returns text language sql as $$
  select public.complete_activity_ai_analysis(pg_temp.uid(30),(select attempt_id from claim),to_jsonb(array_fill(0.6::numeric,array[14])),jsonb_build_object('releaseId','v3-behavior','bundleSha256',repeat('f',64),'modelSha256',repeat('e',64),'manifestVersion',3,'preprocessingVersion','prep','thresholdVersion','threshold'),'wasm','test',map);
@@ -33,6 +33,7 @@ select is(pg_temp.complete(null),'invalid_payload','missing V3 map rejected');
 select is(pg_temp.complete(to_jsonb(array_fill(0.5::numeric,array[49]))),'invalid_payload','V2-sized map rejected for V3');
 select is(pg_temp.complete(to_jsonb(array_fill(1.5::numeric,array[2744]))),'invalid_payload','out of range rejected');
 select is(pg_temp.complete(to_jsonb(array_fill(0.5::numeric,array[2744]))),'ready','valid V3 completes');
+select set_config('request.jwt.claim.sub',pg_temp.uid(2)::text,true);
 select is((select jsonb_array_length(attention_map) from public.get_student_activity_ai_feedback(pg_temp.uid(30))),2744,'student receives 14 per-label maps');
 select is((select attention_method || ' ' || attention_grid_width from public.get_student_activity_ai_feedback(pg_temp.uid(30))),'cam-fc-weights-v1 14','student projection carries V3 metadata');
 select set_config('request.jwt.claim.sub',pg_temp.uid(1)::text,true);

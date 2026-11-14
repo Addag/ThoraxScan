@@ -8,9 +8,7 @@ import { ACTIVITY_AI_LABELS, type ActivityAIFeedback as Feedback } from "@/lib/a
 // These component tests run without Next.js's router or build-time environment.
 import "@/app/globals.css";
 
-vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh: vi.fn() }) }));
 vi.mock("next/link", () => ({ __esModule: true, default: (props: ComponentProps<"a">) => <a {...props} /> }));
-vi.mock("@/lib/activity-ai/actions", () => ({ claimActivityAIAnalysis: vi.fn(), completeActivityAIAnalysis: vi.fn(), failActivityAIAnalysis: vi.fn(), refreshActivityCaseUrl: vi.fn() }));
 
 const labels = ACTIVITY_AI_LABELS.map((label) => ({
   label, threshold: 0.5,
@@ -27,7 +25,7 @@ const initial: Feedback = {
 };
 
 test("shows likely, possible, and all labels like Learning Mode", async () => {
-  await render(<ActivityAIFeedback activityId="a" imageUrl={null} initial={initial} />);
+  await render(<ActivityAIFeedback imageUrl={null} initial={initial} />);
   await expect.element(page.getByRole("region", { name: "Likely findings" })).toHaveTextContent("Cardiomegaly");
   await expect.element(page.getByRole("region", { name: "Possible findings" })).toHaveTextContent("Edema");
   const popup = page.getByRole("dialog", { name: /possible finding/ });
@@ -44,15 +42,15 @@ test("shows likely, possible, and all labels like Learning Mode", async () => {
 });
 
 test("reopening a finished activity does not pop the result up", async () => {
-  await render(<ActivityAIFeedback activityId="a" imageUrl={null} initial={initial} />);
+  await render(<ActivityAIFeedback imageUrl={null} initial={initial} />);
   await page.getByRole("button", { name: "I understand" }).click();
   await expect.element(page.getByRole("button", { name: "Close result" })).not.toBeInTheDocument();
   await expect.element(page.getByRole("region", { name: "Likely findings" })).toBeVisible();
 });
 
 test("feedback that becomes ready during the visit pops up, then stays on the page", async () => {
-  const screen = await render(<ActivityAIFeedback activityId="a" imageUrl={null} initial={{ ...initial, status: "locked", result: null }} />);
-  await screen.rerender(<ActivityAIFeedback activityId="a" imageUrl={null} initial={initial} />);
+  const screen = await render(<ActivityAIFeedback imageUrl={null} initial={{ ...initial, status: "locked", result: null }} />);
+  await screen.rerender(<ActivityAIFeedback imageUrl={null} initial={initial} />);
   await page.getByRole("button", { name: "I understand" }).click();
   const dialog = page.getByRole("dialog", { name: "AI feedback" }).element() as HTMLDialogElement;
   expect(dialog.open).toBe(true);

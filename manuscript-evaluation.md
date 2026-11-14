@@ -71,7 +71,7 @@ Chapter 4 presents the system as built, so its figures should match the live app
 1. Replace "Verification code request", "Reset code" and "OTP / reset verification" with email *links*. The app sends confirmation and password-reset links, not codes.
 2. Add an Administrator entity: an administrator approves Professor applications and manages other administrators.
 3. Add Cloudflare Turnstile (CAPTCHA) to authentication.
-4. Level 1, process 2.0 (AI screening): it runs in the browser after the first student's final submission (or on a professor retry), not when the professor creates the activity.
+4. Level 1, process 2.0 (AI screening): it runs in the professor's browser when the professor publishes the activity (or the next time they open it, if that run was interrupted), not when the professor creates the activity. Only the professor's flow writes to the AI analysis store; the student only reads the released result after their final submission. (Changed 14 November 2026; before that it ran in the browser of the first student to submit.)
 5. Level 1, D3: the store holds 14 probabilities, thresholds, findings and one heatmap per finding, not "confidence score + attention map".
 6. Level 1, process 5.0: a Normal answer has no findings or region (b00530c).
 7. Rewrite both DFD paragraphs to match.
@@ -141,6 +141,7 @@ These should describe how professors and students use ThoraxScan and what it giv
   - the professor's evaluation
   - unlimited private practice in Learning Mode.
 - **Both:** it runs in the browser, so no installation or GPU server is needed, and uploaded practice images stay in the browser.
+- **Integrity of the AI feedback:** suggested sentence: "The AI result for each activity is recorded only from the professor's browser when the activity is published, so a student cannot alter the AI feedback that classmates receive, and students see it only after submitting their own answer." (Since 14 November 2026.)
 - **The model change, in client terms:** TinyViT gave students more reliable feedback than the SqueezeViT in Chapter 3. Use numbers only if your adviser wants them:
 
   | | SqueezeViT v6 | TinyViT v7 |

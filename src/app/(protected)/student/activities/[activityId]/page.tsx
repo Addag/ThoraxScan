@@ -69,7 +69,7 @@ export default async function StudentActivityPage({
               imageError={activity.imageError}
               title={activity.title}
             />
-            <ActivityAIFeedback activityId={activity.id} imageUrl={activity.imageUrl} initial={activity.aiFeedback} />
+            <ActivityAIFeedback imageUrl={activity.imageUrl} initial={activity.aiFeedback} />
           </div>
           <StudentSubmissionForm
             submission={activity.submission}

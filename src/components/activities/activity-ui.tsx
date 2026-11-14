@@ -39,7 +39,7 @@ export function ActivityStepRail({ role, submissionStatus = "Not started", aiSta
       : [
           ["Review activity", submitted ? "complete" : "active"],
           [`Evaluation · ${submissionStatus}`, submitted ? "complete" : "active"],
-          [`AI feedback · ${aiStatus === "ready" ? "Available" : aiStatus === "pending" ? "Pending" : aiStatus === "failed" ? "Retry available" : "Locked"}`, aiStatus === "ready" ? "complete" : submitted ? "active" : "future"],
+          [`AI feedback · ${aiStatus === "ready" ? "Available" : aiStatus === "pending" ? "Pending" : aiStatus === "failed" ? "Failed" : "Locked"}`, aiStatus === "ready" ? "complete" : submitted ? "active" : "future"],
         ];
 
   return (
