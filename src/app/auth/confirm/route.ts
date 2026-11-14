@@ -11,11 +11,13 @@ const otpTypes = new Set<EmailOtpType>([
   "email_change",
 ]);
 
-function safeDestination(value: string | null) {
-  if (!value || !value.startsWith("/") || value.startsWith("//")) {
-    return "/dashboard";
-  }
-  return value;
+function safeDestination(value: string | null, origin: string) {
+  const fallback = new URL("/dashboard", origin);
+  // The URL parser reads "\" as "/" and drops tabs and newlines, so compare the
+  // resolved origin instead of inspecting the string.
+  if (!value?.startsWith("/") || !URL.canParse(value, origin)) return fallback;
+  const destination = new URL(value, origin);
+  return destination.origin === origin ? destination : fallback;
 }
 
 export async function GET(request: NextRequest) {
@@ -23,7 +25,7 @@ export async function GET(request: NextRequest) {
   const tokenHash = searchParams.get("token_hash");
   const rawType = searchParams.get("type");
   const code = searchParams.get("code");
-  const next = safeDestination(searchParams.get("next"));
+  const next = safeDestination(searchParams.get("next"), origin);
   const supabase = await createClient();
   let error: Error | null = null;
 
@@ -49,7 +51,7 @@ export async function GET(request: NextRequest) {
         input_policy_version: policyVersion,
       });
     }
-    return NextResponse.redirect(new URL(next, origin));
+    return NextResponse.redirect(next);
   }
 
   const loginUrl = new URL("/login", origin);
