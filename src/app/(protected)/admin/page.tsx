@@ -116,7 +116,7 @@ export default async function AdminPage() {
             )}
           </section>
 
-          <section className={`${reviewPanelClass} p-6 max-[560px]:p-5`} aria-labelledby="actions-title">
+          <section className={`${reviewPanelClass} min-w-0 p-6 max-[560px]:p-5`} aria-labelledby="actions-title">
             <div className="mb-4"><SectionHeading kicker="Audit" title="Admin actions" titleId="actions-title" aside={<span className={countBadgeClass}>Latest {actions.data.length}</span>} /></div>
             {actions.error ? (
               <EmptyState error role="alert" title="The log is unavailable">Refresh the page or try again later.</EmptyState>
@@ -125,7 +125,7 @@ export default async function AdminPage() {
             ) : (
               <ol className="m-0 grid list-none gap-1 p-0">
                 {actions.data.map((entry, index) => (
-                  <li key={`${entry.created_at}-${index}`} className="rounded-control px-1 py-2">
+                  <li key={`${entry.created_at}-${index}`} className="min-w-0 rounded-control px-1 py-2">
                     <span className="block text-small"><strong>{entry.actor_name}</strong> · {entry.action}{entry.target_label ? ` · ${entry.target_label}` : ""}</span>
                     {entry.detail ? <span className="block truncate text-label text-(--text-secondary)">{entry.detail}</span> : null}
                     <time className="block text-label text-(--text-muted)" dateTime={entry.created_at}>{formatDateTime(entry.created_at)}</time>
