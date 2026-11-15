@@ -44,7 +44,7 @@
 | 9d4cd56 (11-07) | Terms v1.2, with a Data retention section | Supports the ethics paragraph (item 28) |
 | 02cb367 (11-08) | Incomplete answers are caught before the submit confirmation | Minor |
 
-**Follow-up commit 286a947 (11-08):** the chest gate was retrained with 64 hidden units and FracAtlas limb, hip and shoulder X-rays as negatives. Report this version (v2): it catches 5,653 of 5,761 non-chest images and wrongly refuses 5 of 5,000 chest X-rays.
+**Follow-up commit 286a947 (11-08):** the chest gate was retrained with 64 hidden units and FracAtlas limb, hip and shoulder X-rays as negatives. Report this version (v2): it catches 5,653 of 5,761 non-chest images. With the shape check added on 9 November (00388b1), the gate wrongly refuses 12 of 5,000 chest X-rays, about 1 in 400 (5 by the classifier, 7 by the shape check). Quote 12 of 5,000, not 5.
 
 ---
 
