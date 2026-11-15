@@ -13,15 +13,33 @@ evaluation.
 
 ## What it does
 
-- **Students** join workspaces with an invitation code, complete activities,
-  practise in Learning Mode with the active model, read the attention-map guide,
-  and manage their account settings.
+- **Students** join workspaces with an invitation code and complete activities,
+  saving drafts before one final submission. They practise in Learning Mode
+  with the active model, keep private notes on library cases, and read the
+  attention-map guide.
 - **Professors** apply for approval, then create workspaces and activities from
   their own uploads or the built-in CheXpert case library. They review
-  submissions, release feedback, view analytics, and can use Learning Mode too.
-- **Administrators** approve Professor applications and manage other
-  administrators from `/admin`. Administrator is a separate capability, not a
-  registration role (see [Bootstrap the first administrator](#bootstrap-the-first-administrator)).
+  submissions, release their evaluations, view class analytics and export them
+  as CSV, and can use Learning Mode too.
+- **Administrators** approve Professor applications and run the console at
+  `/admin`. There they manage accounts (rename, set a temporary password, sign
+  out, reset two-step login, disable, delete), post site-wide notices, read
+  platform statistics, an activity feed and a Professor report (CSV), and add
+  or remove other administrators. Every administrator action is logged.
+  Administrator is a separate capability, not a registration role (see
+  [Bootstrap the first administrator](#bootstrap-the-first-administrator)).
+- **Every account** has a notification bell and a User Profile page.
+  - Notifications: Students see activities due within 7 days, deadlines missed
+    in the last 7 days, and newly released professor feedback. Professors see
+    upcoming due dates and new final submissions.
+  - User Profile: display name, sign-in email and password changes, optional
+    [two-step login](#two-step-login), a privacy summary, and accessibility
+    options (light or dark theme, larger text, high contrast).
+- **Registration** requires accepting the Terms and the Privacy Policy
+  (`/terms`, `/privacy-policy`). The Privacy Policy acknowledgement is recorded
+  with its version once the email is confirmed.
+- **AI results** open with a written report, a probability chart for all 14
+  labels, likely and possible findings, and a heatmap for each finding.
 
 ## How it works
 
@@ -32,9 +50,11 @@ Supabase: Auth, Postgres with row-level security, Storage
                 -> workspaces, activities, submissions, evaluations, model registry
 ```
 
-Model inference runs in the browser. Learning Mode results stay in memory.
-Activity analyses are saved once through an authorized RPC, and Students see
-them only after they submit and the professor releases feedback. The active
+Model inference runs in the browser. Learning Mode results stay in memory. An
+activity's analysis runs once, in the Professor's browser, when the activity is
+published, and is saved through an authorized RPC that only the workspace's
+Professors can use. Students see it only after their own final submission; the
+Professor's evaluation is released separately. The active
 model is read from a Supabase registry slot, so a model can be replaced without
 redeploying the app (see [The model](#the-model)).
 
@@ -189,6 +209,23 @@ before enabling CAPTCHA in hosted Supabase; otherwise signup, login, and
 password recovery will reject requests without a token. If rollback is needed,
 disable CAPTCHA in Supabase before rolling back the application.
 
+## Two-step login
+
+Any account can turn on two-step login under **User Profile > Security**. Login
+then asks for the password and a 6-digit code from an authenticator app (TOTP),
+entered on `/login/verify`. It is optional; accounts without it log in as
+before.
+
+- Once an account has it on, the database refuses that account's requests until
+  the session has passed the code step. A Data API pre-request check and a
+  Storage policy enforce this; both are in the
+  `20261115120000_two_step_login.sql` migration.
+- Turning it off asks for the current password.
+- An administrator can reset it from `/admin` for a user who lost their phone.
+- The project's Auth settings must allow authenticator-app (TOTP) factors.
+  Local Supabase enables them in `supabase/config.toml` under
+  `[auth.mfa.totp]`.
+
 ## Bootstrap the first administrator
 
 Administrator is a separate capability, not a public registration role. After
@@ -272,7 +309,8 @@ npm run lint
 npm run build
 ```
 
-Before the first browser model test, install the Playwright browser:
+`npm run test:model:browser` runs every browser test: the model tests and the
+component tests. Before the first run, install the Playwright browser:
 
 ```bash
 npx playwright install chromium
@@ -307,7 +345,7 @@ Production: [https://thoraxscan.com](https://thoraxscan.com)
 |---|---|
 | `src/` | Next.js app routes, components, and libraries (inference, Supabase, case library) |
 | `supabase/` | Config, migrations, auth email templates, and pgTAP tests |
-| `scripts/` | Model release CLI, ONNX Runtime asset copy, case library import, guide rendering |
+| `scripts/` | Model release CLI, ONNX Runtime asset copy, case library import, guide rendering, and the feature dumps used to train the view detector and chest X-ray gate |
 | `model-export/` | Python model exporters and their tests |
 | `model-input/` | Ignored local release bundles |
 | `public/` | Static assets, including the built-in CheXpert images and ONNX Runtime files |
@@ -316,6 +354,10 @@ Production: [https://thoraxscan.com](https://thoraxscan.com)
 
 ## Further documentation
 
+- The landing page carries an in-app guide for Students, Professors, and
+  developers, plus a technical overview of the model
+  ([`src/components/docs-section.tsx`](src/components/docs-section.tsx),
+  [`src/components/technical-overview.tsx`](src/components/technical-overview.tsx)).
 - [`map/CLAUDE.md`](map/CLAUDE.md): the system map, covering objects,
   processes, schema, and what a change affects.
 - [`docs/models.md`](docs/models.md): every model, with its data, results,

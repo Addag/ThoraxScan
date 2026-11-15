@@ -132,6 +132,7 @@ const userTopics: Topic[] = [
       <ul className={bullets}>
         <li><b>Profile:</b> display name, plus an optional work phone for Professors.</li>
         <li><b>Security:</b> change your sign-in email (confirmed from both addresses) or your password.</li>
+        <li><b>Two-step login</b> (optional, under Security): scan the QR code with an authenticator app, then enter a 6-digit code after your password each time you log in. Turning it off asks for your password. If you lose your phone, an administrator can reset it.</li>
         <li><b>Accessibility:</b> larger text and high contrast, saved in this browser. The theme button switches light and dark.</li>
       </ul>
     ),
@@ -226,6 +227,7 @@ const devTopics: Topic[] = [
         <li>An operator adds the first administrator once, directly in the database, after that person has registered and confirmed their email.</li>
         <li>From then on, administrators add or remove others in the Administrators section of <code className={code}>/admin</code>. Nobody can remove themselves, so one always remains.</li>
         <li>Administrators sign in by choosing <b>Administrator</b> on the normal login page.</li>
+        <li>The console at <code className={code}>/admin</code> also reviews Professor applications, manages accounts (rename, temporary password, sign out, reset two-step login, disable, delete), posts site-wide notices, and shows platform statistics, an activity feed and a Professor report (CSV). Every administrator action is logged.</li>
       </ul>
     ),
     sources: ["README.md", "map/objects/identity/platform-administrator.md"],
