@@ -18,9 +18,10 @@ export function ActivityAIStatus({ activityId, imageUrl, activityStatus, initial
   const controllerRef = useRef<AbortController | null>(null);
   const startedRef = useRef(false);
 
-  useEffect(() => () => controllerRef.current?.abort(), []);
   // Only a Professor's browser may record the analysis, so it starts here: right after publishing,
   // or on a later visit if that run was interrupted. One automatic attempt per visit.
+  // The run is deliberately not aborted on unmount: React's development double-mount would cancel it
+  // while startedRef blocks the restart, and letting it finish also survives in-app navigation.
   useEffect(() => {
     const leaseHeld = status.status === "pending" && status.claimExpiresAt !== null && new Date(status.claimExpiresAt) > new Date();
     if (activityStatus !== "published" || status.status === "ready" || leaseHeld || startedRef.current) return;
