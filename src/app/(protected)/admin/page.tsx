@@ -17,7 +17,7 @@ const eventSymbol: Record<string, string> = { account: "+", workspace: "▦", ac
 const cellClass = "border-b border-(--border-subtle) px-3 py-2.5 text-left";
 
 function formatDateTime(value: string) {
-  return new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }).format(new Date(value));
+  return new Intl.DateTimeFormat("en-US", { timeZone: "Asia/Manila", month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }).format(new Date(value));
 }
 
 export default async function AdminPage() {
