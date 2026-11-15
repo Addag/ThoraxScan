@@ -13,6 +13,7 @@ import {
 import {
   changeEmailAction,
   changePasswordAction,
+  twoStepAction,
   updateAccountSettingsAction,
 } from "@/app/(protected)/settings/actions";
 import { PasswordToggle } from "@/components/password-toggle";
@@ -22,6 +23,7 @@ import {
   type EmailActionState,
   type PasswordActionState,
   type SettingsActionState,
+  type TwoStepActionState,
   initialSettingsActionState,
 } from "@/lib/settings/types";
 import Link from "next/link";
@@ -83,7 +85,9 @@ export function SettingsForm({
   loadError,
   pendingEmail,
   role,
+  twoStepEnabled = false,
 }: {
+  twoStepEnabled?: boolean;
   email: string;
   initialDisplayName: string;
   initialSettings: AccountSettings;
@@ -177,6 +181,7 @@ export function SettingsForm({
       >
         <EmailPanel />
         <PasswordPanel />
+        <TwoStepPanel initiallyEnabled={twoStepEnabled} />
       </div>
 
       <AccessibilityPanel hidden={activeTab !== "accessibility"} />
@@ -511,6 +516,107 @@ function PasswordPanel() {
         <button className={submitButtonClass} disabled={pending} type="submit">
           {pending ? "Updating…" : "Update password"}
         </button>
+      </div>
+    </form>
+  );
+}
+
+function TwoStepPanel({ initiallyEnabled }: { initiallyEnabled: boolean }) {
+  // One action for every step; each submit button carries its own `op`.
+  const [state, formAction, pending] = useActionState<TwoStepActionState, FormData>(
+    twoStepAction,
+    { status: "idle", message: "", enabled: initiallyEnabled },
+  );
+  const [visible, setVisible] = useState(false);
+
+  return (
+    <form action={formAction} className="grid gap-6" noValidate>
+      <section className={`${panelClass} p-6 max-[600px]:p-5`}>
+        <div className={panelHeadingClass}>
+          <h2>Two-step login</h2>
+          <p>
+            {state.enabled
+              ? "On. Each login asks for your password and a code from your authenticator app."
+              : "Optional. Add a 6-digit code from an authenticator app, such as Google Authenticator or Microsoft Authenticator, after your password."}
+          </p>
+        </div>
+        {state.setup ? (
+          <div className="grid grid-cols-[auto_minmax(0,1fr)] items-start gap-6 max-[600px]:grid-cols-1">
+            {/* Supabase returns the QR code as an SVG data URI, which next/image cannot optimize. */}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img alt="QR code to scan with your authenticator app" className="size-44 rounded-control bg-white p-2" src={state.setup.qrCode} />
+            <div className="grid gap-5">
+              <p className="m-0 text-small text-(--text-secondary)">
+                Scan the QR code with your authenticator app, or type this key into it:
+                <code className="mt-1 block select-all break-all font-mono text-(--text-primary)">{state.setup.secret}</code>
+              </p>
+              <label className={fieldClass}>
+                <span>6-digit code from the app</span>
+                <input
+                  className={`${field} max-w-[220px]`}
+                  aria-invalid={Boolean(state.fieldErrors?.code)}
+                  autoComplete="one-time-code"
+                  disabled={pending}
+                  inputMode="numeric"
+                  maxLength={6}
+                  name="code"
+                  type="text"
+                />
+                {state.fieldErrors?.code ? (
+                  <small data-error="true" className={fieldErrorClass} role="alert">{state.fieldErrors.code}</small>
+                ) : null}
+              </label>
+            </div>
+          </div>
+        ) : state.enabled ? (
+          <label className={`${fieldClass} max-w-[420px]`}>
+            <span>Your password</span>
+            <div className="relative">
+              <input
+                className={`${field} pr-10`}
+                aria-invalid={Boolean(state.fieldErrors?.currentPassword)}
+                autoComplete="current-password"
+                disabled={pending}
+                name="currentPassword"
+                type={visible ? "text" : "password"}
+              />
+              <PasswordToggle className="right-1 size-8" visible={visible} onToggle={() => setVisible((v) => !v)} />
+            </div>
+            {state.fieldErrors?.currentPassword ? (
+              <small data-error="true" className={fieldErrorClass} role="alert">{state.fieldErrors.currentPassword}</small>
+            ) : (
+              <small>Needed to turn two-step login off.</small>
+            )}
+          </label>
+        ) : null}
+      </section>
+      {state.message ? (
+        <p
+          aria-live="polite"
+          className={statusMessageClass(state.status)}
+          role={state.status === "error" || state.status === "unauthorized" ? "alert" : "status"}
+        >
+          {state.message}
+        </p>
+      ) : null}
+      <div className="flex justify-end gap-3 max-[600px]:flex-col">
+        {state.setup ? (
+          <>
+            {/* Confirm comes first so pressing Enter in the code field submits it. */}
+            <button className={`${submitButtonClass} order-2 max-[600px]:order-none`} disabled={pending} name="op" type="submit" value="confirm">
+              {pending ? "Checking…" : "Confirm"}
+            </button>
+            <button className={button("secondary")} disabled={pending} name="op" type="submit" value="cancel">Cancel</button>
+          </>
+        ) : state.enabled ? (
+          <button className={submitButtonClass} disabled={pending} name="op" type="submit" value="disable">
+            {pending ? "Turning off…" : "Turn off"}
+          </button>
+        ) : (
+          <button className={submitButtonClass} disabled={pending} name="op" type="submit" value="start">
+            {pending ? "Starting…" : "Turn on"}
+          </button>
+        )}
       </div>
     </form>
   );

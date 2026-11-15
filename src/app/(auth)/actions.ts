@@ -187,11 +187,25 @@ export async function loginAction(
     );
   }
 
+  // Accounts with two-step login finish on the code screen; the database refuses everything until then.
+  if (data.user.factors?.some((factor) => factor.status === "verified")) {
+    redirect(`/login/verify?as=${expectedRole}`);
+  }
+
+  return finishLogin(supabase, data.user.id, expectedRole as LoginPortal);
+}
+
+/** The portal check, shared by the password step and the two-step code step. */
+async function finishLogin(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  userId: string,
+  expectedRole: LoginPortal,
+): Promise<AuthActionState> {
   if (expectedRole === "administrator") {
     const { data: administrator, error: administratorError } = await supabase
       .from("platform_admins")
       .select("user_id")
-      .eq("user_id", data.user.id)
+      .eq("user_id", userId)
       .maybeSingle<{ user_id: string }>();
 
     if (administratorError || !administrator) {
@@ -207,7 +221,7 @@ export async function loginAction(
   const { data: profile, error: profileError } = await supabase
     .from("profiles")
     .select("role")
-    .eq("id", data.user.id)
+    .eq("id", userId)
     .single<{ role: AppRole }>();
 
   if (profileError || !profile || !isAppRole(profile.role)) {
@@ -225,6 +239,46 @@ export async function loginAction(
     );
   }
 
+  redirect("/dashboard");
+}
+
+export async function verifyTwoStepAction(
+  _previousState: AuthActionState,
+  formData: FormData,
+): Promise<AuthActionState> {
+  const code = value(formData, "code").replace(/\s/g, "");
+  const portal = value(formData, "as");
+  const next = value(formData, "next");
+
+  if (!/^\d{6}$/.test(code)) {
+    return errorState("Check the highlighted fields.", {
+      code: "Enter the 6-digit code from your authenticator app.",
+    });
+  }
+
+  const supabase = await createClient();
+  const { data: factors, error: factorsError } = await supabase.auth.mfa.listFactors();
+  if (factorsError) redirect("/login");
+  // `totp` holds verified factors only. None means two-step login was reset meanwhile.
+  const factor = factors.totp[0];
+  if (!factor) redirect("/dashboard");
+
+  const { data, error } = await supabase.auth.mfa.challengeAndVerify({
+    factorId: factor.id,
+    code,
+  });
+
+  if (error) {
+    return errorState("Check the highlighted fields.", {
+      code:
+        error.status === 429
+          ? "Too many attempts. Wait a minute and try again."
+          : "That code is incorrect or expired. Enter the newest one.",
+    });
+  }
+
+  if (next === "/reset-password") redirect("/reset-password");
+  if (isLoginPortal(portal)) return finishLogin(supabase, data.user.id, portal);
   redirect("/dashboard");
 }
 

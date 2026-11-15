@@ -9,6 +9,7 @@ import type {
   PasswordActionState,
   PasswordField,
   SettingsActionState,
+  TwoStepActionState,
 } from "@/lib/settings/types";
 import { validateSettingsInput } from "@/lib/settings/validation";
 import { createClient } from "@/lib/supabase/server";
@@ -228,4 +229,95 @@ export async function changeEmailAction(
     status: "success",
     message: `Confirmation links were sent to your current email and ${newEmail}. Click both to finish the change.`,
   };
+}
+
+/** One action for the Two-step login panel; the submit button's `op` picks the step. */
+export async function twoStepAction(
+  previousState: TwoStepActionState,
+  formData: FormData,
+): Promise<TwoStepActionState> {
+  const op = String(formData.get("op") ?? "");
+  const supabase = await createClient();
+  const { data: factors, error: factorsError } = await supabase.auth.mfa.listFactors();
+
+  if (factorsError) {
+    return {
+      enabled: previousState.enabled,
+      status: "unauthorized",
+      message: "Your session has expired. Log in again before changing two-step login.",
+    };
+  }
+
+  // `totp` holds verified factors only.
+  const enabled = factors.totp.length > 0;
+  const idle: TwoStepActionState = { enabled, status: "idle", message: "" };
+
+  if (op === "start" && !enabled) {
+    // Supabase keeps factors from abandoned setups; remove them before starting again.
+    await Promise.all(
+      factors.all
+        .filter((factor) => factor.status === "unverified")
+        .map((factor) => supabase.auth.mfa.unenroll({ factorId: factor.id })),
+    );
+    const { data, error } = await supabase.auth.mfa.enroll({ factorType: "totp", issuer: "ThoraxScan" });
+    if (error) return { ...idle, status: "error", message: "Unable to start the setup. Try again." };
+    return { ...idle, setup: { factorId: data.id, qrCode: data.totp.qr_code, secret: data.totp.secret } };
+  }
+
+  if (op === "cancel" && previousState.setup) {
+    await supabase.auth.mfa.unenroll({ factorId: previousState.setup.factorId });
+    return idle;
+  }
+
+  if (op === "confirm" && previousState.setup) {
+    const code = String(formData.get("code") ?? "").replace(/\s/g, "");
+    const { error } = /^\d{6}$/.test(code)
+      ? await supabase.auth.mfa.challengeAndVerify({ factorId: previousState.setup.factorId, code })
+      : { error: true };
+
+    if (error) {
+      return {
+        ...idle,
+        setup: previousState.setup,
+        status: "error",
+        message: "Check the highlighted fields.",
+        fieldErrors: { code: "That code is incorrect or expired. Enter the newest 6-digit code." },
+      };
+    }
+
+    // Keep this device signed in; end every other session so none stays password-only.
+    await supabase.auth.signOut({ scope: "others" });
+    return {
+      enabled: true,
+      status: "success",
+      message: "Two-step login is on. You'll enter a code from your app each time you log in.",
+    };
+  }
+
+  if (op === "disable" && enabled) {
+    const currentPassword = String(formData.get("currentPassword") ?? "");
+    const { data: verified, error: verifyError } = currentPassword
+      ? await supabase.rpc("verify_own_password", { current_password: currentPassword })
+      : { data: false, error: null };
+
+    if (verifyError) return { ...idle, status: "error", message: "Unable to verify your password. Try again." };
+    if (!verified) {
+      return {
+        ...idle,
+        status: "error",
+        message: "Check the highlighted fields.",
+        fieldErrors: { currentPassword: currentPassword ? "Current password is incorrect." : "Enter your current password." },
+      };
+    }
+
+    const results = await Promise.all(
+      factors.totp.map((factor) => supabase.auth.mfa.unenroll({ factorId: factor.id })),
+    );
+    if (results.some((result) => result.error)) {
+      return { ...idle, status: "error", message: "Unable to turn off two-step login. Log in again and retry." };
+    }
+    return { enabled: false, status: "success", message: "Two-step login is off." };
+  }
+
+  return idle;
 }

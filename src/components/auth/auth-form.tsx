@@ -13,7 +13,9 @@ import {
   loginAction,
   registerAction,
   resetPasswordAction,
+  verifyTwoStepAction,
 } from "@/app/(auth)/actions";
+import { logoutAction } from "@/app/(protected)/actions";
 import { button } from "@/components/controls";
 import { fieldErrorClass, fieldErrorText } from "@/components/field-error";
 import { PasswordToggle } from "@/components/password-toggle";
@@ -25,13 +27,14 @@ import {
   TERMS_VERSION,
 } from "@/lib/legal/privacy";
 
-export type AuthMode = "login" | "register" | "forgot" | "reset";
+export type AuthMode = "login" | "register" | "forgot" | "reset" | "verify";
 
 const actions = {
   login: loginAction,
   register: registerAction,
   forgot: forgotPasswordAction,
   reset: resetPasswordAction,
+  verify: verifyTwoStepAction,
 };
 
 const submitLabels = {
@@ -39,6 +42,7 @@ const submitLabels = {
   register: "Create account",
   forgot: "Send reset link",
   reset: "Update password",
+  verify: "Verify",
 };
 
 const turnstileSiteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
@@ -52,15 +56,16 @@ const passwordRules = [
   ["A number", (p: string) => /\d/.test(p)],
 ] as const;
 
-export function AuthForm({ mode }: { mode: AuthMode }) {
+export function AuthForm({ mode, hiddenFields }: { mode: AuthMode; hiddenFields?: Record<string, string> }) {
   const [state, formAction, pending] = useActionState(
     actions[mode],
     initialAuthState,
   );
-  const showEmail = mode !== "reset";
-  const showPasswordField = mode !== "forgot";
+  // The two-step code screen has a signed-in session already: no email, password or captcha.
+  const showEmail = mode !== "reset" && mode !== "verify";
+  const showPasswordField = mode !== "forgot" && mode !== "verify";
   const showConfirmation = mode === "register" || mode === "reset";
-  const requiresCaptcha = mode !== "reset";
+  const requiresCaptcha = mode !== "reset" && mode !== "verify";
   const turnstileRef = useRef<TurnstileInstance | null>(null);
   const [captchaToken, setCaptchaToken] = useState("");
   const [captchaError, setCaptchaError] = useState("");
@@ -96,6 +101,33 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
           mode="register"
           error={state.fieldErrors?.expectedRole}
         />
+      )}
+
+      {hiddenFields && Object.entries(hiddenFields).map(([name, fieldValue]) => (
+        <input key={name} name={name} type="hidden" value={fieldValue} />
+      ))}
+
+      {mode === "verify" && (
+        <div className={fieldClass}>
+          <label htmlFor="verify-code">6-digit code</label>
+          <input
+            className={`${inputClass} text-center font-mono text-[22px] tracking-[8px]`}
+            id="verify-code"
+            name="code"
+            type="text"
+            inputMode="numeric"
+            autoComplete="one-time-code"
+            autoFocus
+            maxLength={6}
+            aria-invalid={Boolean(state.fieldErrors?.code)}
+            aria-describedby={state.fieldErrors?.code ? "verify-code-error" : undefined}
+          />
+          {state.fieldErrors?.code && (
+            <p className={fieldErrorClass} id="verify-code-error" role="alert">
+              {state.fieldErrors.code}
+            </p>
+          )}
+        </div>
       )}
 
       {mode === "register" && (
@@ -446,6 +478,17 @@ function AuthSwitch({ mode }: { mode: AuthMode }) {
     return (
       <p className="mt-7 mb-0 text-center text-[13px] leading-[1.5] text-[#d6e1f0] [&_a]:font-extrabold [&_a]:text-(--brand-blue-text) [&_a]:transition-colors [&_a]:duration-160 [&_a:hover]:text-white">
         Need an account? <Link href="/register">Create an account</Link>
+      </p>
+    );
+  }
+
+  if (mode === "verify") {
+    return (
+      <p className="mt-7 mb-0 text-center text-[13px] leading-[1.5] text-[#d6e1f0]">
+        Lost your phone? Ask an administrator to reset two-step login.{" "}
+        <button className="cursor-pointer border-0 bg-transparent p-0 font-extrabold text-(--brand-blue-text) transition-colors duration-160 hover:text-white" formAction={logoutAction} formNoValidate type="submit">
+          Use a different account
+        </button>
       </p>
     );
   }

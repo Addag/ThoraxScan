@@ -24,6 +24,9 @@ export async function getCurrentProfile() {
     .eq("id", userId)
     .single<Profile>();
 
+  // Raised by the database when this account uses two-step login and the session has not passed it.
+  if (error?.message === "two_step_required") redirect("/login/verify");
+
   if (error || !data) {
     return {
       authenticated: true as const,

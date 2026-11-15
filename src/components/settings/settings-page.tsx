@@ -19,6 +19,7 @@ export async function RoleSettingsPage({ role }: { role: AppRole }) {
         loadError={pageData.error}
         pendingEmail={pageData.pendingEmail}
         role={role}
+        twoStepEnabled={pageData.twoStepEnabled}
       />
     </PageMain>
   );

@@ -27,6 +27,11 @@ const authCopy = {
     eyebrow: "Account Recovery",
     subtitle: "Choose a new password",
   },
+  verify: {
+    title: "Two-Step Login",
+    eyebrow: "Verification code",
+    subtitle: "Enter the code from your authenticator app",
+  },
 } as const;
 
 // Font sizes here and in auth-form.tsx stay px: the auth pages keep a fixed marketing scale whatever the Accessibility text size.
@@ -35,8 +40,10 @@ export function AuthLayout({
   mode,
   message,
   messageStatus = "success",
+  hiddenFields,
 }: {
   mode: AuthMode;
+  hiddenFields?: Record<string, string>;
   message?: string;
   messageStatus?: "success" | "error";
 }) {
@@ -87,7 +94,7 @@ export function AuthLayout({
               {message}
             </p>
           )}
-          <AuthForm mode={mode} />
+          <AuthForm mode={mode} hiddenFields={hiddenFields} />
           <p className="mt-5 text-center text-[12px] leading-[1.5] text-[#b9c8dd]">
             <Link className="font-semibold text-[#9fd1ff] underline underline-offset-2" href="/privacy-policy">Privacy Policy</Link>
             {" · "}<Link className="font-semibold text-[#9fd1ff] underline underline-offset-2" href="/terms">Terms</Link>

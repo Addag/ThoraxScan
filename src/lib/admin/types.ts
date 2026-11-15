@@ -45,7 +45,7 @@ export type AccountProjection = {
   is_admin: boolean;
 };
 
-export type AccountOperation = "rename" | "password" | "signout" | "disable" | "enable" | "delete";
+export type AccountOperation = "rename" | "password" | "signout" | "twostep" | "disable" | "enable" | "delete";
 
 export type PlatformStats = {
   students: number;

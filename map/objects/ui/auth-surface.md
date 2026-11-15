@@ -23,6 +23,7 @@ One form component keeps field states, requested application role, selected logi
 - The role selector renders first on both login and register; registration offers Student or Professor as `requestedRole`, login adds Administrator as an `expectedRole` portal in [auth-form.tsx](<../../../src/components/auth/auth-form.tsx:68>) and [RoleSelector](<../../../src/components/auth/auth-form.tsx:356>).
 - Registration agreement checkboxes (Terms and Privacy Policy) use their visible text as the label and set `aria-describedby` only to their error id while an error shows, in [auth-form.tsx](<../../../src/components/auth/auth-form.tsx:211>). Registration asks no age group and offers no research consent.
 - Password fields carry a client-only show/hide toggle (`.auth-password-control`) in [auth-form.tsx](<../../../src/components/auth/auth-form.tsx:133>); it changes no field names.
+- A fifth mode, `verify` (audited 2026-11-15), renders only a 6-digit `code` field plus hidden `as`/`next` values passed from [the verify page](<../../../src/app/(auth)/login/verify/page.tsx>) through `hiddenFields`; it needs no CAPTCHA because the password step already produced a session. Its "Use a different account" button submits `logoutAction`.
 
 ## Connected to
 

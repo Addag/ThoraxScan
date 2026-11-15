@@ -10,6 +10,7 @@ export type AuthField =
   | "password"
   | "confirmPassword"
   | "captchaToken"
+  | "code"
   | "expectedRole"
   | "requestedRole"
   | "termsAccepted"

@@ -30,6 +30,8 @@ export async function getSettingsPageData(profileId: string) {
     email: userResult.data.user?.email ?? "",
     pendingEmail: userResult.data.user?.new_email ?? null,
     settings: projectSettings(settingsResult.data),
+    twoStepEnabled:
+      userResult.data.user?.factors?.some((factor) => factor.status === "verified") ?? false,
     error:
       userResult.error || settingsResult.error
         ? "Some account settings could not be loaded. Reload before saving changes."

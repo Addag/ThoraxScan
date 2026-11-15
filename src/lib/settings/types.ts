@@ -31,6 +31,15 @@ export type EmailActionState = {
   fieldErrors?: Partial<Record<EmailField, string>>;
 };
 
+export type TwoStepActionState = {
+  status: "idle" | "error" | "success" | "unauthorized";
+  message: string;
+  fieldErrors?: Partial<Record<"code" | "currentPassword", string>>;
+  enabled: boolean;
+  /** Present only between "Turn on" and the confirming code. */
+  setup?: { factorId: string; qrCode: string; secret: string };
+};
+
 export const initialSettingsActionState: SettingsActionState = {
   status: "idle",
   message: "",

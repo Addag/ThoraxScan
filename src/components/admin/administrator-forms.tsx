@@ -96,6 +96,7 @@ function ActionMessage({ state }: { state: AdminReviewActionState }) {
 
 const confirmCopy: Record<Exclude<AccountOperation, "rename" | "password">, { title: string; label: string; danger: boolean; body: string }> = {
   signout: { title: "Sign out everywhere?", label: "Sign out", danger: false, body: "will be signed out on every device." },
+  twostep: { title: "Reset two-step login?", label: "Reset", danger: false, body: "will log in with only a password until they turn two-step login on again, and will be signed out on every device." },
   disable: { title: "Disable sign-in?", label: "Disable", danger: true, body: "will be signed out and can't log in until you enable the account again." },
   enable: { title: "Enable sign-in?", label: "Enable", danger: false, body: "will be able to log in again." },
   delete: { title: "Delete account?", label: "Delete account", danger: true, body: "will be permanently deleted with their settings and memberships. This can't be undone." },
@@ -142,6 +143,7 @@ export function ManageAccountForms({ account }: { account: AccountProjection }) 
       <form className="flex flex-wrap gap-2" action={formAction}>
         <input type="hidden" name="targetUserId" value={id} />
         <button className={button("secondary")} type="button" disabled={pending} onClick={() => setConfirming("signout")}>Sign out everywhere</button>
+        <button className={button("secondary")} type="button" disabled={pending} onClick={() => setConfirming("twostep")}>Reset two-step login</button>
         {account.disabled ? (
           <button className={button("secondary")} type="button" disabled={pending} onClick={() => setConfirming("enable")}>Enable sign-in</button>
         ) : (

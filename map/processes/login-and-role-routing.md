@@ -18,6 +18,7 @@ Credentials, selected portal, and Turnstile token → Supabase authentication an
 4. Administrator selection checks `platform_admins`, signs out unauthorized callers, and redirects authorized callers to `/admin` in [actions.ts](<../../src/app/(auth)/actions.ts:171>).
 5. Student/Professor selection reads the trusted profile role; a missing, invalid, or mismatched profile signs out and returns an error in [actions.ts](<../../src/app/(auth)/actions.ts:188>).
 6. Student and Professor logins route through `/dashboard`; the dashboard redirects pending/rejected Professors to `/professor/application` in [dashboard/page.tsx](<../../src/app/(protected)/dashboard/page.tsx:28>).
+6a. Optional two-step login (audited 2026-11-15): when the signed-in user has a verified authenticator-app factor, `loginAction` skips the portal check and redirects to `/login/verify?as=<portal>` in [actions.ts](<../../src/app/(auth)/actions.ts>). `verifyTwoStepAction` runs `mfa.challengeAndVerify`, then the shared `finishLogin` portal check (steps 4–5). Until the code is accepted the database refuses the session; see [Auth session and claims](../objects/identity/auth-session.md).
 7. Destination pages re-check the role plus Professor approval or administrator capability before rendering in [auth server guards](<../../src/lib/auth/server.ts:65>).
 
 ## Consumes
@@ -43,7 +44,7 @@ Credentials, selected portal, and Turnstile token → Supabase authentication an
 
 ### Does not hit
 
-- Password-reset mechanics unless authentication session behavior changes.
+- Password-reset mechanics unless authentication session behavior changes. (The reset page does send two-step accounts through `/login/verify?next=/reset-password` first.)
 - Registration and Professor review decisions; login only consumes their resulting records.
 
 ## See
