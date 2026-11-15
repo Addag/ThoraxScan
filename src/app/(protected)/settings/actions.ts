@@ -265,7 +265,11 @@ export async function twoStepAction(
   }
 
   if (op === "cancel" && previousState.setup) {
-    await supabase.auth.mfa.unenroll({ factorId: previousState.setup.factorId });
+    // The factor id comes back from the browser, so only remove a setup that was never confirmed.
+    // Removing a confirmed factor must go through "disable", which asks for the password.
+    const setupId = previousState.setup.factorId;
+    const pending = factors.all.find((factor) => factor.id === setupId && factor.status === "unverified");
+    if (pending) await supabase.auth.mfa.unenroll({ factorId: pending.id });
     return idle;
   }
 
