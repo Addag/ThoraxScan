@@ -77,12 +77,12 @@ const userTopics: Topic[] = [
       <ol className={steps}>
         <li>Open <b>Learning mode</b> from the sidebar (Students and Professors).</li>
         <li>Pick an image from the built-in CheXpert library, or choose your own JPEG or PNG, frontal or lateral.</li>
-        <li>Select <b>Analyze</b>. The model runs in your browser and shows findings, every label, and a heatmap for each likely or possible finding.</li>
+        <li>Select <b>Analyze</b>. The model runs in your browser and shows findings, every label, and a heatmap for each likely or possible finding. An image that doesn&rsquo;t look like a chest X-ray is refused and not analyzed.</li>
         <li>Results aren&rsquo;t saved: no submission, no upload, no stored result. <b>Reset</b> clears them.</li>
         <li>On a library case you can keep a private note for your own review. Notes are saved to your account and nobody else can see them.</li>
       </ol>
     ),
-    sources: ["map/processes/student-learning-mode-inference.md", "map/objects/ui/student-learning-mode-surface.md", "map/objects/learning/learning-case-note.md"],
+    sources: ["map/processes/student-learning-mode-inference.md", "map/objects/ui/student-learning-mode-surface.md", "map/objects/learning/chest-gate.md", "map/objects/learning/learning-case-note.md"],
   },
   {
     id: "doc-class",
@@ -104,12 +104,12 @@ const userTopics: Topic[] = [
     body: (
       <ol className={steps}>
         <li>Create a draft with a title, instructions and an optional due date.</li>
-        <li>Attach one frontal chest X-ray: upload a JPEG or PNG, or pick one from the built-in library. Images that look like lateral views are rejected.</li>
+        <li>Attach one frontal chest X-ray: upload a JPEG or PNG, or pick one from the built-in library. Images that aren&rsquo;t chest X-rays, or that look like lateral views, are rejected.</li>
         <li>Write the reference evaluation. Students never see it.</li>
         <li>Publish. A published activity&rsquo;s case can&rsquo;t be replaced; archiving is final.</li>
       </ol>
     ),
-    sources: ["map/processes/activity-authoring-publication.md", "map/objects/learning/view-detector.md"],
+    sources: ["map/processes/activity-authoring-publication.md", "map/objects/learning/chest-gate.md", "map/objects/learning/view-detector.md"],
   },
   {
     id: "doc-review",
@@ -152,7 +152,7 @@ const devTopics: Topic[] = [
           <tr><td>src/lib</td><td>Server data access, validation, analytics, and the in-browser inference runtime</td></tr>
           <tr><td>supabase</td><td>SQL migrations, pgTAP database tests and email templates</td></tr>
           <tr><td>scripts</td><td>Model-release CLI, ONNX Runtime asset prep, CheXpert library import, guide rendering</td></tr>
-          <tr><td>model-export</td><td>ONNX export with the heatmap output, and view-detector training</td></tr>
+          <tr><td>model-export</td><td>ONNX export with the heatmap output, and view-detector and chest-gate training</td></tr>
           <tr><td>public</td><td>Images, the built-in X-ray library, guides and ONNX Runtime assets</td></tr>
           <tr><td>docs · map</td><td>Operator docs, and the source-backed system map</td></tr>
         </tbody>

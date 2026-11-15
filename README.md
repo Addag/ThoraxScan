@@ -233,8 +233,16 @@ can change without an app deployment; a contract change needs one.
 
 A small server-side view detector also rejects lateral images in Professor
 activity uploads. [`docs/models.md`](docs/models.md) documents every model:
-all nine training runs, all fifteen release bundles, the view detector, and the
-models used only during development.
+all nine training runs, all fifteen release bundles, the view detector, the
+chest X-ray gate, and the models used only during development.
+
+A second small classifier, the chest X-ray gate, refuses images that are not
+chest X-rays (photos, documents, other scans). It runs in the browser before
+Learning Mode analysis, because those images are never uploaded, and on the
+server during Professor activity uploads. Its training data and measured
+results are in [`docs/models.md`](docs/models.md#chest-x-ray-gate), and its
+design notes are in
+[`map/objects/learning/chest-gate.md`](map/objects/learning/chest-gate.md).
 
 Releases move through three places:
 

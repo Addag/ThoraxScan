@@ -21,6 +21,7 @@ can be reproduced.
 | `preprocessing_shortside320.py` | Short-side-320 reference preprocessing and fixture |
 | `eval_localization.py` | NIH pointing-game score for the maps |
 | `train_view_detector.py` | Frontal/lateral detector for Professor case upload |
+| `train_chest_gate.py` | Chest X-ray gate for Learning Mode and Professor case upload |
 | `test_*.py` | Exporter, CAM, rollout, and preprocessing checks |
 
 Install with `requirements.txt`; `requirements-lock.txt` pins the verified

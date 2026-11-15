@@ -1,13 +1,16 @@
 # ThoraxScan models
 
 Every AI model ThoraxScan has trained, shipped, or evaluated. ThoraxScan uses
-two models in the app:
+three models in the app:
 
 - **The finding classifier** (`thoraxscan-classifier` slot) runs in the browser
   and predicts 14 chest X-ray findings with a heatmap for each one. It has gone
   through nine training runs and fifteen release bundles.
 - **The view detector** runs on the server and rejects lateral images when a
   Professor uploads an activity case.
+- **The chest X-ray gate** refuses images that are not chest X-rays. It runs in
+  the browser before Learning Mode analysis and on the server when a Professor
+  uploads an activity case.
 
 Two more models were used only during development (see
 [Development-only models](#development-only-models)).
@@ -206,6 +209,30 @@ Logistic regression caught only 94.3% of laterals at the same frontal limit,
 and 64 hidden units gave no gain over 32. Learning Mode does not use the
 detector.
 
+## Chest X-ray gate
+
+| | |
+|---|---|
+| Version | `chest-mlp64-32px-v2`, plus a shape rule in code |
+| Purpose | Refuses images that are not chest X-rays, so the finding classifier never scores a photo, a document, or another kind of scan |
+| Runs | In the browser before Learning Mode analysis (those images are never uploaded), and server-side in Professor activity uploads, before the view detector. Both use `src/lib/chest-gate/` |
+| Checks, in order | Width ÷ height within 0.72–1.6; colourfulness at most 0.08; then a 32×32 grayscale thumbnail → 64 ReLU units → sigmoid, score at least 0.065 |
+| Training | scikit-learn `MLPClassifier` via `model-export/train_chest_gate.py`: 30,000 CheXpert chest X-rays against photos (Imagenette), abdominal CT, breast ultrasound and retinal fundus images (MedMNIST+), generated report documents, and 4,026 FracAtlas limb, hip and shoulder X-rays |
+| Held-out chest X-rays (5,000) | 12 refused, about 1 in 400: 5 by the classifier and 7 by the shape rule |
+| Held-out non-chest images (5,761) | 5,653 caught by the classifier and colour rule alone: documents, ultrasound and fundus 100%, photos 98.5%, FracAtlas X-rays 98.3%, abdominal CT 95.5% |
+| Official 234 | None refused |
+
+The first version (v1) had no limb X-rays in training and passed 26% of
+FracAtlas images; v2 added them. 32 hidden units could not separate limb from
+chest X-rays without refusing far more chest films, so the gate uses 64. The
+shape rule exists because the thumbnail squashes every image square, so a tall
+crop of a foot or arm looked like a chest. A retrain on tightly cropped images
+(v3) did not fix that and passed more abdominal CT, so v2 weights stayed.
+
+Activity AI analysis does not run the gate, because an activity's case already
+passed it at upload. Design notes and known gaps are in
+[`map/objects/learning/chest-gate.md`](../map/objects/learning/chest-gate.md).
+
 ## Development-only models
 
 - **FastViT-SA12 v4** is the distillation teacher for v5 through v8. Its
@@ -222,6 +249,9 @@ detector.
   it is still the largest source of misses.
 - **Lateral views** were in training but are only lightly evaluated (32 official
   images), so activities accept frontal images only.
+- **Chest X-ray gate:** about 1 in 400 chest X-rays is refused, with no
+  override. Spine, skull, abdomen and pelvis films were not in its training
+  and may pass; abdominal CT slices pass about 1 in 22.
 - **Threshold trade-off:** thresholds tuned on radiologist labels catch more
   findings but more than double false alarms, so they were not adopted.
 - **Label noise:** CheXpert train and all NIH labels are mined from radiology
