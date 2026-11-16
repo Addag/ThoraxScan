@@ -251,7 +251,8 @@ join public.profiles as profile on profile.id = administrator.user_id
 join auth.users as auth_user on auth_user.id = administrator.user_id;
 ```
 
-The administrator then selects **Administrator** on the normal login page and is routed to `/admin`.
+The administrator then logs in as usual, as the Student or Professor they are,
+and opens **Administration** in the sidebar to reach `/admin`.
 
 After the first administrator exists, add or remove others from the
 **Administrators** section of `/admin`. Administrators cannot remove themselves,

@@ -18,7 +18,7 @@ Administrator authority is stored separately from `Profile.role`, preserving the
 
 - `public.platform_admins.user_id` is a profile-backed primary key and deletion of the profile cascades to the capability in [the approval migration](<../../../supabase/migrations/20260817124643_professor_approval_administration.sql:1>). Since [the admin management migration](<../../../supabase/migrations/20261024130000_platform_admin_management.sql>), `created_by` and `professor_applications.reviewed_by` reference `profiles`, so removing a capability keeps the name on past grants and reviews.
 - RLS exposes only the authenticated caller's capability row in [the approval migration](<../../../supabase/migrations/20260817124643_professor_approval_administration.sql:54>).
-- Administrator login and protected-page access each re-check that row in [auth actions](<../../../src/app/(auth)/actions.ts:151>) and [auth server guards](<../../../src/lib/auth/server.ts:86>). The dashboard uses the shared Tailwind primitives in [dashboard-ui.tsx](<../../../src/components/dashboard-ui.tsx>).
+- Protected-page access re-checks that row through `requirePlatformAdmin`, and the Student and Professor shells call `isPlatformAdmin` to show an Administration sidebar link, both in [auth server guards](<../../../src/lib/auth/server.ts>). Since 2026-11-16 the login form has no Administrator option; the server-side `administrator` portal check remains in [auth actions](<../../../src/app/(auth)/actions.ts>) but no UI submits it. The dashboard uses the shared Tailwind primitives in [dashboard-ui.tsx](<../../../src/components/dashboard-ui.tsx>).
 - The first capability is inserted by an operator using the documented bootstrap statement in [README.md](<../../../README.md:47>); no public self-provisioning path exists.
 - After that, administrators list, grant (by email of a confirmed account), and revoke capabilities through `list_platform_admins`, `grant_platform_admin`, and `revoke_platform_admin` in [the admin management migration](<../../../supabase/migrations/20261024130000_platform_admin_management.sql>). Revoke refuses the caller's own row, so at least one administrator always remains; it share-locks the caller's row so two administrators cannot remove each other at once.
 
@@ -26,13 +26,13 @@ Administrator authority is stored separately from `Profile.role`, preserving the
 
 ## Connected to
 
-Connected to the [Professor application](professor-application.md), the `LoginPortal` administrator option, the review RPC, and the [Administrator approval surface](../ui/administrator-approval-surface.md). It looks like an application role but is not part of `AppRole` or workspace membership.
+Connected to the [Professor application](professor-application.md), the Administration link in the Student and Professor shells, the (now UI-less) `LoginPortal` administrator value, the review RPC, and the [Administrator approval surface](../ui/administrator-approval-surface.md). It looks like an application role but is not part of `AppRole` or workspace membership.
 
 ## If you change this
 
 ### Hits
 
-- Administrator login, `/admin` protection, application listing, review authorization, and bootstrap instructions.
+- The shells' Administration link, `/admin` protection, application listing, review authorization, and bootstrap instructions.
 
 ### Does not hit
 

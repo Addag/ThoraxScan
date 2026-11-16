@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 
 import { AppShell } from "@/components/app-shell";
+import { isPlatformAdmin } from "@/lib/auth/server";
 import { getNotifications } from "@/lib/notifications/server";
 
 export async function ProfessorShell({
@@ -28,6 +29,7 @@ export async function ProfessorShell({
         { label: "Learning Mode", href: "/professor/learning", icon: "learning.png", active: activeItem === "learning" },
         { label: "Attention Maps", href: "/professor/attention", icon: "attention.png", active: activeItem === "attention" },
         { label: "User Profile", href: "/professor/settings", icon: "settings.png", active: activeItem === "settings" },
+        ...((await isPlatformAdmin()) ? [{ label: "Administration", href: "/admin", icon: "application.svg" }] : []),
       ]}
       sectionLabel={sectionLabel}
       sectionDescription={sectionDescription}

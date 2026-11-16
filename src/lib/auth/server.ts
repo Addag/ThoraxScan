@@ -91,14 +91,21 @@ export async function requirePlatformAdmin() {
 
   if (!result.authenticated) redirect("/login");
   if (!result.profile) redirect("/dashboard");
+  if (!(await isPlatformAdmin(result.profile.id))) redirect("/dashboard");
+  return result.profile;
+}
 
+/** Whether this user (default: the signed-in one) is a platform administrator. */
+export async function isPlatformAdmin(userId?: string) {
   const supabase = await createClient();
+  const id = userId ?? (await supabase.auth.getClaims()).data?.claims?.sub;
+  if (!id) return false;
+
   const { data, error } = await supabase
     .from("platform_admins")
     .select("user_id")
-    .eq("user_id", result.profile.id)
+    .eq("user_id", id)
     .maybeSingle<{ user_id: string }>();
 
-  if (error || !data) redirect("/dashboard");
-  return result.profile;
+  return !error && !!data;
 }

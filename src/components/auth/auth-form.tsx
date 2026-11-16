@@ -385,7 +385,7 @@ function RoleSelector({
       aria-describedby={error ? `${descriptionId} ${errorId}` : descriptionId}
     >
       <legend className="sr-only">Account type</legend>
-      <div className={mode === "login" ? "grid grid-cols-3 gap-3" : "grid grid-cols-2 gap-[26px] max-[420px]:grid-cols-1 max-[420px]:gap-3"}>
+      <div className={mode === "login" ? "grid grid-cols-2 gap-3" : "grid grid-cols-2 gap-[26px] max-[420px]:grid-cols-1 max-[420px]:gap-3"}>
         <div className="relative min-w-0">
           <input
             className="peer sr-only"
@@ -433,22 +433,7 @@ function RoleSelector({
           </label>
         </div>
 
-        {mode === "login" && (
-          <div className="relative min-w-0">
-            <input
-              className="peer sr-only"
-              id="login-role-administrator"
-              name="expectedRole"
-              type="radio"
-              value="administrator"
-            />
-            <label className="relative flex h-32 cursor-pointer flex-col items-center justify-center overflow-hidden rounded-panel border border-[rgb(153_191_240/32%)] bg-(--glass-inset) text-center text-(--text-primary) shadow-(--glass-inset-shadow) transition-[background-color,border-color,transform] duration-[160ms] hover:bg-[rgba(0,119,255,0.28)] peer-checked:border-[#0077ff] peer-checked:bg-[rgba(0,119,255,0.6)] peer-focus-visible:outline-3 peer-focus-visible:outline-white peer-focus-visible:outline-offset-4 peer-active:[transform:translateY(1px)]" htmlFor="login-role-administrator">
-              <span className="absolute top-[13px] grid size-[66px] place-items-center rounded-[18px] border-2 border-[#8bc9ff] text-[42px] leading-none text-[#d5edff]" aria-hidden="true">◇</span>
-              <span className="absolute right-3 bottom-6 left-3 text-[17px] font-extrabold leading-[1.2] max-sm:inset-x-1 max-sm:bottom-3 max-sm:text-[11px]">Administrator</span>
-              <span className="absolute right-3 bottom-[7px] left-3 mx-auto max-w-[170px] text-[11px] leading-[1.3] text-[#d0d4e6] max-sm:hidden">Professor approvals</span>
-            </label>
-          </div>
-        )}
+        
       </div>
 
       <p className="mx-1 mt-3 mb-0 text-center text-[13px] leading-[1.5] text-[#d6e1f0]" id={descriptionId}>

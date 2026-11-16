@@ -226,7 +226,7 @@ const devTopics: Topic[] = [
         <li>Administrator is a separate capability, not a registration role.</li>
         <li>An operator adds the first administrator once, directly in the database, after that person has registered and confirmed their email.</li>
         <li>From then on, administrators add or remove others in the Administrators section of <code className={code}>/admin</code>. Nobody can remove themselves, so one always remains.</li>
-        <li>Administrators sign in by choosing <b>Administrator</b> on the normal login page.</li>
+        <li>Administrators log in as the Student or Professor they are, then open <b>Administration</b> in the sidebar. The console&rsquo;s <b>My dashboard</b> link goes back.</li>
         <li>The console at <code className={code}>/admin</code> also reviews Professor applications, manages accounts (rename, temporary password, sign out, reset two-step login, disable, delete), posts site-wide notices, and shows platform statistics, an activity feed and a Professor report (CSV). Every administrator action is logged.</li>
       </ul>
     ),

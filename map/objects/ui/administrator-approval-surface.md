@@ -8,7 +8,7 @@ snapshot: main @ 391ebdb + working tree
 
 # Administrator approval surface
 
-The `/admin` area is a role-independent, capability-protected console. Home (`/admin`) shows platform totals, a per-Professor report with CSV export (`/admin/report`), a platform activity feed, and the [admin action log](../runtime/admin-action-log.md). Applications (`/admin/applications`) reviews Professor applications. Accounts (`/admin/accounts`) manages accounts and administrators. Notices (`/admin/notices`) posts [site notices](../runtime/site-notice.md). `AdminShell` takes an `activeItem` for the four nav entries.
+The `/admin` area is a role-independent, capability-protected console. Home (`/admin`) shows platform totals, a per-Professor report with CSV export (`/admin/report`), a platform activity feed, and the [admin action log](../runtime/admin-action-log.md). Applications (`/admin/applications`) reviews Professor applications. Accounts (`/admin/accounts`) manages accounts and administrators. Notices (`/admin/notices`) posts [site notices](../runtime/site-notice.md). `AdminShell` takes an `activeItem` for the four nav entries and adds a "My dashboard" link to `/dashboard`. Administrators enter from the Administration link that the Student and Professor shells show when `isPlatformAdmin` is true.
 
 ## Why this shape
 

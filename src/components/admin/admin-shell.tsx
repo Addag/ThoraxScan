@@ -17,7 +17,10 @@ export function AdminShell({ children, activeItem = "home" }: { children: ReactN
       accessTone="warning"
       navLabel="Administration"
       navAriaLabel="Administrator navigation"
-      navItems={Object.entries(sections).map(([key, item]) => ({ ...item, active: key === activeItem }))}
+      navItems={[
+        ...Object.entries(sections).map(([key, item]) => ({ ...item, active: key === activeItem })),
+        { label: "My dashboard", href: "/dashboard", icon: "dashboard.png" },
+      ]}
       sectionLabel="Administration"
       sectionDescription={sections[activeItem].description}
       footerNotes={["Restricted administrator surface", "Account and platform operations"]}
