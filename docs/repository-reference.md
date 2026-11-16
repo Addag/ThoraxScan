@@ -2,18 +2,18 @@
 
 [Start with the beginner guide](beginner-guide.md). This reference helps you find files after you understand the main concepts.
 
-Inventory baseline: `a25613a`, reviewed 16 November 2026. It accounts for all 645 tracked files at that commit. It excludes generated/ignored files, the new guide/reference themselves, and uncommitted work. The working tree was changing during writing; this is a fixed baseline inventory, not an assertion that later files do not exist.
+Inventory baseline: `a25613a`, reviewed 16 November 2026. It accounts for all 645 tracked files at that commit, plus the two files added by the answer-key commit `2f9a6d1` (updated 17 November 2026), for 647. It excludes generated/ignored files, the guide/reference themselves, and uncommitted work. Files added after `2f9a6d1` may be missing.
 
 Export names below were extracted from source declarations at the baseline. They are navigation aids, not a complete function/API specification. Migration topics come from filenames; read the SQL and later replacements to establish actual behavior. Links open the current checkout, so declarations may differ after edits.
 
-| Area | Tracked files at baseline |
+| Area | Tracked files at `2f9a6d1` |
 |---|---:|
 | [Root configuration and notes](#root-configuration-and-notes) | 17 |
 | [Application routes and actions](#application-routes-and-actions) | 52 |
-| [Interface components](#interface-components) | 58 |
+| [Interface components](#interface-components) | 59 |
 | [Application libraries](#application-libraries) | 63 |
 | [Request proxy](#request-proxy) | 1 |
-| [Database migrations](#database-migrations) | 32 |
+| [Database migrations](#database-migrations) | 33 |
 | [Database tests](#database-tests) | 16 |
 | [Database configuration and supporting files](#database-configuration-and-supporting-files) | 10 |
 | [Maintenance scripts](#maintenance-scripts) | 9 |
@@ -27,10 +27,6 @@ Export names below were extracted from source declarations at the baseline. They
 
 - [beginner-guide.md](beginner-guide.md): beginner lessons, setup, architecture, feature traces, exercises, and verification.
 - [repository-reference.md](repository-reference.md): this baseline inventory.
-
-## Work in progress observed while writing
-
-An untracked `supabase/migrations/20261116120000_professor_validated_answer_key.sql` and edits to submission code appeared during inspection. The SQL introduces a Professor-validated label/heatmap answer key and changes activity/submission rules. Its integration, application status, and tests were not verified for this guide. Review the completed change before teaching that workflow. Do not apply unfinished migrations simply to follow a tutorial.
 
 ## Root configuration and notes
 
@@ -155,6 +151,7 @@ An untracked `supabase/migrations/20261116120000_professor_validated_answer_key.
 | [src/components/notification-bell.tsx](../src/components/notification-bell.tsx) | Declared exports: `NotificationBellButton`, `NotificationPanel`. |
 | [src/components/password-toggle.tsx](../src/components/password-toggle.tsx) | Declared exports: `PasswordToggle`. |
 | [src/components/professor/activity-forms.tsx](../src/components/professor/activity-forms.tsx) | Client entry; Declared exports: `ActivityDetailsForm`, `CaseUploadForm`, `ActivityLifecycleControls`. |
+| [src/components/professor/answer-key-form.tsx](../src/components/professor/answer-key-form.tsx) | Client entry; Declared exports: `AnswerKeyForm`, `LabelTags`. The Professor's answer-key validation; see the [guide's answer-key walkthrough](beginner-guide.md#the-answer-key). |
 | [src/components/professor/activity-library.browser.test.tsx](../src/components/professor/activity-library.browser.test.tsx) | Automated browser test. |
 | [src/components/professor/faculty-evaluation-form.browser.test.tsx](../src/components/professor/faculty-evaluation-form.browser.test.tsx) | Automated browser test. |
 | [src/components/professor/faculty-evaluation-form.tsx](../src/components/professor/faculty-evaluation-form.tsx) | Client entry; Declared exports: `FacultyEvaluationForm`. |
@@ -284,6 +281,7 @@ An untracked `supabase/migrations/20261116120000_professor_validated_answer_key.
 | [supabase/migrations/20261111130000_notification_feedback.sql](../supabase/migrations/20261111130000_notification_feedback.sql) | Migration topic from filename: notification feedback. Read later migrations for replacements. |
 | [supabase/migrations/20261114120000_professor_only_activity_ai_claim.sql](../supabase/migrations/20261114120000_professor_only_activity_ai_claim.sql) | Migration topic from filename: professor only activity ai claim. Read later migrations for replacements. |
 | [supabase/migrations/20261115120000_two_step_login.sql](../supabase/migrations/20261115120000_two_step_login.sql) | Migration topic from filename: two step login. Read later migrations for replacements. |
+| [supabase/migrations/20261116120000_professor_validated_answer_key.sql](../supabase/migrations/20261116120000_professor_validated_answer_key.sql) | Migration topic from filename: professor validated answer key. Adds the answer key, label submissions and scoring. Read later migrations for replacements. |
 
 ## Database tests
 

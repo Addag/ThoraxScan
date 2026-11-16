@@ -2,7 +2,7 @@
 
 This guide is for groupmates who are new to coding. It explains what the project contains, how its parts work together, and how to start contributing.
 
-**Source baseline:** commit `a25613a`, reviewed on 16 November 2026. Links point to files in your checkout, which can change. During writing, an uncommitted Professor-validated answer-key migration and submission changes appeared in the working tree. The activity and submission walkthroughs below describe the committed baseline; they must be revised when that work lands. I cannot confirm the deployed version, active hosted model, or whether the uncommitted migration has been applied. This is a source walkthrough, not a report that every setup step or feature was run successfully.
+**Source baseline:** commit `a25613a`, reviewed on 16 November 2026; the activity, submission, and grading sections were updated on 17 November 2026 for the Professor-validated answer key (commit `2f9a6d1`). Links point to files in your checkout, which can change. I cannot confirm the deployed version, active hosted model, or whether the answer-key migration has been applied to a hosted project. This is a source walkthrough, not a report that every setup step or feature was run successfully.
 
 ThoraxScan is an educational application. Its README states that it has not been clinically validated and must not be used for patient care. Keep that limitation when explaining or changing AI result wording. [Source: project README](../README.md).
 
@@ -145,7 +145,7 @@ On a fresh disposable local database, apply the migrations by resetting it:
 npx supabase db reset
 ```
 
-**A reset deletes and rebuilds the local database.** Do not repeat it when you need to keep local work. Before a reset, inspect the migration folder for unfinished work: reset runs the files present in your checkout, including new local SQL files. At this guide's baseline, an answer-key migration was being developed; ask the teammate working on it for a coherent revision before using that checkout for lessons.
+**A reset deletes and rebuilds the local database.** Do not repeat it when you need to keep local work. Before a reset, inspect the migration folder for unfinished work: reset runs the files present in your checkout, including new local SQL files. If a teammate has unfinished migrations in the checkout, ask them for a coherent revision before using it for lessons.
 
 Create `.env.local` only if it does not already exist:
 
@@ -211,22 +211,22 @@ The [repository reference](repository-reference.md) lists tracked files across t
 This function appears in the committed [submission validation](../src/lib/submissions/validation.ts):
 
 ```ts
-export function normalizeSubmission(input: SubmissionValues): SubmissionValues {
-  // Read the source file for the function body.
+export function validateSubmission(values: SubmissionValues): SubmissionFieldErrors {
+  const error = labelsError(values.labels);
+  return error ? { labels: error } : {};
 }
 ```
 
-This excerpt shows the declaration only; it is not a replacement implementation.
-
 - `export` lets another file import the function.
 - `function` declares a reusable operation.
-- `normalizeSubmission` is its name.
-- `input` is the value passed in by the caller.
+- `validateSubmission` is its name.
+- `values` is the value passed in by the caller.
 - `: SubmissionValues` describes the expected input shape.
-- The second `: SubmissionValues` describes the returned shape.
+- `: SubmissionFieldErrors` describes the returned shape: an object of error messages, empty when the input is acceptable.
 - `{ ... }` encloses the work the function performs.
+- `condition ? a : b` returns `a` when the condition is true, otherwise `b`.
 
-In the baseline implementation, normalization trims fields and clears descriptive fields for a `normal` classification. Validation is a separate function. The [tests](../src/lib/submissions/validation.test.ts) show examples of accepted and rejected values.
+The same file has `normalizeLabels` (keeps known labels in the fixed order, without repeats), `labelsError` (at least one label; `No Finding` only on its own), and `scoreLabels` (the scoring formula described in section 10.1). The [tests](../src/lib/submissions/validation.test.ts) show examples of accepted and rejected values.
 
 ### 6.3 Recognize frequently used expressions
 
@@ -349,21 +349,29 @@ The built-in gallery is different: its JPEGs are static files under `public/imag
 
 ### 10.1 Student submission: a complete form journey
 
-This walkthrough describes baseline `a25613a`; the answer-key work mentioned above changes this area.
+Students answer by ticking labels from the model's 14 (for example `Cardiomegaly`, `Pleural Effusion`, or `No Finding`) instead of writing findings. A final answer is scored against the Professor's answer key (section 10.2).
 
 ```text
-Activity page -> submission form -> Server Action -> validation
-     -> save_student_activity_submission RPC -> database rules
-     -> returned status -> refreshed pages and feedback UI
+Activity page -> label checklist -> Server Action -> validation
+     -> save_student_activity_submission RPC -> database rules and scoring
+     -> returned status -> refreshed pages, answer-key feedback, grade
 ```
 
 1. The [activity page](../src/app/%28protected%29/student/activities/%5BactivityId%5D/page.tsx) calls `requireRole("student")`, checks the ID, and loads activity/evaluation data.
 2. It renders [StudentSubmissionForm](../src/components/activities/student-submission-form.tsx) and binds the activity ID to `saveStudentSubmission`.
 3. The [action](../src/app/%28protected%29/student/activities/actions.ts) checks the ID, authenticated user, Student profile, draft/final intent, and confirmation for a final submission.
-4. [Normalization and validation](../src/lib/submissions/validation.ts) prepare and check the interpretation. At baseline, a normal answer clears descriptive fields; an abnormal final answer needs findings and a region.
-5. `save_student_activity_submission` enforces the database workflow, including membership, deadlines, and finality. Read the [original submission migration](../supabase/migrations/20260919160249_student_activity_submissions.sql) together with the [later normal-answer change](../supabase/migrations/20261107120000_normal_submissions_without_findings.sql).
+4. [Validation](../src/lib/submissions/validation.ts) keeps only known labels and requires at least one; `No Finding` cannot be combined with other labels. In the form, `toggleLabel` enforces the same rule while the Student clicks.
+5. `save_student_activity_submission` enforces the database workflow: membership, deadlines, finality, the same label rule (`private.valid_answer_labels`), and that the activity has an answer key. On a final submission it stores `label_score`:
+
+   ```text
+   score = correct picks / (key labels + wrong extra picks) x 100
+   ```
+
+   With key `{Cardiomegaly, Edema}`, picking `{Cardiomegaly, Pleural Effusion}` scores 1 / (2 + 1) = 33.33. Ticking every label adds many wrong picks, so it cannot score 100. `scoreLabels` in TypeScript mirrors this formula for display; the database value is the one that counts. Read the [answer-key migration](../supabase/migrations/20261116120000_professor_validated_answer_key.sql).
 6. The action translates returned statuses into messages and revalidates relevant paths so subsequent rendering reads updated data.
-7. The page also renders [AI feedback](../src/components/activities/activity-ai-feedback.tsx) and [faculty evaluation](../src/components/activities/student-faculty-evaluation.tsx). Their data helpers and database rules decide whether content is available; final submission and Professor feedback release are separate events.
+7. After a final submission, [AI feedback](../src/components/activities/activity-ai-feedback.tsx) shows the Professor-validated labels and the key's heatmaps next to the Student's picks. [Faculty evaluation](../src/components/activities/student-faculty-evaluation.tsx) appears once the Professor releases it. The final grade is `finalGrade` in [evaluations/types.ts](../src/lib/evaluations/types.ts): the average of the label score and the Professor's grade.
+
+Older text submissions made before this change keep their answers and are graded by the Professor alone (their `label_score` is empty). Activities published before answer keys existed accept no new answers, because there is nothing to score against.
 
 Practice explaining why a validation check in the browser cannot replace the database's deadline check. A user can send requests without following the intended screen sequence.
 
@@ -371,9 +379,23 @@ Practice explaining why a validation check in the browser cannot replace the dat
 
 Start with [activity forms](../src/components/professor/activity-forms.tsx), then the [activity actions](../src/app/%28protected%29/professor/activities/actions.ts).
 
-At baseline, the Professor creates a draft, provides reference material, reserves a case, uploads it directly to private Storage with a signed upload token, confirms the upload, and publishes. Server confirmation decodes the image with `sharp`, checks the chest gate and view detector, and calls `confirm_activity_case_upload`. Upload inputs require JPEG/PNG within the configured size limit and a de-identification/frontal-view attestation. A classifier check does not establish that identifying information has been removed.
+The Professor creates a draft, provides reference material, reserves a case, uploads it directly to private Storage with a signed upload token, confirms the upload, validates the AI's result into an answer key, and publishes. Server confirmation decodes the image with `sharp`, checks the chest gate and view detector, and calls `confirm_activity_case_upload`. Upload inputs require JPEG/PNG within the configured size limit and a de-identification/frontal-view attestation. A classifier check does not establish that identifying information has been removed.
 
-The [ActivityAIStatus component](../src/components/activities/activity-ai-status.tsx) starts analysis from the Professor's browser for a published activity, or can retry after interruption. It claims an attempt, runs inference, and records completion through [activity AI actions](../src/lib/activity-ai/actions.ts). This is not a server background queue. **Pending answer-key work changes when analysis and validation occur; do not mix the two workflows in a demonstration.**
+The [ActivityAIStatus component](../src/components/activities/activity-ai-status.tsx) starts analysis from the Professor's browser as soon as a draft's case is ready, or can retry after interruption. It claims an attempt, runs inference, and records completion through [activity AI actions](../src/lib/activity-ai/actions.ts). This is not a server background queue.
+
+#### The answer key
+
+```text
+Draft + ready case -> AI analysis -> AnswerKeyForm (tick labels, repaint heatmaps)
+     -> saveAnswerKeyAction -> save_activity_answer_key RPC -> publish
+```
+
+1. [AnswerKeyForm](../src/components/professor/answer-key-form.tsx) starts with the AI's findings ticked. The Professor ticks the labels that are actually true and can repaint each finding's heatmap. Professors see the AI's finding labels but never its probabilities.
+2. `saveAnswerKeyAction` in the [activity actions](../src/app/%28protected%29/professor/activities/actions.ts) calls `save_activity_answer_key`, which accepts the key only while the activity is a draft with a ready analysis. It stores `validated_labels`, `validated_heatmap`, and `validated_at` on `activity_reference_evaluations`.
+3. Publishing requires the key. After publishing, the database rejects any change to it, and the form shows it read-only.
+4. Replacing a draft's case or deleting the draft drops its AI result and key, so the Professor must validate again.
+
+The form also shows how much of the key the AI found on its own (`aiAccuracy`, for example "2 of 3 (67%)"). That line compares the model with the Professor; it is not a clinical accuracy measure.
 
 ### 10.3 Other feature reading paths
 
@@ -512,7 +534,7 @@ Completion check: the learner can identify which file owns the text and describe
 
 ### Exercise B: understand a pure function through tests
 
-Use the baseline [submission validation tests](../src/lib/submissions/validation.test.ts), or select an equivalent current test if the answer-key change has landed.
+Use the [submission validation tests](../src/lib/submissions/validation.test.ts). The scoring cases are a good start: work out the score by hand with the formula in section 10.1 before running them.
 
 1. Read one test name and its input object.
 2. Predict the expected output before running it.
@@ -596,7 +618,9 @@ Do not paste passwords, tokens, private images, or service keys into error repor
 | AI says no active model | The local registry slot and model release setup |
 | Runtime assets fail to load | `prepare:ort`, pinned package version, and `/ort/1.27.0` requests |
 | A case image will not display | Signed URL, expiry, Storage access, and case upload state |
-| Activity analysis remains pending | Baseline Professor-browser workflow, claim lease, and stored safe error/status |
+| Activity analysis remains pending | Professor-browser workflow (the draft page must stay open), claim lease, and stored safe error/status |
+| Publish is refused | Whether the draft has a ready AI analysis and a saved answer key |
+| Student cannot answer an activity | Older activities published without an answer key take no new answers |
 | Build fails loading fonts | Root layout's `next/font/google` imports and the actual build/network error |
 
 These are investigation starting points, not diagnoses. Confirm the cause before editing source.
@@ -632,7 +656,7 @@ Useful review questions:
 
 The [README](../README.md) is the setup/overview entry point. This guide teaches the application. The [file reference](repository-reference.md) helps locate files. The [system map](../map/CLAUDE.md) records detailed objects, processes, and change impact. [models.md](models.md), [model-releases.md](model-releases.md), and the [export README](../model-export/README.md) cover specialized model work.
 
-When behavior changes, update its walkthrough and source links in the same change. In particular, replace the baseline activity/submission sections after the Professor-validated answer-key work is complete and verified. Refresh the file inventory when files are added or removed. Preserve the distinction between code evidence, historical documentation, and an actual deployed-state check.
+When behavior changes, update its walkthrough and source links in the same change. Refresh the file inventory when files are added or removed. Preserve the distinction between code evidence, historical documentation, and an actual deployed-state check.
 
 Before using a guide for a demonstration, confirm the revision, checkout changes, environment, local migrations, and required model artifacts. If one of those is unavailable, state what cannot be confirmed instead of presenting the documented workflow as a successful live test.
 
