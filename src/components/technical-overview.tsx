@@ -21,8 +21,8 @@ const highlights = [
 const features = [
   { module: "Accounts and access", items: ["Student or Professor registration with email confirmation", "Cloudflare Turnstile on sign-up, login and password recovery", "Professor accounts approved by an administrator", "Settings: theme, text size, high contrast, sign-in email"] },
   { module: "Workspaces", items: ["Professor-owned class workspaces", "Expiring, use-limited invitation codes for students and co-professors", "Membership-scoped access to every activity and case"] },
-  { module: "Activities", items: ["Draft → published → archived lifecycle", "One X-ray case per activity: JPEG or PNG upload, or a pick from the built-in library", "A private reference evaluation students never receive", "Optional due dates and a notification bell"] },
-  { module: "Submissions and feedback", items: ["Drafts, then one immutable final answer: findings, normal or abnormal, and region", "AI feedback released only after submission", "Faculty evaluation with a score and feedback, released explicitly"] },
+  { module: "Activities", items: ["Draft → published → archived lifecycle", "One X-ray case per activity: JPEG or PNG upload, or a pick from the built-in library", "AI analysis on the draft, validated by the Professor into an answer key of labels and heatmaps", "Optional due dates and a notification bell"] },
+  { module: "Submissions and feedback", items: ["Drafts, then one immutable final answer: a selection from the 14 labels", "Automatic label score and the validated answer key, released only after submission", "Faculty evaluation with a grade and feedback, released explicitly; the final grade averages both"] },
   { module: "Learning Mode", items: ["Practice on a 234-image CheXpert library or your own image", "Likely and possible findings across all 14 labels", "Finding heatmaps and a printable heatmap guide", "Practice results stay in browser memory", "Private notes on library cases, visible only to you"] },
   { module: "Administration", items: ["Review Professor applications", "Grant and revoke administrator access; the last administrator can't remove themselves"] },
 ] as const;
@@ -48,7 +48,7 @@ const stack = [
 
 const security = [
   { title: "Row-level security", body: "Every table is guarded in Postgres. Students read only their own work; Professors read only final submissions in their workspaces." },
-  { title: "Answers stay private", body: "Reference evaluations live in a separate table, and the student data layer never serializes them." },
+  { title: "Answers stay private", body: "Answer keys live in a separate table that students cannot read; they receive the key only after their own final submission." },
   { title: "Private case images", body: "Images upload straight to a private bucket with a signed token. The server then re-checks type, size and that the file actually decodes." },
   { title: "Hashed invitations", body: "Codes are 128-bit, expiring and use-limited. Only SHA-256 hashes are stored, and redemption locks the row so caps hold under load." },
   { title: "Immutable records", body: "Final submissions, released AI feedback, released evaluations, model releases and published cases can't be edited or deleted." },
@@ -61,7 +61,7 @@ const status = {
   implemented: [
     "Accounts, roles, Professor approval and administrator management",
     "Workspaces, invitation codes and membership",
-    "Activities with private cases and reference evaluations",
+    "Activities with private cases and Professor-validated answer keys",
     "Draft and final submissions",
     "In-browser AI analysis with finding heatmaps, released after submission",
     "Faculty evaluation and notifications",

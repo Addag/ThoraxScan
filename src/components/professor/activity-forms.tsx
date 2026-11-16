@@ -115,18 +115,18 @@ export function ActivityDetailsForm({
         <FieldError>{state.fieldErrors?.dueAt}</FieldError>
       </label>
 
-      <label className="mt-3.5 grid gap-[7px] text-caption text-(--text-muted)">
-        Private reference evaluation
+      <label className="mt-3.5 grid gap-[7px] text-caption text-(--text-muted) [&>small:first-child]:text-(--text-muted)">
+        Private notes <small>Optional</small>
         <textarea
           className={`${textarea} disabled:opacity-55`}
           name="referenceEvaluation"
           maxLength={5000}
-          rows={8}
+          rows={4}
           defaultValue={activity?.referenceEvaluation}
           disabled={isArchived}
           aria-invalid={Boolean(state.fieldErrors?.referenceEvaluation)}
         />
-        <span className="text-label text-(--text-muted)">Visible to teaching staff only. Required before publishing.</span>
+        <span className="text-label text-(--text-muted)">Visible to teaching staff only. The answer key is the AI result you validate after uploading the case.</span>
         <FieldError>{state.fieldErrors?.referenceEvaluation}</FieldError>
       </label>
 

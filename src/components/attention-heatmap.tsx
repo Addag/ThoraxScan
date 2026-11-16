@@ -6,7 +6,7 @@ import { attentionColor, attentionGradient, labelActivation, upsampleAttention, 
 
 // Canvas resolution for the smoothed overlay; CSS scales it to the image.
 const OVERLAY_SIZE = 112;
-function drawOverlay(canvas: HTMLCanvasElement | null, values: number[], grid: number) {
+export function drawOverlay(canvas: HTMLCanvasElement | null, values: number[], grid: number) {
   const context = canvas?.getContext("2d");
   if (!context) return;
   const image = context.createImageData(OVERLAY_SIZE, OVERLAY_SIZE);
@@ -20,7 +20,8 @@ const ALL_FINDINGS = THORAXSCAN_LABELS.filter(label => label !== "No Finding");
 const textClass = "mx-0 mt-0 mb-2.5 text-caption leading-normal text-(--text-secondary)";
 const controlClass = "mt-2.5 flex items-center gap-[7px] text-caption text-(--text-secondary)";
 
-export function AttentionHeatmap({ imageUrl, attention, labels, title = "Attention overlay", illustrative = false, className = "" }: { imageUrl: string | null; attention: Heatmap; labels?: HeatmapLabel[]; title?: string; illustrative?: boolean; className?: string }) {
+// `findings` lists the Professor-validated labels of an answer key; its maps may have been edited by the Professor.
+export function AttentionHeatmap({ imageUrl, attention, labels, findings, title = "Attention overlay", illustrative = false, className = "" }: { imageUrl: string | null; attention: Heatmap; labels?: HeatmapLabel[]; findings?: readonly string[]; title?: string; illustrative?: boolean; className?: string }) {
   const titleId = useId();
   const selectId = useId();
   const [enabled, setEnabled] = useState(true);
@@ -29,20 +30,24 @@ export function AttentionHeatmap({ imageUrl, attention, labels, title = "Attenti
   if (attention.status !== "ready") return <p className="m-0 px-4 py-3.5 text-caption leading-normal text-(--text-secondary)">This model release does not export attention data. Prediction results are still available.</p>;
   const perLabel = attention.kind === "per-label";
   // With probabilities, per-label maps are offered for likely then possible findings, each tier most probable first.
-  const options: { label: string; text: string }[] = !perLabel ? [] : labels
+  const options: { label: string; text: string }[] = !perLabel ? [] : findings
+    ? findings.filter(label => label !== "No Finding").map(label => ({ label, text: label }))
+    : labels
     ? labels.filter(item => (item.predicted || item.possible) && item.label !== "No Finding").sort((a, b) => Number(b.predicted) - Number(a.predicted) || b.probability - a.probability)
       .map(item => ({ label: item.label, text: `${item.label} (${item.predicted ? "likely" : "possible"}, ${(item.probability * 100).toFixed(1)}%)` }))
     : ALL_FINDINGS.map(label => ({ label, text: label }));
   const current = options.find(item => item.label === selected) ?? options[0];
   if (perLabel && !current) return <section aria-labelledby={titleId} className={`text-(--text-primary) ${className}`}>
     <h3 className="mx-0 mt-0 mb-1.5 text-lead" id={titleId}>{title}</h3>
-    <p className={textClass}>No finding met its threshold, so there is no finding-specific heatmap to show.</p>
+    <p className={textClass}>{findings ? "This case has no findings, so there is no finding-specific heatmap to show." : "No finding met its threshold, so there is no finding-specific heatmap to show."}</p>
   </section>;
   const grid = attention.width;
   const values = perLabel ? labelActivation(attention.values, THORAXSCAN_LABELS.indexOf(current.label as (typeof THORAXSCAN_LABELS)[number])) : attention.values;
   return <section aria-labelledby={titleId} className={`text-(--text-primary) ${className}`}>
     <h3 className="mx-0 mt-0 mb-1.5 text-lead" id={titleId}>{title}</h3>
-    {perLabel
+    {perLabel && findings
+      ? <p className={textClass}>This heatmap shows where the evidence for <strong>{current.label}</strong> is in this image. It starts from the AI&apos;s class activation map and may have been corrected by the Professor. Warmer colors (red) mark the finding; cooler colors (blue) mark little or none. It is a coarse 14×14 guide for where to look, not a lesion outline, a measurement, or a diagnosis.</p>
+      : perLabel
       ? <p className={textClass}>This class activation map shows where the model&apos;s evidence for <strong>{current.label}</strong> is strongest in this image. Warmer colors (red) mark more evidence relative to the rest of this image; cooler colors (blue) mark little or none. It is a coarse 14×14 guide for where to look, not a lesion outline, a measurement, or a diagnosis.</p>
       : <p className={textClass}>{illustrative ? "This illustrative overlay uses hand-picked values to demonstrate the global, class-agnostic attention display. These values are not model output for this X-ray." : "Legacy global attention: this class-agnostic overlay shows the relative internal attention the model assigned across the image during this inference."} Warmer colors (red) indicate higher relative attention within this image; cooler colors (blue) indicate lower. It does not identify a lesion, explain a specific finding, or confirm disease location.</p>}
     {perLabel ? <label className={controlClass} htmlFor={selectId}>Finding
@@ -62,7 +67,7 @@ export function AttentionHeatmap({ imageUrl, attention, labels, title = "Attenti
     <p className={textClass}>{perLabel ? `Less evidence for ${current.label} → More evidence for ${current.label}` : "Lower relative attention → Higher relative attention"}</p>
     <details className="mt-2.5 text-caption text-(--text-secondary)"><summary>Method and {grid}×{grid} data</summary>
       <p>{perLabel
-        ? "Class activation map (CAM): the classifier's weights for this finding applied to the final feature map, negative evidence clipped to zero, then scaled so this finding's strongest cell is 1. The values are relative evidence within this image, not probabilities. A strong map does not mean the finding is present; check the finding's probability for that."
+        ? "Class activation map (CAM): the classifier's weights for this finding applied to the final feature map, negative evidence clipped to zero, then scaled so this finding's strongest cell is 1. The values are relative evidence within this image, not probabilities. A strong map does not mean the finding is present; check the finding's probability for that." + (findings ? " In a validated heatmap, cells the Professor marked are 1 and cells they erased are 0." : "")
         : illustrative ? "Illustrative values only; no attention rollout was run for this example. Model-generated maps use four-layer attention rollout, averaged over queries, normalized per image." : "Four-layer attention rollout, averaged over queries, normalized per image. These values are relative attention, not probabilities."}{" "}The overlay is smoothed between cell centers for display; the underlying data is still this {grid}×{grid} grid.</p>
       <div style={{ overflowX: "auto" }}><table>
         <caption>{perLabel ? `Normalized ${current.label} evidence` : "Normalized attention values"}, rows top to bottom and columns left to right</caption>

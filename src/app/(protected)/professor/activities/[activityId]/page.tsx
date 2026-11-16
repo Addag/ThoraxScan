@@ -20,6 +20,7 @@ import { getProfessorActivity } from "@/lib/activities/server";
 import { requireRole } from "@/lib/auth/server";
 import { getProfessorWorkspaces } from "@/lib/workspaces/server";
 import { ActivityAIStatus } from "@/components/activities/activity-ai-status";
+import { AnswerKeyForm } from "@/components/professor/answer-key-form";
 import { PageHeading, PageMain } from "@/components/dashboard-ui";
 
 export const metadata: Metadata = {
@@ -57,7 +58,7 @@ export default async function ProfessorActivityPage({
           <span>{activity.status === "published" ? "Visible to current and future workspace students" : activity.status === "archived" ? "No longer visible to students" : "Visible to teaching staff only"}</span>
         </div>
         <ActivityStepRail role="professor" caseReady={activity.caseUploadStatus === "ready"} published={activity.status !== "draft"} aiStatus={activity.aiStatus.status} />
-        <Link className={`${activitiesCtaClass} mb-6`} href={`/professor/submissions?activity=${activity.id}`}><span className="grid gap-1"><strong>Review submissions</strong><small className="text-label text-(--brand-blue-text)">Final responses for this activity, with AI output and your reference</small></span><span className="text-display text-(--brand-blue-text)" aria-hidden="true">→</span></Link>
+        <Link className={`${activitiesCtaClass} mb-6`} href={`/professor/submissions?activity=${activity.id}`}><span className="grid gap-1"><strong>Review submissions</strong><small className="text-label text-(--brand-blue-text)">Final responses for this activity, scored against your answer key</small></span><span className="text-display text-(--brand-blue-text)" aria-hidden="true">→</span></Link>
 
         <div className={activityLayoutClass("default")}>
           <div className={activityCaseColumnClass}>
@@ -68,10 +69,13 @@ export default async function ProfessorActivityPage({
               status={activity.caseUploadStatus}
             />
             {activity.status === "draft" ? <CaseUploadForm activityId={activity.id} caseId={activity.caseId} /> : null}
-            <ActivityAIStatus activityId={activity.id} imageUrl={activity.imageUrl} activityStatus={activity.status} initial={activity.aiStatus} />
+            {/* Keyed by case so a replaced image gets its own automatic run. */}
+            <ActivityAIStatus key={activity.caseId} activityId={activity.id} imageUrl={activity.imageUrl} activityStatus={activity.status} caseReady={activity.caseUploadStatus === "ready"} initial={activity.aiStatus} />
           </div>
           <div className={activityConfigColumnClass}>
             <ActivityDetailsForm workspaces={workspaces.data} activity={activity} />
+            {/* Remounts when the AI result or saved key changes, so the form starts from the server's state. */}
+            <AnswerKeyForm key={`${activity.caseId}:${activity.aiStatus.completedAt}:${activity.validatedLabels?.join()}`} activity={activity} />
             <ActivityLifecycleControls activity={activity} />
           </div>
         </div>

@@ -69,7 +69,7 @@ export default async function StudentActivityPage({
               imageError={activity.imageError}
               title={activity.title}
             />
-            <ActivityAIFeedback imageUrl={activity.imageUrl} initial={activity.aiFeedback} />
+            <ActivityAIFeedback imageUrl={activity.imageUrl} initial={activity.aiFeedback} selected={activity.submission?.labels ?? []} labelScore={activity.submission?.labelScore ?? null} />
           </div>
           <StudentSubmissionForm
             submission={activity.submission}
@@ -78,7 +78,7 @@ export default async function StudentActivityPage({
             action={saveStudentSubmission.bind(null, activityId)}
           />
         </div>
-        <StudentFacultyEvaluationPanel evaluation={facultyEvaluation.data} error={facultyEvaluation.error} />
+        <StudentFacultyEvaluationPanel evaluation={facultyEvaluation.data} error={facultyEvaluation.error} labelScore={activity.submission?.labelScore ?? null} />
       </PageMain>
     </StudentShell>
   );

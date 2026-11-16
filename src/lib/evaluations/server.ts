@@ -6,12 +6,12 @@ import { evaluationUuid, type ProfessorEvaluation, type ReviewStatus, type Stude
 
 type SubmissionRow = {
   id: string; activity_id: string; student_id: string; submitted_at: string;
-  visible_findings: string; classification: string; relevant_region: string;
+  selected_labels: string[]; label_score: number | null; classification: string;
   profiles: { display_name: string } | null;
   activities: { title: string; workspace_id: string; workspaces: { name: string } };
   faculty_evaluations: ProfessorEvaluation | null;
 };
-const selection = "id, activity_id, student_id, submitted_at, visible_findings, classification, relevant_region, profiles!student_submissions_student_id_fkey(display_name), activities!inner(title, workspace_id, workspaces!inner(name)), faculty_evaluations(id, professor_id, score, remarks, feedback, status, released_at, updated_at)";
+const selection = "id, activity_id, student_id, submitted_at, selected_labels, label_score, classification, profiles!student_submissions_student_id_fkey(display_name), activities!inner(title, workspace_id, workspaces!inner(name)), faculty_evaluations(id, professor_id, score, remarks, feedback, status, released_at, updated_at)";
 
 async function professorClient() {
   const { profile } = await getCurrentProfile();

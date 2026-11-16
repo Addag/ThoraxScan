@@ -13,5 +13,9 @@ export type EvaluationActionState = {
   message: string;
   fieldErrors?: Partial<Record<keyof EvaluationValues, string>>;
 };
+/** Half automatic label score, half Professor grade. Submissions without a label score keep the Professor grade. */
+export function finalGrade(labelScore: number | null, professorScore: number) {
+  return labelScore === null ? professorScore : Math.round((labelScore + professorScore) * 50) / 100;
+}
 export const initialEvaluationState: EvaluationActionState = { status: "idle", message: "" };
 export const evaluationUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;

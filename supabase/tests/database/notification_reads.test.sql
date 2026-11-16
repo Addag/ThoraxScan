@@ -18,13 +18,13 @@ insert into public.workspaces(id,name,owner_id) values ('43000000-0000-4000-8000
 insert into public.workspace_members(workspace_id,user_id,role) values ('43000000-0000-4000-8000-000000000001','41000000-0000-4000-8000-000000000001','student');
 insert into public.xray_cases(id,workspace_id,storage_path,uploaded_by,mime_type,byte_size,upload_status,attested_by) values ('44000000-0000-4000-8000-000000000001','43000000-0000-4000-8000-000000000001','43000000-0000-4000-8000-000000000001/44000000-0000-4000-8000-000000000001','41000000-0000-4000-8000-000000000003','image/png',100,'ready','41000000-0000-4000-8000-000000000003');
 insert into public.activities(id,workspace_id,case_id,created_by,title,instructions,due_at) values ('42000000-0000-4000-8000-000000000001','43000000-0000-4000-8000-000000000001','44000000-0000-4000-8000-000000000001','41000000-0000-4000-8000-000000000003','Notify activity','Review this chest X-ray.',now()+interval '3 days');
-insert into public.activity_reference_evaluations(activity_id,evaluation) values ('42000000-0000-4000-8000-000000000001','Reference');
+insert into public.activity_reference_evaluations(activity_id,evaluation,validated_labels,validated_at) values ('42000000-0000-4000-8000-000000000001','Reference',array['No Finding'],now());
 update public.activities set status='published' where id='42000000-0000-4000-8000-000000000001';
 select throws_ok($$insert into public.notification_reads(user_id,kind,ref_id) values ('41000000-0000-4000-8000-000000000001','bogus','42000000-0000-4000-8000-000000000001')$$,'23514',null,'unknown kinds are rejected');
 
 set local role authenticated;
 select set_config('request.jwt.claim.sub','41000000-0000-4000-8000-000000000001',true);
-select is(public.save_student_activity_submission('42000000-0000-4000-8000-000000000001','Final','normal','',true), 'submitted', 'fixture submission');
+select is(public.save_student_activity_submission('42000000-0000-4000-8000-000000000001',array['No Finding'],true), 'submitted', 'fixture submission');
 select lives_ok($$insert into public.notification_reads(user_id,kind,ref_id) values ('41000000-0000-4000-8000-000000000001','activity_due','42000000-0000-4000-8000-000000000001')$$,'member marks a visible due read');
 select lives_ok($$insert into public.notification_reads(user_id,kind,ref_id) values ('41000000-0000-4000-8000-000000000001','activity_due','42000000-0000-4000-8000-000000000001') on conflict do nothing$$,'marking read again is a no-op');
 select is((select count(*) from public.notification_reads),1::bigint,'member sees one own read');

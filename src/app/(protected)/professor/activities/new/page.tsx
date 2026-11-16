@@ -32,7 +32,7 @@ export default async function NewProfessorActivityPage() {
             <aside className="rounded-panel border border-(--border-shell) [background:var(--glass-surface)] backdrop-blur-[18px] backdrop-saturate-[135%] shadow-(--glass-shadow) sticky top-6 p-6 max-[1050px]:static">
               <span className="grid size-10 place-items-center rounded-full border border-brand font-extrabold text-(--brand-blue-text)" aria-hidden="true">i</span>
               <h2 className="mx-0 mt-[17px] mb-[7px] text-title">Draft first</h2>
-              <p className="m-0 text-caption leading-relaxed text-(--text-muted)">The draft is private to teaching staff. After it is saved, upload one de-identified frontal JPEG or PNG and publish when ready.</p>
+              <p className="m-0 text-caption leading-relaxed text-(--text-muted)">The draft is private to teaching staff. After it is saved, upload one de-identified frontal JPEG or PNG. The AI reads it, you validate its result, and then you publish.</p>
             </aside>
             <ActivityDetailsForm workspaces={workspaces.data} />
           </div>

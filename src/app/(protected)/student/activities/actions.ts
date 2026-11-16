@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import type { SubmissionActionState } from "@/lib/submissions/types";
-import { normalizeSubmission, validateSubmission } from "@/lib/submissions/validation";
+import { normalizeLabels, validateSubmission } from "@/lib/submissions/validation";
 
 export async function saveStudentSubmission(activityId: string, _previous: SubmissionActionState, formData: FormData): Promise<SubmissionActionState> {
   const unauthorized: SubmissionActionState = { status: "unauthorized", message: "You are not permitted to submit to this activity. Sign in with an authorized Student account." };
@@ -17,13 +17,11 @@ export async function saveStudentSubmission(activityId: string, _previous: Submi
   if (intent !== "draft" && intent !== "final") return { status: "error", message: "Choose Save draft or Submit final evaluation." };
   const finalize = intent === "final";
   if (finalize && formData.get("confirmed") !== "yes") return { status: "error", message: "Confirm that your final submission cannot be edited." };
-  const read = (name: string) => { const value = formData.get(name); return typeof value === "string" ? value : ""; };
-  const values = normalizeSubmission({ visibleFindings: read("visibleFindings"), classification: read("classification"), relevantRegion: read("relevantRegion") });
-  const fieldErrors = validateSubmission(values, finalize);
-  if (Object.keys(fieldErrors).length) return { status: "error", message: "Check your response fields.", fieldErrors };
+  const values = { labels: normalizeLabels(formData.getAll("labels")) };
+  const fieldErrors = validateSubmission(values);
+  if (Object.keys(fieldErrors).length) return { status: "error", message: "Check your selected labels.", fieldErrors };
   const { data, error } = await supabase.rpc("save_student_activity_submission", {
-    target_activity_id: activityId, input_visible_findings: values.visibleFindings,
-    input_classification: values.classification, input_relevant_region: values.relevantRegion, finalize,
+    target_activity_id: activityId, input_labels: values.labels, finalize,
   });
   if (error) return { status: "error", message: "Your response could not be saved. Please try again." };
   const messages = {

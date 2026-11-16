@@ -23,10 +23,10 @@ const calloutStyles = {
 
 // The hero callouts' colours carry over: purple interpret, blue AI feedback, green faculty; amber marks the lock-in.
 const learningLoop = [
-  { title: "Interpret first", body: "Study the case and record your findings, whether it looks normal or abnormal, and the relevant region.", ring: "border-[rgb(194_157_255/72%)] text-[#d9c4ff]" },
+  { title: "Interpret first", body: "Study the case and select every finding you see from the 14 labels.", ring: "border-[rgb(194_157_255/72%)] text-[#d9c4ff]" },
   { title: "Submit", body: "Your final answer locks. It can't be edited afterwards, so the feedback always answers your own reading.", ring: "border-[rgb(255_214_54/72%)] text-[#ffe082]" },
-  { title: "Review AI feedback", body: "Unlocks only after you submit: likely findings, possible findings, every label the model scores, and a heatmap for each finding.", ring: "border-[rgb(112_184_255/72%)] text-[#b9dbff]" },
-  { title: "Faculty evaluation", body: "Your professor reviews the submission and gives the evaluation that counts.", ring: "border-[rgb(103_222_179/72%)] text-[#a9f0d4]" },
+  { title: "Review AI feedback", body: "Unlocks only after you submit: the correct labels, validated by your professor from the AI's result, your label score, and a heatmap for each finding.", ring: "border-[rgb(112_184_255/72%)] text-[#b9dbff]" },
+  { title: "Faculty evaluation", body: "Your professor reviews the submission; their grade and your label score make up the final grade.", ring: "border-[rgb(103_222_179/72%)] text-[#a9f0d4]" },
 ] as const;
 
 const roles = [
@@ -35,7 +35,7 @@ const roles = [
     image: { src: "/images/student-role.png", width: 125, height: 88 },
     points: [
       "Join your class workspace with an invitation code from your professor.",
-      "Complete activities and get AI feedback once you submit.",
+      "Complete activities and see the validated answer and your score once you submit.",
       "Practice anytime in Learning Mode with the built-in X-ray library; practice results stay in your browser.",
       "Learn what finding heatmaps can and can't tell you.",
     ],

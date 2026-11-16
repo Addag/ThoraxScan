@@ -39,7 +39,7 @@ export async function failActivityAIAnalysis(activityId: string, attemptId: stri
 export async function refreshActivityCaseUrl(activityId: string) {
   const supabase = await createClient();
   const { data: activity, error } = await supabase.from("activities").select("id, workspace_id, case_id, status").eq("id", activityId).maybeSingle<{ id: string; workspace_id: string; case_id: string | null; status: string }>();
-  if (error || !activity?.case_id || !["published", "archived"].includes(activity.status)) return { ok: false as const };
+  if (error || !activity?.case_id || !["draft", "published", "archived"].includes(activity.status)) return { ok: false as const };
   const { data, error: signedError } = await supabase.storage.from("activity-cases").createSignedUrl(`${activity.workspace_id}/${activity.case_id}`, 600);
   return data?.signedUrl && !signedError ? { ok: true as const, url: data.signedUrl } : { ok: false as const };
 }

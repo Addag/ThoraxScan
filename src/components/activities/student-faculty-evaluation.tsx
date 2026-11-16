@@ -1,15 +1,16 @@
-import type { StudentFacultyEvaluation } from "@/lib/evaluations/types";
+import { finalGrade, type StudentFacultyEvaluation } from "@/lib/evaluations/types";
 
 import { evaluationStatusClass } from "@/components/professor/review-styles";
 
 const mutedClass = "mx-0 mt-0 mb-3 text-small leading-normal text-(--text-muted)";
 
-export function StudentFacultyEvaluationPanel({ evaluation, error }: { evaluation: StudentFacultyEvaluation | null; error: string | null }) {
+export function StudentFacultyEvaluationPanel({ evaluation, error, labelScore }: { evaluation: StudentFacultyEvaluation | null; error: string | null; labelScore: number | null }) {
   return <section className="mt-6 rounded-panel border border-(--border-shell) [background:var(--glass-surface)] backdrop-blur-[18px] backdrop-saturate-[135%] shadow-(--glass-shadow) p-6 max-[520px]:p-5 text-(--text-primary)" aria-labelledby="student-faculty-heading">
     <h2 className="mx-0 mt-0 mb-3.5 text-title font-extrabold" id="student-faculty-heading">Faculty evaluation</h2>
     {error ? <p className={mutedClass} role="alert">{error}</p> : !evaluation ? <p className={mutedClass}>Evaluation unavailable.</p> : evaluation.status === "released" ? <>
       <p className={`mx-0 mt-0 mb-3 inline-block text-(--text-muted) ${evaluationStatusClass()}`}>Released</p>
-      <p className="mx-0 mt-0 mb-3 text-[2rem] leading-none font-extrabold">{evaluation.score.toFixed(2)}%</p>
+      <p className="mx-0 mt-0 mb-3 text-[2rem] leading-none font-extrabold">{finalGrade(labelScore, evaluation.score).toFixed(2)}%</p>
+      <p className={mutedClass}>{labelScore === null ? "Final grade · Professor grade only" : `Final grade · label score ${labelScore.toFixed(2)}% and Professor grade ${evaluation.score.toFixed(2)}%, weighted equally`}</p>
       <p className="mx-0 mt-0 mb-3 whitespace-pre-wrap text-lead leading-relaxed">{evaluation.feedback}</p>
       <p className={mutedClass}>Released <time dateTime={evaluation.releasedAt}>{new Date(evaluation.releasedAt).toLocaleString()}</time></p>
     </> : <p className={mutedClass} role="status">{evaluation.status === "locked" ? "Locked · submit your final response to receive a faculty evaluation." : "Awaiting review · your Professor has not released an evaluation yet."}</p>}

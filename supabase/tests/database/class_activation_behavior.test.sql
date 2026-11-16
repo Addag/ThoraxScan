@@ -9,9 +9,9 @@ insert into public.workspaces(id,name,owner_id) values(pg_temp.uid(10),'CAM work
 insert into public.workspace_members(workspace_id,user_id,role) values(pg_temp.uid(10),pg_temp.uid(1),'professor'),(pg_temp.uid(10),pg_temp.uid(2),'student') on conflict do nothing;
 insert into public.xray_cases(id,workspace_id,storage_path,uploaded_by,mime_type,byte_size,upload_status,attested_by) values(pg_temp.uid(20),pg_temp.uid(10),pg_temp.uid(10)::text||'/'||pg_temp.uid(20)::text,pg_temp.uid(1),'image/png',1,'ready',pg_temp.uid(1));
 insert into public.activities(id,workspace_id,case_id,created_by,title,instructions) values(pg_temp.uid(30),pg_temp.uid(10),pg_temp.uid(20),pg_temp.uid(1),'CAM activity','Synthetic testing instructions');
-insert into public.activity_reference_evaluations(activity_id,evaluation) values(pg_temp.uid(30),'Private reference') on conflict(activity_id) do update set evaluation=excluded.evaluation;
+insert into public.activity_reference_evaluations(activity_id,evaluation,validated_labels,validated_at) values(pg_temp.uid(30),'Private reference',array['No Finding'],now()) on conflict(activity_id) do update set evaluation=excluded.evaluation;
 update public.activities set status='published' where id=pg_temp.uid(30);
-insert into public.student_submissions(activity_id,student_id,visible_findings,classification,status,submitted_at,created_at,updated_at) values(pg_temp.uid(30),pg_temp.uid(2),'Synthetic findings','normal','submitted',now(),now(),now());
+insert into public.student_submissions(activity_id,student_id,selected_labels,label_score,classification,status,submitted_at,created_at,updated_at) values(pg_temp.uid(30),pg_temp.uid(2),array['No Finding'],100,'normal','submitted',now(),now(),now());
 create temp table v3_manifest as select jsonb_build_object(
   'schemaVersion', 3,
   'release', jsonb_build_object('id','v3-behavior','preprocessingVersion','prep','thresholdVersion','threshold'),
@@ -42,5 +42,55 @@ select set_config('request.jwt.claim.sub',pg_temp.uid(3)::text,true);
 select is((select count(*) from public.get_professor_activity_ai_heatmap(pg_temp.uid(30))),0::bigint,'outsider denied');
 create temp table cam_constraints (like public.ai_analyses including constraints including defaults);
 select throws_ok($$insert into cam_constraints(id,activity_id,status,attention_status,manifest_version,attention_map,attention_grid_width,attention_grid_height,attention_method,attention_normalization) values(gen_random_uuid(),gen_random_uuid(),'ready','ready',3,to_jsonb(array_fill(0.5,array[2744])),7,7,'cam-fc-weights-v1','relu-per-label-max-v1')$$,'23514',null,'V3 row with a 7x7 grid rejected');
+-- New flow: the AI runs on a draft, the Professor validates it into an answer key, then publishes.
+reset role;
+insert into public.xray_cases(id,workspace_id,storage_path,uploaded_by,mime_type,byte_size,upload_status,attested_by) select pg_temp.uid(i),pg_temp.uid(10),pg_temp.uid(10)::text||'/'||pg_temp.uid(i)::text,pg_temp.uid(1),'image/png',1,'ready',pg_temp.uid(1) from generate_series(21,22) i;
+insert into public.activities(id,workspace_id,case_id,created_by,title,instructions) values(pg_temp.uid(31),pg_temp.uid(10),pg_temp.uid(21),pg_temp.uid(1),'Draft flow activity','Synthetic testing instructions');
+insert into public.activity_reference_evaluations(activity_id) values(pg_temp.uid(31));
+select throws_ok($$update public.activities set status='published' where id=pg_temp.uid(31)$$,'23514','a validated answer key is required','publishing needs a validated key');
+select set_config('request.jwt.claim.sub',pg_temp.uid(1)::text,true);
+select is(public.save_activity_answer_key(pg_temp.uid(31),array['Cardiomegaly'],null),'analysis_required','no key before the AI has run');
+create temp table draft_claim as select * from public.claim_activity_ai_analysis(pg_temp.uid(31));
+select is((select status from draft_claim),'pending','Professor claims the analysis on a draft');
+select is(public.complete_activity_ai_analysis(pg_temp.uid(31),(select attempt_id from draft_claim),'[0.1,0.1,0.9,0.1,0.1,0.9,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1]'::jsonb,jsonb_build_object('releaseId','v3-behavior','bundleSha256',repeat('f',64),'modelSha256',repeat('e',64),'manifestVersion',3,'preprocessingVersion','prep','thresholdVersion','threshold'),'wasm','test',to_jsonb(array_fill(0.5::numeric,array[2744]))),'ready','analysis completes on a draft');
+select is(public.get_professor_activity_ai_findings(pg_temp.uid(31)),array['Cardiomegaly','Edema'],'Professor reads the AI finding labels');
+select is(public.save_activity_answer_key(pg_temp.uid(31),array['No Finding','Edema'],null),'invalid_payload','No Finding cannot join other labels');
+select is(public.save_activity_answer_key(pg_temp.uid(31),array['Edema','Edema'],null),'invalid_payload','repeated labels rejected');
+select is(public.save_activity_answer_key(pg_temp.uid(31),array['Edema'],to_jsonb(array_fill(0.5::numeric,array[49]))),'invalid_payload','wrong-sized heatmap rejected');
+select is(public.save_activity_answer_key(pg_temp.uid(31),array['Pleural Effusion','Edema','Cardiomegaly'],null),'saved','Professor adds the label the AI missed');
+select set_config('request.jwt.claim.sub',pg_temp.uid(3)::text,true);
+select is(public.save_activity_answer_key(pg_temp.uid(31),array['Edema'],null),'unauthorized','outsider cannot write the key');
+select is(public.get_professor_activity_ai_findings(pg_temp.uid(31)),null,'outsider cannot read AI findings');
+reset role;
+select is((select validated_labels from public.activity_reference_evaluations where activity_id=pg_temp.uid(31)),array['Cardiomegaly','Edema','Pleural Effusion'],'key stored in canonical order');
+select is((select jsonb_array_length(validated_heatmap) from public.activity_reference_evaluations where activity_id=pg_temp.uid(31)),2744,'unedited key keeps the AI heatmap');
+-- Replacing a draft's case discards the AI result and the key that described the old image.
+update public.activities set case_id=pg_temp.uid(22) where id=pg_temp.uid(31);
+select is((select count(*) from public.ai_analyses where activity_id=pg_temp.uid(31)),0::bigint,'case change drops the draft analysis');
+select ok((select validated_labels is null from public.activity_reference_evaluations where activity_id=pg_temp.uid(31)),'case change clears the key');
+select set_config('request.jwt.claim.sub',pg_temp.uid(1)::text,true);
+create temp table second_claim as select * from public.claim_activity_ai_analysis(pg_temp.uid(31));
+select is(public.complete_activity_ai_analysis(pg_temp.uid(31),(select attempt_id from second_claim),'[0.1,0.1,0.9,0.1,0.1,0.9,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1]'::jsonb,jsonb_build_object('releaseId','v3-behavior','bundleSha256',repeat('f',64),'modelSha256',repeat('e',64),'manifestVersion',3,'preprocessingVersion','prep','thresholdVersion','threshold'),'wasm','test',to_jsonb(array_fill(0.5::numeric,array[2744]))),'ready','analysis reruns for the new case');
+select is(public.save_activity_answer_key(pg_temp.uid(31),array['Cardiomegaly','Edema','Pleural Effusion'],to_jsonb(array_fill(1::numeric,array[2744]))),'saved','key saved with an edited heatmap');
+reset role;
+select lives_ok($$update public.activities set status='published' where id=pg_temp.uid(31)$$,'validated draft publishes');
+select set_config('request.jwt.claim.sub',pg_temp.uid(1)::text,true);
+select is(public.save_activity_answer_key(pg_temp.uid(31),array['Edema'],null),'locked','key is locked after publishing');
+reset role;
+select throws_ok($$update public.activity_reference_evaluations set validated_labels=array['Edema'] where activity_id=pg_temp.uid(31)$$,'42501','published answer keys are immutable','key immutable even through privileged update');
+select lives_ok($$update public.activity_reference_evaluations set evaluation='Notes' where activity_id=pg_temp.uid(31)$$,'private notes stay editable');
+set local role authenticated;
+select set_config('request.jwt.claim.sub',pg_temp.uid(2)::text,true);
+select is((select status from public.get_student_activity_ai_feedback(pg_temp.uid(31))),'locked','key hidden before the Student submits');
+select ok((select validated_labels is null from public.get_student_activity_ai_feedback(pg_temp.uid(31))),'locked result carries no key');
+select is(public.save_student_activity_submission(pg_temp.uid(31),array['Cardiomegaly','Edema'],true),'submitted','Student submits labels');
+select is((select validated_labels from public.get_student_activity_ai_feedback(pg_temp.uid(31))),array['Cardiomegaly','Edema','Pleural Effusion'],'submitted Student sees the validated key');
+select is((select attention_map -> 0 from public.get_student_activity_ai_feedback(pg_temp.uid(31))),'1'::jsonb,'Student sees the edited heatmap, not the raw AI map');
+reset role;
+-- Deleting a draft takes its AI result with it.
+insert into public.activities(id,workspace_id,created_by,title,instructions) values(pg_temp.uid(32),pg_temp.uid(10),pg_temp.uid(1),'Deleted draft','Synthetic testing instructions');
+insert into public.ai_analyses(activity_id,status) values(pg_temp.uid(32),'failed');
+select lives_ok($$delete from public.activities where id=pg_temp.uid(32)$$,'draft with an analysis can be deleted');
+select throws_ok($$delete from public.ai_analyses where activity_id=pg_temp.uid(31)$$,'42501','ready analysis results are immutable','published analysis cannot be deleted');
 select * from finish();
 rollback;

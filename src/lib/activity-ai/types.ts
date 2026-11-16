@@ -60,6 +60,8 @@ export type ActivityAIResult = {
   provenance: ActivityAIProvenance;
   attention?: AttentionHeatmap;
   attentionStatus: "ready" | "unavailable";
+  // The Professor's answer key. Null on activities published before answer keys existed.
+  validatedLabels: ActivityAILabel[] | null;
 };
 
 export type ActivityAIFeedback = {

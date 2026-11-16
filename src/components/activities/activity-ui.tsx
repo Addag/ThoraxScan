@@ -33,13 +33,13 @@ export function ActivityStepRail({ role, submissionStatus = "Not started", aiSta
     role === "professor"
       ? [
           ["Upload case", caseReady === undefined ? "future" : caseReady ? "complete" : "active"],
-          ["Configure activity", published ? "complete" : "active"],
           ["AI analysis", aiState],
+          ["Validate and publish", published ? "complete" : aiStatus === "ready" ? "active" : "future"],
         ]
       : [
           ["Review activity", submitted ? "complete" : "active"],
           [`Evaluation · ${submissionStatus}`, submitted ? "complete" : "active"],
-          [`AI feedback · ${aiStatus === "ready" ? "Available" : aiStatus === "pending" ? "Pending" : aiStatus === "failed" ? "Failed" : "Locked"}`, aiStatus === "ready" ? "complete" : submitted ? "active" : "future"],
+          [`Results · ${aiStatus === "ready" ? "Available" : aiStatus === "pending" ? "Pending" : aiStatus === "failed" ? "Failed" : "Locked"}`, aiStatus === "ready" ? "complete" : submitted ? "active" : "future"],
         ];
 
   return (

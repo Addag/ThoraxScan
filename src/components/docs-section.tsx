@@ -49,7 +49,7 @@ const userTopics: Topic[] = [
     body: (
       <ol className={steps}>
         <li>Open a published activity from your workspace. You see the instructions, the due date and the X-ray.</li>
-        <li>Record your findings, whether the image is normal or abnormal, and for abnormal cases the relevant region.</li>
+        <li>Tick every finding you see from the 14 labels. Choose No Finding on its own for a normal X-ray. Wrong extra ticks lower your score.</li>
         <li>Save a draft as often as you like. Drafts are private.</li>
         <li>Submit when you&rsquo;re sure. You confirm first, and the final answer can&rsquo;t be changed. A draft left past the due date stays unsubmitted.</li>
       </ol>
@@ -59,12 +59,12 @@ const userTopics: Topic[] = [
   {
     id: "doc-feedback",
     title: "Read your feedback",
-    gist: "AI feedback after you submit, then your professor's evaluation.",
+    gist: "Your results after you submit, then your professor's evaluation.",
     body: (
       <ul className={bullets}>
-        <li><b>AI feedback</b> appears only after your final submission. It lists likely findings, possible findings (often false alarms), every label the model scores, and a heatmap for each finding.</li>
-        <li>Pick a finding under the image to see where the model found the evidence for it. The heatmap doesn&rsquo;t outline a lesion or confirm a diagnosis.</li>
-        <li><b>Faculty evaluation</b> shows your score and feedback once your professor releases it. Until then the activity shows as awaiting review.</li>
+        <li><b>Results</b> appear only after your final submission. They show the correct labels, which your professor validated starting from the AI&rsquo;s result, which ones you selected, missed or added wrongly, and your label score.</li>
+        <li>Pick a finding under the image to see its validated heatmap: the AI&rsquo;s map, corrected by your professor where needed. The heatmap doesn&rsquo;t outline a lesion or confirm a diagnosis.</li>
+        <li><b>Faculty evaluation</b> shows your professor&rsquo;s feedback and your final grade once it is released: half your label score, half your professor&rsquo;s grade. Until then the activity shows as awaiting review.</li>
       </ul>
     ),
     sources: ["map/processes/student-activity-view.md", "map/objects/learning/ai-feedback-release.md", "map/processes/faculty-evaluation.md"],
@@ -100,13 +100,14 @@ const userTopics: Topic[] = [
   {
     id: "doc-publish",
     title: "Publish an activity",
-    gist: "Professors: draft, attach an X-ray, publish.",
+    gist: "Professors: draft, attach an X-ray, validate the AI result, publish.",
     body: (
       <ol className={steps}>
         <li>Create a draft with a title, instructions and an optional due date.</li>
         <li>Attach one frontal chest X-ray: upload a JPEG or PNG, or pick one from the built-in library. Images that aren&rsquo;t chest X-rays, or that look like lateral views, are rejected.</li>
-        <li>Write the reference evaluation. Students never see it.</li>
-        <li>Publish. A published activity&rsquo;s case can&rsquo;t be replaced; archiving is final.</li>
+        <li>The AI reads the case in your browser as soon as it is attached. Keep the page open while it runs.</li>
+        <li>Validate the AI result: tick the labels that are truly present, adding what the AI missed, and paint over each finding&rsquo;s heatmap to correct it. Save the answer key.</li>
+        <li>Publish. A published activity&rsquo;s case and answer key can&rsquo;t be changed; archiving is final.</li>
       </ol>
     ),
     sources: ["map/processes/activity-authoring-publication.md", "map/objects/learning/chest-gate.md", "map/objects/learning/view-detector.md"],
@@ -118,8 +119,8 @@ const userTopics: Topic[] = [
     body: (
       <ul className={bullets}>
         <li>The review queue lists final submissions, including those in archived activities.</li>
-        <li>Save a private draft evaluation, then release it with a score and feedback. Released evaluations can&rsquo;t be changed, and students never see your remarks.</li>
-        <li><b>Analytics</b> shows each workspace&rsquo;s on-time, late and missing work, released-score averages, the review backlog, and how often students agree with the AI&rsquo;s normal/abnormal call. Export the per-student table as CSV.</li>
+        <li>Each submission shows the student&rsquo;s labels against your answer key and an automatic label score. Save a private draft evaluation, then release it with your own grade and feedback; the final grade is the average of the two. Released evaluations can&rsquo;t be changed, and students never see your remarks.</li>
+        <li><b>Analytics</b> shows each workspace&rsquo;s on-time, late and missing work, final-grade averages, the review backlog, and how often students agree with the AI&rsquo;s normal/abnormal call. Export the per-student table as CSV.</li>
       </ul>
     ),
     sources: ["map/processes/faculty-evaluation.md", "map/objects/learning/analytics.md"],

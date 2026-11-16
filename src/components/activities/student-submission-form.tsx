@@ -1,10 +1,11 @@
 "use client";
 
 import { useActionState, useEffect, useState } from "react";
+import { ACTIVITY_AI_LABELS, type ActivityAILabel } from "@/lib/activity-ai/types";
 import { initialSubmissionState, type StudentSubmission, type SubmissionActionState } from "@/lib/submissions/types";
-import { normalizeSubmission, validateSubmission } from "@/lib/submissions/validation";
+import { labelsError, toggleLabel } from "@/lib/submissions/validation";
 import { ConfirmDialog } from "@/components/confirm-dialog";
-import { button, field, textarea } from "@/components/controls";
+import { button } from "@/components/controls";
 import { activityFormHeadingClass, activityFormHeadingIconClass, activityFormHeadingKickerClass, activityFormHeadingTitleClass } from "@/components/activities/activity-form-styles";
 
 export function StudentSubmissionForm({ submission, dueAt, deadlinePassed, action }: {
@@ -14,14 +15,12 @@ export function StudentSubmissionForm({ submission, dueAt, deadlinePassed, actio
   action: (previous: SubmissionActionState, data: FormData) => Promise<SubmissionActionState>;
 }) {
   const [state, formAction, pending] = useActionState(action, initialSubmissionState);
-  const [findings, setFindings] = useState(submission?.visibleFindings ?? "");
-  const [classification, setClassification] = useState(submission?.classification ?? "");
-  const [region, setRegion] = useState(submission?.relevantRegion ?? "");
+  const [labels, setLabels] = useState<ActivityAILabel[]>(submission?.labels ?? []);
   const [confirming, setConfirming] = useState(false);
   const [incomplete, setIncomplete] = useState(false);
   const edited = () => { setConfirming(false); setIncomplete(false); };
-  // Same rules the server applies, so an unfinished answer is caught before the confirmation opens.
-  const startFinal = () => Object.keys(validateSubmission(normalizeSubmission({ visibleFindings: findings, classification, relevantRegion: region }), true)).length ? setIncomplete(true) : setConfirming(true);
+  // Same rule the server applies, so an unfinished answer is caught before the confirmation opens.
+  const startFinal = () => labelsError(labels) ? setIncomplete(true) : setConfirming(true);
   const [expired, setExpired] = useState(deadlinePassed);
   useEffect(() => {
     if (!dueAt) return;
@@ -33,44 +32,35 @@ export function StudentSubmissionForm({ submission, dueAt, deadlinePassed, actio
   const submitted = submission?.status === "submitted" || state.status === "submitted" || state.status === "already_submitted";
   const closed = expired || state.status === "deadline_passed";
   const locked = submitted || closed || state.status === "unauthorized" || state.status === "unavailable";
-  const errors = state.fieldErrors;
+  const error = state.fieldErrors?.labels;
   const message = pending ? "Saving your response…"
     : submitted ? state.message || "Submitted · This response is permanently locked."
     : closed ? "Deadline passed · Not submitted. Your draft is read-only."
     : state.message || (submission ? "Draft · Not submitted. Save changes or submit your final evaluation." : "Not started · Save a private draft or submit your final evaluation.");
-  const lockedClassification = submission?.classification || classification;
-  const lockedFindings = submission?.visibleFindings || findings;
-  const fieldError = (field: "visibleFindings" | "classification" | "relevantRegion") => errors?.[field] ? <small className="text-caption text-(--status-error-text)" id={`${field}-error`} role="alert">{errors[field]}</small> : null;
+  const lockedLabels = submission?.labels.length ? submission.labels : labels;
   return <section className="rounded-panel border border-(--border-shell) [background:var(--glass-surface)] backdrop-blur-[18px] backdrop-saturate-[135%] shadow-(--glass-shadow) p-6 max-[520px]:p-5">
     <div className={activityFormHeadingClass}><span className={activityFormHeadingIconClass} aria-hidden="true">➤</span><div><p className={activityFormHeadingKickerClass}>Student response</p><h2 className={activityFormHeadingTitleClass}>Your evaluation</h2></div></div>
     <p className="my-3 text-small leading-normal" role="status" aria-live="polite">{message}</p>
     {submission?.submittedAt ? <p className="my-3 text-small leading-normal">Submitted <time dateTime={submission.submittedAt}>{new Date(submission.submittedAt).toLocaleString()}</time></p> : null}
-    {locked ? <dl className="grid gap-4 [overflow-wrap:anywhere]">
-      <div><dt className="font-semibold">Classification</dt><dd className="mx-0 mt-1 mb-0 whitespace-pre-wrap">{lockedClassification || "Not selected"}</dd></div>
-      {/* Older Normal responses may still carry findings text, so show it whenever it exists. */}
-      {lockedClassification !== "normal" || lockedFindings ? <div><dt className="font-semibold">Visible findings</dt><dd className="mx-0 mt-1 mb-0 whitespace-pre-wrap">{lockedFindings || "No findings entered"}</dd></div> : null}
-      {lockedClassification === "abnormal" ? <div><dt className="font-semibold">Relevant region</dt><dd className="mx-0 mt-1 mb-0 whitespace-pre-wrap">{submission?.relevantRegion || region || "Not entered"}</dd></div> : null}
-    </dl> : <form action={formAction}>
-      <fieldset disabled={pending} className="m-0 grid min-w-0 gap-3 border-0 p-0 [&>label]:text-small [&>label]:text-(--text-secondary) [&_legend]:text-small [&_legend]:text-(--text-secondary) [&>small]:text-caption [&>small]:text-(--text-muted)">
-        <fieldset className="border-0 p-0 aria-invalid:outline-2 aria-invalid:outline-(--status-error-text)" aria-describedby={errors?.classification ? "classification-error" : undefined} aria-invalid={Boolean(errors?.classification)}>
-          <legend>Normal or abnormal?</legend>
-          <div className="flex flex-wrap gap-4">{["normal", "abnormal"].map((value) => <label className="flex items-center gap-2" key={value}><input className="size-4 accent-brand" type="radio" name="classification" value={value} checked={classification === value} onChange={() => { setClassification(value); if (value === "normal") { setFindings(""); setRegion(""); } edited(); }} />{value === "normal" ? "Normal" : "Abnormal"}</label>)}</div>
+    {locked ? <div className="[overflow-wrap:anywhere]">
+      <h3 className="m-0 text-small font-semibold">Labels you selected</h3>
+      {lockedLabels.length ? <ul className="mx-0 mt-1 mb-0 grid list-disc gap-1 pl-5 text-small">{lockedLabels.map((label) => <li key={label}>{label}</li>)}</ul> : <p className="mx-0 mt-1 mb-0 text-small">No labels selected</p>}
+    </div> : <form action={formAction}>
+      <fieldset disabled={pending} className="m-0 grid min-w-0 gap-3 border-0 p-0">
+        {/* React resets the form after each save, which unticks controlled checkboxes. Remounting them when the save settles makes the ticked state their reset default. */}
+        <fieldset key={pending ? "saving" : "idle"} className="m-0 grid grid-cols-2 gap-x-4 gap-y-2.5 border-0 p-0 max-[520px]:grid-cols-1 aria-invalid:outline-2 aria-invalid:outline-(--status-error-text)" aria-describedby={error ? "labels-error" : "labels-hint"} aria-invalid={Boolean(error)}>
+          <legend className="mb-2 p-0 text-small text-(--text-secondary)">Which findings are present in this X-ray?</legend>
+          {ACTIVITY_AI_LABELS.map((label) => <label className="flex items-center gap-2 text-small text-(--text-secondary)" key={label}>
+            <input className="size-4 accent-brand" type="checkbox" name="labels" value={label} checked={labels.includes(label)} onChange={() => { setLabels(toggleLabel(labels, label)); edited(); }} />{label}
+          </label>)}
         </fieldset>
-        {fieldError("classification")}
-        {classification === "abnormal" ? <>
-          <label htmlFor="visibleFindings">What visible findings do you observe?</label>
-          <textarea className={`${textarea} disabled:opacity-55`} id="visibleFindings" name="visibleFindings" rows={5} value={findings} onChange={(event) => { setFindings(event.target.value); edited(); }} aria-invalid={Boolean(errors?.visibleFindings)} aria-describedby={errors?.visibleFindings ? "visibleFindings-error" : undefined} />
-          {fieldError("visibleFindings")}
-          <label htmlFor="relevantRegion">Which region appears most relevant?</label>
-          <input className={field} id="relevantRegion" name="relevantRegion" value={region} onChange={(event) => { setRegion(event.target.value); edited(); }} aria-invalid={Boolean(errors?.relevantRegion)} aria-describedby={errors?.relevantRegion ? "relevantRegion-error" : "region-hint"} />
-          <small className="text-caption text-(--text-muted)" id="region-hint">Required for a final abnormal response. Maximum 200 characters.</small>
-          {fieldError("relevantRegion")}
-        </> : null}
+        <small className="text-caption text-(--text-muted)" id="labels-hint">Select every finding you see. Choose No Finding on its own for a normal X-ray. Wrong extra selections lower your score.</small>
+        {error ? <small className="text-caption text-(--status-error-text)" id="labels-error" role="alert">{error}</small> : null}
         <div className="flex flex-wrap gap-4">
           <button className={button("secondary")} type="submit" name="intent" value="draft" onClick={edited}>Save draft</button>
           <button className={button("primary")} type="button" onClick={startFinal}>Submit final evaluation</button>
         </div>
-        {incomplete ? <p className="m-0 rounded-control border border-(--status-error-text) px-3 py-2 text-small font-semibold text-(--status-error-text)" role="alert">Enter your answer before submitting.</p> : null}
+        {incomplete ? <p className="m-0 rounded-control border border-(--status-error-text) px-3 py-2 text-small font-semibold text-(--status-error-text)" role="alert">Select at least one label before submitting.</p> : null}
         {confirming ? <ConfirmDialog title="Confirm final submission" cancelLabel="Keep editing" confirmLabel="Confirm and submit" name="intent" value="final" onClose={() => setConfirming(false)}>
           Your final evaluation cannot be edited. Review your response before confirming.
           <input type="hidden" name="confirmed" value="yes" />

@@ -17,6 +17,7 @@ import { createClient } from "@/lib/supabase/server";
 import { looksLateral } from "@/lib/view-detector";
 import { passesChestGate } from "@/lib/chest-gate";
 import { chestFeaturesFile } from "@/lib/chest-gate/server";
+import { labelsError, normalizeLabels } from "@/lib/submissions/validation";
 
 const uuidPattern =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
@@ -225,7 +226,7 @@ export async function createActivityDraftAction(
 
   if (referenceInsertError) {
     await session.supabase.from("activities").delete().eq("id", activity.id);
-    return activityError("Unable to save the reference evaluation.");
+    return activityError("Unable to save the private notes.");
   }
 
   revalidateActivityPaths(activity.id, values.workspaceId);
@@ -267,7 +268,7 @@ export async function updateActivityAction(
     .update({ evaluation: values.referenceEvaluation })
     .eq("activity_id", activity.id);
 
-  if (referenceUpdateError) return activityError("The activity changed, but the reference evaluation did not save.");
+  if (referenceUpdateError) return activityError("The activity changed, but the private notes did not save.");
 
   revalidateActivityPaths(activity.id, activity.workspace_id);
   return { status: "success", message: "Activity saved." };
@@ -534,13 +535,13 @@ export async function publishActivityAction(
     activity.case_id ? getCase(session, activity.case_id) : Promise.resolve(null),
     session.supabase
       .from("activity_reference_evaluations")
-      .select("evaluation")
+      .select("validated_labels")
       .eq("activity_id", activity.id)
-      .maybeSingle<{ evaluation: string }>(),
+      .maybeSingle<{ validated_labels: string[] | null }>(),
   ]);
 
   if (caseRow?.upload_status !== "ready") return activityError("Upload and verify a frontal JPEG or PNG before publishing.");
-  if (!referenceResult.data?.evaluation) return activityError("Add the private reference evaluation before publishing.");
+  if (!referenceResult.data?.validated_labels) return activityError("Validate the AI result and save the answer key before publishing.");
   if (activity.due_at && new Date(activity.due_at).getTime() <= Date.now()) {
     return activityError("Choose a future due date or remove the due date before publishing.");
   }
@@ -554,6 +555,35 @@ export async function publishActivityAction(
   if (error) return activityError("Unable to publish the activity. Check all required fields and try again.");
   revalidateActivityPaths(activity.id, activity.workspace_id);
   return { status: "success", message: "Activity published to the workspace." };
+}
+
+/** Saves the Professor's validation of a draft's AI result: the true labels and the edited per-label heatmaps. */
+export async function saveAnswerKeyAction(activityId: string, labels: string[], heatmap: number[] | null) {
+  const failed = (message: string) => ({ ok: false as const, message });
+  const known = normalizeLabels(Array.isArray(labels) ? labels : []);
+  const invalid = labelsError(known);
+  if (!uuidPattern.test(activityId)) return failed("You are not permitted to manage this activity.");
+  if (invalid) return failed(invalid);
+  if (heatmap !== null && (!Array.isArray(heatmap) || heatmap.length !== 2744 || heatmap.some((value) => typeof value !== "number" || !(value >= 0 && value <= 1)))) {
+    return failed("The edited heatmap is not valid. Reload and try again.");
+  }
+  const session = await getProfessorSession();
+  if (!session) return failed("You are not permitted to manage this activity.");
+  const activity = await getActivityAccess(session, activityId);
+  if (!activity) return failed("You are not permitted to manage this activity.");
+
+  const { data, error } = await session.supabase.rpc("save_activity_answer_key", {
+    target_activity_id: activity.id, input_labels: known, input_heatmap: heatmap,
+  });
+  const messages: Record<string, string> = {
+    locked: "The answer key cannot change after the activity is published.",
+    analysis_required: "Wait for the AI analysis to finish before validating it.",
+    invalid_payload: "The selected labels or heatmap could not be accepted.",
+    unauthorized: "You are not permitted to manage this activity.",
+  };
+  if (error || data !== "saved") return failed(messages[String(data)] ?? "Unable to save the answer key. Try again.");
+  revalidateActivityPaths(activity.id, activity.workspace_id);
+  return { ok: true as const, message: "Answer key saved. You can now publish the activity." };
 }
 
 export async function archiveActivityAction(

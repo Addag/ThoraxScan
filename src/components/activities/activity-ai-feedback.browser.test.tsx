@@ -12,49 +12,48 @@ vi.mock("next/link", () => ({ __esModule: true, default: (props: ComponentProps<
 
 const labels = ACTIVITY_AI_LABELS.map((label) => ({
   label, threshold: 0.5,
-  probability: label === "Cardiomegaly" ? 0.8 : label === "Edema" ? 0.4 : 0.1,
-  predicted: label === "Cardiomegaly", possible: label === "Edema",
+  probability: label === "Cardiomegaly" ? 0.8 : 0.1,
+  predicted: label === "Cardiomegaly", possible: false,
 }));
+// The AI found Cardiomegaly; the Professor added Edema.
 const initial: Feedback = {
   status: "ready", attemptCount: 1, safeErrorCode: null, attemptedAt: null, completedAt: null,
   result: {
-    state: "predicted", labels, findings: labels.filter((item) => item.predicted), possibleFindings: labels.filter((item) => item.possible),
+    state: "predicted", labels, findings: labels.filter((item) => item.predicted), possibleFindings: [],
     provenance: { releaseId: "r", modelSha256: "m", bundleSha256: "b", manifestVersion: 1, preprocessingVersion: "p", thresholdVersion: "t", executionProvider: "wasm", applicationBuild: "a" },
     attention: { status: "unavailable", reason: "legacy-model-release" }, attentionStatus: "unavailable",
+    validatedLabels: ["Cardiomegaly", "Edema"],
   },
 };
+const answer = { selected: ["Cardiomegaly", "Fracture"], labelScore: 33.33 };
 
-test("shows likely, possible, and all labels like Learning Mode", async () => {
-  await render(<ActivityAIFeedback imageUrl={null} initial={initial} />);
-  await expect.element(page.getByRole("region", { name: "Likely findings" })).toHaveTextContent("Cardiomegaly");
-  await expect.element(page.getByRole("region", { name: "Possible findings" })).toHaveTextContent("Edema");
-  const popup = page.getByRole("dialog", { name: /possible finding/ });
-  await expect.element(popup).toHaveTextContent("many will be false alarms");
-  await page.getByRole("button", { name: "I understand" }).click();
-  await expect.element(popup).not.toBeInTheDocument();
-  await expect.element(page.getByText("AI-generated result.", { exact: false })).toBeVisible();
-  await expect.element(page.getByRole("region", { name: "AI-generated radiographic report" })).toHaveTextContent("Impression");
-  await page.getByText("All 14 labels", { exact: true }).click();
-  const list = page.getByText("All 14 labels", { exact: true }).element().closest("details")!.textContent;
-  expect(list).toContain("Likely");
-  expect(list).toContain("Possible");
-  expect(list).toContain("Not matched");
+test("compares the Student's labels with the Professor-validated key", async () => {
+  await render(<ActivityAIFeedback imageUrl={null} initial={initial} {...answer} />);
+  await expect.element(page.getByRole("region", { name: "Label score" })).toHaveTextContent("33.33%");
+  const key = page.getByRole("region", { name: "Correct labels" });
+  await expect.element(key).toHaveTextContent("Cardiomegaly · You selected thisAI found");
+  await expect.element(key).toHaveTextContent("Edema · You missed thisAdded by Professor");
+  await expect.element(key).toHaveTextContent("Fracture · You selected this, but it is not present");
 });
 
 test("reopening a finished activity does not pop the result up", async () => {
-  await render(<ActivityAIFeedback imageUrl={null} initial={initial} />);
-  await page.getByRole("button", { name: "I understand" }).click();
+  await render(<ActivityAIFeedback imageUrl={null} initial={initial} {...answer} />);
   await expect.element(page.getByRole("button", { name: "Close result" })).not.toBeInTheDocument();
-  await expect.element(page.getByRole("region", { name: "Likely findings" })).toBeVisible();
+  await expect.element(page.getByRole("region", { name: "Correct labels" })).toBeVisible();
 });
 
-test("feedback that becomes ready during the visit pops up, then stays on the page", async () => {
-  const screen = await render(<ActivityAIFeedback imageUrl={null} initial={{ ...initial, status: "locked", result: null }} />);
-  await screen.rerender(<ActivityAIFeedback imageUrl={null} initial={initial} />);
-  await page.getByRole("button", { name: "I understand" }).click();
-  const dialog = page.getByRole("dialog", { name: "AI feedback" }).element() as HTMLDialogElement;
+test("results that become ready during the visit pop up, then stay on the page", async () => {
+  const screen = await render(<ActivityAIFeedback imageUrl={null} initial={{ ...initial, status: "locked", result: null }} {...answer} />);
+  await expect.element(page.getByText("Submit your final evaluation", { exact: false })).toBeVisible();
+  await screen.rerender(<ActivityAIFeedback imageUrl={null} initial={initial} {...answer} />);
+  const dialog = page.getByRole("dialog", { name: "Results" }).element() as HTMLDialogElement;
   expect(dialog.open).toBe(true);
   await page.getByRole("button", { name: "Close result" }).click();
   expect(dialog.open).toBe(false);
-  await expect.element(page.getByRole("region", { name: "Likely findings" })).toHaveTextContent("Cardiomegaly");
+  await expect.element(page.getByRole("region", { name: "Correct labels" })).toHaveTextContent("Cardiomegaly");
+});
+
+test("an activity without an answer key explains that it has no results", async () => {
+  await render(<ActivityAIFeedback imageUrl={null} initial={{ ...initial, result: { ...initial.result!, validatedLabels: null } }} {...answer} />);
+  await expect.element(page.getByText("published before answer keys existed", { exact: false })).toBeVisible();
 });

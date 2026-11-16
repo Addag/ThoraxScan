@@ -3,9 +3,10 @@
 ThoraxScan is a professor-guided learning platform for chest X-ray
 interpretation, built for Radiologic Pathology and BS Radiologic Technology
 students. Professors run private workspaces and publish activities built on
-de-identified teaching cases. Students submit their interpretations and, once
-they have submitted, receive AI-assisted feedback and the professor's
-evaluation.
+de-identified teaching cases. The AI reads each case first and the professor
+validates its result into an answer key. Students answer by selecting labels
+and, once they have submitted, see the validated answer, their label score and
+the professor's evaluation.
 
 > **Educational use only.** ThoraxScan is not a diagnostic tool and has not been
 > clinically validated. It does not replace a radiologist and must not be used
@@ -13,12 +14,14 @@ evaluation.
 
 ## What it does
 
-- **Students** join workspaces with an invitation code and complete activities,
-  saving drafts before one final submission. They practise in Learning Mode
+- **Students** join workspaces with an invitation code and complete activities
+  by selecting findings from the 14 labels, saving drafts before one final
+  submission that is scored against the professor's answer key. They practise in Learning Mode
   with the active model, keep private notes on library cases, and read the
   attention-map guide.
 - **Professors** apply for approval, then create workspaces and activities from
-  their own uploads or the built-in CheXpert case library. They review
+  their own uploads or the built-in CheXpert case library. They validate the
+  AI's labels and heatmaps for each case before publishing, review
   submissions, release their evaluations, view class analytics and export them
   as CSV, and can use Learning Mode too.
 - **Administrators** approve Professor applications and run the console at
@@ -51,10 +54,15 @@ Supabase: Auth, Postgres with row-level security, Storage
 ```
 
 Model inference runs in the browser. Learning Mode results stay in memory. An
-activity's analysis runs once, in the Professor's browser, when the activity is
-published, and is saved through an authorized RPC that only the workspace's
-Professors can use. Students see it only after their own final submission; the
-Professor's evaluation is released separately. The active
+activity's analysis runs once, in the Professor's browser, as soon as a case is
+attached to the draft, and is saved through an authorized RPC that only the
+workspace's Professors can use. The Professor then validates it: they tick the
+true labels and repaint the per-finding heatmaps, and that answer key locks
+when the activity is published. A Student's selected labels are scored against
+the key (correct picks over key labels plus wrong extra picks), and the Student
+sees the key only after their own final submission. The Professor's evaluation
+is released separately; the final grade is the average of the label score and
+the Professor's grade. The active
 model is read from a Supabase registry slot, so a model can be replaced without
 redeploying the app (see [The model](#the-model)).
 
@@ -355,6 +363,11 @@ Production: [https://thoraxscan.com](https://thoraxscan.com)
 
 ## Further documentation
 
+- [`docs/beginner-guide.md`](docs/beginner-guide.md): a teaching guide for
+  groupmates new to coding, covering setup, basic syntax, architecture, feature
+  walkthroughs, practice tasks, and verification. Its
+  [repository reference](docs/repository-reference.md) inventories the tracked
+  files at the documented baseline.
 - The landing page carries an in-app guide for Students, Professors, and
   developers, plus a technical overview of the model
   ([`src/components/docs-section.tsx`](src/components/docs-section.tsx),

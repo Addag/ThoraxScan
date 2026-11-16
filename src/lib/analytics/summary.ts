@@ -84,7 +84,7 @@ export function csvCell(value: string | number | null) {
 }
 
 export function toCsv(rows: ClassSummary["perStudent"]) {
-  const header = ["Student", "Submitted", "Activities", "Late", "Missing", "Average released score", "AI agreement %"];
+  const header = ["Student", "Submitted", "Activities", "Late", "Missing", "Average final grade", "AI agreement %"];
   const lines = rows.map((row) => [row.name, row.submitted, row.total, row.late, row.missing, row.averageScore, row.agreement]);
   return [header, ...lines].map((line) => line.map(csvCell).join(",")).join("\r\n") + "\r\n";
 }

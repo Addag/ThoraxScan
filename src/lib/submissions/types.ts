@@ -1,8 +1,12 @@
+import type { ActivityAILabel } from "@/lib/activity-ai/types";
+
 export type SubmissionStatus = "draft" | "submitted";
-export type SubmissionValues = { visibleFindings: string; classification: string; relevantRegion: string };
+export type SubmissionValues = { labels: ActivityAILabel[] };
 export type StudentSubmission = SubmissionValues & {
   id: string;
   status: SubmissionStatus;
+  // Set when the answer is finalized; older text-only finals have none.
+  labelScore: number | null;
   createdAt: string;
   updatedAt: string;
   submittedAt: string | null;

@@ -2,13 +2,13 @@
 node_type: object
 universe: live
 status: verified
-audited: 2026-09-29
+audited: 2026-11-16
 snapshot: main @ 6af6c16
 ---
 
 # Activity
 
-Activity is the workspace-scoped `public.activities` assignment record plus its professor-only `public.activity_reference_evaluations` answer record.
+Activity is the workspace-scoped `public.activities` assignment record plus its professor-only `public.activity_reference_evaluations` row, which holds the answer key (validated labels and per-label heatmaps) and optional private notes.
 
 ## Why this shape
 
@@ -18,7 +18,8 @@ Student-readable assignment text is separated from the private teaching referenc
 
 - Activities carry a workspace, one optional draft case, creator, constrained title/instructions, optional due date, and `draft | published | archived` lifecycle in [the activity migration](<../../../supabase/migrations/20260820101401_activities_case_publication.sql:31>).
 - One reference evaluation is keyed by activity and cascades only with draft deletion in [the private-reference table](<../../../supabase/migrations/20260820101401_activities_case_publication.sql:73>).
-- Database triggers enforce `draft → published → archived`, require a ready case and non-empty reference at publication, forbid published deletion/case replacement, and make archive terminal in [the lifecycle trigger](<../../../supabase/migrations/20260820101401_activities_case_publication.sql:148>).
+- The answer key is `validated_labels` (1–14 known labels, No Finding only alone), `validated_heatmap` (2744 values, the AI's V3 maps as edited by the Professor) and `validated_at`, written by `save_activity_answer_key` on a draft with a ready analysis and immutable once published ([answer key migration](<../../../supabase/migrations/20261116120000_professor_validated_answer_key.sql>)).
+- Database triggers enforce `draft → published → archived`, require a ready case and a validated answer key at publication, forbid published deletion/case replacement, and make archive terminal in [the lifecycle trigger](<../../../supabase/migrations/20260820101401_activities_case_publication.sql:148>).
 - TypeScript exposes separate Professor and Student projections so the Student data layer never serializes reference evaluations in [activity types](<../../../src/lib/activities/types.ts:5>). The projections also include the authorized AI status/feedback view.
 
 ## Connected to

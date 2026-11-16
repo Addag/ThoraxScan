@@ -8,7 +8,8 @@ import type {
   StudentActivitySummary,
 } from "@/lib/activities/types";
 import { createClient } from "@/lib/supabase/server";
-import { getProfessorActivityAIStatus, getStudentActivityAIFeedback } from "@/lib/activity-ai/server";
+import { getProfessorActivityAIResult, getProfessorActivityAIStatus, getStudentActivityAIFeedback } from "@/lib/activity-ai/server";
+import { normalizeLabels } from "@/lib/submissions/validation";
 
 type ActivityRow = {
   id: string;
@@ -25,6 +26,8 @@ type ActivityRow = {
 
 type ReferenceRow = {
   evaluation: string;
+  validated_labels: string[] | null;
+  validated_heatmap: number[] | null;
 };
 
 type CaseRow = {
@@ -81,7 +84,7 @@ export async function getProfessorActivity(activityId: string) {
       .maybeSingle<ActivityRow>(),
     supabase
       .from("activity_reference_evaluations")
-      .select("evaluation")
+      .select("evaluation, validated_labels, validated_heatmap")
       .eq("activity_id", activityId)
       .maybeSingle<ReferenceRow>(),
   ]);
@@ -111,6 +114,7 @@ export async function getProfessorActivity(activityId: string) {
   }
 
   const aiStatus = await getProfessorActivityAIStatus(activityId);
+  const aiResult = aiStatus.status === "ready" ? await getProfessorActivityAIResult(activityId) : null;
   return {
     ...professorSummary(activity),
     caseId: activity.case_id,
@@ -122,17 +126,21 @@ export async function getProfessorActivity(activityId: string) {
     imageUrl,
     imageError,
     aiStatus,
+    aiFindings: aiResult?.findings ?? null,
+    aiHeatmap: aiResult?.heatmap ?? null,
+    validatedLabels: referenceResult.data?.validated_labels ? normalizeLabels(referenceResult.data.validated_labels) : null,
+    validatedHeatmap: referenceResult.data?.validated_heatmap ?? null,
   } satisfies ProfessorActivityDetails;
 }
 
 type SubmissionRow = {
-  id: string; visible_findings: string; classification: string | null; relevant_region: string;
+  id: string; selected_labels: string[]; label_score: number | null;
   status: SubmissionStatus; created_at: string; updated_at: string; submitted_at: string | null;
 };
 type StudentActivityRow = ActivityRow & { student_submissions: SubmissionRow[] };
 function projectSubmission(row?: SubmissionRow): StudentSubmission | null {
-  return row ? { id: row.id, visibleFindings: row.visible_findings, classification: row.classification ?? "",
-    relevantRegion: row.relevant_region, status: row.status, createdAt: row.created_at,
+  return row ? { id: row.id, labels: normalizeLabels(row.selected_labels),
+    labelScore: row.label_score === null ? null : Number(row.label_score), status: row.status, createdAt: row.created_at,
     updatedAt: row.updated_at, submittedAt: row.submitted_at } : null;
 }
 
@@ -176,7 +184,7 @@ export async function getStudentActivity(activityId: string) {
   const { data: activity, error } = await supabase
     .from("activities")
     .select(
-      "id, workspace_id, case_id, title, instructions, due_at, status, published_at, updated_at, workspaces!inner(name), student_submissions(id, visible_findings, classification, relevant_region, status, created_at, updated_at, submitted_at)",
+      "id, workspace_id, case_id, title, instructions, due_at, status, published_at, updated_at, workspaces!inner(name), student_submissions(id, selected_labels, label_score, status, created_at, updated_at, submitted_at)",
     )
     .eq("id", activityId)
     .eq("status", "published")

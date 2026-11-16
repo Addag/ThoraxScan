@@ -39,7 +39,7 @@ export default async function StudentPage() {
                 <Link className="transition-colors duration-160 hover:bg-(--hover-overlay) flex min-h-[130px] flex-col justify-between rounded-panel border border-(--border-shell) bg-(--glass-inset) p-4 no-underline shadow-(--glass-inset-shadow)" href={`/student/activities/${activity.id}`} key={activity.id}>
                   <span className="text-label font-extrabold uppercase tracking-[0.08em] text-(--brand-blue-text)">{activity.workspaceName}</span>
                   <strong className="mt-2 text-lead leading-tight text-(--text-primary)">{activity.title}</strong>
-                  <small className="mt-3 text-label leading-snug text-(--text-muted)">{submissionLabel(activity.submissionStatus, activity.dueAt)} · {activity.aiStatus === "ready" ? "Feedback available" : activity.aiStatus === "pending" ? "Analysis pending" : activity.aiStatus === "failed" ? "Analysis failed" : "AI feedback locked"} · {formatDueDate(activity.dueAt)}</small>
+                  <small className="mt-3 text-label leading-snug text-(--text-muted)">{submissionLabel(activity.submissionStatus, activity.dueAt)} · {activity.aiStatus === "ready" ? "Results available" : activity.aiStatus === "pending" ? "Analysis pending" : activity.aiStatus === "failed" ? "Analysis failed" : "Results locked"} · {formatDueDate(activity.dueAt)}</small>
                 </Link>
               ))}
             </div>
