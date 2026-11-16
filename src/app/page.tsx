@@ -7,7 +7,7 @@ import { RevealOnScroll } from "@/components/reveal-on-scroll";
 import { TechnicalOverview } from "@/components/technical-overview";
 import { DocsSection } from "@/components/docs-section";
 import { getCurrentProfile } from "@/lib/auth/server";
-import { LandingFooter, LandingHeader, glassCard, secondaryPill, sectionLead, sectionShell, sectionTitle } from "@/components/landing-ui";
+import { LandingFooter, LandingHeader, glassCard, primaryPill as loginButton, secondaryPill, sectionLead, sectionShell, sectionTitle } from "@/components/landing-ui";
 
 const workflowCallouts = [
   { color: "purple", label: "Interpret first" },
@@ -65,8 +65,6 @@ const modelScore = {
   label: "mean AUC across the five CheXpert competition labels",
   source: "Release v7, measured on the 234-image CheXpert validation set, which the model was neither trained nor tuned on.",
 };
-
-const loginButton = "inline-flex min-h-12 items-center justify-center gap-2 rounded-full border border-[rgb(168_211_255/48%)] px-7 text-[1rem] font-extrabold text-white no-underline [background:var(--landing-login-bg)] shadow-(--landing-login-shadow) [transition:transform_160ms_ease] hover:[background:var(--landing-login-bg-hover)] active:translate-y-px focus-visible:outline-3 focus-visible:outline-[#c5e3ff] focus-visible:outline-offset-[5px]";
 
 export default async function Home() {
   const { authenticated } = await getCurrentProfile();
