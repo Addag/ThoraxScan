@@ -22,3 +22,7 @@ The review list, detail page, grading form, Student evaluation panel, and attent
 ## Does not do
 
 No revisions, appeals, assignment model, prediction arrays, or heatmaps. Released evaluations appear in the Student [bell](notification.md).
+
+## Live release
+
+Students cannot read `faculty_evaluations` (it holds Professor-only remarks). When a row becomes `released`, the `faculty_evaluations_broadcast_release` trigger sends an empty private `feedback_released` broadcast to the Student's `notifications:<student id>` topic, and the open page re-renders through the existing projections ([realtime migration](../../../supabase/migrations/20261118130000_notification_realtime.sql)). Changing the release transition or the submission-to-Student link hits that trigger.

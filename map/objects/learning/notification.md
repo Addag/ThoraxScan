@@ -21,6 +21,7 @@ Dues and submissions already live in their own tables, so the feed is derived wh
 - Opening an item marks it read and redirects to a role-derived route. "Mark all read" marks every unread item and refreshes the page ([actions](<../../../src/app/(protected)/actions.ts:15>)).
 - The panel itself is a native Popover API panel with no client JS. It has one panel and two bell buttons: the desktop header and the mobile bar ([component](<../../../src/components/notification-bell.tsx:14>)).
 - Live updates (audited 2026-11-18): `AppShell` mounts [NotificationListener](<../../../src/components/notification-listener.tsx>) wherever it renders the bell. It subscribes on a private `notifications:<user id>` channel to Postgres `INSERT`/`UPDATE` changes on `activities` and `student_submissions`, which Realtime filters through each table's RLS, plus a `feedback_released` broadcast, and calls `router.refresh()` at most once per second of activity. Students cannot read `faculty_evaluations`, so the `faculty_evaluations_broadcast_release` trigger sends an empty private broadcast to the Student's topic when an evaluation becomes released, and a `realtime.messages` policy lets each user listen only on their own topic ([realtime migration](<../../../supabase/migrations/20261118130000_notification_realtime.sql>)). The `ai_feedback_releases_broadcast_release` trigger sends the same signal when a Student's AI results become released (the analysis finished after they submitted), so an open activity page's Results panel re-renders too ([live results migration](<../../../supabase/migrations/20261118140000_live_activity_results.sql>)). `DELETE` events are not subscribed because Realtime does not apply RLS to them.
+- Local caveat: the local Realtime server (v2.124.2) rejects the `sb_publishable_…` key (MalformedJWT), so live updates are verified on hosted only; locally they fail silently and pages update on navigation.
 
 ## Connected to
 
@@ -36,7 +37,7 @@ Dues and submissions already live in their own tables, so the feed is derived wh
 
 ### Does not hit
 
-- Administrator and pending-Professor application shells (no bell), email or push delivery, and AI feedback. (The only app-sent email is the Professor application result, which is separate from the bell; see [the review process](../../processes/professor-application-review.md).)
+- Administrator and pending-Professor application shells (no bell; the pending page has its own listener), and email or push delivery. (The only app-sent email is the Professor application result, which is separate from the bell; see [the review process](../../processes/professor-application-review.md).)
 
 ## Surfaces
 

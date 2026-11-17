@@ -16,7 +16,9 @@ Each final submission has one `pending_analysis` or immutable `released` row, wi
 
 On read, `getStudentActivityAIFeedback` derives `possibleFindings` from the stored thresholds with the same rule as Learning Mode: an abnormal label below its threshold but at or above its `possibleThreshold` ([server.ts](<../../../src/lib/activity-ai/server.ts:25>)). The Student feedback card and Learning Mode both render results through the shared [AnalysisFindings](<../../../src/components/analysis-findings.tsx:10>) component, so a change to its likely/possible/all-labels layout lands on both.
 
+Releases are announced live (audited 2026-11-18): the `ai_feedback_releases_broadcast_release` trigger sends an empty private `feedback_released` broadcast to `notifications:<student id>` when a row becomes `released`, and never again for that row ([live results migration](<../../../supabase/migrations/20261118140000_live_activity_results.sql>)). Students still cannot read this table; the signal only makes an open page re-render and refetch through the RPC.
+
 ## Connected to
 
-[Student submission](student-submission.md), [AI analysis](ai-analysis.md), [Activity](activity.md), and [Student activity viewing](../../processes/student-activity-view.md).
+[Student submission](student-submission.md), [AI analysis](ai-analysis.md), [Activity](activity.md), [Student activity viewing](../../processes/student-activity-view.md), and the [bell's live listener](notification.md).
 
