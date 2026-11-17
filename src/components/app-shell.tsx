@@ -5,6 +5,7 @@ import type { ReactNode } from "react";
 import { logoutAction } from "@/app/(protected)/actions";
 import { AppSidebar } from "@/components/app-sidebar";
 import { NotificationBellButton, NotificationPanel } from "@/components/notification-bell";
+import { NotificationListener } from "@/components/notification-listener";
 import { SiteAnnouncements } from "@/components/site-announcements";
 import { ThemeIconButton } from "@/components/theme-toggle";
 import type { NotificationsResult } from "@/lib/notifications/types";
@@ -112,6 +113,7 @@ export function AppShell({
         </footer>
       </div>
       {notifications ? <NotificationPanel notifications={notifications} /> : null}
+      {notifications ? <NotificationListener /> : null}
     </div>
   );
 }
