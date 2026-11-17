@@ -2,7 +2,7 @@
 
 This guide is for groupmates who are new to coding. It explains what the project contains, how its parts work together, and how to start contributing.
 
-**Source baseline:** commit `a25613a`, reviewed on 16 November 2026; the activity, submission, and grading sections were updated on 17 November 2026 for the Professor-validated answer key (commit `2f9a6d1`). Links point to files in your checkout, which can change. I cannot confirm the deployed version, active hosted model, or whether the answer-key migration has been applied to a hosted project. This is a source walkthrough, not a report that every setup step or feature was run successfully.
+**Source baseline:** commit `a25613a`, reviewed on 16 November 2026; the activity, submission, and grading sections were updated on 17 November 2026 for the Professor-validated answer key (commit `2f9a6d1`), then for written answers, Student heatmaps, Professor-only grading and the heatmap brush (uncommitted working tree). Links point to files in your checkout, which can change. I cannot confirm the deployed version, active hosted model, or whether the answer-key migration has been applied to a hosted project. This is a source walkthrough, not a report that every setup step or feature was run successfully.
 
 ThoraxScan is an educational application. Its README states that it has not been clinically validated and must not be used for patient care. Keep that limitation when explaining or changing AI result wording. [Source: project README](../README.md).
 
@@ -208,25 +208,25 @@ The [repository reference](repository-reference.md) lists tracked files across t
 
 ### 6.2 Read a small function
 
-This function appears in the committed [submission validation](../src/lib/submissions/validation.ts):
+This function appears in the [submission validation](../src/lib/submissions/validation.ts):
 
 ```ts
-export function validateSubmission(values: SubmissionValues): SubmissionFieldErrors {
-  const error = labelsError(values.labels);
-  return error ? { labels: error } : {};
+export function unpaintedFindings(map: readonly number[] | null, labels: readonly ActivityAILabel[]) {
+  const painted = paintedLabels(map, labels);
+  return labels.filter((label) => label !== "No Finding" && !painted.includes(label));
 }
 ```
 
 - `export` lets another file import the function.
 - `function` declares a reusable operation.
-- `validateSubmission` is its name.
-- `values` is the value passed in by the caller.
-- `: SubmissionValues` describes the expected input shape.
-- `: SubmissionFieldErrors` describes the returned shape: an object of error messages, empty when the input is acceptable.
+- `unpaintedFindings` is its name.
+- `map` and `labels` are the values passed in by the caller.
+- `: readonly number[] | null` describes the expected input shape: a list of numbers the function will not change, or `null` when nothing was painted.
 - `{ ... }` encloses the work the function performs.
-- `condition ? a : b` returns `a` when the condition is true, otherwise `b`.
+- `const painted = ...` stores an intermediate result under a name.
+- `labels.filter((label) => ...)` keeps only the labels for which the arrow function returns `true`; `&&` means "and", `!` means "not".
 
-The same file has `normalizeLabels` (keeps known labels in the fixed order, without repeats), `labelsError` (at least one label; `No Finding` only on its own), and `scoreLabels` (the scoring formula described in section 10.1). The [tests](../src/lib/submissions/validation.test.ts) show examples of accepted and rejected values.
+The same file has `normalizeLabels` (keeps known labels in the fixed order, without repeats), `labelsError` (at least one label; `No Finding` only on its own), `normalizeAnswers` (trims written answers and keeps them for selected labels only), `paintedLabels` (which selected findings have a cell above 0), `validateSubmission` (combines these checks into field errors), and `compareLabels` (correct, extra and missed labels against the key, without a score). The [tests](../src/lib/submissions/validation.test.ts) show examples of accepted and rejected values.
 
 ### 6.3 Recognize frequently used expressions
 
@@ -349,29 +349,34 @@ The built-in gallery is different: its JPEGs are static files under `public/imag
 
 ### 10.1 Student submission: a complete form journey
 
-Students answer by ticking labels from the model's 14 (for example `Cardiomegaly`, `Pleural Effusion`, or `No Finding`) instead of writing findings. A final answer is scored against the Professor's answer key (section 10.2).
+Students answer by ticking labels from the model's 14 (for example `Cardiomegaly`, `Pleural Effusion`, or `No Finding`), optionally explaining each one in writing, and marking where each finding is on a heatmap. Answers are not scored automatically: the Professor grades them, using the answer key (section 10.2) as a guide.
 
 ```text
-Activity page -> label checklist -> Server Action -> validation
-     -> save_student_activity_submission RPC -> database rules and scoring
-     -> returned status -> refreshed pages, answer-key feedback, grade
+Activity page -> labels, written answers, heatmap brush -> Server Action -> validation
+     -> save_student_activity_submission RPC -> database rules
+     -> returned status -> refreshed pages, side-by-side feedback, Professor's grade
 ```
 
 1. The [activity page](../src/app/%28protected%29/student/activities/%5BactivityId%5D/page.tsx) calls `requireRole("student")`, checks the ID, and loads activity/evaluation data.
-2. It renders [StudentSubmissionForm](../src/components/activities/student-submission-form.tsx) and binds the activity ID to `saveStudentSubmission`.
-3. The [action](../src/app/%28protected%29/student/activities/actions.ts) checks the ID, authenticated user, Student profile, draft/final intent, and confirmation for a final submission.
-4. [Validation](../src/lib/submissions/validation.ts) keeps only known labels and requires at least one; `No Finding` cannot be combined with other labels. In the form, `toggleLabel` enforces the same rule while the Student clicks.
-5. `save_student_activity_submission` enforces the database workflow: membership, deadlines, finality, the same label rule (`private.valid_answer_labels`), and that the activity has an answer key. On a final submission it stores `label_score`:
-
-   ```text
-   score = correct picks / (key labels + wrong extra picks) x 100
-   ```
-
-   With key `{Cardiomegaly, Edema}`, picking `{Cardiomegaly, Pleural Effusion}` scores 1 / (2 + 1) = 33.33. Ticking every label adds many wrong picks, so it cannot score 100. `scoreLabels` in TypeScript mirrors this formula for display; the database value is the one that counts. Read the [answer-key migration](../supabase/migrations/20261116120000_professor_validated_answer_key.sql).
+2. It renders [StudentSubmissionForm](../src/components/activities/student-submission-form.tsx) and binds the activity ID to `saveStudentSubmission`. Under the checklist the form shows one optional text box per selected label and a [HeatmapPainter](../src/components/heatmap-painter.tsx) for the selected findings (see "The heatmap brush" below).
+3. The [action](../src/app/%28protected%29/student/activities/actions.ts) checks the ID, authenticated user, Student profile, draft/final intent, and confirmation for a final submission. It reads the `answer:<label>` fields and the hidden `heatmap` field (2,744 numbers from 0 to 1, or empty), and asks the database whether this activity needs a heatmap (`activity_requires_student_heatmap`, true when the key has maps).
+4. [Validation](../src/lib/submissions/validation.ts) keeps only known labels and requires at least one; `No Finding` cannot be combined with other labels. Written answers are trimmed and limited to 2,000 characters. A final submission needs at least one marked cell for every selected finding when the key has maps. In the form, `toggleLabel` enforces the label rule while the Student clicks, and `unpaintedFindings` blocks the confirmation dialog until every finding is marked.
+5. `save_student_activity_submission` enforces the database workflow: membership, deadlines, finality, the same label rule (`private.valid_answer_labels`), that the activity has an answer key, and the heatmap rule (returning `heatmap_required`). It stores `selected_labels`, `label_answers` and `student_heatmap`, and computes no score. Read the [answers and heatmaps migration](../supabase/migrations/20261117120000_student_label_answers_and_heatmaps.sql), which replaced the label scoring of the [answer-key migration](../supabase/migrations/20261116120000_professor_validated_answer_key.sql).
 6. The action translates returned statuses into messages and revalidates relevant paths so subsequent rendering reads updated data.
-7. After a final submission, [AI feedback](../src/components/activities/activity-ai-feedback.tsx) shows the Professor-validated labels and the key's heatmaps next to the Student's picks. [Faculty evaluation](../src/components/activities/student-faculty-evaluation.tsx) appears once the Professor releases it. The final grade is `finalGrade` in [evaluations/types.ts](../src/lib/evaluations/types.ts): the average of the label score and the Professor's grade.
+7. After a final submission, [AI feedback](../src/components/activities/activity-ai-feedback.tsx) shows the Professor-validated labels (selected, missed, extra) with the Student's written answers, and [HeatmapComparison](../src/components/heatmap-comparison.tsx) shows the Student's heatmap beside the key's for each finding. [Faculty evaluation](../src/components/activities/student-faculty-evaluation.tsx) appears once the Professor releases it; that grade is the only grade.
 
-Older text submissions made before this change keep their answers and are graded by the Professor alone (their `label_score` is empty). Activities published before answer keys existed accept no new answers, because there is nothing to score against.
+Activities published before answer keys existed accept no new answers. Older submissions keep what they stored; no special handling applies to them.
+
+#### The heatmap brush
+
+Both the Professor's answer key and the Student's answer use [HeatmapPainter](../src/components/heatmap-painter.tsx). It edits one 14×14 map per finding, the same grid as the AI's class activation maps, so all three maps can be compared directly. The maths lives in [heatmap-brush.ts](../src/lib/heatmap-brush.ts), as pure functions with [unit tests](../src/lib/heatmap-brush.test.ts):
+
+- **Size** (1–8 cells), **Strength** (10–100%) and **Hardness** (0–100%) shape a round brush; Mark or Erase picks the direction.
+- One stroke never goes past its strength, like opacity in an image editor; painting over the same area in a new stroke builds up. Painting computes `v + (1 − v) × mask`; erasing computes `v × (1 − mask)`.
+- Values are rounded to 3 decimals, and anything below 0.01 becomes 0, so a faint speck does not count as "marked".
+- Undo and Redo keep up to 50 steps. Shortcuts: `[` and `]` change the size, `B` marks, `E` erases, Ctrl+Z undoes, Ctrl+Shift+Z redoes. Keyboard users move a cell outline with the arrow keys and paint with Space or Enter.
+
+Because painted cells can hold values between 0 and 1, code that asks "is this cell marked?" must check `> 0`, as `paintedLabels` does.
 
 Practice explaining why a validation check in the browser cannot replace the database's deadline check. A user can send requests without following the intended screen sequence.
 
@@ -386,11 +391,11 @@ The [ActivityAIStatus component](../src/components/activities/activity-ai-status
 #### The answer key
 
 ```text
-Draft + ready case -> AI analysis -> AnswerKeyForm (tick labels, repaint heatmaps)
+Draft + ready case -> AI analysis -> AnswerKeyForm (tick labels, repaint heatmaps with the brush)
      -> saveAnswerKeyAction -> save_activity_answer_key RPC -> publish
 ```
 
-1. [AnswerKeyForm](../src/components/professor/answer-key-form.tsx) starts with the AI's findings ticked. The Professor ticks the labels that are actually true and can repaint each finding's heatmap. Professors see the AI's finding labels but never its probabilities.
+1. [AnswerKeyForm](../src/components/professor/answer-key-form.tsx) starts with the AI's findings ticked. The Professor ticks the labels that are actually true and can repaint each finding's heatmap with the [heatmap brush](#the-heatmap-brush); "Reset to AI" restores a finding's AI map, and can itself be undone. Professors see the AI's finding labels but never its probabilities.
 2. `saveAnswerKeyAction` in the [activity actions](../src/app/%28protected%29/professor/activities/actions.ts) calls `save_activity_answer_key`, which accepts the key only while the activity is a draft with a ready analysis. It stores `validated_labels`, `validated_heatmap`, and `validated_at` on `activity_reference_evaluations`.
 3. Publishing requires the key. After publishing, the database rejects any change to it, and the form shows it read-only.
 4. Replacing a draft's case or deleting the draft drops its AI result and key, so the Professor must validate again.
@@ -534,7 +539,7 @@ Completion check: the learner can identify which file owns the text and describe
 
 ### Exercise B: understand a pure function through tests
 
-Use the [submission validation tests](../src/lib/submissions/validation.test.ts). The scoring cases are a good start: work out the score by hand with the formula in section 10.1 before running them.
+Use the [submission validation tests](../src/lib/submissions/validation.test.ts). The painting cases are a good start: work out by hand which findings `paintedLabels` and `unpaintedFindings` report before running them. Then try the [brush tests](../src/lib/heatmap-brush.test.ts): with the formulas in section 10.1, predict the value after two 30% strokes.
 
 1. Read one test name and its input object.
 2. Predict the expected output before running it.

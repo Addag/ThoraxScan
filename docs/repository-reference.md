@@ -2,18 +2,18 @@
 
 [Start with the beginner guide](beginner-guide.md). This reference helps you find files after you understand the main concepts.
 
-Inventory baseline: `a25613a`, reviewed 16 November 2026. It accounts for all 645 tracked files at that commit, plus the two files added by the answer-key commit `2f9a6d1` (updated 17 November 2026), for 647. It excludes generated/ignored files, the guide/reference themselves, and uncommitted work. Files added after `2f9a6d1` may be missing.
+Inventory baseline: `a25613a`, reviewed 16 November 2026. It accounts for all 645 tracked files at that commit, plus the two files added by the answer-key commit `2f9a6d1` (updated 17 November 2026), for 647, plus six files from the uncommitted written-answers and heatmap-brush work (the painter, comparison and brush files with their tests, and the `20261117120000` migration), for 653. It excludes generated/ignored files and the guide/reference themselves. Other files added after `2f9a6d1` may be missing.
 
 Export names below were extracted from source declarations at the baseline. They are navigation aids, not a complete function/API specification. Migration topics come from filenames; read the SQL and later replacements to establish actual behavior. Links open the current checkout, so declarations may differ after edits.
 
-| Area | Tracked files at `2f9a6d1` |
+| Area | Files at `2f9a6d1` + working tree |
 |---|---:|
 | [Root configuration and notes](#root-configuration-and-notes) | 17 |
 | [Application routes and actions](#application-routes-and-actions) | 52 |
-| [Interface components](#interface-components) | 59 |
-| [Application libraries](#application-libraries) | 63 |
+| [Interface components](#interface-components) | 62 |
+| [Application libraries](#application-libraries) | 65 |
 | [Request proxy](#request-proxy) | 1 |
-| [Database migrations](#database-migrations) | 33 |
+| [Database migrations](#database-migrations) | 34 |
 | [Database tests](#database-tests) | 16 |
 | [Database configuration and supporting files](#database-configuration-and-supporting-files) | 10 |
 | [Maintenance scripts](#maintenance-scripts) | 9 |
@@ -140,6 +140,9 @@ Export names below were extracted from source declarations at the baseline. They
 | [src/components/empty-state.tsx](../src/components/empty-state.tsx) | Declared exports: `EmptyState`. |
 | [src/components/field-error.ts](../src/components/field-error.ts) | Declared exports: `fieldErrorText`, `fieldErrorClass`, `authEyebrowClass`. |
 | [src/components/filter-form.tsx](../src/components/filter-form.tsx) | Client entry; Declared exports: `FilterForm`. |
+| [src/components/heatmap-comparison.tsx](../src/components/heatmap-comparison.tsx) | Client entry; Declared exports: `HeatmapComparison`. The Student's heatmap beside the answer key's, per finding. |
+| [src/components/heatmap-painter.browser.test.tsx](../src/components/heatmap-painter.browser.test.tsx) | Automated browser test. |
+| [src/components/heatmap-painter.tsx](../src/components/heatmap-painter.tsx) | Client entry; Declared exports: `HeatmapPainter`. Adjustable heatmap brush for the answer key and the Student's answer; see the [guide's brush section](beginner-guide.md#the-heatmap-brush). |
 | [src/components/landing-ui.tsx](../src/components/landing-ui.tsx) | Declared exports: `sectionShell`, `sectionTitle`, `sectionLead`, `glassCard`, `secondaryPill`; more in source. |
 | [src/components/learning/attention-maps-content.tsx](../src/components/learning/attention-maps-content.tsx) | Declared exports: `sampleHeatmap`, `sampleHeatmapLabels`, `AttentionMapsContent`. |
 | [src/components/learning/learning-mode-analyzer.browser.test.tsx](../src/components/learning/learning-mode-analyzer.browser.test.tsx) | Automated browser test. |
@@ -201,6 +204,8 @@ Export names below were extracted from source declarations at the baseline. They
 | [src/lib/evaluations/types.ts](../src/lib/evaluations/types.ts) | Declared exports: `ReviewStatus`, `ProfessorEvaluation`, `StudentFacultyEvaluation`, `EvaluationValues`, `EvaluationActionState`; more in source. |
 | [src/lib/evaluations/validation.test.ts](../src/lib/evaluations/validation.test.ts) | Automated Node-project test. |
 | [src/lib/evaluations/validation.ts](../src/lib/evaluations/validation.ts) | Declared exports: `normalizeEvaluation`, `validateEvaluation`, `evaluationActionResult`. |
+| [src/lib/heatmap-brush.test.ts](../src/lib/heatmap-brush.test.ts) | Automated Node-project test. |
+| [src/lib/heatmap-brush.ts](../src/lib/heatmap-brush.ts) | Declared exports: `Brush`, `GridPoint`, `BRUSH_SIZE`, `DEFAULT_BRUSH`, `emptyMask`; more in source (`dab`, `strokeTo`, `applyStroke`). Pure brush maths. |
 | [src/lib/inference/attention.test.ts](../src/lib/inference/attention.test.ts) | Automated Node-project test. |
 | [src/lib/inference/attention.ts](../src/lib/inference/attention.ts) | Declared exports: `CAM_GRID`, `CAM_CELLS`, `CAM_LABEL_COUNT`, `AttentionHeatmap`, `UNAVAILABLE_ATTENTION`; more in source. |
 | [src/lib/inference/contract.test.ts](../src/lib/inference/contract.test.ts) | Automated Node-project test. |
@@ -225,7 +230,7 @@ Export names below were extracted from source declarations at the baseline. They
 | [src/lib/settings/validation.ts](../src/lib/settings/validation.ts) | Declared exports: `normalizeDisplayName`, `normalizeWorkPhone`, `validateDisplayName`, `validateWorkPhone`, `validateSettingsInput`. |
 | [src/lib/submissions/types.ts](../src/lib/submissions/types.ts) | Declared exports: `SubmissionStatus`, `SubmissionValues`, `StudentSubmission`, `SubmissionFieldErrors`, `SubmissionActionState`; more in source. |
 | [src/lib/submissions/validation.test.ts](../src/lib/submissions/validation.test.ts) | Automated Node-project test. |
-| [src/lib/submissions/validation.ts](../src/lib/submissions/validation.ts) | Declared exports: `normalizeSubmission`, `validateSubmission`. |
+| [src/lib/submissions/validation.ts](../src/lib/submissions/validation.ts) | Declared exports: `ANSWER_LIMIT`, `HEATMAP_LENGTH`, `normalizeLabels`, `labelsError`, `normalizeAnswers`; more in source (`paintedLabels`, `unpaintedFindings`, `validateSubmission`, `toggleLabel`, `compareLabels`, `aiAccuracy`). |
 | [src/lib/supabase/client.ts](../src/lib/supabase/client.ts) | Declared exports: `createClient`. |
 | [src/lib/supabase/proxy.ts](../src/lib/supabase/proxy.ts) | Declared exports: `updateSession`. |
 | [src/lib/supabase/server.ts](../src/lib/supabase/server.ts) | Declared exports: `createClient`. |
@@ -281,7 +286,8 @@ Export names below were extracted from source declarations at the baseline. They
 | [supabase/migrations/20261111130000_notification_feedback.sql](../supabase/migrations/20261111130000_notification_feedback.sql) | Migration topic from filename: notification feedback. Read later migrations for replacements. |
 | [supabase/migrations/20261114120000_professor_only_activity_ai_claim.sql](../supabase/migrations/20261114120000_professor_only_activity_ai_claim.sql) | Migration topic from filename: professor only activity ai claim. Read later migrations for replacements. |
 | [supabase/migrations/20261115120000_two_step_login.sql](../supabase/migrations/20261115120000_two_step_login.sql) | Migration topic from filename: two step login. Read later migrations for replacements. |
-| [supabase/migrations/20261116120000_professor_validated_answer_key.sql](../supabase/migrations/20261116120000_professor_validated_answer_key.sql) | Migration topic from filename: professor validated answer key. Adds the answer key, label submissions and scoring. Read later migrations for replacements. |
+| [supabase/migrations/20261116120000_professor_validated_answer_key.sql](../supabase/migrations/20261116120000_professor_validated_answer_key.sql) | Migration topic from filename: professor validated answer key. Adds the answer key, label submissions and scoring; the scoring is removed by the next migration. Read later migrations for replacements. |
+| [supabase/migrations/20261117120000_student_label_answers_and_heatmaps.sql](../supabase/migrations/20261117120000_student_label_answers_and_heatmaps.sql) | Migration topic from filename: student label answers and heatmaps. Replaces `label_score` with `label_answers` and `student_heatmap`, adds `activity_requires_student_heatmap`, and leaves grading to the Professor. Read later migrations for replacements. |
 
 ## Database tests
 

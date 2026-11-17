@@ -24,7 +24,7 @@ select throws_ok($$insert into public.notification_reads(user_id,kind,ref_id) va
 
 set local role authenticated;
 select set_config('request.jwt.claim.sub','41000000-0000-4000-8000-000000000001',true);
-select is(public.save_student_activity_submission('42000000-0000-4000-8000-000000000001',array['No Finding'],true), 'submitted', 'fixture submission');
+select is(public.save_student_activity_submission('42000000-0000-4000-8000-000000000001',array['No Finding'],null,null,true), 'submitted', 'fixture submission');
 select lives_ok($$insert into public.notification_reads(user_id,kind,ref_id) values ('41000000-0000-4000-8000-000000000001','activity_due','42000000-0000-4000-8000-000000000001')$$,'member marks a visible due read');
 select lives_ok($$insert into public.notification_reads(user_id,kind,ref_id) values ('41000000-0000-4000-8000-000000000001','activity_due','42000000-0000-4000-8000-000000000001') on conflict do nothing$$,'marking read again is a no-op');
 select is((select count(*) from public.notification_reads),1::bigint,'member sees one own read');

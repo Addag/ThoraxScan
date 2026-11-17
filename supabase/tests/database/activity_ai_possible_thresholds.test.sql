@@ -25,7 +25,7 @@ insert into public.xray_cases(id,workspace_id,storage_path,uploaded_by,mime_type
 insert into public.activities(id,workspace_id,case_id,created_by,title,instructions) select pg_temp.uid(i+10),pg_temp.uid(10),pg_temp.uid(i),pg_temp.uid(1),'Possible threshold activity','Synthetic testing instructions' from generate_series(20,21) i;
 insert into public.activity_reference_evaluations(activity_id,evaluation,validated_labels,validated_at) select pg_temp.uid(i),'Private reference',array['No Finding'],now() from generate_series(30,31) i on conflict(activity_id) do update set evaluation=excluded.evaluation;
 update public.activities set status='published' where id in (pg_temp.uid(30),pg_temp.uid(31));
-insert into public.student_submissions(activity_id,student_id,selected_labels,label_score,classification,status,submitted_at,created_at,updated_at) select pg_temp.uid(i),pg_temp.uid(2),array['No Finding'],100,'normal','submitted',now(),now(),now() from generate_series(30,31) i;
+insert into public.student_submissions(activity_id,student_id,selected_labels,classification,status,submitted_at,created_at,updated_at) select pg_temp.uid(i),pg_temp.uid(2),array['No Finding'],'normal','submitted',now(),now(),now() from generate_series(30,31) i;
 
 -- Release with possible thresholds.
 select public.register_model_release('possible-tiered',repeat('e',64),repeat('f',64),1024,'artifacts/sha256/'||repeat('e',64)||'/model.onnx','bundles/sha256/'||repeat('f',64)||'/manifest.json',pg_temp.manifest('possible-tiered',repeat('e',64),true),'{"passed":true}'::jsonb,'test');

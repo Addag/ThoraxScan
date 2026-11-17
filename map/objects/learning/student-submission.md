@@ -1,13 +1,13 @@
 ---
 node_type: object
 status: live
-audited: 2026-11-16
+audited: 2026-11-17
 snapshot: working tree
 ---
 
 # Student submission
 
-One private editable draft or immutable final response per Student/activity. The answer is `selected_labels`, a selection from the 14 labels (No Finding only on its own), with `label_score` set at finalization against the activity's answer key: correct picks / (key labels + wrong extra picks) × 100 ([answer key migration](<../../../supabase/migrations/20261116120000_professor_validated_answer_key.sql>)). `classification` is derived (normal when only No Finding) so class analytics keeps its normal/abnormal comparison; `visible_findings` and `relevant_region` remain only for finals written before this flow. Expired drafts remain unsubmitted. No due date means editable until finalization.
+One private editable draft or immutable final response per Student/activity. The answer is `selected_labels`, a selection from the 14 labels (No Finding only on its own), with `label_answers` (optional written answer per selected label) and `student_heatmap` (2744 values from 0 to 1, one 14×14 map per label like the answer key's, painted with the [heatmap brush](../inference/attention-heatmap.md#painting-answer-key-and-student-answer); every selected finding must be marked at finalization when the key has maps). Answers are not scored automatically; the Professor's released evaluation is the grade ([answers migration](<../../../supabase/migrations/20261117120000_student_label_answers_and_heatmaps.sql>)). `classification` is derived (normal when only No Finding) so class analytics keeps its normal/abnormal comparison; `visible_findings` and `relevant_region` remain only for finals written before this flow. Expired drafts remain unsubmitted. No due date means editable until finalization.
 
 ## See source
 

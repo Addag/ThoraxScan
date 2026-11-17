@@ -69,16 +69,18 @@ export default async function StudentActivityPage({
               imageError={activity.imageError}
               title={activity.title}
             />
-            <ActivityAIFeedback imageUrl={activity.imageUrl} initial={activity.aiFeedback} selected={activity.submission?.labels ?? []} labelScore={activity.submission?.labelScore ?? null} />
+            <ActivityAIFeedback imageUrl={activity.imageUrl} initial={activity.aiFeedback} submission={activity.submission} />
           </div>
           <StudentSubmissionForm
             submission={activity.submission}
+            imageUrl={activity.imageUrl}
+            heatmapRequired={activity.heatmapRequired}
             dueAt={activity.dueAt}
             deadlinePassed={submissionLabel(null, activity.dueAt) === "Deadline passed"}
             action={saveStudentSubmission.bind(null, activityId)}
           />
         </div>
-        <StudentFacultyEvaluationPanel evaluation={facultyEvaluation.data} error={facultyEvaluation.error} labelScore={activity.submission?.labelScore ?? null} />
+        <StudentFacultyEvaluationPanel evaluation={facultyEvaluation.data} error={facultyEvaluation.error} />
       </PageMain>
     </StudentShell>
   );

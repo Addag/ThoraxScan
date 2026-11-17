@@ -11,7 +11,7 @@ insert into public.xray_cases(id,workspace_id,storage_path,uploaded_by,mime_type
 insert into public.activities(id,workspace_id,case_id,created_by,title,instructions) values(pg_temp.uid(30),pg_temp.uid(10),pg_temp.uid(20),pg_temp.uid(1),'CAM activity','Synthetic testing instructions');
 insert into public.activity_reference_evaluations(activity_id,evaluation,validated_labels,validated_at) values(pg_temp.uid(30),'Private reference',array['No Finding'],now()) on conflict(activity_id) do update set evaluation=excluded.evaluation;
 update public.activities set status='published' where id=pg_temp.uid(30);
-insert into public.student_submissions(activity_id,student_id,selected_labels,label_score,classification,status,submitted_at,created_at,updated_at) values(pg_temp.uid(30),pg_temp.uid(2),array['No Finding'],100,'normal','submitted',now(),now(),now());
+insert into public.student_submissions(activity_id,student_id,selected_labels,classification,status,submitted_at,created_at,updated_at) values(pg_temp.uid(30),pg_temp.uid(2),array['No Finding'],'normal','submitted',now(),now(),now());
 create temp table v3_manifest as select jsonb_build_object(
   'schemaVersion', 3,
   'release', jsonb_build_object('id','v3-behavior','preprocessingVersion','prep','thresholdVersion','threshold'),
@@ -83,7 +83,12 @@ set local role authenticated;
 select set_config('request.jwt.claim.sub',pg_temp.uid(2)::text,true);
 select is((select status from public.get_student_activity_ai_feedback(pg_temp.uid(31))),'locked','key hidden before the Student submits');
 select ok((select validated_labels is null from public.get_student_activity_ai_feedback(pg_temp.uid(31))),'locked result carries no key');
-select is(public.save_student_activity_submission(pg_temp.uid(31),array['Cardiomegaly','Edema'],true),'submitted','Student submits labels');
+select is(public.activity_requires_student_heatmap(pg_temp.uid(31)),true,'a key with maps requires a Student heatmap');
+select is(public.save_student_activity_submission(pg_temp.uid(31),array['Cardiomegaly','Edema'],'{"Edema":"  Hazy bases  ","Fracture":"not selected","Cardiomegaly":""}'::jsonb,null,true),'heatmap_required','final needs a heatmap');
+select is(public.save_student_activity_submission(pg_temp.uid(31),array['Cardiomegaly','Edema'],null,(select to_jsonb(array_agg(case when cell between 392 and 587 then 1 else 0 end order by cell)) from generate_series(0,2743) cell),true),'heatmap_required','every selected finding needs a marked cell');
+select is(public.save_student_activity_submission(pg_temp.uid(31),array['Cardiomegaly','Edema'],'{"Edema":"  Hazy bases  ","Fracture":"not selected","Cardiomegaly":""}'::jsonb,(select to_jsonb(array_agg(case when cell in (392, 980) then 1 else 0 end order by cell)) from generate_series(0,2743) cell),true),'submitted','Student submits labels, answers and a heatmap');
+select is((select label_answers from public.student_submissions where activity_id=pg_temp.uid(31)),'{"Edema":"Hazy bases"}'::jsonb,'answers trimmed and limited to selected labels');
+select is((select jsonb_array_length(student_heatmap) from public.student_submissions where activity_id=pg_temp.uid(31)),2744,'Student reads back their own heatmap');
 select is((select validated_labels from public.get_student_activity_ai_feedback(pg_temp.uid(31))),array['Cardiomegaly','Edema','Pleural Effusion'],'submitted Student sees the validated key');
 select is((select attention_map -> 0 from public.get_student_activity_ai_feedback(pg_temp.uid(31))),'1'::jsonb,'Student sees the edited heatmap, not the raw AI map');
 reset role;

@@ -2,7 +2,7 @@
 node_type: process
 universe: live
 status: verified
-audited: 2026-11-16
+audited: 2026-11-17
 snapshot: main @ ed26b07 + working tree
 ---
 
@@ -15,7 +15,7 @@ Joined Student â†’ published activity query and short-lived private image URL â†
 1. Student activity routes recheck the Student role before reading any assignment in [the activity list](<../../src/app/(protected)/student/activities/page.tsx:17>) and [detail route](<../../src/app/(protected)/student/activities/[activityId]/page.tsx:22>).
 2. The server projection selects only published activity fields permitted by RLS and never queries or serializes the private reference evaluation in [Student projections](<../../src/lib/activities/server.ts:124>).
 3. The detail projection derives the generated object path from student-readable workspace/case IDs and requests a ten-minute signed URL under the Storage read policy in [Student activity detail](<../../src/lib/activities/server.ts:157>).
-4. The route renders instructions, due state, workspace context, and the private preview; the label-selection form supports private drafts and final submission, and the results panel shows the validated answer key, the Student's match and label score, and the validated heatmap only after the server projection reports a finalized, released submission ([Student activity page](<../../src/app/(protected)/student/activities/[activityId]/page.tsx:22>)).
+4. The route renders instructions, due state, workspace context, and the private preview; the answer form (labels, optional written answer per label, a heatmap per finding) supports private drafts and final submission, and the results panel shows the validated answer key, the Student's labels and answers against it, and the Student's heatmap side by side with the validated one only after the server projection reports a finalized, released submission ([Student activity page](<../../src/app/(protected)/student/activities/[activityId]/page.tsx:22>)).
 5. The detail route sends malformed IDs directly to the generic not-found path, while activity RLS makes draft, archived, other-workspace, and unknown rows unreadable before the same result in [the detail route](<../../src/app/(protected)/student/activities/[activityId]/page.tsx:31>) and [Student select policy](<../../supabase/migrations/20260820101401_activities_case_publication.sql:423>).
 
 ## Consumes

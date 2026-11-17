@@ -50,6 +50,8 @@ export type StudentActivityDetails = StudentActivitySummary & {
   instructions: string;
   imageUrl: string | null;
   imageError: boolean;
+  // True when the answer key has per-finding maps, so the Student must mark a heatmap for each finding.
+  heatmapRequired: boolean;
   aiFeedback: ActivityAIFeedback;
 };
 

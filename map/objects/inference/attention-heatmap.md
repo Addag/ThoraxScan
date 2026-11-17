@@ -1,7 +1,7 @@
 ---
 node_type: object
 status: live
-audited: 2026-10-29
+audited: 2026-11-17
 snapshot: main @ b71d5f3 + working tree
 ---
 
@@ -39,6 +39,17 @@ The component draws a 112px canvas overlay, bilinearly interpolated between cell
 - The PDF guide's inline script copies the ramp and interpolation, now with a grid parameter, plus the sample's Cardiomegaly map; keep them in sync.
 
 Rollback to a V1/V2 release affects new inference only; existing analyses keep their maps.
+
+## Painting (answer key and Student answer)
+
+[HeatmapPainter](../../../src/components/heatmap-painter.tsx) edits a V3-shaped array (2744 values, one 14×14 map per label) for the Professor's answer key (`validated_heatmap`, with Reset to AI) and the Student's answer (`student_heatmap`). The brush maths is pure in [heatmap-brush.ts](../../../src/lib/heatmap-brush.ts):
+
+- Round brush with size 1–8 cells, strength 10–100% and hardness 0–100%; Mark or Erase.
+- Photoshop-style opacity: a stroke's mask takes the maximum of its dabs, so one stroke never exceeds its strength. Painting gives `v + (1 − v) × mask`, erasing `v × (1 − mask)`. Values round to 3 decimals and anything under 0.01 becomes 0, so specks do not count as "marked".
+- Undo/Redo keep up to 50 whole arrays; Clear this finding and Reset to AI are undoable. Shortcuts: `[` `]` size, `B`/`E` mode, Ctrl+Z, Ctrl+Shift+Z or Ctrl+Y. Keyboard users move a cell cursor with the arrows and dab with Space or Enter.
+- The grid stays 14×14, so painted maps stay comparable with the AI's and need no schema change. Painted values are fractional, so code that treats a cell as marked must use `> 0`, not `=== 1` ([validation](../../../src/lib/submissions/validation.ts) `paintedLabels`).
+
+[HeatmapComparison](../../../src/components/heatmap-comparison.tsx) shows the Student's map beside the key's after submission and on the Professor's review page. Tests: [brush](../../../src/lib/heatmap-brush.test.ts), [painter](../../../src/components/heatmap-painter.browser.test.tsx).
 
 Sources: [component](../../../src/components/attention-heatmap.tsx),
 [runtime](../../../src/lib/inference/runtime.ts),

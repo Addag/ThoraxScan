@@ -2,7 +2,7 @@ import "server-only";
 import { createClient } from "@/lib/supabase/server";
 import { getProfessorActivities } from "@/lib/activities/server";
 import { getProfessorSubmissions } from "@/lib/evaluations/server";
-import { evaluationUuid, finalGrade } from "@/lib/evaluations/types";
+import { evaluationUuid } from "@/lib/evaluations/types";
 import { getProfessorWorkspace } from "@/lib/workspaces/server";
 import { summarizeClass, type AICall, type ClassSummary } from "./summary";
 
@@ -28,7 +28,7 @@ export async function getClassAnalytics(profileId: string, workspaceId: string, 
         .map((activity) => ({ id: activity.id, title: activity.title, dueAt: activity.dueAt })),
       submissions: submissions.data.map((row) => ({
         activityId: row.activity_id, studentId: row.student_id, submittedAt: row.submitted_at, classification: row.classification,
-        evaluation: row.faculty_evaluations ? { status: row.faculty_evaluations.status, score: row.faculty_evaluations.score === null ? null : finalGrade(row.label_score === null ? null : Number(row.label_score), Number(row.faculty_evaluations.score)) } : null,
+        evaluation: row.faculty_evaluations ? { status: row.faculty_evaluations.status, score: row.faculty_evaluations.score === null ? null : Number(row.faculty_evaluations.score) } : null,
       })),
       aiCalls: new Map(((aiCalls.data ?? []) as { activity_id: string; ai_call: AICall }[]).map((row) => [row.activity_id, row.ai_call])),
       now: new Date(),

@@ -1,16 +1,16 @@
 ---
 node_type: process
 status: live
-audited: 2026-11-16
+audited: 2026-11-17
 snapshot: working tree
 ---
 
 # Student submission workflow
 
 1. [Student activity projection](../../src/lib/activities/server.ts) selects the caller's response alongside published activity content.
-2. [Form](../../src/components/activities/student-submission-form.tsx) is a multiselect over the 14 labels (No Finding stands alone). It permits draft saves and requires explicit confirmation for final submission. Pending controls are disabled and messages/errors are announced.
+2. [Form](../../src/components/activities/student-submission-form.tsx) is a multiselect over the 14 labels (No Finding stands alone), with an optional written answer per label and a map per selected finding painted with the adjustable [heatmap brush](../objects/inference/attention-heatmap.md#painting-answer-key-and-student-answer). Final submission is blocked client-side until every finding has a marked cell when the key has maps. It permits draft saves and requires explicit confirmation for final submission. Pending controls are disabled and messages/errors are announced.
 3. [Server Action](<../../src/app/(protected)/student/activities/actions.ts>) verifies the activity UUID, reauthenticates, checks Student role, normalizes/validates the labels, and invokes the RPC.
-4. [Database write interface](../../supabase/migrations/20260919160249_student_activity_submissions.sql) rechecks authorization and publication, serializes writes, rejects finalized/expired responses and activities without an answer key, and saves or finalizes the single row. On finalize it stores `label_score` = correct picks / (key labels + wrong extra picks) × 100 ([answer key migration](../../supabase/migrations/20261116120000_professor_validated_answer_key.sql)).
+4. [Database write interface](../../supabase/migrations/20260919160249_student_activity_submissions.sql) rechecks authorization and publication, serializes writes, rejects finalized/expired responses and activities without an answer key, and saves or finalizes the single row. It keeps written answers for selected labels only (trimmed, at most 2,000 characters each), and on finalize requires a marked heatmap cell for each selected finding when the key has per-finding maps, otherwise returning `heatmap_required`. Nothing is scored ([answers migration](../../supabase/migrations/20261117120000_student_label_answers_and_heatmaps.sql)).
 5. The action revalidates detail, list, and dashboard. Final submissions render a read-only summary and timestamp; expired drafts explicitly remain not submitted.
 
 ## Verification
