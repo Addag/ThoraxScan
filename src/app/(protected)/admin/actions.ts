@@ -3,7 +3,9 @@
 import { revalidatePath } from "next/cache";
 
 import type { AccountOperation, AdminReviewActionState } from "@/lib/admin/types";
+import { getProfessorApplications } from "@/lib/admin/server";
 import { validatePassword } from "@/lib/auth/types";
+import { sendProfessorReviewEmail } from "@/lib/email/server";
 import { createClient } from "@/lib/supabase/server";
 
 const uuidPattern =
@@ -101,12 +103,19 @@ export async function reviewProfessorApplicationAction(
   revalidatePath("/professor/application");
 
   const approved = data === "approved" || data === "already_approved";
-  return {
-    status: "success",
-    message: approved
-      ? "Professor access approved."
-      : "Professor application rejected.",
-  };
+  const message = approved ? "Professor access approved." : "Professor application rejected.";
+
+  // Only a fresh decision emails the applicant; repeats ("already_approved") stay quiet.
+  if (data === "approved" || data === "rejected") {
+    const { data: applications } = await getProfessorApplications();
+    const applicant = applications.find((application) => application.user_id === targetUserId);
+    const sent = applicant
+      ? await sendProfessorReviewEmail(applicant.email, applicant.display_name, data, rejectionReason || null)
+      : false;
+    if (!sent) return { status: "success", message: `${message} The email notification could not be sent.` };
+  }
+
+  return { status: "success", message };
 }
 
 export async function grantPlatformAdminAction(

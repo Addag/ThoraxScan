@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 
+import { ApplicationStatusListener } from "@/components/professor/application-status-listener";
 import { ProfessorApplicationShell } from "@/components/professor/professor-application-shell";
 import { rejectionReasonClass, reviewPanelClass } from "@/components/admin/review-styles";
 import { getOwnProfessorApplication } from "@/lib/admin/server";
@@ -26,6 +27,7 @@ export default async function ProfessorApplicationPage() {
 
   return (
     <ProfessorApplicationShell>
+      {isPending && <ApplicationStatusListener userId={result.profile.id} />}
       <PageMain>
         <PageHeading title="Professor application" subtitle={`${result.profile.display_name}, your account is awaiting workspace access.`} showDate={false} />
 
@@ -59,7 +61,7 @@ export default async function ProfessorApplicationPage() {
             </div>
             <div className="grid grid-cols-[130px_minmax(0,1fr)] gap-4 border-t border-(--border-shell) pt-2.5 max-[560px]:grid-cols-1">
               <dt className="text-label text-(--text-muted) uppercase tracking-[0.08em] font-extrabold">Notification</dt>
-              <dd className="m-0 text-caption font-extrabold">Return to this page to see the review result</dd>
+              <dd className="m-0 text-caption font-extrabold">{isPending ? "This page updates automatically when your application is reviewed" : "Contact an administrator for a new review"}</dd>
             </div>
           </dl>
         </section>
