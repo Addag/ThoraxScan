@@ -34,7 +34,7 @@ Dues and submissions already live in their own tables, so the feed is derived wh
 
 ### Does not hit
 
-- Administrator and pending-Professor application shells (no bell), email or push delivery, and AI feedback.
+- Administrator and pending-Professor application shells (no bell), email or push delivery, and AI feedback. (The only app-sent email is the Professor application result, which is separate from the bell; see [the review process](../../processes/professor-application-review.md).)
 
 ## Surfaces
 
