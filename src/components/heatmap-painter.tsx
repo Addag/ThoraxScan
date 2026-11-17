@@ -10,6 +10,8 @@ import { button } from "@/components/controls";
 const textClass = "m-0 text-caption leading-normal text-(--text-secondary)";
 const selectClass = "min-h-[32px] max-w-full rounded-control border border-(--border-strong) bg-(--surface-sunken) px-[10px] text-caption text-(--text-primary)";
 const sliderLabelClass = "flex min-w-0 items-center gap-[7px] text-caption text-(--text-secondary)";
+// Fixed-width values, so dragging a slider between 1 and 3 digits never reflows the row.
+const valueClass = "shrink-0 whitespace-nowrap tabular-nums";
 const HISTORY_LIMIT = 50;
 
 type Stroke = { offset: number; start: number[]; mask: number[]; last: GridPoint };
@@ -138,15 +140,15 @@ export function HeatmapPainter({ imageUrl, labels, values, onChange, resetTo, di
       <legend className="sr-only">Brush</legend>
       <label className={sliderLabelClass}>Size
         <input className="w-[min(120px,28vw)] accent-brand" type="range" min={BRUSH_SIZE.min} max={BRUSH_SIZE.max} step={1} value={brush.size} onChange={(event) => setBrush({ ...brush, size: Number(event.target.value) })} />
-        <span className="shrink-0 whitespace-nowrap tabular-nums">{brush.size} {brush.size === 1 ? "cell" : "cells"}</span>
+        <span className={`${valueClass} min-w-[8ch]`}>{brush.size} {brush.size === 1 ? "cell" : "cells"}</span>
       </label>
       <label className={sliderLabelClass}>Strength
         <input className="w-[min(120px,28vw)] accent-brand" type="range" min={0.1} max={1} step={0.05} value={brush.strength} onChange={(event) => setBrush({ ...brush, strength: Number(event.target.value) })} />
-        <span className="shrink-0 whitespace-nowrap tabular-nums">{percent(brush.strength)}</span>
+        <span className={`${valueClass} min-w-[5ch]`}>{percent(brush.strength)}</span>
       </label>
       <label className={sliderLabelClass}>Hardness
         <input className="w-[min(120px,28vw)] accent-brand" type="range" min={0} max={1} step={0.05} value={brush.hardness} onChange={(event) => setBrush({ ...brush, hardness: Number(event.target.value) })} />
-        <span className="shrink-0 whitespace-nowrap tabular-nums">{percent(brush.hardness)}</span>
+        <span className={`${valueClass} min-w-[5ch]`}>{percent(brush.hardness)}</span>
       </label>
     </fieldset>
     <div className="flex flex-wrap items-center gap-2">
