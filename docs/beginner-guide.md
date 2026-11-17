@@ -2,7 +2,7 @@
 
 This guide is for groupmates who are new to coding. It explains what the project contains, how its parts work together, and how to start contributing.
 
-**Source baseline:** commit `a25613a`, reviewed on 16 November 2026; the activity, submission, and grading sections were updated on 17 November 2026 for the Professor-validated answer key (commit `2f9a6d1`), then for written answers, Student heatmaps, Professor-only grading and the heatmap brush (uncommitted working tree). Links point to files in your checkout, which can change. I cannot confirm the deployed version, active hosted model, or whether the answer-key migration has been applied to a hosted project. This is a source walkthrough, not a report that every setup step or feature was run successfully.
+**Source baseline:** commit `a25613a`, reviewed on 16 November 2026; the activity, submission, and grading sections were updated on 17 November 2026 for the Professor-validated answer key (commit `2f9a6d1`), then for written answers, Student heatmaps, Professor-only grading and the heatmap brush (commit `b074efb`), and on 18 November 2026 for review emails and live page updates (through commit `bfa95f9`). Links point to files in your checkout, which can change. I cannot confirm the deployed version, active hosted model, or whether these migrations have been applied to a hosted project. This is a source walkthrough, not a report that every setup step or feature was run successfully.
 
 ThoraxScan is an educational application. Its README states that it has not been clinically validated and must not be used for patient care. Keep that limitation when explaining or changing AI result wording. [Source: project README](../README.md).
 
@@ -154,7 +154,7 @@ Copy-Item .env.example .env.local
 npx supabase status
 ```
 
-Edit `.env.local` with the local Supabase URL and publishable key from the status output. Set the local Turnstile test site key from the README and keep the site URL as `http://localhost:3000`. The example groups app, Auth, and operator variables together; you do not need model publisher credentials to edit pages. Keep the CAPTCHA secret in `.env`, and keep operator service-role credentials out of browser variables. [Sources: environment example](../.env.example), [Supabase operations](../supabase/README.md).
+Edit `.env.local` with the local Supabase URL and publishable key from the status output. Set the local Turnstile test site key from the README and keep the site URL as `http://localhost:3000`. The example groups app, Auth, and operator variables together; you do not need model publisher credentials to edit pages. Keep the CAPTCHA secret in `.env`, and keep operator service-role credentials out of browser variables. `RESEND_API_KEY` and `EMAIL_FROM` are optional locally: without them, reviewing a Professor application still works but sends no email. [Sources: environment example](../.env.example), [Supabase operations](../supabase/README.md).
 
 Do not share actual secrets in screenshots, commits, or chat messages. `NEXT_PUBLIC_` means the application can expose that variable to the browser; adding that prefix does not protect a value.
 
@@ -345,6 +345,22 @@ Professor activity images use the private `activity-cases` Storage bucket and si
 
 The built-in gallery is different: its JPEGs are static files under `public/images/chexpert`, described by [cases.json](../src/lib/xray-library/cases.json). Files under `public` are served publicly. Do not put private uploads or credentials there. The [library README](../src/lib/xray-library/README.md) states that public redistribution permission for the dataset images cannot be confirmed from the supplied local agreement evidence.
 
+### 9.4 Live updates (Realtime)
+
+Most pages are rendered on the server, so they normally show new data only after navigation. **Supabase Realtime** keeps a connection open from the browser and announces database changes, so a page can call `router.refresh()` and render again with fresh data. Two small client components do this; neither displays anything.
+
+| Listener | Mounted by | Listens for | Effect |
+|---|---|---|---|
+| [NotificationListener](../src/components/notification-listener.tsx) | [AppShell](../src/components/app-shell.tsx), wherever the bell appears | Inserts and updates on `activities` and `student_submissions`; a `feedback_released` broadcast on the user's private `notifications:<user id>` topic | Refreshes the page at most once a second, so the bell and an open activity page update |
+| [ApplicationStatusListener](../src/components/professor/application-status-listener.tsx) | The [pending application page](../src/app/%28protected%29/professor/application/page.tsx) | Updates to the applicant's own `professor_applications` row, plus the tab regaining focus | Refreshes; an approved applicant is redirected to the Professor area |
+
+Two kinds of message reach the browser:
+
+- **Row changes.** A table joins the `supabase_realtime` publication, and Realtime applies that table's existing RLS, so each user only hears about rows they can already read. Only inserts and updates are subscribed, because Realtime does not apply RLS to deletes.
+- **Empty broadcasts.** Students cannot read `faculty_evaluations` or `ai_feedback_releases`. Instead, a database trigger sends an empty `feedback_released` signal to the Student's own topic when an evaluation or their AI results are released, and the page refetches through its usual functions. A `realtime.messages` policy lets each user listen only on their own topic.
+
+Read the [application](../supabase/migrations/20261118120000_professor_application_realtime.sql), [notification](../supabase/migrations/20261118130000_notification_realtime.sql), and [activity results](../supabase/migrations/20261118140000_live_activity_results.sql) migrations. **Local caveat:** the local Realtime server rejects the publishable key, so live updates fail silently on `localhost` and pages update on navigation instead. Live updates have been verified only on the hosted project. [Source: notification map card](../map/objects/learning/notification.md).
+
 ## 10. Follow the main features
 
 ### 10.1 Student submission: a complete form journey
@@ -408,12 +424,12 @@ The form also shows how much of the key the AI found on its own (`aiAccuracy`, f
 |---|---|
 | Workspace creation, invitation, roster | [Professor forms](../src/components/professor/professor-forms.tsx), [Professor actions](../src/app/%28protected%29/professor/actions.ts), [workspace data](../src/lib/workspaces/server.ts), workspace migrations |
 | Join/leave workspace | [Invitation form](../src/components/student/invitation-form.tsx), [Student actions](../src/app/%28protected%29/student/actions.ts) |
-| Professor application review | [Review form](../src/components/admin/application-review-form.tsx), [Admin actions](../src/app/%28protected%29/admin/actions.ts) |
+| Professor application review | [Review form](../src/components/admin/application-review-form.tsx), [Admin actions](../src/app/%28protected%29/admin/actions.ts), [review email](../src/lib/email/server.ts) (a fresh approval or rejection emails the applicant through Resend; if the email fails, the review still saves), [live status listener](../src/components/professor/application-status-listener.tsx) |
 | Account administration and announcements | [Admin pages](../src/app/%28protected%29/admin/page.tsx), [Admin data](../src/lib/admin/server.ts), [console migration](../supabase/migrations/20261111120000_admin_console.sql) |
 | Professor evaluation | [Evaluation form](../src/components/professor/faculty-evaluation-form.tsx), [submission review actions](../src/app/%28protected%29/professor/submissions/actions.ts), [evaluation validation](../src/lib/evaluations/validation.ts), [evaluation data](../src/lib/evaluations/server.ts) |
 | Class analytics and CSV | [Analytics page](../src/app/%28protected%29/professor/analytics/page.tsx), [summary](../src/lib/analytics/summary.ts), [queries](../src/lib/analytics/server.ts), [CSV handler](../src/app/%28protected%29/professor/analytics/export/route.ts) |
 | Profile/security settings | [Settings form](../src/components/settings/settings-form.tsx), [settings actions](../src/app/%28protected%29/settings/actions.ts), [settings validation](../src/lib/settings/validation.ts) |
-| Notification bell | [Bell](../src/components/notification-bell.tsx), [notification queries](../src/lib/notifications/server.ts), [shared actions](../src/app/%28protected%29/actions.ts) |
+| Notification bell | [Bell](../src/components/notification-bell.tsx), [notification queries](../src/lib/notifications/server.ts), [shared actions](../src/app/%28protected%29/actions.ts), [live listener](../src/components/notification-listener.tsx) (section 9.4) |
 | Private library notes | [LearningNotes](../src/components/learning/learning-notes.tsx), [shared actions](../src/app/%28protected%29/actions.ts), [notes migration](../supabase/migrations/20261030120000_learning_case_notes.sql) |
 | Terms and privacy consent | [Terms page](../src/app/terms/page.tsx), [privacy page](../src/app/privacy-policy/page.tsx), [version constants](../src/lib/legal/privacy.ts), auth actions and consent migration |
 
@@ -626,6 +642,8 @@ Do not paste passwords, tokens, private images, or service keys into error repor
 | Activity analysis remains pending | Professor-browser workflow (the draft page must stay open), claim lease, and stored safe error/status |
 | Publish is refused | Whether the draft has a ready AI analysis and a saved answer key |
 | Student cannot answer an activity | Older activities published without an answer key take no new answers |
+| A page does not update live | Expected on `localhost` (section 9.4); on hosted, the browser console, the table's publication membership, and RLS |
+| An applicant gets no review email | `RESEND_API_KEY` and `EMAIL_FROM` on the server, the administrator's success message, and Resend's dashboard |
 | Build fails loading fonts | Root layout's `next/font/google` imports and the actual build/network error |
 
 These are investigation starting points, not diagnoses. Confirm the cause before editing source.

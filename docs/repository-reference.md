@@ -2,18 +2,18 @@
 
 [Start with the beginner guide](beginner-guide.md). This reference helps you find files after you understand the main concepts.
 
-Inventory baseline: `a25613a`, reviewed 16 November 2026. It accounts for all 645 tracked files at that commit, plus the two files added by the answer-key commit `2f9a6d1` (updated 17 November 2026), for 647, plus six files from the uncommitted written-answers and heatmap-brush work (the painter, comparison and brush files with their tests, and the `20261117120000` migration), for 653. It excludes generated/ignored files and the guide/reference themselves. Other files added after `2f9a6d1` may be missing.
+Inventory baseline: `a25613a`, reviewed 16 November 2026. It accounts for all 645 tracked files at that commit, plus the two files added by the answer-key commit `2f9a6d1` (updated 17 November 2026), for 647, plus six files from the written-answers and heatmap-brush commit `b074efb` (the painter, comparison and brush files with their tests, and the `20261117120000` migration), for 653, plus ten files added through `bfa95f9` (updated 18 November 2026): the loading screen, 404 page and link-preview image from `3f2cac5`, and the review email, two live-update listeners and three Realtime migrations, for 663. It excludes generated/ignored files and the guide/reference themselves. Files added after `bfa95f9` may be missing.
 
 Export names below were extracted from source declarations at the baseline. They are navigation aids, not a complete function/API specification. Migration topics come from filenames; read the SQL and later replacements to establish actual behavior. Links open the current checkout, so declarations may differ after edits.
 
-| Area | Files at `2f9a6d1` + working tree |
+| Area | Files at `bfa95f9` |
 |---|---:|
 | [Root configuration and notes](#root-configuration-and-notes) | 17 |
-| [Application routes and actions](#application-routes-and-actions) | 52 |
-| [Interface components](#interface-components) | 62 |
-| [Application libraries](#application-libraries) | 65 |
+| [Application routes and actions](#application-routes-and-actions) | 55 |
+| [Interface components](#interface-components) | 64 |
+| [Application libraries](#application-libraries) | 67 |
 | [Request proxy](#request-proxy) | 1 |
-| [Database migrations](#database-migrations) | 34 |
+| [Database migrations](#database-migrations) | 37 |
 | [Database tests](#database-tests) | 16 |
 | [Database configuration and supporting files](#database-configuration-and-supporting-files) | 10 |
 | [Maintenance scripts](#maintenance-scripts) | 9 |
@@ -70,6 +70,7 @@ Export names below were extracted from source declarations at the baseline. They
 | [src/app/(protected)/admin/page.tsx](../src/app/%28protected%29/admin/page.tsx) | Declared exports: `metadata`, `AdminPage`. |
 | [src/app/(protected)/admin/report/route.ts](../src/app/%28protected%29/admin/report/route.ts) | Declared exports: `GET`. |
 | [src/app/(protected)/dashboard/page.tsx](../src/app/%28protected%29/dashboard/page.tsx) | Declared exports: `DashboardPage`. |
+| [src/app/(protected)/loading.tsx](../src/app/%28protected%29/loading.tsx) | Declared exports: default `Loading`. Loading screen shown while a signed-in page renders. |
 | [src/app/(protected)/professor/actions.ts](../src/app/%28protected%29/professor/actions.ts) | Server Actions; Declared exports: `createWorkspaceAction`, `renameWorkspaceAction`, `createInvitationAction`, `revokeInvitationAction`, `redeemInvitationAction`; more in source. |
 | [src/app/(protected)/professor/activities/[activityId]/page.tsx](../src/app/%28protected%29/professor/activities/%5BactivityId%5D/page.tsx) | Declared exports: `metadata`, `ProfessorActivityPage`. |
 | [src/app/(protected)/professor/activities/actions.ts](../src/app/%28protected%29/professor/activities/actions.ts) | Server Actions; Declared exports: `createActivityDraftAction`, `updateActivityAction`, `prepareCaseUploadAction`, `confirmCaseUploadAction`, `removeActivityCaseAction`; more in source. |
@@ -103,6 +104,8 @@ Export names below were extracted from source declarations at the baseline. They
 | [src/app/favicon.ico](../src/app/favicon.ico) | Static ICO asset; inspect references to establish usage. |
 | [src/app/globals.css](../src/app/globals.css) | Global styles and design tokens. |
 | [src/app/layout.tsx](../src/app/layout.tsx) | Declared exports: `metadata`, `RootLayout`. |
+| [src/app/not-found.tsx](../src/app/not-found.tsx) | Declared exports: `metadata`, default `NotFound`. The 404 page. |
+| [src/app/opengraph-image.tsx](../src/app/opengraph-image.tsx) | Declared exports: `alt`, `size`, `contentType`, default `Image`. Generates the link-preview image. |
 | [src/app/page.tsx](../src/app/page.tsx) | Declared exports: `Home`. |
 | [src/app/privacy-policy/page.tsx](../src/app/privacy-policy/page.tsx) | Declared exports: `metadata`, `PrivacyPolicyPage`. |
 | [src/app/terms/page.tsx](../src/app/terms/page.tsx) | Declared exports: `metadata`, `TermsPage`. |
@@ -152,12 +155,14 @@ Export names below were extracted from source declarations at the baseline. They
 | [src/components/learning/sample-heatmap.json](../src/components/learning/sample-heatmap.json) | Bundled sample heatmap data; check its consumers. |
 | [src/components/learning/xray-library.tsx](../src/components/learning/xray-library.tsx) | Client entry; Declared exports: `XrayLibrary`. |
 | [src/components/notification-bell.tsx](../src/components/notification-bell.tsx) | Declared exports: `NotificationBellButton`, `NotificationPanel`. |
+| [src/components/notification-listener.tsx](../src/components/notification-listener.tsx) | Client entry; Declared exports: `NotificationListener`. Realtime refresh for the bell and open pages; see the [guide's live updates section](beginner-guide.md#94-live-updates-realtime). |
 | [src/components/password-toggle.tsx](../src/components/password-toggle.tsx) | Declared exports: `PasswordToggle`. |
 | [src/components/professor/activity-forms.tsx](../src/components/professor/activity-forms.tsx) | Client entry; Declared exports: `ActivityDetailsForm`, `CaseUploadForm`, `ActivityLifecycleControls`. |
 | [src/components/professor/answer-key-form.tsx](../src/components/professor/answer-key-form.tsx) | Client entry; Declared exports: `AnswerKeyForm`, `LabelTags`. The Professor's answer-key validation; see the [guide's answer-key walkthrough](beginner-guide.md#the-answer-key). |
 | [src/components/professor/activity-library.browser.test.tsx](../src/components/professor/activity-library.browser.test.tsx) | Automated browser test. |
 | [src/components/professor/faculty-evaluation-form.browser.test.tsx](../src/components/professor/faculty-evaluation-form.browser.test.tsx) | Automated browser test. |
 | [src/components/professor/faculty-evaluation-form.tsx](../src/components/professor/faculty-evaluation-form.tsx) | Client entry; Declared exports: `FacultyEvaluationForm`. |
+| [src/components/professor/application-status-listener.tsx](../src/components/professor/application-status-listener.tsx) | Client entry; Declared exports: `ApplicationStatusListener`. Refreshes a pending applicant's page when their application is reviewed. |
 | [src/components/professor/professor-application-shell.tsx](../src/components/professor/professor-application-shell.tsx) | Declared exports: `ProfessorApplicationShell`. |
 | [src/components/professor/professor-forms.tsx](../src/components/professor/professor-forms.tsx) | Client entry; Declared exports: `CreateWorkspaceForm`, `ProfessorRedeemForm`, `RenameWorkspaceForm`, `InvitationCreateForm`, `RevokeInvitationButton`; more in source. |
 | [src/components/professor/professor-shell.tsx](../src/components/professor/professor-shell.tsx) | Declared exports: `ProfessorShell`. |
@@ -200,6 +205,8 @@ Export names below were extracted from source declarations at the baseline. They
 | [src/lib/chest-gate/server.ts](../src/lib/chest-gate/server.ts) | Declared exports: `chestFeaturesFile`. |
 | [src/lib/chest-gate/weights.json](../src/lib/chest-gate/weights.json) | Parameters for the chest X-ray gate. |
 | [src/lib/display-prefs.ts](../src/lib/display-prefs.ts) | Declared exports: `applySavedDisplayPrefs`. |
+| [src/lib/email/server.test.ts](../src/lib/email/server.test.ts) | Automated Node-project test. |
+| [src/lib/email/server.ts](../src/lib/email/server.ts) | Declared exports: `sendProfessorReviewEmail`. Sends the application review email through Resend; sends nothing without `RESEND_API_KEY`/`EMAIL_FROM`. |
 | [src/lib/evaluations/server.ts](../src/lib/evaluations/server.ts) | Declared exports: `getProfessorSubmissions`, `getProfessorSubmission`, `getStudentActivityFacultyEvaluation`. |
 | [src/lib/evaluations/types.ts](../src/lib/evaluations/types.ts) | Declared exports: `ReviewStatus`, `ProfessorEvaluation`, `StudentFacultyEvaluation`, `EvaluationValues`, `EvaluationActionState`; more in source. |
 | [src/lib/evaluations/validation.test.ts](../src/lib/evaluations/validation.test.ts) | Automated Node-project test. |
@@ -288,6 +295,9 @@ Export names below were extracted from source declarations at the baseline. They
 | [supabase/migrations/20261115120000_two_step_login.sql](../supabase/migrations/20261115120000_two_step_login.sql) | Migration topic from filename: two step login. Read later migrations for replacements. |
 | [supabase/migrations/20261116120000_professor_validated_answer_key.sql](../supabase/migrations/20261116120000_professor_validated_answer_key.sql) | Migration topic from filename: professor validated answer key. Adds the answer key, label submissions and scoring; the scoring is removed by the next migration. Read later migrations for replacements. |
 | [supabase/migrations/20261117120000_student_label_answers_and_heatmaps.sql](../supabase/migrations/20261117120000_student_label_answers_and_heatmaps.sql) | Migration topic from filename: student label answers and heatmaps. Replaces `label_score` with `label_answers` and `student_heatmap`, adds `activity_requires_student_heatmap`, and leaves grading to the Professor. Read later migrations for replacements. |
+| [supabase/migrations/20261118120000_professor_application_realtime.sql](../supabase/migrations/20261118120000_professor_application_realtime.sql) | Migration topic from filename: professor application realtime. Adds `professor_applications` to the Realtime publication. Read later migrations for replacements. |
+| [supabase/migrations/20261118130000_notification_realtime.sql](../supabase/migrations/20261118130000_notification_realtime.sql) | Migration topic from filename: notification realtime. Publishes `activities` and `student_submissions`, broadcasts evaluation releases, and limits each user to their own topic. Read later migrations for replacements. |
+| [supabase/migrations/20261118140000_live_activity_results.sql](../supabase/migrations/20261118140000_live_activity_results.sql) | Migration topic from filename: live activity results. Broadcasts when a Student's AI results are released. Read later migrations for replacements. |
 
 ## Database tests
 
