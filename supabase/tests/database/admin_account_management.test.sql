@@ -20,6 +20,8 @@ update public.professor_applications set status = 'approved', reviewed_at = now(
 where user_id = '31000000-0000-0000-0000-000000000003';
 insert into public.workspaces (id, name, owner_id)
 values ('31100000-0000-0000-0000-000000000001', 'Console workspace', '31000000-0000-0000-0000-000000000003');
+-- Start from no notices so real ones in the database don't leak into the assertions; rollback restores them.
+delete from public.site_announcements;
 insert into public.site_announcements (message, ends_at) values ('Expired notice', now() - interval '1 minute');
 
 set local role authenticated;
