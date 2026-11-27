@@ -1,5 +1,6 @@
 "use client";
 
+import { button, field } from "@/components/controls";
 import {
   type KeyboardEvent,
   useActionState,
@@ -12,6 +13,7 @@ import {
 import {
   changeEmailAction,
   changePasswordAction,
+  twoStepAction,
   updateAccountSettingsAction,
 } from "@/app/(protected)/settings/actions";
 import { PasswordToggle } from "@/components/password-toggle";
@@ -21,6 +23,7 @@ import {
   type EmailActionState,
   type PasswordActionState,
   type SettingsActionState,
+  type TwoStepActionState,
   initialSettingsActionState,
 } from "@/lib/settings/types";
 import Link from "next/link";
@@ -28,14 +31,13 @@ import Link from "next/link";
 const tabOrder = ["profile", "security", "privacy", "accessibility"] as const;
 type SettingsTab = (typeof tabOrder)[number];
 
-const panelClass = "border border-(--border-strong) rounded-[10px] [background:var(--glass-surface)] backdrop-blur-[18px] backdrop-saturate-[135%] shadow-(--glass-shadow)";
-const panelHeadingClass = "mb-[26px] [&_h2]:m-0 [&_h2]:text-[1.25rem] [&_h2]:capitalize [&_p]:m-0 [&_p]:mt-[3px] [&_p]:text-[0.8125rem] [&_p]:text-(--text-muted)";
-const fieldClass = "grid gap-[7px] text-[0.8125rem] text-(--text-primary) [&>span>small]:ml-[5px] [&>span>small]:text-(--text-disabled) [&>small:not([data-error])]:text-[0.625rem] [&>small:not([data-error])]:leading-[1.4] [&>small:not([data-error])]:text-(--text-secondary)";
-const inputClass = "min-h-[38px] w-full rounded-[7px] border border-(--border-field) bg-(--surface-input) px-[11px] py-[7px] text-(--text-primary) [&[readonly]]:bg-(--surface-input-readonly) [&[readonly]]:text-(--text-muted)";
-const fieldErrorClass = "text-[0.6875rem] text-(--status-error-text)";
+const panelClass = "border border-(--border-strong) rounded-panel [background:var(--glass-surface)] backdrop-blur-[18px] backdrop-saturate-[135%] shadow-(--glass-shadow)";
+const panelHeadingClass = "mb-[26px] [&_h2]:m-0 [&_h2]:text-title [&_h2]:capitalize [&_p]:m-0 [&_p]:mt-[3px] [&_p]:text-small [&_p]:text-(--text-muted)";
+const fieldClass = "grid content-start gap-[7px] text-small text-(--text-primary) [&>span>small]:ml-[5px] [&>span>small]:text-(--text-disabled) [&>small:not([data-error])]:text-label [&>small:not([data-error])]:leading-snug [&>small:not([data-error])]:text-(--text-secondary)";
+const fieldErrorClass = "text-label text-(--status-error-text)";
 const iconClass = "size-6 fill-none stroke-current stroke-[1.6] [stroke-linecap:round] [stroke-linejoin:round]";
-const messageBaseClass = "-mt-[9px] rounded-[6px] px-3 py-2.5 text-[0.75rem]";
-const submitButtonClass = "transition-[filter] duration-160 not-disabled:hover:brightness-115 min-h-[42px] min-w-[135px] cursor-pointer rounded-[5px] border-0 bg-[linear-gradient(270deg,#4363ff_0%,#8397fe_100%)] px-[18px] text-[0.8125rem] font-extrabold text-[#050612] disabled:cursor-not-allowed disabled:opacity-50 max-[600px]:w-full";
+const messageBaseClass = "-mt-[9px] rounded-control px-3 py-2.5 text-caption";
+const submitButtonClass = `${button("primary")} min-w-[135px] max-[600px]:w-full`;
 
 function statusMessageClass(status: SettingsActionState["status"]) {
   if (status === "error" || status === "unauthorized") return `${messageBaseClass} bg-[rgba(255,55,69,0.12)] text-(--status-error-text)`;
@@ -83,7 +85,9 @@ export function SettingsForm({
   loadError,
   pendingEmail,
   role,
+  twoStepEnabled = false,
 }: {
+  twoStepEnabled?: boolean;
   email: string;
   initialDisplayName: string;
   initialSettings: AccountSettings;
@@ -143,12 +147,12 @@ export function SettingsForm({
   return (
     <div className="grid gap-6">
       <section className={`${panelClass} overflow-hidden`} aria-label="User profile categories">
-        <div className="grid gap-5 p-[18px_17px_22px] max-[600px]:gap-[9px] max-[600px]:p-[13px]" role="tablist" aria-label="Account settings">
+        <div className="grid grid-cols-4 gap-2 p-2 max-[600px]:grid-cols-2" role="tablist" aria-label="Account settings">
           {tabOrder.map((tab, index) => (
             <button
               aria-controls={`settings-panel-${tab}`}
               aria-selected={activeTab === tab}
-              className={`transition-colors duration-160 grid min-h-[67px] w-full cursor-pointer grid-cols-[36px_minmax(0,1fr)] items-center rounded-[10px] border px-[22px] text-left text-[1.25rem] font-semibold text-(--text-primary) max-[600px]:min-h-[58px] max-[600px]:px-[14px] max-[600px]:text-[1.0625rem] ${activeTab === tab ? "border-[#21aaff] bg-[rgba(70,193,255,0.49)]" : "border-transparent bg-transparent hover:bg-(--hover-overlay)"}`}
+              className={`transition-colors duration-160 flex min-h-11 w-full cursor-pointer items-center justify-center gap-2 rounded-control border px-3 text-lead font-semibold text-(--text-primary) ${activeTab === tab ? "border-brand bg-[rgba(70,193,255,0.49)]" : "border-transparent bg-transparent hover:bg-(--hover-overlay)"}`}
               id={`settings-tab-${tab}`}
               key={tab}
               onClick={() => setActiveTab(tab)}
@@ -177,6 +181,7 @@ export function SettingsForm({
       >
         <EmailPanel />
         <PasswordPanel />
+        <TwoStepPanel initiallyEnabled={twoStepEnabled} />
       </div>
 
       <AccessibilityPanel hidden={activeTab !== "accessibility"} />
@@ -184,7 +189,7 @@ export function SettingsForm({
       <form action={formAction} className="grid gap-6" hidden={activeTab === "security" || activeTab === "accessibility"} noValidate>
         <section
           aria-labelledby="settings-tab-profile"
-          className={`${panelClass} min-h-[247px] p-[25px] max-[600px]:p-5`}
+          className={`${panelClass} min-h-[247px] p-6 max-[600px]:p-5`}
           hidden={activeTab !== "profile"}
           id="settings-panel-profile"
           role="tabpanel"
@@ -198,7 +203,7 @@ export function SettingsForm({
             <label className={fieldClass}>
               <span>Full name</span>
               <input
-                className={inputClass}
+                className={field}
                 aria-invalid={Boolean(state.fieldErrors?.displayName)}
                 disabled={pending}
                 maxLength={100}
@@ -213,7 +218,7 @@ export function SettingsForm({
             </label>
             <label className={fieldClass}>
               <span>Email address</span>
-              <input className={inputClass} aria-readonly="true" readOnly type="email" value={email} />
+              <input className={field} aria-readonly="true" readOnly type="email" value={email} />
               <small>
                 {pendingEmail
                   ? `Pending change to ${pendingEmail}. Click the confirmation links sent to both addresses to finish.`
@@ -224,7 +229,7 @@ export function SettingsForm({
               <label className={fieldClass}>
                 <span>Work phone number <small>Optional</small></span>
                 <input
-                  className={inputClass}
+                  className={field}
                   aria-invalid={Boolean(state.fieldErrors?.workPhone)}
                   autoComplete="tel"
                   disabled={pending}
@@ -245,7 +250,7 @@ export function SettingsForm({
 
         <section
           aria-labelledby="settings-tab-privacy"
-          className={`${panelClass} min-h-[247px] p-[25px] max-[600px]:p-5`}
+          className={`${panelClass} min-h-[247px] p-6 max-[600px]:p-5`}
           hidden={activeTab !== "privacy"}
           id="settings-panel-privacy"
           role="tabpanel"
@@ -256,18 +261,18 @@ export function SettingsForm({
             <p>Current data handling based on the features that are implemented today.</p>
           </div>
           <div className="grid gap-3.5">
-            <article className="grid min-h-[54px] grid-cols-[26px_minmax(0,1fr)] items-center gap-3 rounded-[5px] border border-[#007623] bg-[rgba(0,224,93,0.32)] px-3 py-2.5 max-[600px]:items-start">
+            <article className="grid min-h-[54px] grid-cols-[26px_minmax(0,1fr)] items-center gap-3 rounded-control border border-[#007623] bg-[rgba(0,224,93,0.32)] px-3 py-2.5 max-[600px]:items-start">
               <SettingsIcon tab="privacy" />
               <div>
-                <strong className="text-[0.8125rem]">Private teaching-case storage</strong>
-                <p className="m-0 mt-0.5 text-[0.75rem] leading-[1.35] text-(--text-secondary)">Approved, de-identified cases use private Supabase Storage with short-lived signed access for authorized activity pages.</p>
+                <strong className="text-small">Private teaching-case storage</strong>
+                <p className="m-0 mt-0.5 text-caption leading-snug text-(--text-secondary)">Approved, de-identified cases use private Supabase Storage with short-lived signed access for authorized activity pages.</p>
               </div>
             </article>
-            <article className="grid min-h-[54px] grid-cols-[26px_minmax(0,1fr)] items-center gap-3 rounded-[5px] border border-[#0d5fc7] bg-[rgba(0,132,255,0.38)] px-3 py-2.5 max-[600px]:items-start">
+            <article className="grid min-h-[54px] grid-cols-[26px_minmax(0,1fr)] items-center gap-3 rounded-control border border-[#0d5fc7] bg-[rgba(0,132,255,0.38)] px-3 py-2.5 max-[600px]:items-start">
               <span className="grid size-6 place-items-center rounded-full border border-current" aria-hidden="true">✓</span>
               <div>
-                <strong className="text-[0.8125rem]">Browser inference foundation</strong>
-                <p className="m-0 mt-0.5 text-[0.75rem] leading-[1.35] text-(--text-secondary)">Learning Mode can run the active ONNX release in this browser. Authorized activity analysis may persist model results and feedback according to the <Link className="font-semibold underline underline-offset-2" href="/privacy-policy">Privacy Policy</Link>.</p>
+                <strong className="text-small">Browser inference foundation</strong>
+                <p className="m-0 mt-0.5 text-caption leading-snug text-(--text-secondary)">Learning Mode can run the active ONNX release in this browser. Authorized activity analysis may persist model results and feedback according to the <Link className="font-semibold underline underline-offset-2" href="/privacy-policy">Privacy Policy</Link>.</p>
               </div>
             </article>
           </div>
@@ -330,7 +335,7 @@ function AccessibilityPanel({ hidden }: { hidden: boolean }) {
   return (
     <section
       aria-labelledby="settings-tab-accessibility"
-      className={`${panelClass} min-h-[247px] p-[25px] max-[600px]:p-5`}
+      className={`${panelClass} min-h-[247px] p-6 max-[600px]:p-5`}
       hidden={hidden}
       id="settings-panel-accessibility"
       role="tabpanel"
@@ -342,11 +347,11 @@ function AccessibilityPanel({ hidden }: { hidden: boolean }) {
       </div>
       <div className="grid gap-[26px]">
         <fieldset className="m-0 grid gap-[7px] border-0 p-0">
-          <legend className="mb-[7px] p-0 text-[0.8125rem] text-(--text-primary)">Text size</legend>
+          <legend className="mb-[7px] p-0 text-small text-(--text-primary)">Text size</legend>
           <div className="flex flex-wrap gap-2.5">
             {textSizes.map((size) => (
               <label
-                className="transition-colors duration-160 flex min-h-[38px] cursor-pointer items-center gap-2 rounded-[7px] border border-(--border-field) px-3.5 text-[0.8125rem] text-(--text-primary) hover:bg-(--hover-overlay) has-checked:border-[#21aaff] has-checked:bg-[rgba(70,193,255,0.25)]"
+                className="transition-colors duration-160 flex min-h-10 cursor-pointer items-center gap-2 rounded-control border border-(--border-field) px-3.5 text-small text-(--text-primary) hover:bg-(--hover-overlay) has-checked:border-brand has-checked:bg-[rgba(70,193,255,0.25)]"
                 key={size.value}
               >
                 <input
@@ -370,8 +375,8 @@ function AccessibilityPanel({ hidden }: { hidden: boolean }) {
             type="checkbox"
           />
           <span className="grid gap-0.5">
-            <span className="text-[0.8125rem] text-(--text-primary)">High contrast</span>
-            <small className="text-[0.6875rem] leading-[1.4] text-(--text-secondary)">Solid panels, stronger borders and brighter secondary text.</small>
+            <span className="text-small text-(--text-primary)">High contrast</span>
+            <small className="text-label leading-snug text-(--text-secondary)">Solid panels, stronger borders and brighter secondary text.</small>
           </span>
         </label>
       </div>
@@ -395,16 +400,16 @@ function EmailPanel() {
 
   return (
     <form action={formAction} className="grid gap-6" noValidate>
-      <section className={`${panelClass} p-[25px] max-[600px]:p-5`}>
+      <section className={`${panelClass} p-6 max-[600px]:p-5`}>
         <div className={panelHeadingClass}>
           <h2>Change email</h2>
           <p>We&apos;ll send a confirmation link to your current and new email. The change finishes after you click both.</p>
         </div>
         <div className="grid grid-cols-2 gap-x-[84px] gap-y-[26px] max-[600px]:grid-cols-1 max-[600px]:gap-y-5">
-          <label className={`${fieldClass} content-start`}>
+          <label className={fieldClass}>
             <span>New email</span>
             <input
-              className={inputClass}
+              className={field}
               aria-invalid={Boolean(state.fieldErrors?.newEmail)}
               autoComplete="email"
               disabled={pending}
@@ -416,11 +421,11 @@ function EmailPanel() {
               <small data-error="true" className={fieldErrorClass} role="alert">{state.fieldErrors.newEmail}</small>
             ) : null}
           </label>
-          <label className={`${fieldClass} content-start`}>
+          <label className={fieldClass}>
             <span>Your password</span>
             <div className="relative">
               <input
-                className={`${inputClass} pr-10`}
+                className={`${field} pr-10`}
                 aria-invalid={Boolean(state.fieldErrors?.currentPassword)}
                 autoComplete="current-password"
                 disabled={pending}
@@ -464,35 +469,35 @@ function PasswordPanel() {
 
   return (
     <form action={formAction} className="grid gap-6" noValidate>
-      <section className={`${panelClass} min-h-[247px] p-[25px] max-[600px]:p-5`}>
+      <section className={`${panelClass} min-h-[247px] p-6 max-[600px]:p-5`}>
         <div className={panelHeadingClass}>
           <h2>Change password</h2>
           <p>Enter your current password, then choose a new one. Other signed-in devices will be logged out.</p>
         </div>
         <div className="grid grid-cols-2 gap-x-[84px] gap-y-[26px] max-[600px]:grid-cols-1 max-[600px]:gap-y-5">
-          {passwordFields.map((field) => (
-            <label className={`${fieldClass} content-start ${field.name === "newPassword" ? "col-start-1" : ""}`} key={field.name}>
-              <span>{field.label}</span>
+          {passwordFields.map((input) => (
+            <label className={`${fieldClass} ${input.name === "newPassword" ? "col-start-1" : ""}`} key={input.name}>
+              <span>{input.label}</span>
               <div className="relative">
                 <input
-                  className={`${inputClass} pr-10`}
-                  aria-invalid={Boolean(state.fieldErrors?.[field.name])}
-                  autoComplete={field.autoComplete}
+                  className={`${field} pr-10`}
+                  aria-invalid={Boolean(state.fieldErrors?.[input.name])}
+                  autoComplete={input.autoComplete}
                   disabled={pending}
-                  name={field.name}
+                  name={input.name}
                   required
-                  type={visible[field.name] ? "text" : "password"}
+                  type={visible[input.name] ? "text" : "password"}
                 />
                 <PasswordToggle
                   className="right-1 size-8"
-                  visible={Boolean(visible[field.name])}
-                  onToggle={() => setVisible((v) => ({ ...v, [field.name]: !v[field.name] }))}
+                  visible={Boolean(visible[input.name])}
+                  onToggle={() => setVisible((v) => ({ ...v, [input.name]: !v[input.name] }))}
                 />
               </div>
-              {state.fieldErrors?.[field.name] ? (
-                <small data-error="true" className={fieldErrorClass} role="alert">{state.fieldErrors[field.name]}</small>
-              ) : "hint" in field ? (
-                <small>{field.hint}</small>
+              {state.fieldErrors?.[input.name] ? (
+                <small data-error="true" className={fieldErrorClass} role="alert">{state.fieldErrors[input.name]}</small>
+              ) : "hint" in input ? (
+                <small>{input.hint}</small>
               ) : null}
             </label>
           ))}
@@ -511,6 +516,107 @@ function PasswordPanel() {
         <button className={submitButtonClass} disabled={pending} type="submit">
           {pending ? "Updating…" : "Update password"}
         </button>
+      </div>
+    </form>
+  );
+}
+
+function TwoStepPanel({ initiallyEnabled }: { initiallyEnabled: boolean }) {
+  // One action for every step; each submit button carries its own `op`.
+  const [state, formAction, pending] = useActionState<TwoStepActionState, FormData>(
+    twoStepAction,
+    { status: "idle", message: "", enabled: initiallyEnabled },
+  );
+  const [visible, setVisible] = useState(false);
+
+  return (
+    <form action={formAction} className="grid gap-6" noValidate>
+      <section className={`${panelClass} p-6 max-[600px]:p-5`}>
+        <div className={panelHeadingClass}>
+          <h2>Two-step login</h2>
+          <p>
+            {state.enabled
+              ? "On. Each login asks for your password and a code from your authenticator app."
+              : "Optional. Add a 6-digit code from an authenticator app, such as Google Authenticator or Microsoft Authenticator, after your password."}
+          </p>
+        </div>
+        {state.setup ? (
+          <div className="grid grid-cols-[auto_minmax(0,1fr)] items-start gap-6 max-[600px]:grid-cols-1">
+            {/* Supabase returns the QR code as an SVG data URI, which next/image cannot optimize. */}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img alt="QR code to scan with your authenticator app" className="size-44 rounded-control bg-white p-2" src={state.setup.qrCode} />
+            <div className="grid gap-5">
+              <p className="m-0 text-small text-(--text-secondary)">
+                Scan the QR code with your authenticator app, or type this key into it:
+                <code className="mt-1 block select-all break-all font-mono text-(--text-primary)">{state.setup.secret}</code>
+              </p>
+              <label className={fieldClass}>
+                <span>6-digit code from the app</span>
+                <input
+                  className={`${field} max-w-[220px]`}
+                  aria-invalid={Boolean(state.fieldErrors?.code)}
+                  autoComplete="one-time-code"
+                  disabled={pending}
+                  inputMode="numeric"
+                  maxLength={6}
+                  name="code"
+                  type="text"
+                />
+                {state.fieldErrors?.code ? (
+                  <small data-error="true" className={fieldErrorClass} role="alert">{state.fieldErrors.code}</small>
+                ) : null}
+              </label>
+            </div>
+          </div>
+        ) : state.enabled ? (
+          <label className={`${fieldClass} max-w-[420px]`}>
+            <span>Your password</span>
+            <div className="relative">
+              <input
+                className={`${field} pr-10`}
+                aria-invalid={Boolean(state.fieldErrors?.currentPassword)}
+                autoComplete="current-password"
+                disabled={pending}
+                name="currentPassword"
+                type={visible ? "text" : "password"}
+              />
+              <PasswordToggle className="right-1 size-8" visible={visible} onToggle={() => setVisible((v) => !v)} />
+            </div>
+            {state.fieldErrors?.currentPassword ? (
+              <small data-error="true" className={fieldErrorClass} role="alert">{state.fieldErrors.currentPassword}</small>
+            ) : (
+              <small>Needed to turn two-step login off.</small>
+            )}
+          </label>
+        ) : null}
+      </section>
+      {state.message ? (
+        <p
+          aria-live="polite"
+          className={statusMessageClass(state.status)}
+          role={state.status === "error" || state.status === "unauthorized" ? "alert" : "status"}
+        >
+          {state.message}
+        </p>
+      ) : null}
+      <div className="flex justify-end gap-3 max-[600px]:flex-col">
+        {state.setup ? (
+          <>
+            {/* Confirm comes first so pressing Enter in the code field submits it. */}
+            <button className={`${submitButtonClass} order-2 max-[600px]:order-none`} disabled={pending} name="op" type="submit" value="confirm">
+              {pending ? "Checking…" : "Confirm"}
+            </button>
+            <button className={button("secondary")} disabled={pending} name="op" type="submit" value="cancel">Cancel</button>
+          </>
+        ) : state.enabled ? (
+          <button className={submitButtonClass} disabled={pending} name="op" type="submit" value="disable">
+            {pending ? "Turning off…" : "Turn off"}
+          </button>
+        ) : (
+          <button className={submitButtonClass} disabled={pending} name="op" type="submit" value="start">
+            {pending ? "Starting…" : "Turn on"}
+          </button>
+        )}
       </div>
     </form>
   );

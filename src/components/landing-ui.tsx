@@ -7,7 +7,8 @@ export const sectionShell = "mx-auto max-w-[1200px] px-[clamp(16px,5vw,72px)] py
 export const sectionTitle = "m-0 [font-family:var(--font-inter),Arial,sans-serif] text-[clamp(2rem,4vw,3rem)] font-extrabold tracking-[-1.2px] leading-[1.15] text-(--text-primary)";
 export const sectionLead = "mt-4 mb-0 max-w-[640px] text-[1.0625rem] font-semibold leading-[1.5] text-[#c3d0e2]";
 export const glassCard = "rounded-[22px] border border-[rgb(175_207_255/32%)] [background:var(--glass-surface)] shadow-(--glass-shadow)";
-export const secondaryPill = "inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-[rgb(168_211_255/48%)] px-6 text-[1rem] font-semibold text-[#e7f1ff] no-underline [background:linear-gradient(135deg,rgb(43_65_105/78%),rgb(10_24_49/72%))] shadow-(--glass-inset-shadow) backdrop-blur-[12px] [transition:border-color_160ms_ease,transform_160ms_ease] hover:border-[rgb(168_211_255/85%)] active:translate-y-px no-backdrop:[background:#14243e]";
+export const primaryPill = "inline-flex min-h-12 items-center justify-center gap-2 rounded-full border border-[rgb(168_211_255/48%)] px-7 text-[1rem] font-extrabold text-white no-underline [background:var(--landing-login-bg)] shadow-(--landing-login-shadow) [transition:transform_160ms_ease] hover:[background:var(--landing-login-bg-hover)] active:translate-y-px focus-visible:outline-3 focus-visible:outline-[#c5e3ff] focus-visible:outline-offset-[5px]";
+export const secondaryPill ="inline-flex min-h-12 items-center justify-center gap-2 rounded-full border border-[rgb(168_211_255/48%)] px-6 text-[1rem] font-semibold text-[#e7f1ff] no-underline [background:linear-gradient(135deg,rgb(43_65_105/78%),rgb(10_24_49/72%))] shadow-(--glass-inset-shadow) backdrop-blur-[12px] [transition:border-color_160ms_ease,transform_160ms_ease] hover:border-[rgb(168_211_255/85%)] active:translate-y-px no-backdrop:[background:#14243e]";
 
 // In-page jumps; the brand links back to the top.
 const navLinks = [
@@ -16,21 +17,44 @@ const navLinks = [
   { href: "#docs", label: "Docs" },
 ] as const;
 
+// Sub-sections of the technical overview; also the header's hover shortcuts.
+export const technicalToc = [
+  ["architecture", "Architecture"],
+  ["features", "Features"],
+  ["model-details", "Model details"],
+  ["stack", "Stack"],
+  ["security", "Security"],
+  ["status", "Status"],
+  ["academic", "Academic project"],
+] as const;
+
+const navLinkClass = "block rounded-panel px-3.5 py-2 text-[0.9375rem] font-semibold text-[#c3d0e2] no-underline hover:bg-[rgb(92_155_255/20%)] hover:text-[#e7f1ff]";
+
 export function LandingHeader() {
   return (
-    <header className="relative h-[81px] bg-(--glass-shell) backdrop-blur-[12px] shadow-[inset_0_-1px_0_rgb(255_255_255/8%)] narrow:h-[73px] no-backdrop:[background:#14243e]">
+    <header className="relative flex h-[81px] items-center justify-between gap-4 px-9 bg-(--glass-shell) backdrop-blur-[12px] shadow-[inset_0_-1px_0_rgb(255_255_255/8%)] narrow:h-[73px] narrow:px-5 max-[480px]:h-auto max-[480px]:flex-wrap max-[480px]:justify-center max-[480px]:py-2 no-backdrop:[background:#14243e]">
       <Brand variant="landing" />
-      <nav className="absolute top-1/2 right-9 flex -translate-y-1/2 gap-1 narrow:right-5" aria-label="On this page">
-        {navLinks.map((link) => (
-          // Phones keep only Docs beside the brand; the hero's button reaches How it works and the footer links Technical.
-          <a
-            className={`rounded-[10px] px-3.5 py-2 text-[0.9375rem] font-semibold text-[#c3d0e2] no-underline hover:bg-[rgb(92_155_255/20%)] hover:text-[#e7f1ff] ${link.href === "#docs" ? "" : "max-[480px]:hidden"}`}
-            href={link.href}
-            key={link.href}
-          >
-            {link.label}
-          </a>
-        ))}
+      {/* Below 480px the links no longer fit beside the brand, so the nav wraps to its own row. */}
+      <nav className="flex gap-1" aria-label="On this page">
+        {navLinks.map((link) =>
+          link.href === "#technical" ? (
+            // Hover or keyboard focus reveals shortcut bullets to the overview's sub-sections.
+            <div className="group relative z-20" key={link.href}>
+              <a className={navLinkClass} href={link.href}>{link.label}</a>
+              <div className="invisible absolute top-full left-0 pt-1 opacity-0 [transition:opacity_140ms_ease,visibility_140ms] group-focus-within:visible group-focus-within:opacity-100 group-hover:visible group-hover:opacity-100">
+                <ul className="m-0 min-w-[190px] list-disc rounded-panel border border-[rgb(175_207_255/32%)] bg-[#14243e] py-2 pr-3 pl-8 shadow-(--glass-shadow) marker:text-brand">
+                  {technicalToc.map(([id, label]) => (
+                    <li key={id}>
+                      <a className="block py-1 text-[0.875rem] font-semibold text-[#c3d0e2] no-underline hover:text-[#e7f1ff]" href={`#${id}`}>{label}</a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          ) : (
+            <a className={navLinkClass} href={link.href} key={link.href}>{link.label}</a>
+          ),
+        )}
       </nav>
       <span className="absolute inset-x-0 bottom-0 block h-px w-full [background:url('/images/header-divider.svg')_center/100%_1px_no-repeat]" aria-hidden="true" />
     </header>

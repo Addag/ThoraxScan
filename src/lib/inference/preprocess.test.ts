@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { preprocessRgba } from "./preprocess";
+import { preprocessRgba, trainingSize } from "./preprocess";
 
 describe("preprocessRgba", () => {
   it("normalizes black and white pixels according to contract version 1", () => {
@@ -23,4 +23,30 @@ describe("preprocessRgba", () => {
       /dimensions/,
     );
   });
+
+  it("keeps the single-stage resize unchanged and skips stage 1 for CheXpert-small sizes", () => {
+    const small = randomRgba(371, 300, 3);
+    expect(preprocessRgba(small, 371, 300, "shortside320-bilinear-center")).toEqual(preprocessRgba(small, 371, 300));
+    expect(trainingSize(2828, 2320)).toEqual({ width: 390, height: 320 });
+    expect(trainingSize(1751, 2022)).toEqual({ width: 320, height: 369 });
+    expect(trainingSize(390, 320)).toEqual({ width: 390, height: 320 });
+  });
+
+  it("shrinks large images to short side 320 before the 224 resize", () => {
+    const large = randomRgba(640, 800, 4);
+    const twoStage = preprocessRgba(large, 640, 800, "shortside320-bilinear-center");
+    const oneStage = preprocessRgba(large, 640, 800);
+    expect(twoStage).toHaveLength(224 * 224);
+    expect(Math.max(...twoStage.map((value, index) => Math.abs(value - oneStage[index])))).toBeGreaterThan(0.01);
+  });
 });
+
+function randomRgba(width: number, height: number, seed: number) {
+  const rgba = new Uint8ClampedArray(width * height * 4);
+  let state = seed;
+  for (let index = 0; index < rgba.length; index += 1) {
+    state = (state * 1664525 + 1013904223) >>> 0;
+    rgba[index] = index % 4 === 3 ? 255 : state >>> 24;
+  }
+  return rgba;
+}

@@ -8,7 +8,7 @@ import type {
   AuthField,
   LoginPortal,
 } from "@/lib/auth/types";
-import { emailPattern } from "@/lib/auth/types";
+import { emailPattern, validatePassword } from "@/lib/auth/types";
 import { createClient } from "@/lib/supabase/server";
 import {
   PRIVACY_POLICY_EFFECTIVE_DATE,
@@ -33,14 +33,6 @@ function validateEmail(email: string) {
   if (!emailPattern.test(email)) return "Enter a valid email address.";
 }
 
-function validatePassword(password: string) {
-  if (!password) return "Enter your password.";
-  if (password.length < 8) return "Use at least 8 characters.";
-  if (!/[a-z]/i.test(password) || !/\d/.test(password)) {
-    return "Include at least one letter and one number.";
-  }
-}
-
 function validateCaptchaToken(captchaToken: string) {
   if (!captchaToken) return "Complete the security verification.";
 }
@@ -55,6 +47,7 @@ function isLoginPortal(portal: string): portal is LoginPortal {
 
 function authMessage(code: string | undefined, fallback: string) {
   if (code === "invalid_credentials") return "Email or password is incorrect.";
+  if (code === "user_banned") return "This account is disabled. Contact an administrator.";
   if (code === "email_not_confirmed") {
     return "Confirm your email address before logging in.";
   }
@@ -194,11 +187,25 @@ export async function loginAction(
     );
   }
 
+  // Accounts with two-step login finish on the code screen; the database refuses everything until then.
+  if (data.user.factors?.some((factor) => factor.status === "verified")) {
+    redirect(`/login/verify?as=${expectedRole}`);
+  }
+
+  return finishLogin(supabase, data.user.id, expectedRole as LoginPortal);
+}
+
+/** The portal check, shared by the password step and the two-step code step. */
+async function finishLogin(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  userId: string,
+  expectedRole: LoginPortal,
+): Promise<AuthActionState> {
   if (expectedRole === "administrator") {
     const { data: administrator, error: administratorError } = await supabase
       .from("platform_admins")
       .select("user_id")
-      .eq("user_id", data.user.id)
+      .eq("user_id", userId)
       .maybeSingle<{ user_id: string }>();
 
     if (administratorError || !administrator) {
@@ -214,7 +221,7 @@ export async function loginAction(
   const { data: profile, error: profileError } = await supabase
     .from("profiles")
     .select("role")
-    .eq("id", data.user.id)
+    .eq("id", userId)
     .single<{ role: AppRole }>();
 
   if (profileError || !profile || !isAppRole(profile.role)) {
@@ -232,6 +239,46 @@ export async function loginAction(
     );
   }
 
+  redirect("/dashboard");
+}
+
+export async function verifyTwoStepAction(
+  _previousState: AuthActionState,
+  formData: FormData,
+): Promise<AuthActionState> {
+  const code = value(formData, "code").replace(/\s/g, "");
+  const portal = value(formData, "as");
+  const next = value(formData, "next");
+
+  if (!/^\d{6}$/.test(code)) {
+    return errorState("Check the highlighted fields.", {
+      code: "Enter the 6-digit code from your authenticator app.",
+    });
+  }
+
+  const supabase = await createClient();
+  const { data: factors, error: factorsError } = await supabase.auth.mfa.listFactors();
+  if (factorsError) redirect("/login");
+  // `totp` holds verified factors only. None means two-step login was reset meanwhile.
+  const factor = factors.totp[0];
+  if (!factor) redirect("/dashboard");
+
+  const { data, error } = await supabase.auth.mfa.challengeAndVerify({
+    factorId: factor.id,
+    code,
+  });
+
+  if (error) {
+    return errorState("Check the highlighted fields.", {
+      code:
+        error.status === 429
+          ? "Too many attempts. Wait a minute and try again."
+          : "That code is incorrect or expired. Enter the newest one.",
+    });
+  }
+
+  if (next === "/reset-password") redirect("/reset-password");
+  if (isLoginPortal(portal)) return finishLogin(supabase, data.user.id, portal);
   redirect("/dashboard");
 }
 

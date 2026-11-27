@@ -18,9 +18,14 @@ const funnelDisplay = Funnel_Display({
 });
 
 export const metadata: Metadata = {
+  // Makes the share image URL absolute; NEXT_PUBLIC_SITE_URL is already set for auth email links.
+  metadataBase: process.env.NEXT_PUBLIC_SITE_URL ? new URL(process.env.NEXT_PUBLIC_SITE_URL) : undefined,
   title: "ThoraxScan | AI-Assisted Chest X-Ray Learning Platform",
   description:
     "An educational learning platform for guided chest X-ray interpretation practice.",
+  // Title, description and the image from opengraph-image.tsx fill in automatically; Twitter/X copies them.
+  openGraph: { siteName: "ThoraxScan", type: "website" },
+  twitter: { card: "summary_large_image" },
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {

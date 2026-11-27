@@ -13,8 +13,10 @@ import {
   loginAction,
   registerAction,
   resetPasswordAction,
+  verifyTwoStepAction,
 } from "@/app/(auth)/actions";
-import { primaryButtonBase, primaryButtonSkin } from "@/components/primary-button";
+import { logoutAction } from "@/app/(protected)/actions";
+import { button } from "@/components/controls";
 import { fieldErrorClass, fieldErrorText } from "@/components/field-error";
 import { PasswordToggle } from "@/components/password-toggle";
 import { initialAuthState } from "@/lib/auth/types";
@@ -25,13 +27,14 @@ import {
   TERMS_VERSION,
 } from "@/lib/legal/privacy";
 
-export type AuthMode = "login" | "register" | "forgot" | "reset";
+export type AuthMode = "login" | "register" | "forgot" | "reset" | "verify";
 
 const actions = {
   login: loginAction,
   register: registerAction,
   forgot: forgotPasswordAction,
   reset: resetPasswordAction,
+  verify: verifyTwoStepAction,
 };
 
 const submitLabels = {
@@ -39,24 +42,35 @@ const submitLabels = {
   register: "Create account",
   forgot: "Send reset link",
   reset: "Update password",
+  verify: "Verify",
 };
 
 const turnstileSiteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
-const inputClass = "h-[53px] w-full rounded-[9px] border border-[rgb(153_191_240/38%)] bg-[rgb(7_18_39/56%)] px-3.5 text-foreground aria-invalid:border-[#ff6b6b]";
+const inputClass = "h-12 w-full rounded-control border border-[rgb(153_191_240/38%)] bg-[rgb(7_18_39/56%)] px-3.5 text-foreground aria-invalid:border-[#ff6b6b]";
 const fieldClass = "mt-4 flex flex-col [&>label]:mb-[6px] [&>label]:text-[16px] [&>label]:font-extrabold [&>label]:leading-5";
 
-export function AuthForm({ mode }: { mode: AuthMode }) {
+// Mirrors the server check `validatePassword` in lib/auth/types.ts: 8+ characters, a letter and a number.
+const passwordRules = [
+  ["At least 8 characters", (p: string) => p.length >= 8],
+  ["A letter", (p: string) => /[a-z]/i.test(p)],
+  ["A number", (p: string) => /\d/.test(p)],
+] as const;
+
+export function AuthForm({ mode, hiddenFields }: { mode: AuthMode; hiddenFields?: Record<string, string> }) {
   const [state, formAction, pending] = useActionState(
     actions[mode],
     initialAuthState,
   );
-  const showEmail = mode !== "reset";
-  const showPasswordField = mode !== "forgot";
+  // The two-step code screen has a signed-in session already: no email, password or captcha.
+  const showEmail = mode !== "reset" && mode !== "verify";
+  const showPasswordField = mode !== "forgot" && mode !== "verify";
   const showConfirmation = mode === "register" || mode === "reset";
-  const requiresCaptcha = mode !== "reset";
+  const requiresCaptcha = mode !== "reset" && mode !== "verify";
   const turnstileRef = useRef<TurnstileInstance | null>(null);
   const [captchaToken, setCaptchaToken] = useState("");
   const [captchaError, setCaptchaError] = useState("");
+  const [password, setPassword] = useState("");
+  const showRules = mode === "register" || mode === "reset";
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [confirmVisible, setConfirmVisible] = useState(false);
 
@@ -77,7 +91,7 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
   const captchaReady = !requiresCaptcha || Boolean(captchaToken);
 
   return (
-    <form className="flex flex-col" action={formAction} noValidate>
+    <form className="flex flex-col" action={formAction} onReset={() => setPassword("")} noValidate>
       {mode === "login" && (
         <RoleSelector mode="login" error={state.fieldErrors?.expectedRole} />
       )}
@@ -87,6 +101,33 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
           mode="register"
           error={state.fieldErrors?.expectedRole}
         />
+      )}
+
+      {hiddenFields && Object.entries(hiddenFields).map(([name, fieldValue]) => (
+        <input key={name} name={name} type="hidden" value={fieldValue} />
+      ))}
+
+      {mode === "verify" && (
+        <div className={fieldClass}>
+          <label htmlFor="verify-code">6-digit code</label>
+          <input
+            className={`${inputClass} text-center font-mono text-[22px] tracking-[8px]`}
+            id="verify-code"
+            name="code"
+            type="text"
+            inputMode="numeric"
+            autoComplete="one-time-code"
+            autoFocus
+            maxLength={6}
+            aria-invalid={Boolean(state.fieldErrors?.code)}
+            aria-describedby={state.fieldErrors?.code ? "verify-code-error" : undefined}
+          />
+          {state.fieldErrors?.code && (
+            <p className={fieldErrorClass} id="verify-code-error" role="alert">
+              {state.fieldErrors.code}
+            </p>
+          )}
+        </div>
       )}
 
       {mode === "register" && (
@@ -151,19 +192,34 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
           </label>
           <div className="relative">
             <input
-              className={`${inputClass} pr-[54px]`}
+              className={`${inputClass} pr-12`}
               id={`${mode}-password`}
               name="password"
               type={passwordVisible ? "text" : "password"}
               autoComplete={mode === "login" ? "current-password" : "new-password"}
               minLength={mode === "login" ? undefined : 8}
+              onChange={showRules ? (e) => setPassword(e.target.value) : undefined}
               aria-invalid={Boolean(state.fieldErrors?.password)}
               aria-describedby={
-                state.fieldErrors?.password ? `${mode}-password-error` : undefined
+                [showRules && `${mode}-password-rules`, state.fieldErrors?.password && `${mode}-password-error`].filter(Boolean).join(" ") || undefined
               }
             />
             <PasswordToggle visible={passwordVisible} onToggle={() => setPasswordVisible((v) => !v)} />
           </div>
+          {showRules && (
+            <ul className="m-0 mt-2 grid list-none gap-1 p-0 text-[13px] leading-[1.4]" id={`${mode}-password-rules`}>
+              {passwordRules.map(([label, test]) => {
+                const met = test(password);
+                return (
+                  <li className={`flex items-center gap-2 ${met ? "text-[#b8f3ce]" : "text-[#d6e1f0]"}`} key={label}>
+                    <span aria-hidden="true" className={`grid size-4 flex-none place-items-center rounded-full border text-[11px] font-extrabold leading-none ${met ? "border-[#67deb3] bg-[#17643a] text-white" : "border-[rgb(153_191_240/50%)]"}`}>{met ? "✓" : ""}</span>
+                    {label}
+                    <span className="sr-only">{met ? "(met)" : "(not met)"}</span>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
           {state.fieldErrors?.password && (
             <p
               className={fieldErrorClass}
@@ -181,7 +237,7 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
           <label htmlFor={`${mode}-confirm-password`}>Confirm password</label>
           <div className="relative">
             <input
-              className={`${inputClass} pr-[54px]`}
+              className={`${inputClass} pr-12`}
               id={`${mode}-confirm-password`}
               name="confirmPassword"
               type={confirmVisible ? "text" : "password"}
@@ -290,7 +346,7 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
       )}
 
       <button
-        className={`${primaryButtonBase} ${primaryButtonSkin} mt-[22px] h-[71px] w-full rounded-full text-[27px] leading-[34px] disabled:opacity-[0.72] ${pending ? "cursor-wait" : "disabled:cursor-not-allowed"}`}
+        className={`${button("primary", "lg")} mt-6 w-full rounded-full!`}
         type="submit"
         disabled={pending || !captchaReady}
         aria-busy={pending}
@@ -325,11 +381,11 @@ function RoleSelector({
 
   return (
     <fieldset
-      className={mode === "login" ? "m-0 mb-[22px] w-full border-0 p-0" : "m-0 mb-[22px] w-[min(507px,calc(100%+38px))] self-center border-0 p-0"}
+      className="m-0 mb-[22px] w-full border-0 p-0"
       aria-describedby={error ? `${descriptionId} ${errorId}` : descriptionId}
     >
       <legend className="sr-only">Account type</legend>
-      <div className={mode === "login" ? "grid grid-cols-3 gap-3" : "grid grid-cols-2 gap-[26px] max-[420px]:grid-cols-1 max-[420px]:gap-3"}>
+      <div className={mode === "login" ? "grid grid-cols-2 gap-3" : "grid grid-cols-2 gap-[26px] max-[420px]:grid-cols-1 max-[420px]:gap-3"}>
         <div className="relative min-w-0">
           <input
             className="peer sr-only"
@@ -339,7 +395,7 @@ function RoleSelector({
             value="student"
             defaultChecked
           />
-          <label className={`relative flex ${mode === "login" ? "h-32" : "h-[147px]"} cursor-pointer flex-col items-center justify-center overflow-hidden rounded-[10px] border border-[rgb(153_191_240/32%)] bg-(--glass-inset) text-center text-(--text-primary) shadow-(--glass-inset-shadow) transition-[background-color,border-color,transform] duration-[160ms] hover:bg-[rgba(0,119,255,0.28)] peer-checked:border-[#0077ff] peer-checked:bg-[rgba(0,119,255,0.6)] peer-focus-visible:outline-3 peer-focus-visible:outline-white peer-active:[transform:translateY(1px)]`} htmlFor={`${mode}-role-student`}>
+          <label className={`relative flex ${mode === "login" ? "h-32" : "h-[147px]"} cursor-pointer flex-col items-center justify-center overflow-hidden rounded-panel border border-[rgb(153_191_240/32%)] bg-(--glass-inset) text-center text-(--text-primary) shadow-(--glass-inset-shadow) transition-[background-color,border-color,transform] duration-[160ms] hover:bg-[rgba(0,119,255,0.28)] peer-checked:border-[#0077ff] peer-checked:bg-[rgba(0,119,255,0.6)] peer-focus-visible:outline-3 peer-focus-visible:outline-white peer-focus-visible:outline-offset-4 peer-active:[transform:translateY(1px)]`} htmlFor={`${mode}-role-student`}>
             <Image
               className={`absolute inset-x-0 top-[7px] mx-auto block h-[88px] w-[125px] [transform:scaleX(-1)] ${mode === "login" ? "scale-[0.84] origin-top max-sm:scale-[0.7]" : ""}`}
               src="/images/student-role.png"
@@ -348,8 +404,8 @@ function RoleSelector({
               height={88}
               aria-hidden="true"
             />
-            <span className={`absolute right-3 left-3 font-extrabold leading-[1.2] ${mode === "login" ? "bottom-6 text-[17px] max-sm:inset-x-1 max-sm:bottom-3 max-sm:text-[13px]" : "bottom-[27px] text-[20px]"}`}>Student</span>
-            <span className={`absolute right-3 left-3 mx-auto max-w-[170px] leading-[1.3] text-[#d0d4e6] ${mode === "login" ? "bottom-[7px] text-[10px] max-sm:hidden" : "bottom-[9px] text-[12px]"}`}>Learning workspace</span>
+            <span className={`absolute right-3 left-3 font-extrabold leading-[1.2] ${mode === "login" ? "bottom-6 text-[17px] max-sm:inset-x-1 max-sm:bottom-3 max-sm:text-[11px]" : "bottom-[27px] text-[20px]"}`}>Student</span>
+            <span className={`absolute right-3 left-3 mx-auto max-w-[170px] leading-[1.3] text-[#d0d4e6] ${mode === "login" ? "bottom-[7px] text-[11px] max-sm:hidden" : "bottom-[9px] text-[12px]"}`}>Learning workspace</span>
           </label>
         </div>
 
@@ -361,38 +417,23 @@ function RoleSelector({
             type="radio"
             value="professor"
           />
-          <label className={`relative flex ${mode === "login" ? "h-32" : "h-[147px]"} cursor-pointer flex-col items-center justify-center overflow-hidden rounded-[10px] border border-[rgb(153_191_240/32%)] bg-(--glass-inset) text-center text-(--text-primary) shadow-(--glass-inset-shadow) transition-[background-color,border-color,transform] duration-[160ms] hover:bg-[rgba(0,119,255,0.28)] peer-checked:border-[#0077ff] peer-checked:bg-[rgba(0,119,255,0.6)] peer-focus-visible:outline-3 peer-focus-visible:outline-white peer-focus-visible:outline-offset-4 peer-active:[transform:translateY(1px)]`} htmlFor={`${mode}-role-professor`}>
+          <label className={`relative flex ${mode === "login" ? "h-32" : "h-[147px]"} cursor-pointer flex-col items-center justify-center overflow-hidden rounded-panel border border-[rgb(153_191_240/32%)] bg-(--glass-inset) text-center text-(--text-primary) shadow-(--glass-inset-shadow) transition-[background-color,border-color,transform] duration-[160ms] hover:bg-[rgba(0,119,255,0.28)] peer-checked:border-[#0077ff] peer-checked:bg-[rgba(0,119,255,0.6)] peer-focus-visible:outline-3 peer-focus-visible:outline-white peer-focus-visible:outline-offset-4 peer-active:[transform:translateY(1px)]`} htmlFor={`${mode}-role-professor`}>
             <Image
-              className="absolute top-[7px] left-1/2 block h-[83px] w-[86px] [transform:translateX(-50%)]"
+              className={`absolute top-[7px] left-1/2 block h-[83px] w-[86px] [transform:translateX(-50%)] ${mode === "login" ? "scale-[0.84] origin-top max-sm:scale-[0.7]" : ""}`}
               src="/images/professor-role.png"
               alt=""
               width={86}
               height={83}
               aria-hidden="true"
             />
-            <span className={`absolute right-3 left-3 font-extrabold leading-[1.2] ${mode === "login" ? "bottom-6 text-[17px] max-sm:inset-x-1 max-sm:bottom-3 max-sm:text-[13px]" : "bottom-[27px] text-[20px]"}`}>Professor</span>
-            <span className={`absolute right-3 left-3 mx-auto max-w-[170px] leading-[1.3] text-[#d0d4e6] ${mode === "login" ? "bottom-[7px] text-[10px] max-sm:hidden" : "bottom-[9px] text-[12px]"}`}>
+            <span className={`absolute right-3 left-3 font-extrabold leading-[1.2] ${mode === "login" ? "bottom-6 text-[17px] max-sm:inset-x-1 max-sm:bottom-3 max-sm:text-[11px]" : "bottom-[27px] text-[20px]"}`}>Professor</span>
+            <span className={`absolute right-3 left-3 mx-auto max-w-[170px] leading-[1.3] text-[#d0d4e6] ${mode === "login" ? "bottom-[7px] text-[11px] max-sm:hidden" : "bottom-[9px] text-[12px]"}`}>
               {mode === "register" ? "Approval required" : "Teaching workspace"}
             </span>
           </label>
         </div>
 
-        {mode === "login" && (
-          <div className="relative min-w-0">
-            <input
-              className="peer sr-only"
-              id="login-role-administrator"
-              name="expectedRole"
-              type="radio"
-              value="administrator"
-            />
-            <label className="relative flex h-32 cursor-pointer flex-col items-center justify-center overflow-hidden rounded-[10px] border border-[rgb(153_191_240/32%)] bg-(--glass-inset) text-center text-(--text-primary) shadow-(--glass-inset-shadow) transition-[background-color,border-color,transform] duration-[160ms] hover:bg-[rgba(0,119,255,0.28)] peer-checked:border-[#0077ff] peer-checked:bg-[rgba(0,119,255,0.6)] peer-focus-visible:outline-3 peer-focus-visible:outline-white peer-focus-visible:outline-offset-4 peer-active:[transform:translateY(1px)]" htmlFor="login-role-administrator">
-              <span className="absolute top-[13px] grid size-[66px] place-items-center rounded-[18px] border-2 border-[#8bc9ff] text-[42px] leading-none text-[#d5edff]" aria-hidden="true">◇</span>
-              <span className="absolute right-3 bottom-6 left-3 text-[17px] font-extrabold leading-[1.2] max-sm:inset-x-1 max-sm:bottom-3 max-sm:text-[13px]">Administrator</span>
-              <span className="absolute right-3 bottom-[7px] left-3 mx-auto max-w-[170px] text-[10px] leading-[1.3] text-[#d0d4e6] max-sm:hidden">Professor approvals</span>
-            </label>
-          </div>
-        )}
+        
       </div>
 
       <p className="mx-1 mt-3 mb-0 text-center text-[13px] leading-[1.5] text-[#d6e1f0]" id={descriptionId}>
@@ -422,6 +463,17 @@ function AuthSwitch({ mode }: { mode: AuthMode }) {
     return (
       <p className="mt-7 mb-0 text-center text-[13px] leading-[1.5] text-[#d6e1f0] [&_a]:font-extrabold [&_a]:text-(--brand-blue-text) [&_a]:transition-colors [&_a]:duration-160 [&_a:hover]:text-white">
         Need an account? <Link href="/register">Create an account</Link>
+      </p>
+    );
+  }
+
+  if (mode === "verify") {
+    return (
+      <p className="mt-7 mb-0 text-center text-[13px] leading-[1.5] text-[#d6e1f0]">
+        Lost your phone? Ask an administrator to reset two-step login.{" "}
+        <button className="cursor-pointer border-0 bg-transparent p-0 font-extrabold text-(--brand-blue-text) transition-colors duration-160 hover:text-white" formAction={logoutAction} formNoValidate type="submit">
+          Use a different account
+        </button>
       </p>
     );
   }

@@ -6,7 +6,17 @@ project is production and has its own independent `thoraxscan-classifier`
 pointer. A staged release is inactive until an explicit compare-and-swap
 activation succeeds.
 
+For what each release contains and how it performed, see [models.md](models.md).
+
 Learning Mode runs inference in browser memory. Activity analyses persist through authorized RPCs; Students see maps only after submission and feedback release. Approved Professors with workspace access use a separate heatmap RPC. Direct analysis table reads remain revoked.
+
+## Contract version 3
+
+- Retains the V1 `logits` output and replaces V2's global map with `class_activation`, float32 `[batch, 14, 14, 14]`: one 14×14 class activation map per label, in label order.
+- Method `cam-fc-weights-v1`: the classifier weights for each label applied to the pre-pool head features (exact for SqueezeViT's average-pool head, so `mean(raw map) + bias = logit`). Normalization `relu-per-label-max-v1`: negative evidence clipped to zero, then each label divided by its own maximum.
+- V3 bundles include `fixtures/expected-class-activation.json` instead of `expected-attention.json`; the validator checks the same evidence, determinism and parity limits as V2. The fixture present decides the contract version, and a bundle may not carry both.
+- V3 activity analyses persist all 2744 values in `attention_map`, with `attention_method = 'cam-fc-weights-v1'` and a 14×14 grid; the read RPCs are unchanged. The UI offers maps for likely and possible findings (Students, Learning Mode) or every finding (Professors, who don't receive probabilities).
+- Export with `model-export/export_squeezevit_cam.py`.
 
 ## Contract version 2
 
@@ -47,8 +57,12 @@ model-input/<release-id>/
     ├── expected-tensor.f32
     ├── model-input.f32
     ├── expected-logits.json
-    └── expected-probabilities.json
+    ├── expected-probabilities.json
+    ├── expected-attention.json          # V2 only
+    └── expected-class-activation.json   # V3 only
 ```
+
+V2 and V3 bundles also carry the exporter's `export-validation.json` next to `model.onnx`.
 
 `release.json` has this shape:
 
@@ -62,9 +76,20 @@ model-input/<release-id>/
   },
   "sourceVersion": "training-code-commit-or-release",
   "preprocessingVersion": "preprocessing-v1",
-  "thresholdVersion": "thresholds-v1"
+  "thresholdVersion": "thresholds-v1",
+  "resizeInterpolation": "bilinear-center"
 }
 ```
+
+`resizeInterpolation` is optional and defaults to `bilinear-center`, one resize
+straight to 224. `shortside320-bilinear-center` first shrinks images whose short
+side exceeds 320 to short side 320 (long side floored) with the same bilinear
+math, the way CheXpert-small was made, so full-size uploads match the training
+images. Such a bundle needs `model-export/preprocessing_shortside320.py` as its
+`preprocessing-reference.py` and a fixture larger than 320 from its
+`--write-fixture` option. The value becomes the manifest's
+`preprocessing.resize.interpolation`; app builds that predate it reject such a
+manifest, so deploy the app before activating the release.
 
 `thresholds.json` must contain all 14 labels in the exact contract order, each
 with a finite value from 0 through 1. The optional `possible-thresholds.json` has
@@ -88,7 +113,7 @@ new-headless Chromium (`channel: "chromium"`, `--enable-unsafe-webgpu`), so a
 machine with a GPU gets a real adapter; the reason for any disabled WebGPU is
 printed as `WebGPU disabled: …`. A release enables WebGPU
 only when its logits are within `1e-3` absolute difference of WASM; otherwise
-the manifest pins that release to WASM. For V2, WebGPU must also meet the attention parity limit of `1e-3`; WASM attention must match the PyTorch fixture within `1e-4`. Unavailable WebGPU is recorded as disabled, never as a successful parity measurement.
+the manifest pins that release to WASM. For V2 and V3, WebGPU must also meet the heatmap parity limit of `1e-3`; the WASM heatmap must match the PyTorch fixture within `1e-4`. Unavailable WebGPU is recorded as disabled, never as a successful parity measurement.
 
 ## Local workflow
 
@@ -159,7 +184,11 @@ For a deliberate rollback:
 npm run model:rollback -- --to <previous-release-id> --expected-revision <revision> --reason "<incident reference>"
 ```
 
-Never activate a bundle with missing evidence, failed parity, an unsupported manifest, or an artifact over 50 MiB. Keep V1 artifacts registered for rollback. Rollback changes only the active pointer; existing immutable V1/V2 analyses and their maps remain unchanged.
+Never activate a bundle with missing evidence, failed parity, an unsupported manifest, or an artifact over 50 MiB. Keep V1 artifacts registered for rollback. Rollback changes only the active pointer; existing immutable V1/V2/V3 analyses and their maps remain unchanged.
+
+## V3 export and migration
+
+`20261029120000_class_activation_maps.sql` allows contract 3, pins the V3 manifest descriptor, accepts 2744-value maps with the V3 method for V3 analyses, and maps schemaVersion 3 in `register_model_release`. V1 and V2 rows and their constraints are unchanged. `export-validation.json` records `classActivationFixtureSha256` instead of `attentionFixtureSha256`.
 
 ## V2 export and migration
 

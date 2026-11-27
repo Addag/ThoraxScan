@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { parseModelManifest, parseThresholds, THORAXSCAN_LABELS } from "./contract";
+import { parseModelManifest, parseReleaseSource, parseThresholds, THORAXSCAN_LABELS } from "./contract";
 import { createTestManifest } from "./test-manifest";
 
 describe("ModelManifestV1", () => {
@@ -15,6 +15,31 @@ describe("ModelManifestV1", () => {
     };
 
     expect(() => parseModelManifest(changed)).toThrow(/input\.shape/);
+  });
+
+  it("accepts the short-side-320 resize and rejects unknown resize modes", () => {
+    const manifest = createTestManifest();
+    const resize = (interpolation: string) => ({
+      ...manifest,
+      preprocessing: { ...manifest.preprocessing, resize: { ...manifest.preprocessing.resize, interpolation } },
+    });
+    expect(parseModelManifest(resize("shortside320-bilinear-center"))).toEqual(resize("shortside320-bilinear-center"));
+    expect(() => parseModelManifest(resize("area"))).toThrow(/preprocessing configuration/);
+  });
+
+  it("defaults release.json to the single-stage resize", () => {
+    const source = {
+      releaseId: "test-release-20261030.1",
+      modelFamily: "thoraxscan-classifier",
+      checkpoint: { id: "checkpoint", sha256: "a".repeat(64) },
+      sourceVersion: "source",
+      preprocessingVersion: "preprocessing",
+      thresholdVersion: "thresholds",
+    };
+    expect(parseReleaseSource(source).resizeInterpolation).toBe("bilinear-center");
+    expect(parseReleaseSource({ ...source, resizeInterpolation: "shortside320-bilinear-center" }).resizeInterpolation)
+      .toBe("shortside320-bilinear-center");
+    expect(() => parseReleaseSource({ ...source, resizeInterpolation: "area" })).toThrow(/resizeInterpolation/);
   });
 
   it("rejects reordered labels and invalid thresholds", () => {

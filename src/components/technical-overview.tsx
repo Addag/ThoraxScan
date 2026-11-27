@@ -1,17 +1,8 @@
-import { glassCard, sectionLead, sectionShell, sectionTitle } from "@/components/landing-ui";
+import { glassCard, sectionLead, sectionShell, sectionTitle, technicalToc as toc } from "@/components/landing-ui";
 
 // The landing page's technical overview, after parada-landing's technical tab. Every fact comes from the system map
 // (map/objects, map/processes) or package.json; update both together. The headline model figures live in the page's
 // "Under the hood" section, so this one carries only the details.
-const toc = [
-  ["architecture", "Architecture"],
-  ["features", "Features"],
-  ["model-details", "Model details"],
-  ["stack", "Stack"],
-  ["security", "Security"],
-  ["status", "Status"],
-  ["academic", "Academic project"],
-] as const;
 
 const architecture = [
   { name: "Browser", tech: "Next.js 16 · React 19 · Tailwind CSS 4" },
@@ -30,32 +21,34 @@ const highlights = [
 const features = [
   { module: "Accounts and access", items: ["Student or Professor registration with email confirmation", "Cloudflare Turnstile on sign-up, login and password recovery", "Professor accounts approved by an administrator", "Settings: theme, text size, high contrast, sign-in email"] },
   { module: "Workspaces", items: ["Professor-owned class workspaces", "Expiring, use-limited invitation codes for students and co-professors", "Membership-scoped access to every activity and case"] },
-  { module: "Activities", items: ["Draft → published → archived lifecycle", "One X-ray case per activity: JPEG or PNG upload, or a pick from the built-in library", "A private reference evaluation students never receive", "Optional due dates and a notification bell"] },
-  { module: "Submissions and feedback", items: ["Drafts, then one immutable final answer: findings, normal or abnormal, and region", "AI feedback released only after submission", "Faculty evaluation with a score and feedback, released explicitly"] },
-  { module: "Learning Mode", items: ["Practice on a 234-image CheXpert library or your own image", "Likely and possible findings across all 14 labels", "Attention heatmap and a printable attention maps guide", "Practice results stay in browser memory"] },
+  { module: "Activities", items: ["Draft → published → archived lifecycle", "One X-ray case per activity: JPEG or PNG upload, or a pick from the built-in library", "AI analysis on the draft, validated by the Professor into an answer key of labels and heatmaps", "Optional due dates and a notification bell"] },
+  { module: "Submissions and feedback", items: ["Drafts, then one immutable final answer: labels from the 14, optional written answers per label, and a heatmap per finding", "The validated answer key, with the student's heatmap side by side, released only after submission", "Faculty evaluation with a grade and feedback, released explicitly"] },
+  { module: "Learning Mode", items: ["Practice on a 234-image CheXpert library or your own image", "Likely and possible findings across all 14 labels", "Finding heatmaps and a printable heatmap guide", "Practice results stay in browser memory", "Private notes on library cases, visible only to you"] },
   { module: "Administration", items: ["Review Professor applications", "Grant and revoke administrator access; the last administrator can't remove themselves"] },
 ] as const;
 
 const modelDetails = [
-  ["Release", "squeezevit-v5-kd-cardio042-possible85-20261017.1"],
-  ["Model", "SqueezeViT, a compact vision transformer distilled from a FastViT-SA12 teacher."],
-  ["Training data", "CheXpert v1.0, frontal and lateral views. Checkpoint and thresholds are chosen on a held-out patient split, so the 234-image official validation set stays unseen."],
-  ["Input", "Grayscale, resized to 224×224 and normalized, with the same transform in training and in the browser."],
-  ["Thresholds", "Per-label F1 on the held-out split. Cardiomegaly is lowered to reach 80% held-out sensitivity. A \"possible\" tier flags the five competition labels at 85% sensitivity."],
-  ["Explainability", "Four-layer attention rollout, averaged over queries and normalized per image into a 7×7 map. Global and class-agnostic, not Grad-CAM, and it doesn't locate lesions."],
-  ["Limits", "Learning Mode accepts frontal and lateral images; activities accept frontal only. Lateral held-out competition AUC is 0.80 (frontal 0.79), but lateral mean AUC is lower (0.74 vs 0.78). Cardiomegaly sensitivity is 0.49 on the official set even after tuning. Not clinically validated."],
+  ["Release", "tinyvit-v7-nih-cam-ecm-possible85-sr320-20261030.1"],
+  ["Model", "TinyViT-11M, a hybrid vision transformer (convolution stage, then attention stages) pretrained on ImageNet-22k and distilled from a FastViT-SA12 teacher."],
+  ["Training data", "CheXpert v1.0 (frontal and lateral views) plus the NIH ChestX-ray14 training split (frontal). Labels NIH does not report are left out of the loss for its images. Checkpoint and thresholds are chosen on a held-out patient split, so the 234-image official validation set stays unseen."],
+  ["Input", "Grayscale. Full-size uploads are first shrunk to a 320-pixel short side, the way the CheXpert-small training images were made; then every image is resized to 224×224 and normalized. Built-in library images are already at that size, so their results are unchanged."],
+  ["Thresholds", "Per-label F1 on the held-out split. Cardiomegaly is lowered to reach 80% held-out sensitivity. A \"possible\" tier flags the five competition labels at 85% sensitivity. Enlarged Cardiomediastinum is also flagged whenever Cardiomegaly is, following CheXpert's label hierarchy, and then shows the Cardiomegaly heatmap."],
+  ["Explainability", "Class activation maps: the classifier's weights for each finding applied to the final 7×7 feature map (with the head's normalization), smoothed to 14×14, clipped at zero and scaled per finding. Exact for this architecture and computed in the same forward pass. A guide to where the evidence is, not a lesion outline."],
+  ["Limits", "Learning Mode accepts frontal and lateral images; activities accept frontal only. Lateral held-out competition AUC is 0.82 (frontal 0.80), but lateral mean AUC is lower (0.77 vs 0.81). Cardiomegaly sensitivity is 0.47 on the official set even after tuning. Not clinically validated."],
 ] as const;
 
 const stack = [
-  { group: "Frontend", items: ["Next.js 16 (App Router)", "React 19", "Tailwind CSS 4", "TypeScript"] },
+  { group: "Frontend", items: ["Next.js 16 (App Router)", "React 19", "Tailwind CSS 4", "TypeScript 5"] },
   { group: "Data and auth", items: ["Supabase Auth", "Postgres with row-level security", "Supabase Storage", "sharp for server-side image checks"] },
-  { group: "AI", items: ["PyTorch training", "ONNX export", "ONNX Runtime Web 1.27", "WebGPU and WebAssembly"] },
-  { group: "Operations", items: ["Cloudflare Turnstile", "Vercel Analytics and Speed Insights", "Vitest unit and Playwright browser tests"] },
+  { group: "In-browser AI", items: ["ONNX Runtime Web 1.27", "WebGPU, with a WebAssembly fallback", "Content-addressed model files"] },
+  { group: "Model training", items: ["Python 3.14 and PyTorch with CUDA 12.8", "timm vision models", "ONNX export (opset 17)","ONNX Runtime GPU parity checks"] },
+  { group: "Hardware", items: ["NVIDIA GPU workstation for training and export", "The user's own device runs the model", "Vercel and Supabase cloud servers"] },
+  { group: "Operations", items: ["Cloudflare Turnstile", "Vercel Analytics and Speed Insights", "Vitest unit and Playwright browser tests", "pgTAP database tests"] },
 ] as const;
 
 const security = [
   { title: "Row-level security", body: "Every table is guarded in Postgres. Students read only their own work; Professors read only final submissions in their workspaces." },
-  { title: "Answers stay private", body: "Reference evaluations live in a separate table, and the student data layer never serializes them." },
+  { title: "Answers stay private", body: "Answer keys live in a separate table that students cannot read; they receive the key only after their own final submission." },
   { title: "Private case images", body: "Images upload straight to a private bucket with a signed token. The server then re-checks type, size and that the file actually decodes." },
   { title: "Hashed invitations", body: "Codes are 128-bit, expiring and use-limited. Only SHA-256 hashes are stored, and redemption locks the row so caps hold under load." },
   { title: "Immutable records", body: "Final submissions, released AI feedback, released evaluations, model releases and published cases can't be edited or deleted." },
@@ -68,12 +61,12 @@ const status = {
   implemented: [
     "Accounts, roles, Professor approval and administrator management",
     "Workspaces, invitation codes and membership",
-    "Activities with private cases and reference evaluations",
+    "Activities with private cases and Professor-validated answer keys",
     "Draft and final submissions",
-    "In-browser AI analysis with attention heatmaps, released after submission",
+    "In-browser AI analysis with finding heatmaps, released after submission",
     "Faculty evaluation and notifications",
     "Class analytics with CSV export",
-    "Learning Mode with the built-in X-ray library, frontal and lateral",
+    "Learning Mode with the built-in X-ray library, frontal and lateral, and private case notes",
     "Model registry with validation, staging, activation and rollback",
     "Privacy notice consent recording and accessibility settings",
   ],
@@ -149,7 +142,7 @@ export function TechnicalOverview() {
 
       <section id="stack" className={subSection} aria-labelledby="stack-title">
         <h3 className={subTitle} id="stack-title" data-reveal>What it&rsquo;s built with</h3>
-        <div className="mt-8 grid grid-cols-4 gap-5 stacked:grid-cols-2 max-[640px]:grid-cols-1">
+        <div className="mt-8 grid grid-cols-3 gap-5 stacked:grid-cols-2 max-[640px]:grid-cols-1">
           {stack.map((s) => (
             <div className={`${glassCard} p-6`} key={s.group} data-reveal>
               <h4 className={`${cardTitle} mb-4`}>{s.group}</h4>

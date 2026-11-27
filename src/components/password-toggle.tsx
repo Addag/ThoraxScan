@@ -9,13 +9,14 @@ export function PasswordToggle({
 }) {
   return (
     <button
-      className={`absolute top-1/2 ${className} inline-flex -translate-y-1/2 items-center justify-center rounded-[7px] border-0 bg-transparent text-(--text-secondary) hover:bg-[rgb(153_191_240/12%)] hover:text-(--text-primary)`}
+      className={`absolute top-1/2 ${className} inline-flex -translate-y-1/2 items-center justify-center rounded-control border-0 bg-transparent text-(--text-secondary) hover:bg-[rgb(153_191_240/12%)] hover:text-(--text-primary)`}
       type="button"
       aria-label={visible ? "Hide password" : "Show password"}
       aria-pressed={visible}
       onClick={onToggle}
     >
       <svg
+        className="size-5"
         aria-hidden="true"
         viewBox="0 0 24 24"
         fill="none"

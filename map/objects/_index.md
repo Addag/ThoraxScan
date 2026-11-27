@@ -34,7 +34,9 @@ One line per important noun. live cards are source-backed; ghost entries are doc
 | AI feedback release | live | [ai-feedback-release.md](learning/ai-feedback-release.md) | `public.ai_feedback_releases`, submission trigger, and authorized feedback RPC |
 | Faculty evaluation | live | [faculty-evaluation.md](learning/faculty-evaluation.md) | immutable Professor review and Student projection |
 | Built-in X-ray library | live | [built-in-xray-library.md](learning/built-in-xray-library.md) | Bundled CheXpert `valid` JPEGs, `cases.json` manifest, and shared gallery component |
+| Learning case note | live | [learning-case-note.md](learning/learning-case-note.md) | `public.learning_case_notes`: private per-user notes on built-in library cases in Learning Mode |
 | View detector | live | [view-detector.md](learning/view-detector.md) | Server-side frontal/lateral classifier on `sharp` thumbnails, used by Professor case confirmation |
+| Chest X-ray gate | live | [chest-gate.md](learning/chest-gate.md) | Browser and server chest/not-chest MLP on raw-RGBA 32×32 features, used by Learning Mode and Professor case upload |
 | Bell notification | live | [notification.md](learning/notification.md) | Derived due/submission feed, `public.notification_reads`, and popover bell |
 | Class analytics | live | [analytics.md](learning/analytics.md) | Read-time Professor projection, AI-call RPC, `/professor/analytics` page and CSV route |
 
@@ -59,7 +61,7 @@ One line per important noun. live cards are source-backed; ghost entries are doc
 | Landing surface | live | [landing-surface.md](ui/landing-surface.md) | src/app/page.tsx || Authentication surface | live | [auth-surface.md](ui/auth-surface.md) | auth pages, layout, form, and actions |
 | Privacy policy surface | live | [privacy-policy.md](ui/privacy-policy.md) | public `/privacy-policy` page and shared legal navigation |
 | Terms and conditions surface | live | [terms.md](ui/terms.md) | public `/terms` page, registration agreement, and signup metadata version/date |
-| Administrator approval surface | live | [administrator-approval-surface.md](ui/administrator-approval-surface.md) | /admin, review actions, and administrator shell |
+| Administrator console | live | [administrator-approval-surface.md](ui/administrator-approval-surface.md) | /admin home, applications, accounts, notices, report, and administrator shell |
 | Shared settings surface | live | [shared-settings-surface.md](ui/shared-settings-surface.md) | Shared role-gated settings wrapper, form, and navigation |
 | Design tokens | live | [design-tokens.md](ui/design-tokens.md) | src/app/globals.css |
 | X-ray sample asset | live | [xray-sample-asset.md](ui/xray-sample-asset.md) | public/images/xray-sample.png |
@@ -73,3 +75,5 @@ One line per important noun. live cards are source-backed; ghost entries are doc
 | Account settings | live | [account-settings.md](runtime/account-settings.md) | Self-private settings table and atomic authenticated RPC |
 | Supabase auth boundary | live | [supabase-auth-boundary.md](runtime/supabase-auth-boundary.md) | client/server adapters and environment contract |
 | Legal consent record | live | [legal-consent.md](runtime/legal-consent.md) | `public.legal_consents` and consent RPCs |
+| Site notice | live | [site-notice.md](runtime/site-notice.md) | `public.site_announcements`, admin Notices page, and the shell/auth banner |
+| Admin action log | live | [admin-action-log.md](runtime/admin-action-log.md) | `public.admin_actions`, logging helper, and triggers |

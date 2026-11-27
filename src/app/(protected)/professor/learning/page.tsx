@@ -4,12 +4,12 @@ import { LearningModeContent } from "@/components/learning/learning-mode-content
 import { ProfessorShell } from "@/components/professor/professor-shell";
 import { requireRole } from "@/lib/auth/server";
 
-export const metadata: Metadata = { title: "Learning mode | ThoraxScan" };
+export const metadata: Metadata = { title: "Learning Mode | ThoraxScan" };
 
 export default async function ProfessorLearningPage() {
   await requireRole("professor");
   return (
-    <ProfessorShell activeItem="learning" sectionLabel="Learning mode" sectionDescription="Private browser practice">
+    <ProfessorShell activeItem="learning" sectionLabel="Learning Mode" sectionDescription="Private browser practice">
       <LearningModeContent />
     </ProfessorShell>
   );

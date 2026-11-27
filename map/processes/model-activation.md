@@ -17,6 +17,18 @@ Inactive release plus expected revision → locked pointer change and history ev
 3. The CLI reads the pointer back and runs Node and headless-Chromium WASM smoke inference ([browser smoke](../../scripts/model-release.ts#L660), [read-back](../../scripts/model-release.ts#L842)).
 4. A failed post-check records a compensating activation that restores the previous pointer or clears an initially empty slot ([automatic restoration](../../scripts/model-release.ts#L851)).
 
+History query (service role, for example the Supabase SQL Editor):
+
+```sql
+select e.revision, e.activated_at, e.activated_by, e.reason, r.release_id
+from public.model_activation_events e
+join public.model_releases r on r.id = e.active_model_release_id
+where e.slot = 'thoraxscan-classifier'
+order by e.revision;
+```
+
+`model:status` shows only the current pointer; the hosted history so far is in [Active model slot](../objects/inference/active-model-slot.md).
+
 ## Consumes
 
 - [Model release](../objects/inference/model-release.md)

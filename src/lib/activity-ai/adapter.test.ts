@@ -31,8 +31,16 @@ describe("activity AI persistence adapter", () => {
 it("persists a validated V2 map and rejects missing or malformed maps", () => {
  const next = result(); next.manifestVersion = 2;
  expect(() => toActivityAIPersistencePayload(next)).toThrow();
- next.attention = { status: "ready", values: Array(49).fill(0.5), width: 7, height: 7, attribution: "global", aggregation: "attention-rollout-mean-query-v1", normalization: "per-image-min-max-v1" };
+ next.attention = { status: "ready", kind: "global", values: Array(49).fill(0.5), width: 7, height: 7, attribution: "global", aggregation: "attention-rollout-mean-query-v1", normalization: "per-image-min-max-v1" };
  expect(toActivityAIPersistencePayload(next).attentionMap).toHaveLength(49);
- next.attention.values.pop();
+ if (next.attention.status === "ready") next.attention.values.pop();
  expect(() => toActivityAIPersistencePayload(next)).toThrow();
+});
+
+it("persists V3 per-label maps and rejects a global map on a V3 release", () => {
+ const next = result(); next.manifestVersion = 3;
+ next.attention = { status: "ready", kind: "global", values: Array(49).fill(0.5), width: 7, height: 7, attribution: "global", aggregation: "attention-rollout-mean-query-v1", normalization: "per-image-min-max-v1" };
+ expect(() => toActivityAIPersistencePayload(next)).toThrow();
+ next.attention = { status: "ready", kind: "per-label", values: Array(2744).fill(0.25), width: 14, height: 14, method: "cam-fc-weights-v1", normalization: "relu-per-label-max-v1" };
+ expect(toActivityAIPersistencePayload(next).attentionMap).toHaveLength(2744);
 });

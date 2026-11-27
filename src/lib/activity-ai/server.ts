@@ -1,4 +1,4 @@
-import { readyAttention, UNAVAILABLE_ATTENTION } from "@/lib/inference/attention";
+import { storedHeatmap, UNAVAILABLE_ATTENTION } from "@/lib/inference/attention";
 import { createClient } from "@/lib/supabase/server";
 import { ACTIVITY_AI_LABELS, isActivityAILabel, type ActivityAIFeedback, type ActivityAIProvenance, type ActivityAIStatusProjection } from "./types";
 
@@ -14,7 +14,8 @@ type FeedbackRow = {
   provenance: ActivityAIProvenance | null;
   attention_status: "ready" | "unavailable";
   attention_map: number[] | null;
-  attention_grid_width: 7 | null; attention_grid_height: 7 | null; attention_method: string | null; attention_normalization: string | null;
+  attention_grid_width: 7 | 14 | null; attention_grid_height: 7 | 14 | null; attention_method: string | null; attention_normalization: string | null;
+  validated_labels: string[] | null;
 };
 
 export async function getStudentActivityAIFeedback(activityId: string): Promise<ActivityAIFeedback> {
@@ -41,8 +42,9 @@ export async function getStudentActivityAIFeedback(activityId: string): Promise<
         }),
         possibleFindings: labels.filter((item) => item.possible),
         provenance: data.provenance,
-        attention: data.attention_status === "ready" && data.attention_map ? readyAttention(data.attention_map) : UNAVAILABLE_ATTENTION,
+        attention: data.attention_status === "ready" && data.attention_map ? storedHeatmap(data.attention_map, data.attention_method) : UNAVAILABLE_ATTENTION,
         attentionStatus: data.attention_status,
+        validatedLabels: data.validated_labels?.filter(isActivityAILabel) ?? null,
       }
     : null;
   return { status, attemptCount: data.attempt_count, safeErrorCode: data.safe_error_code, attemptedAt: data.attempted_at, completedAt: data.completed_at, result };
@@ -56,14 +58,14 @@ type StatusRow = {
   claim_expires_at: string | null;
   completed_at: string | null;
   release_id: string | null;
-  manifest_version: 1 | 2 | null;
+  manifest_version: 1 | 2 | 3 | null;
   preprocessing_version: string | null;
   threshold_version: string | null;
   execution_provider: ActivityAIStatusProjection["executionProvider"];
   application_build: string | null;
   attention_status: "ready" | "unavailable";
   attention_map: number[] | null;
-  attention_grid_width: 7 | null; attention_grid_height: 7 | null; attention_method: string | null; attention_normalization: string | null;
+  attention_grid_width: 7 | 14 | null; attention_grid_height: 7 | 14 | null; attention_method: string | null; attention_normalization: string | null;
 };
 
 export async function getProfessorActivityAIStatus(activityId: string): Promise<ActivityAIStatusProjection> {
@@ -73,9 +75,22 @@ export async function getProfessorActivityAIStatus(activityId: string): Promise<
   return { status: data.status === "ready" ? "ready" : data.status === "failed" ? "failed" : data.status === "pending" ? "pending" : "not_started", attemptCount: data.attempt_count, safeErrorCode: data.safe_error_code, attemptedAt: data.attempted_at, claimExpiresAt: data.claim_expires_at, completedAt: data.completed_at, releaseId: data.release_id, manifestVersion: data.manifest_version, preprocessingVersion: data.preprocessing_version, thresholdVersion: data.threshold_version, executionProvider: data.execution_provider, applicationBuild: data.application_build, attentionStatus: data.attention_status };
 }
 
+/** The ready analysis's finding labels and V3 per-label maps, for the Professor to validate. */
+export async function getProfessorActivityAIResult(activityId: string) {
+  const supabase = await createClient();
+  const [findings, heatmap] = await Promise.all([
+    supabase.rpc("get_professor_activity_ai_findings", { target_activity_id: activityId }),
+    supabase.rpc("get_professor_activity_ai_heatmap", { target_activity_id: activityId }).maybeSingle<{ attention_map: number[] | null; attention_method: string | null }>(),
+  ]);
+  return {
+    findings: Array.isArray(findings.data) ? (findings.data as unknown[]).filter(isActivityAILabel) : null,
+    heatmap: heatmap.data?.attention_method === "cam-fc-weights-v1" ? heatmap.data.attention_map : null,
+  };
+}
+
 export async function getProfessorActivityAIHeatmap(activityId: string) {
   const supabase = await createClient();
-  const { data, error } = await supabase.rpc("get_professor_activity_ai_heatmap", { target_activity_id: activityId }).maybeSingle<{ attention_status: "ready" | "unavailable"; attention_map: number[] | null }>();
+  const { data, error } = await supabase.rpc("get_professor_activity_ai_heatmap", { target_activity_id: activityId }).maybeSingle<{ attention_status: "ready" | "unavailable"; attention_map: number[] | null; attention_method: string | null }>();
   if (error || !data || data.attention_status !== "ready" || !data.attention_map) return UNAVAILABLE_ATTENTION;
-  return readyAttention(data.attention_map);
+  return storedHeatmap(data.attention_map, data.attention_method);
 }

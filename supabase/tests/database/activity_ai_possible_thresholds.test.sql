@@ -23,16 +23,17 @@ insert into public.workspace_members(workspace_id,user_id,role) values(pg_temp.u
 -- Two activities: one analysed under a release with possible thresholds, one under a release without.
 insert into public.xray_cases(id,workspace_id,storage_path,uploaded_by,mime_type,byte_size,upload_status,attested_by) select pg_temp.uid(i),pg_temp.uid(10),pg_temp.uid(10)::text||'/'||pg_temp.uid(i)::text,pg_temp.uid(1),'image/png',1,'ready',pg_temp.uid(1) from generate_series(20,21) i;
 insert into public.activities(id,workspace_id,case_id,created_by,title,instructions) select pg_temp.uid(i+10),pg_temp.uid(10),pg_temp.uid(i),pg_temp.uid(1),'Possible threshold activity','Synthetic testing instructions' from generate_series(20,21) i;
-insert into public.activity_reference_evaluations(activity_id,evaluation) select pg_temp.uid(i),'Private reference' from generate_series(30,31) i on conflict(activity_id) do update set evaluation=excluded.evaluation;
+insert into public.activity_reference_evaluations(activity_id,evaluation,validated_labels,validated_at) select pg_temp.uid(i),'Private reference',array['No Finding'],now() from generate_series(30,31) i on conflict(activity_id) do update set evaluation=excluded.evaluation;
 update public.activities set status='published' where id in (pg_temp.uid(30),pg_temp.uid(31));
-insert into public.student_submissions(activity_id,student_id,visible_findings,classification,status,submitted_at,created_at,updated_at) select pg_temp.uid(i),pg_temp.uid(2),'Synthetic findings','normal','submitted',now(),now(),now() from generate_series(30,31) i;
+insert into public.student_submissions(activity_id,student_id,selected_labels,classification,status,submitted_at,created_at,updated_at) select pg_temp.uid(i),pg_temp.uid(2),array['No Finding'],'normal','submitted',now(),now(),now() from generate_series(30,31) i;
 
 -- Release with possible thresholds.
 select public.register_model_release('possible-tiered',repeat('e',64),repeat('f',64),1024,'artifacts/sha256/'||repeat('e',64)||'/model.onnx','bundles/sha256/'||repeat('f',64)||'/manifest.json',pg_temp.manifest('possible-tiered',repeat('e',64),true),'{"passed":true}'::jsonb,'test');
 select public.activate_model_release((select id from public.model_releases where release_id='possible-tiered'),(select revision from public.model_slots where slot='thoraxscan-classifier'),'test','possible threshold test');
-select set_config('request.jwt.claim.sub',pg_temp.uid(2)::text,true);
+select set_config('request.jwt.claim.sub',pg_temp.uid(1)::text,true);
 create temp table claim_tiered as select * from public.claim_activity_ai_analysis(pg_temp.uid(30));
 select is(public.complete_activity_ai_analysis(pg_temp.uid(30),(select attempt_id from claim_tiered),pg_temp.probabilities(),pg_temp.provenance('possible-tiered',repeat('e',64),repeat('f',64)),'wasm','test',null),'ready','release with possible thresholds completes');
+select set_config('request.jwt.claim.sub',pg_temp.uid(2)::text,true);
 create temp table tiered as select * from public.get_student_activity_ai_feedback(pg_temp.uid(30));
 select is((select status from tiered),'released','submitted student receives the released result');
 select is((select jsonb_array_length(thresholds) from tiered),14,'all 14 thresholds are stored');
@@ -47,8 +48,10 @@ select is((select array_agg(item ->> 'label') from tiered, jsonb_array_elements(
 -- Release without possible thresholds stores null, which the app treats as "no possible tier".
 select public.register_model_release('possible-plain',repeat('1',64),repeat('2',64),1024,'artifacts/sha256/'||repeat('1',64)||'/model.onnx','bundles/sha256/'||repeat('2',64)||'/manifest.json',pg_temp.manifest('possible-plain',repeat('1',64),false),'{"passed":true}'::jsonb,'test');
 select public.activate_model_release((select id from public.model_releases where release_id='possible-plain'),(select revision from public.model_slots where slot='thoraxscan-classifier'),'test','plain release test');
+select set_config('request.jwt.claim.sub',pg_temp.uid(1)::text,true);
 create temp table claim_plain as select * from public.claim_activity_ai_analysis(pg_temp.uid(31));
 select is(public.complete_activity_ai_analysis(pg_temp.uid(31),(select attempt_id from claim_plain),pg_temp.probabilities(),pg_temp.provenance('possible-plain',repeat('1',64),repeat('2',64)),'wasm','test',null),'ready','release without possible thresholds still completes');
+select set_config('request.jwt.claim.sub',pg_temp.uid(2)::text,true);
 create temp table plain as select * from public.get_student_activity_ai_feedback(pg_temp.uid(31));
 select is((select count(*) from plain, jsonb_array_elements(thresholds) item where item -> 'possibleThreshold' = 'null'::jsonb),14::bigint,'missing possible thresholds are stored as null');
 select is((select count(*) from plain, jsonb_array_elements(thresholds) item where (item ->> 'threshold')::numeric = 0.5),14::bigint,'main thresholds are stored without possible thresholds');

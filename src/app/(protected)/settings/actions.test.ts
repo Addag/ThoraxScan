@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { changeEmailAction } from "./actions";
+import { changeEmailAction, twoStepAction } from "./actions";
 
 const mocks = vi.hoisted(() => ({
   createClient: vi.fn(),
@@ -64,5 +64,33 @@ describe("change email", () => {
     const result = await changeEmailAction(idle, emailForm());
 
     expect(result.fieldErrors?.newEmail).toBe("That email is already in use.");
+  });
+});
+
+describe("two-step login", () => {
+  const unenroll = vi.fn();
+  const setup = { factorId: "", qrCode: "", secret: "" };
+
+  function cancel(factorId: string, status: "verified" | "unverified") {
+    const factor = { id: factorId, status };
+    mocks.createClient.mockResolvedValue({
+      auth: { mfa: { unenroll, listFactors: async () => ({ data: { all: [factor], totp: status === "verified" ? [factor] : [] }, error: null }) } },
+    });
+    const formData = new FormData();
+    formData.set("op", "cancel");
+    return twoStepAction({ enabled: false, status: "idle", message: "", setup: { ...setup, factorId } }, formData);
+  }
+
+  it("cancel removes a setup that was never confirmed", async () => {
+    await cancel("pending-factor", "unverified");
+
+    expect(unenroll).toHaveBeenCalledExactlyOnceWith({ factorId: "pending-factor" });
+  });
+
+  it("cancel never removes a confirmed factor named by the browser", async () => {
+    const result = await cancel("live-factor", "verified");
+
+    expect(unenroll).not.toHaveBeenCalled();
+    expect(result.enabled).toBe(true);
   });
 });

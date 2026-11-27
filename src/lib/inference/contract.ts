@@ -4,6 +4,9 @@ export const MODEL_SLOT = "thoraxscan-classifier" as const;
 export const MODEL_BUCKET = "model-artifacts" as const;
 export const MODEL_MAX_BYTES = 50 * 1024 * 1024;
 export const MODEL_INPUT_SIZE = 224;
+/** "shortside320-…" first shrinks images whose short side exceeds 320 to short side 320, as CheXpert-small was made. */
+export const RESIZE_INTERPOLATIONS = ["bilinear-center", "shortside320-bilinear-center"] as const;
+export type ResizeInterpolation = (typeof RESIZE_INTERPOLATIONS)[number];
 
 export const THORAXSCAN_LABELS = [
   "No Finding",
@@ -34,6 +37,7 @@ export interface ReleaseSourceV1 {
   sourceVersion: string;
   preprocessingVersion: string;
   thresholdVersion: string;
+  resizeInterpolation: ResizeInterpolation;
 }
 
 export interface ModelManifestV1 {
@@ -73,7 +77,7 @@ export interface ModelManifestV1 {
     resize: {
       width: 224;
       height: 224;
-      interpolation: "bilinear-center";
+      interpolation: ResizeInterpolation;
     };
     alpha: "reject";
     pixelRange: [0, 1];
@@ -125,7 +129,23 @@ export interface ModelManifestV2 extends Omit<ModelManifestV1, "schemaVersion" |
     webGpuMaxAbsoluteAttentionDifference: number | null;
   };
 }
-export type ModelManifest = ModelManifestV1 | ModelManifestV2;
+export const CLASS_ACTIVATION_DESCRIPTOR = {
+  output: { name: "class_activation", dtype: "float32", shape: ["batch", 14, 14, 14] },
+  method: "cam-fc-weights-v1",
+  normalization: "relu-per-label-max-v1",
+  grid: { width: 14, height: 14 },
+} as const;
+
+export interface ModelManifestV3 extends Omit<ModelManifestV1, "schemaVersion" | "validation"> {
+  schemaVersion: 3;
+  classActivation: typeof CLASS_ACTIVATION_DESCRIPTOR;
+  validation: ModelManifestV1["validation"] & {
+    expectedClassActivationSha256: string;
+    maxAbsoluteClassActivationError: number;
+    webGpuMaxAbsoluteClassActivationDifference: number | null;
+  };
+}
+export type ModelManifest = ModelManifestV1 | ModelManifestV2 | ModelManifestV3;
 
 export interface ActiveModelRelease {
   modelReleaseId: number;
@@ -180,6 +200,13 @@ function exactArray(value: unknown, expected: readonly unknown[], name: string) 
   }
 }
 
+function resizeInterpolation(value: unknown, name: string): ResizeInterpolation {
+  if (!RESIZE_INTERPOLATIONS.includes(value as ResizeInterpolation)) {
+    fail(`${name} must be one of ${RESIZE_INTERPOLATIONS.join(", ")}.`);
+  }
+  return value as ResizeInterpolation;
+}
+
 export function parseReleaseSource(value: unknown): ReleaseSourceV1 {
   const source = objectValue(value, "release.json");
   const checkpoint = objectValue(source.checkpoint, "release.checkpoint");
@@ -197,6 +224,10 @@ export function parseReleaseSource(value: unknown): ReleaseSourceV1 {
       "preprocessingVersion",
     ),
     thresholdVersion: stringValue(source.thresholdVersion, "thresholdVersion"),
+    resizeInterpolation:
+      source.resizeInterpolation === undefined
+        ? "bilinear-center"
+        : resizeInterpolation(source.resizeInterpolation, "resizeInterpolation"),
   };
 }
 
@@ -239,8 +270,22 @@ export function withPossibleThresholds(
 export function parseModelManifest(value: unknown): ModelManifest {
   const source = objectValue(value, "manifest");
   if (source.schemaVersion === 1) return parseV1(source);
-  if (source.schemaVersion !== 2) fail("Only manifest schemaVersion 1 or 2 is supported.");
+  if (source.schemaVersion !== 2 && source.schemaVersion !== 3) fail("Only manifest schemaVersion 1, 2 or 3 is supported.");
   const base = parseV1({ ...source, schemaVersion: 1 });
+  const validation = objectValue(source.validation, "validation");
+  if (source.schemaVersion === 3) {
+    const cam = objectValue(source.classActivation, "classActivation");
+    const output = objectValue(cam.output, "classActivation.output");
+    const grid = objectValue(cam.grid, "classActivation.grid");
+    if (output.name !== "class_activation" || output.dtype !== "float32" || grid.width !== 14 || grid.height !== 14 ||
+        cam.method !== CLASS_ACTIVATION_DESCRIPTOR.method || cam.normalization !== CLASS_ACTIVATION_DESCRIPTOR.normalization) fail("Invalid class activation descriptor.");
+    exactArray(output.shape, ["batch", 14, 14, 14], "classActivation.output.shape");
+    const { error, gpu } = mapParity(base, validation, "maxAbsoluteClassActivationError", "webGpuMaxAbsoluteClassActivationDifference", "Class activation");
+    return { ...base, schemaVersion: 3, classActivation: CLASS_ACTIVATION_DESCRIPTOR, validation: {
+      ...base.validation, expectedClassActivationSha256: sha256Value(validation.expectedClassActivationSha256, "validation.expectedClassActivationSha256"),
+      maxAbsoluteClassActivationError: error, webGpuMaxAbsoluteClassActivationDifference: gpu,
+    } };
+  }
   const attention = objectValue(source.attention, "attention");
   const output = objectValue(attention.output, "attention.output");
   const grid = objectValue(attention.grid, "attention.grid");
@@ -248,15 +293,20 @@ export function parseModelManifest(value: unknown): ModelManifest {
       attention.attribution !== ATTENTION_DESCRIPTOR.attribution || attention.aggregation !== ATTENTION_DESCRIPTOR.aggregation ||
       attention.normalization !== ATTENTION_DESCRIPTOR.normalization) fail("Invalid attention descriptor.");
   exactArray(output.shape, ["batch", 1, 7, 7], "attention.output.shape");
-  const validation = objectValue(source.validation, "validation");
-  const error = finiteNumber(validation.maxAbsoluteAttentionError, "validation.maxAbsoluteAttentionError");
-  const gpu = validation.webGpuMaxAbsoluteAttentionDifference;
-  if (error < 0 || error > 1e-4) fail("Attention parity exceeds 1e-4.");
-  if (base.validation.webGpuEnabled ? typeof gpu !== "number" || !Number.isFinite(gpu) || gpu < 0 || gpu > 1e-3 : gpu !== null) fail("Invalid attention provider parity.");
+  const { error, gpu } = mapParity(base, validation, "maxAbsoluteAttentionError", "webGpuMaxAbsoluteAttentionDifference", "Attention");
   return { ...base, schemaVersion: 2, attention: ATTENTION_DESCRIPTOR, validation: {
     ...base.validation, expectedAttentionSha256: sha256Value(validation.expectedAttentionSha256, "validation.expectedAttentionSha256"),
-    maxAbsoluteAttentionError: error, webGpuMaxAbsoluteAttentionDifference: gpu as number | null,
+    maxAbsoluteAttentionError: error, webGpuMaxAbsoluteAttentionDifference: gpu,
   } };
+}
+
+// Heatmap outputs share the same CPU parity (1e-4) and WebGPU parity (1e-3, or null when WebGPU is off) limits.
+function mapParity(base: ModelManifestV1, validation: Record<string, unknown>, errorKey: string, gpuKey: string, name: string) {
+  const error = finiteNumber(validation[errorKey], `validation.${errorKey}`);
+  const gpu = validation[gpuKey];
+  if (error < 0 || error > 1e-4) fail(`${name} parity exceeds 1e-4.`);
+  if (base.validation.webGpuEnabled ? typeof gpu !== "number" || !Number.isFinite(gpu) || gpu < 0 || gpu > 1e-3 : gpu !== null) fail(`Invalid ${name.toLowerCase()} provider parity.`);
+  return { error, gpu: gpu as number | null };
 }
 
 function parseV1(value: unknown): ModelManifestV1 {
@@ -307,7 +357,7 @@ function parseV1(value: unknown): ModelManifestV1 {
     preprocessing.layout !== "NCHW" ||
     resize.width !== 224 ||
     resize.height !== 224 ||
-    resize.interpolation !== "bilinear-center"
+    !RESIZE_INTERPOLATIONS.includes(resize.interpolation as ResizeInterpolation)
   ) {
     fail("The preprocessing configuration does not match contract version 1.");
   }
@@ -420,7 +470,7 @@ function parseV1(value: unknown): ModelManifestV1 {
     preprocessing: {
       colorSpace: "grayscale",
       colorConversion: "rec601-luma",
-      resize: { width: 224, height: 224, interpolation: "bilinear-center" },
+      resize: { width: 224, height: 224, interpolation: resize.interpolation as ResizeInterpolation },
       alpha: "reject",
       pixelRange: [0, 1],
       mean: 0.5,

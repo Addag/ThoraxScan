@@ -1,90 +1,59 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
-import { InferenceError } from "@/lib/inference/errors";
-import { toActivityAIPersistencePayload } from "@/lib/activity-ai/adapter";
-import { claimActivityAIAnalysis, completeActivityAIAnalysis, failActivityAIAnalysis, refreshActivityCaseUrl } from "@/lib/activity-ai/actions";
+import { useState } from "react";
 import type { ActivityAIFeedback } from "@/lib/activity-ai/types";
-import { AttentionHeatmap } from "@/components/attention-heatmap";
-import { AnalysisFindings } from "@/components/analysis-findings";
-import { activityButton } from "@/components/activities/activity-button";
+import type { StudentSubmission } from "@/lib/submissions/types";
+import { compareLabels } from "@/lib/submissions/validation";
+import { HeatmapComparison } from "@/components/heatmap-comparison";
+import { ResultDialog } from "@/components/result-dialog";
 import { ActivityPanelTitle } from "@/components/activities/activity-ui";
 
-function safeCode(error: unknown) {
-  if (error instanceof InferenceError) return error.code.toLowerCase();
-  if (error instanceof Error && error.name === "AbortError") return "aborted";
-  return "recording_failed";
-}
+const textClass = "m-0 px-4 py-3.5 text-caption leading-normal text-(--text-secondary)";
+const rowClass = "grid gap-1.5 rounded-control border border-(--border-subtle) px-3 py-2.5 text-small";
+const tagClass = "rounded-full border border-(--border-strong) px-2 py-0.5 text-label text-(--text-muted)";
 
-export function ActivityAIFeedback({ activityId, imageUrl, initial }: { activityId: string; imageUrl: string | null; initial: ActivityAIFeedback }) {
-  const router = useRouter();
-  const [feedback, setFeedback] = useState(initial);
-  const [running, setRunning] = useState(false);
-  const [message, setMessage] = useState("");
-  const controllerRef = useRef<AbortController | null>(null);
-  const startedRef = useRef(false);
-
-  useEffect(() => setFeedback(initial), [initial]);
-  useEffect(() => () => controllerRef.current?.abort(), []);
-
-  async function runAnalysis() {
-    if (running || feedback.status === "locked" || feedback.status === "ready") return;
-    startedRef.current = true;
-    const controller = new AbortController();
-    controllerRef.current = controller;
-    setRunning(true); setMessage("Preparing browser analysis…");
-    let attemptId: string | null = null;
-    try {
-      const claim = await claimActivityAIAnalysis(activityId);
-      if (!claim.ok) throw new Error("claim_failed");
-      if (claim.status === "ready") { router.refresh(); return; }
-      attemptId = claim.attemptId;
-      let url = imageUrl;
-      let response = url ? await fetch(url, { signal: controller.signal }) : null;
-      if (!response || !response.ok) {
-        const refreshed = await refreshActivityCaseUrl(activityId);
-        if (!refreshed.ok) throw new Error("case_unavailable");
-        url = refreshed.url;
-        response = await fetch(url, { signal: controller.signal });
-      }
-      if (!response.ok) throw new Error("case_unavailable");
-      setMessage("Analyzing securely in this browser…");
-      const { analyzeImage } = await import("@/lib/inference/runtime");
-      const result = await analyzeImage(await response.blob(), { signal: controller.signal });
-      if (controller.signal.aborted) return;
-      const recorded = await completeActivityAIAnalysis(activityId, attemptId, toActivityAIPersistencePayload(result));
-      if (!recorded.ok) throw new Error(recorded.code);
-      setMessage("Analysis recorded. Waiting for the released result…");
-      router.refresh();
-    } catch (error) {
-      if (controller.signal.aborted) return;
-      if (attemptId) await failActivityAIAnalysis(activityId, attemptId, safeCode(error));
-      setFeedback((current) => ({ ...current, status: "failed", safeErrorCode: safeCode(error) as ActivityAIFeedback["safeErrorCode"] }));
-      setMessage("Analysis could not be completed. Your final submission remains saved; try again.");
-    } finally {
-      if (controllerRef.current === controller) controllerRef.current = null;
-      setRunning(false);
-    }
-  }
-
-  useEffect(() => {
-    if (feedback.status === "pending" && !startedRef.current) void runAnalysis();
-    // The pending state is the server-approved post-submission gate.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [feedback.status]);
-
+/**
+ * A Student's results after a final submission: the Professor-validated answer key, how the Student's labels
+ * and written answers line up with it, and the Student's heatmap next to the validated one. Not a score:
+ * the Professor grades separately.
+ */
+export function ActivityAIFeedback({ imageUrl, initial: feedback, submission }: { imageUrl: string | null; initial: ActivityAIFeedback; submission: StudentSubmission | null }) {
+  // Pops up only when the result arrives during this visit, not every time a finished activity is reopened.
+  const [popUp] = useState(feedback.status !== "ready");
   const result = feedback.result;
-  return <section className="overflow-hidden rounded-[10px] border border-(--border-shell) [background:var(--glass-surface)] shadow-(--glass-shadow)" aria-labelledby="activity-ai-feedback-title">
-    <ActivityPanelTitle icon="✦" title="AI feedback" titleId="activity-ai-feedback-title" />
-    {feedback.status === "locked" ? <p className="m-0 px-4 py-3.5 text-[0.75rem] leading-[1.55] text-(--text-secondary)">Submit your final evaluation to unlock controlled AI feedback.</p> : null}
-    {feedback.status === "pending" || running ? <p role="status" className="m-0 px-4 py-3.5 text-[0.75rem] leading-[1.55] text-(--text-secondary)">{message || "Analysis is pending…"}</p> : null}
-    {feedback.status === "failed" && !running ? <div className="m-0 px-4 py-3.5 text-[0.75rem] leading-[1.55] text-(--text-secondary)"><p role="alert">{message || "Analysis failed. No prediction was released."}</p><button className={`${activityButton.primary} mx-4 mt-0 mb-4`} type="button" onClick={() => { startedRef.current = false; void runAnalysis(); }}>Retry analysis</button></div> : null}
-    {feedback.status === "ready" && result ? <div className="m-0 px-4 py-3.5 text-[0.75rem] leading-[1.55] text-(--text-secondary) [&_dl]:mt-3 [&_dl]:grid [&_dl]:grid-cols-[minmax(90px,.8fr)_minmax(0,1.2fr)] [&_dl]:gap-x-3 [&_dl]:gap-y-[7px] [&_dt]:text-[#8e9bb0] light:[&_dt]:text-(--text-muted) [&_dd]:m-0 [&_dd]:[overflow-wrap:anywhere]">
-      <p className="border-l-[3px] border-l-(color:--disclaimer-yellow) pl-2.5 text-[#ffe28a] light:text-(--status-warning-text)">Educational use only. This result is not a diagnosis and should not guide medical decisions.</p>
-      <AnalysisFindings state={result.state} labels={result.labels} findings={result.findings} possibleFindings={result.possibleFindings} idPrefix="activity" />
-      <details className="mt-[18px] border-t border-t-[#3f5271] pt-3.5"><summary className="cursor-pointer font-bold">Release and execution provenance</summary><dl><dt>Model release</dt><dd>{result.provenance.releaseId}</dd><dt>Preprocessing</dt><dd>{result.provenance.preprocessingVersion}</dd><dt>Thresholds</dt><dd>{result.provenance.thresholdVersion}</dd><dt>Provider</dt><dd>{result.provenance.executionProvider.toUpperCase()}</dd><dt>Model SHA-256</dt><dd>{result.provenance.modelSha256}</dd><dt>Bundle SHA-256</dt><dd>{result.provenance.bundleSha256}</dd><dt>Application build</dt><dd>{result.provenance.applicationBuild}</dd></dl></details>
-      <AttentionHeatmap imageUrl={imageUrl} attention={result.attention ?? { status: "unavailable", reason: "legacy-model-release" }} title="Model attention" />
-    </div> : null}
+  const key = result?.validatedLabels;
+  const selected = submission?.labels ?? [];
+  const answers = submission?.answers ?? {};
+  const match = key ? compareLabels(selected, key) : null;
+  const aiFound = new Set<string>(result?.findings.map((finding) => finding.label));
+  const keyMap = result?.attention?.status === "ready" && result.attention.kind === "per-label" ? result.attention.values : null;
+  const answer = (label: string) => answers[label as keyof typeof answers]
+    ? <p className="m-0 whitespace-pre-wrap text-(--text-secondary)"><span className="text-(--text-muted)">Your answer: </span>{answers[label as keyof typeof answers]}</p> : null;
+  return <section className="overflow-hidden rounded-panel border border-(--border-shell) [background:var(--glass-surface)] shadow-(--glass-shadow)" aria-labelledby="activity-ai-feedback-title">
+    <ActivityPanelTitle icon="✦" title="Results" titleId="activity-ai-feedback-title" />
+    {feedback.status === "locked" ? <p className={textClass}>Submit your final evaluation to see the correct labels and compare your heatmap with your Professor&apos;s.</p> : null}
+    {feedback.status === "pending" || feedback.status === "failed" ? <p role="status" className={textClass}>The results for this activity aren&apos;t ready yet. Your submission is saved; check back later.</p> : null}
+    {feedback.status === "ready" && result && !(key && match) ? <p className={textClass}>This activity was published before answer keys existed, so it has no results to show.</p> : null}
+    {feedback.status === "ready" && result && key && match ? <ResultDialog popUp={popUp} label="Results"><div className="m-0 px-4 py-3.5 text-caption leading-normal text-(--text-secondary) [&_dl]:mt-3 [&_dl]:grid [&_dl]:grid-cols-[minmax(90px,.8fr)_minmax(0,1.2fr)] [&_dl]:gap-x-3 [&_dl]:gap-y-[7px] [&_dt]:text-(--text-muted) [&_dd]:m-0 [&_dd]:[overflow-wrap:anywhere]">
+      <section aria-labelledby="activity-key-title">
+        <h3 className="mb-1 text-lead font-extrabold text-(--text-primary)" id="activity-key-title">Correct labels</h3>
+        <p className="mb-3">Validated by your Professor, starting from the AI&apos;s result. You selected {match.correct.length} of {key.length}. Your Professor grades your answer separately.</p>
+        <ul className="m-0 grid list-none gap-2 p-0">
+          {key.map((label) => <li className={rowClass} key={label}>
+            <span className="flex flex-wrap items-center justify-between gap-2">
+              <span className="text-(--text-primary)"><span aria-hidden="true">{selected.includes(label) ? "✓ " : "✗ "}</span><strong>{label}</strong> · {selected.includes(label) ? "You selected this" : "You missed this"}</span>
+              <span className={tagClass}>{aiFound.has(label) ? "AI found" : "Added by Professor"}</span>
+            </span>
+            {answer(label)}
+          </li>)}
+          {match.extra.map((label) => <li className={rowClass} key={label}>
+            <span className="text-(--status-warning-text)"><span aria-hidden="true">✗ </span><strong>{label}</strong> · You selected this, but it is not present</span>
+            {answer(label)}
+          </li>)}
+        </ul>
+      </section>
+      <div className="mt-5"><HeatmapComparison imageUrl={imageUrl} studentMap={submission?.heatmap ?? null} studentLabels={selected} keyMap={keyMap} keyLabels={key} /></div>
+      <details className="mt-[18px] border-t border-t-(--border-subtle) pt-3.5"><summary className="cursor-pointer font-extrabold">AI release and execution provenance</summary><dl><dt>Model release</dt><dd>{result.provenance.releaseId}</dd><dt>Preprocessing</dt><dd>{result.provenance.preprocessingVersion}</dd><dt>Thresholds</dt><dd>{result.provenance.thresholdVersion}</dd><dt>Provider</dt><dd>{result.provenance.executionProvider.toUpperCase()}</dd><dt>Model SHA-256</dt><dd>{result.provenance.modelSha256}</dd><dt>Bundle SHA-256</dt><dd>{result.provenance.bundleSha256}</dd><dt>Application build</dt><dd>{result.provenance.applicationBuild}</dd></dl></details>
+    </div></ResultDialog> : null}
   </section>;
 }

@@ -11,6 +11,7 @@ vi.mock("@/app/(protected)/settings/actions", () => ({
   changeEmailAction: changeEmail,
   changePasswordAction: changePassword,
   updateAccountSettingsAction: updateSettings,
+  twoStepAction: vi.fn(),
 }));
 
 // These component tests run without Next.js's router or build-time environment.

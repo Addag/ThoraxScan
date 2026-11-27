@@ -8,7 +8,7 @@ snapshot: main @ 767ee8f + working tree
 
 # AppRole
 
-The application role is the closed union student | professor; `LoginPortal` adds administrator without making it a profile or membership role.
+The application role is the closed union student | professor; `LoginPortal` adds administrator without making it a profile or membership role. The login form no longer offers it (2026-11-16); administrators reach `/admin` from the sidebar.
 
 ## Why this shape
 
@@ -23,7 +23,7 @@ Student and Professor drive application and workspace authorization, while admin
 
 ## Connected to
 
-The [Profile](profile.md), [Professor application](professor-application.md), registration selector, login portal selector, `requireRole`, and Student/Professor route pages. It looks like Administrator portal selection but does not confer administrator capability.
+The [Profile](profile.md), [Professor application](professor-application.md), registration selector, login portal selector (Student and Professor only), `requireRole`, and Student/Professor route pages. It does not confer administrator capability.
 
 ## If you change this
 

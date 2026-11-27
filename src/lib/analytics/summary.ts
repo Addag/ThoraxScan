@@ -78,7 +78,7 @@ export function summarizeClass({ students, activities, submissions, aiCalls, now
 export type ClassSummary = ReturnType<typeof summarizeClass>;
 
 // Quote every cell and neutralize formula prefixes so spreadsheets never evaluate names.
-function csvCell(value: string | number | null) {
+export function csvCell(value: string | number | null) {
   const text = value === null ? "" : String(value);
   return `"${(/^[=+\-@\t\r]/.test(text) ? `'${text}` : text).replaceAll('"', '""')}"`;
 }

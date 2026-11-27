@@ -20,9 +20,10 @@ One form component keeps field states, requested application role, selected logi
 - The layout provides the shared product message and form panel in [auth-layout.tsx](<../../../src/components/auth/auth-layout.tsx:30>).
 - Form submissions select the corresponding server action in [auth-form.tsx](<../../../src/components/auth/auth-form.tsx:21>).
 - Registration, login, and forgot-password require a single-use Cloudflare Turnstile token; reset-password remains protected by its recovery session in [auth-form.tsx](<../../../src/components/auth/auth-form.tsx:45>).
-- The role selector renders first on both login and register; registration offers Student or Professor as `requestedRole`, login adds Administrator as an `expectedRole` portal in [auth-form.tsx](<../../../src/components/auth/auth-form.tsx:68>) and [RoleSelector](<../../../src/components/auth/auth-form.tsx:356>).
+- The role selector renders first on both login and register; registration offers Student or Professor as `requestedRole`, and login offers the same two as `expectedRole` (the Administrator card was removed on 2026-11-16) in [auth-form.tsx](<../../../src/components/auth/auth-form.tsx:68>) and [RoleSelector](<../../../src/components/auth/auth-form.tsx:356>).
 - Registration agreement checkboxes (Terms and Privacy Policy) use their visible text as the label and set `aria-describedby` only to their error id while an error shows, in [auth-form.tsx](<../../../src/components/auth/auth-form.tsx:211>). Registration asks no age group and offers no research consent.
 - Password fields carry a client-only show/hide toggle (`.auth-password-control`) in [auth-form.tsx](<../../../src/components/auth/auth-form.tsx:133>); it changes no field names.
+- A fifth mode, `verify` (audited 2026-11-15), renders only a 6-digit `code` field plus hidden `as`/`next` values passed from [the verify page](<../../../src/app/(auth)/login/verify/page.tsx>) through `hiddenFields`; it needs no CAPTCHA because the password step already produced a session. Its "Use a different account" button submits `logoutAction`.
 
 ## Connected to
 

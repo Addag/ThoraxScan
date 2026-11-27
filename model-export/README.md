@@ -1,4 +1,37 @@
-# Attention V2 export
+# Model export
+
+Python tools that turn a trained PyTorch checkpoint into a ThoraxScan release
+bundle: `model.onnx`, its fixtures, and `export-validation.json`, written into
+the ignored `model-input/<release-id>/` folder. The app then validates and
+publishes the bundle (see [release operations](../docs/model-releases.md)).
+
+The live release, `tinyvit-v7-nih-cam-ecm-possible85-sr320-20261030.1`, was
+built with [`export_tinyvit_cam.py`](#per-finding-class-activation-maps-contract-v3)
+using `--ecm-rule-thresholds` and
+[short-side-320 preprocessing](#short-side-320-preprocessing). The SqueezeViT
+V2 and FastViT sections describe earlier releases and remain so their evidence
+can be reproduced.
+
+| File | Purpose |
+|---|---|
+| `export_tinyvit_cam.py`, `tinyvit_thoraxscan.py` | TinyViT-11M, contract V3 (live) |
+| `export_squeezevit_cam.py` | SqueezeViT, contract V3 |
+| `export_squeezevit.py`, `squeezevit.py` | SqueezeViT, contract V2 attention rollout |
+| `export_fastvit.py`, `fastvit_thoraxscan.py` | FastViT-SA12, contract V2 attention rollout |
+| `preprocessing_shortside320.py` | Short-side-320 reference preprocessing and fixture |
+| `eval_localization.py` | NIH pointing-game score for the maps |
+| `train_view_detector.py` | Frontal/lateral detector for Professor case upload |
+| `train_chest_gate.py` | Chest X-ray gate for Learning Mode and Professor case upload |
+| `test_*.py` | Exporter, CAM, rollout, and preprocessing checks |
+
+Install with `requirements.txt`; `requirements-lock.txt` pins the verified
+environment. Run every check with:
+
+```powershell
+python -m unittest discover -s model-export -p "test_*.py"
+```
+
+## SqueezeViT attention (contract V2)
 
 Exports the official best checkpoint with unchanged 14 logits and global,
 class-agnostic attention. Four head-averaged attention matrices receive identity
@@ -6,6 +39,7 @@ and row normalization. Later layers multiply on the left; query averaging and
 per-image min-max normalization produce float32[batch,1,7,7]. Constant maps are zeros.
 
 Use Python with requirements.txt (verified with torch 2.11.0+cu128 on CPU).
+requirements-lock.txt pins the full environment, including indirect packages.
 Copy the existing V1 synthetic fixtures and thresholds into a new ignored bundle;
 do not replace baseline logits with V2 outputs. Give release.json a new immutable
 release ID and the official checkpoint checksum.
@@ -29,7 +63,7 @@ fixture or checkpoint evidence, checks preprocessing and repeated WASM inference
 and measures browser providers. WebGPU remains disabled unless logits and attention
 both pass provider parity. Review the generated 49 values before staging.
 
-## FastViT-SA12 (retrain v3)
+## FastViT-SA12 attention (retrain v3, contract V2)
 
 `export_fastvit.py` reparameterizes the trained `fastvit_thoraxscan.py` model and
 rolls out its two stage-4 global attention blocks (7x7 tokens, heads averaged) with
@@ -45,6 +79,65 @@ python model-export/export_fastvit.py `
   --fixture-input "model-input/<release-id>/fixtures/model-input.f32"
 npm run model:validate -- --bundle "model-input/<release-id>"
 ```
+
+## Per-finding class activation maps (contract V3)
+
+`export_squeezevit_cam.py` exports a SqueezeViT checkpoint with unchanged logits
+and `class_activation`, float32[batch,14,14,14]: the `fc` weights for each label
+applied to the 256×14×14 `head_conv` features (exact CAM, because the head is a
+plain average pool), negative values clipped and each label scaled to its own
+maximum. `export_squeezevit.py` is left unchanged so V2 exporter evidence still
+matches. Copy the synthetic fixtures, thresholds and preprocessing reference from
+the source bundle; the exporter writes `fixtures/expected-class-activation.json`
+and `export-validation.json`.
+
+```powershell
+python model-export/export_squeezevit_cam.py `
+  --checkpoint "<training-directory>/Official_retrain_v5_squeezevit_kd/checkpoints/squeezevit_v5_best.pth" `
+  --output "model-input/<release-id>/model.onnx" `
+  --fixture-input "model-input/<release-id>/fixtures/model-input.f32" `
+  --baseline-logits "model-input/<release-id>/fixtures/expected-logits.json"
+npm run model:validate -- --bundle "model-input/<release-id>"
+```
+
+`test_cam.py` checks the CAM identity (`mean(raw map) + bias = logits`) and the
+normalization.
+
+`export_tinyvit_cam.py` does the same for TinyViT-11M (`tinyvit_thoraxscan.py`).
+Its head is avg pool → LayerNorm → fc, so each cell gets the head's per-image
+LayerNorm mean and scale before the fc weights (still exact). The 7×7 features
+are bilinearly upsampled to the contract's 14×14 grid. It writes the fixture
+logits and probabilities from the trained model, like the FastViT exporter; copy
+only the synthetic preprocessing fixtures, thresholds and preprocessing reference.
+
+```powershell
+python model-export/export_tinyvit_cam.py `
+  --checkpoint "<training-directory>/Official_retrain_v7_tinyvit/checkpoints/tinyvit_v7_best.pth" `
+  --output "model-input/<release-id>/model.onnx" `
+  --fixture-input "model-input/<release-id>/fixtures/model-input.f32"
+npm run model:validate -- --bundle "model-input/<release-id>"
+```
+
+`--ecm-rule-thresholds <bundle>/thresholds.json` also flags Enlarged Cardiomediastinum whenever
+Cardiomegaly is flagged (CheXpert's label hierarchy) by raising the ECM logit inside the graph; the fixture
+logits include the rule and ECM shows the Cardiomegaly map where the rule decides.
+
+`eval_localization.py --arch tinyvit` scores its maps in the NIH pointing game.
+
+## Short-side-320 preprocessing
+
+CheXpert-small, every model's training data, was made by shrinking originals to
+short side 320 with plain bilinear (no antialias). Releases with
+`"resizeInterpolation": "shortside320-bilinear-center"` in `release.json` repeat
+that step for larger uploads before the 224 resize. Copy
+`preprocessing_shortside320.py` into the bundle as `preprocessing-reference.py`
+and write its fixture (480×400, so the first stage runs):
+
+```powershell
+python model-export/preprocessing_shortside320.py --write-fixture "model-input/<release-id>/fixtures"
+```
+
+`test_preprocessing.py` checks the stage sizes and both paths.
 
 Never commit checkpoints, patient images or generated artifacts.
 See [release operations](../docs/model-releases.md) for authorization and rollback.

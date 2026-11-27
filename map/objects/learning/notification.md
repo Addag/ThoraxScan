@@ -2,7 +2,7 @@
 node_type: object
 universe: live
 status: verified
-audited: 2026-10-23
+audited: 2026-11-18
 snapshot: main @ working tree
 ---
 
@@ -16,29 +16,32 @@ Dues and submissions already live in their own tables, so the feed is derived wh
 
 ## Shape
 
-- Students see published activities with `now < due_at ≤ now + 7 days` that they have not submitted. Professors see published activities in workspaces they teach that are due in the same window, plus final submissions from the last 7 days (newest 20) in [the loader](<../../../src/lib/notifications/server.ts:16>).
-- Read state is keyed by `(user_id, kind, ref_id)`, where `kind` is `activity_due` or `submission`. RLS lets users read only their own rows and insert only for activities or submissions their own RLS can see. There is no update or delete grant ([migration](<../../../supabase/migrations/20261023120000_notification_reads.sql:3>)).
+- Students see published activities with `now − 7 days < due_at ≤ now + 7 days` that they have not submitted. Past-due ones show as a red "Missed deadlines" group (late submissions are refused), and items due within 24 hours are red. Students also see "New feedback": faculty evaluations released in the last 7 days, from `get_student_feedback_notifications` in [the feedback migration](<../../../supabase/migrations/20261111130000_notification_feedback.sql>), keyed by activity id. The loader returns its request time as `now`, so the panel splits missed from upcoming without reading a clock during render. Professors see published activities in workspaces they teach that are due in the same window, plus final submissions from the last 7 days (newest 20) in [the loader](<../../../src/lib/notifications/server.ts:16>).
+- Read state is keyed by `(user_id, kind, ref_id)`, where `kind` is `activity_due`, `submission`, or `feedback`. RLS lets users read only their own rows and insert only for activities or submissions their own RLS can see. There is no update or delete grant ([migration](<../../../supabase/migrations/20261023120000_notification_reads.sql:3>)).
 - Opening an item marks it read and redirects to a role-derived route. "Mark all read" marks every unread item and refreshes the page ([actions](<../../../src/app/(protected)/actions.ts:15>)).
-- The UI is a native Popover API panel with no client JS. It has one panel and two bell buttons: the desktop header and the mobile bar ([component](<../../../src/components/notification-bell.tsx:14>)).
+- The panel itself is a native Popover API panel with no client JS. It has one panel and two bell buttons: the desktop header and the mobile bar ([component](<../../../src/components/notification-bell.tsx:14>)).
+- Live updates (audited 2026-11-18): `AppShell` mounts [NotificationListener](<../../../src/components/notification-listener.tsx>) wherever it renders the bell. It subscribes on a private `notifications:<user id>` channel to Postgres `INSERT`/`UPDATE` changes on `activities` and `student_submissions`, which Realtime filters through each table's RLS, plus a `feedback_released` broadcast, and calls `router.refresh()` at most once per second of activity. Students cannot read `faculty_evaluations`, so the `faculty_evaluations_broadcast_release` trigger sends an empty private broadcast to the Student's topic when an evaluation becomes released, and a `realtime.messages` policy lets each user listen only on their own topic ([realtime migration](<../../../supabase/migrations/20261118130000_notification_realtime.sql>)). The `ai_feedback_releases_broadcast_release` trigger sends the same signal when a Student's AI results become released (the analysis finished after they submitted), so an open activity page's Results panel re-renders too ([live results migration](<../../../supabase/migrations/20261118140000_live_activity_results.sql>)). `DELETE` events are not subscribed because Realtime does not apply RLS to them.
+- Local caveat: the local Realtime server (v2.124.2) rejects the `sb_publishable_…` key (MalformedJWT), so live updates are verified on hosted only; locally they fail silently and pages update on navigation.
 
 ## Connected to
 
-[Activity](activity.md), [Student submission](student-submission.md), [Role workspace surface](role-workspace-surface.md), and `AppShell`/`AppSidebar`.
+[Activity](activity.md), [Student submission](student-submission.md), [Role workspace surface](role-workspace-surface.md), `AppShell`/`AppSidebar`, and Supabase Realtime.
 
 ## If you change this
 
 ### Hits
 
 - Student and Professor shells, which fetch the feed on every page render. Also the `AppShell` header, the `AppSidebar` mobile bar, the read-state migration and RLS, and [the pgTAP test](<../../../supabase/tests/database/notification_reads.test.sql>).
-- Activity `due_at`/`status` or submission `status`/`submitted_at` semantics, because the feed filters on them.
+- The `supabase_realtime` publication and RLS on `activities` and `student_submissions`: they decide which row changes reach each browser, and every change sends the full row to every allowed subscriber. Also both release broadcast triggers (`faculty_evaluations`, `ai_feedback_releases`) and the `realtime.messages` topic policy.
+- Activity `due_at`/`status`, submission `status`/`submitted_at`, or faculty evaluation `status`/`released_at` semantics, because the feed filters on them.
 
 ### Does not hit
 
-- Administrator and pending-Professor application shells (no bell), email or push delivery, faculty evaluation release, and AI feedback.
+- Administrator and pending-Professor application shells (no bell; the pending page has its own listener), and email or push delivery. (The only app-sent email is the Professor application result, which is separate from the bell; see [the review process](../../processes/professor-application-review.md).)
 
 ## Surfaces
 
-Authenticated Server Components and Server Actions on every Student and approved-Professor page.
+Authenticated Server Components and Server Actions on every Student and approved-Professor page, plus one client Realtime subscription per open page.
 
 ## See
 

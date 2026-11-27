@@ -45,7 +45,7 @@ export type ActivityAIProvenance = {
   releaseId: string;
   modelSha256: string;
   bundleSha256: string;
-  manifestVersion: 1 | 2;
+  manifestVersion: 1 | 2 | 3;
   preprocessingVersion: string;
   thresholdVersion: string;
   executionProvider: ActivityAIProvider;
@@ -60,6 +60,8 @@ export type ActivityAIResult = {
   provenance: ActivityAIProvenance;
   attention?: AttentionHeatmap;
   attentionStatus: "ready" | "unavailable";
+  // The Professor's answer key. Null on activities published before answer keys existed.
+  validatedLabels: ActivityAILabel[] | null;
 };
 
 export type ActivityAIFeedback = {
@@ -79,7 +81,7 @@ export type ActivityAIStatusProjection = {
   claimExpiresAt: string | null;
   completedAt: string | null;
   releaseId: string | null;
-  manifestVersion: 1 | 2 | null;
+  manifestVersion: 1 | 2 | 3 | null;
   preprocessingVersion: string | null;
   thresholdVersion: string | null;
   executionProvider: ActivityAIProvider | null;

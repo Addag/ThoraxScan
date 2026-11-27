@@ -8,7 +8,8 @@ import type {
   StudentActivitySummary,
 } from "@/lib/activities/types";
 import { createClient } from "@/lib/supabase/server";
-import { getProfessorActivityAIStatus, getStudentActivityAIFeedback } from "@/lib/activity-ai/server";
+import { getProfessorActivityAIResult, getProfessorActivityAIStatus, getStudentActivityAIFeedback } from "@/lib/activity-ai/server";
+import { normalizeAnswers, normalizeLabels } from "@/lib/submissions/validation";
 
 type ActivityRow = {
   id: string;
@@ -25,6 +26,8 @@ type ActivityRow = {
 
 type ReferenceRow = {
   evaluation: string;
+  validated_labels: string[] | null;
+  validated_heatmap: number[] | null;
 };
 
 type CaseRow = {
@@ -81,7 +84,7 @@ export async function getProfessorActivity(activityId: string) {
       .maybeSingle<ActivityRow>(),
     supabase
       .from("activity_reference_evaluations")
-      .select("evaluation")
+      .select("evaluation, validated_labels, validated_heatmap")
       .eq("activity_id", activityId)
       .maybeSingle<ReferenceRow>(),
   ]);
@@ -111,6 +114,7 @@ export async function getProfessorActivity(activityId: string) {
   }
 
   const aiStatus = await getProfessorActivityAIStatus(activityId);
+  const aiResult = aiStatus.status === "ready" ? await getProfessorActivityAIResult(activityId) : null;
   return {
     ...professorSummary(activity),
     caseId: activity.case_id,
@@ -122,17 +126,22 @@ export async function getProfessorActivity(activityId: string) {
     imageUrl,
     imageError,
     aiStatus,
+    aiFindings: aiResult?.findings ?? null,
+    aiHeatmap: aiResult?.heatmap ?? null,
+    validatedLabels: referenceResult.data?.validated_labels ? normalizeLabels(referenceResult.data.validated_labels) : null,
+    validatedHeatmap: referenceResult.data?.validated_heatmap ?? null,
   } satisfies ProfessorActivityDetails;
 }
 
 type SubmissionRow = {
-  id: string; visible_findings: string; classification: string | null; relevant_region: string;
+  id: string; selected_labels: string[]; label_answers: Record<string, unknown>; student_heatmap: number[] | null;
   status: SubmissionStatus; created_at: string; updated_at: string; submitted_at: string | null;
 };
 type StudentActivityRow = ActivityRow & { student_submissions: SubmissionRow[] };
 function projectSubmission(row?: SubmissionRow): StudentSubmission | null {
-  return row ? { id: row.id, visibleFindings: row.visible_findings, classification: row.classification ?? "",
-    relevantRegion: row.relevant_region, status: row.status, createdAt: row.created_at,
+  const labels = row ? normalizeLabels(row.selected_labels) : [];
+  return row ? { id: row.id, labels, answers: normalizeAnswers(row.label_answers ?? {}, labels),
+    heatmap: row.student_heatmap, status: row.status, createdAt: row.created_at,
     updatedAt: row.updated_at, submittedAt: row.submitted_at } : null;
 }
 
@@ -176,7 +185,7 @@ export async function getStudentActivity(activityId: string) {
   const { data: activity, error } = await supabase
     .from("activities")
     .select(
-      "id, workspace_id, case_id, title, instructions, due_at, status, published_at, updated_at, workspaces!inner(name), student_submissions(id, visible_findings, classification, relevant_region, status, created_at, updated_at, submitted_at)",
+      "id, workspace_id, case_id, title, instructions, due_at, status, published_at, updated_at, workspaces!inner(name), student_submissions(id, selected_labels, label_answers, student_heatmap, status, created_at, updated_at, submitted_at)",
     )
     .eq("id", activityId)
     .eq("status", "published")
@@ -186,9 +195,10 @@ export async function getStudentActivity(activityId: string) {
   if (error || !activity?.case_id || !activity.published_at) return null;
 
   const path = `${activity.workspace_id}/${activity.case_id}`;
-  const signedUrlResult = await supabase.storage
-    .from("activity-cases")
-    .createSignedUrl(path, 600);
+  const [signedUrlResult, heatmapRequired] = await Promise.all([
+    supabase.storage.from("activity-cases").createSignedUrl(path, 600),
+    supabase.rpc("activity_requires_student_heatmap", { target_activity_id: activityId }),
+  ]);
 
   const aiFeedback = activity.student_submissions[0]?.status === "submitted"
     ? await getStudentActivityAIFeedback(activityId)
@@ -206,6 +216,7 @@ export async function getStudentActivity(activityId: string) {
     publishedAt: activity.published_at,
     imageUrl: signedUrlResult.data?.signedUrl ?? null,
     imageError: Boolean(signedUrlResult.error),
+    heatmapRequired: heatmapRequired.data === true,
     aiFeedback,
   } satisfies StudentActivityDetails;
 }

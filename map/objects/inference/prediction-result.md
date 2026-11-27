@@ -8,7 +8,7 @@ snapshot: main @ 6af6c16
 
 # Transient prediction result
 
-`InferenceResult` is an in-memory prediction with label decisions, release provenance, and an optional validated V2 attention map. Activity analysis adapts its fixed probability vector and optional map before the database independently derives thresholded findings.
+`InferenceResult` is an in-memory prediction with label decisions, release provenance, and an optional validated V2 global or V3 per-label heatmap. Activity analysis adapts its fixed probability vector and optional map before the database independently derives thresholded findings.
 
 ## Why this shape
 

@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 
+import { redirect } from "next/navigation";
+
 import { AuthLayout } from "@/components/auth/auth-layout";
+import { getCurrentProfile } from "@/lib/auth/server";
 
 export const metadata: Metadata = {
   title: "Log in | ThoraxScan",
@@ -12,6 +15,7 @@ export default async function LoginPage({
 }: {
   searchParams: Promise<{ error?: string; message?: string }>;
 }) {
+  if ((await getCurrentProfile()).authenticated) redirect("/dashboard");
   const { error, message } = await searchParams;
 
   return (

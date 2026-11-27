@@ -3,7 +3,6 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import {
-  ActivityPageHeading,
   ActivityStatusBadge,
   ActivityStepRail,
   XrayCasePreview,
@@ -21,7 +20,8 @@ import { getProfessorActivity } from "@/lib/activities/server";
 import { requireRole } from "@/lib/auth/server";
 import { getProfessorWorkspaces } from "@/lib/workspaces/server";
 import { ActivityAIStatus } from "@/components/activities/activity-ai-status";
-import { PageMain } from "@/components/dashboard-ui";
+import { AnswerKeyForm } from "@/components/professor/answer-key-form";
+import { PageHeading, PageMain } from "@/components/dashboard-ui";
 
 export const metadata: Metadata = {
   title: "Manage activity | ThoraxScan",
@@ -48,17 +48,17 @@ export default async function ProfessorActivityPage({
   return (
     <ProfessorShell activeItem="activities" sectionLabel="Activities" sectionDescription={activity.workspaceName}>
       <PageMain>
-        <ActivityPageHeading
+        <PageHeading
           title={activity.title}
-          description={`${activity.workspaceName} · ${formatDueDate(activity.dueAt)}`}
-          backHref="/professor/activities"
+          subtitle={`${activity.workspaceName} · ${formatDueDate(activity.dueAt)}`}
+          back={{ href: "/professor/activities", label: "Back to activities" }}
         />
-        <div className="-mt-2 mb-[18px] flex items-center gap-3 text-[0.75rem] text-[#aab1bf] light:text-(--text-muted)">
+        <div className="-mt-2 mb-[18px] flex items-center gap-3 text-caption text-(--text-muted)">
           <ActivityStatusBadge status={activity.status} />
           <span>{activity.status === "published" ? "Visible to current and future workspace students" : activity.status === "archived" ? "No longer visible to students" : "Visible to teaching staff only"}</span>
         </div>
-        <ActivityStepRail role="professor" />
-        <Link className={activitiesCtaClass} href={`/professor/submissions?activity=${activity.id}`}>Review submissions</Link>
+        <ActivityStepRail role="professor" caseReady={activity.caseUploadStatus === "ready"} published={activity.status !== "draft"} aiStatus={activity.aiStatus.status} />
+        <Link className={`${activitiesCtaClass} mb-6`} href={`/professor/submissions?activity=${activity.id}`}><span className="grid gap-1"><strong>Review submissions</strong><small className="text-label text-(--brand-blue-text)">Final responses for this activity, to grade against your answer key</small></span><span className="text-display text-(--brand-blue-text)" aria-hidden="true">→</span></Link>
 
         <div className={activityLayoutClass("default")}>
           <div className={activityCaseColumnClass}>
@@ -69,10 +69,13 @@ export default async function ProfessorActivityPage({
               status={activity.caseUploadStatus}
             />
             {activity.status === "draft" ? <CaseUploadForm activityId={activity.id} caseId={activity.caseId} /> : null}
-            <ActivityAIStatus activityId={activity.id} imageUrl={activity.imageUrl} activityStatus={activity.status} initial={activity.aiStatus} />
+            {/* Keyed by case so a replaced image gets its own automatic run. */}
+            <ActivityAIStatus key={activity.caseId} activityId={activity.id} imageUrl={activity.imageUrl} activityStatus={activity.status} caseReady={activity.caseUploadStatus === "ready"} initial={activity.aiStatus} />
           </div>
           <div className={activityConfigColumnClass}>
             <ActivityDetailsForm workspaces={workspaces.data} activity={activity} />
+            {/* Remounts when the AI result or saved key changes, so the form starts from the server's state. */}
+            <AnswerKeyForm key={`${activity.caseId}:${activity.aiStatus.completedAt}:${activity.validatedLabels?.join()}`} activity={activity} />
             <ActivityLifecycleControls activity={activity} />
           </div>
         </div>

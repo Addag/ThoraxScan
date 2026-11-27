@@ -16,6 +16,7 @@ Request cookies → Supabase claim refresh and profile lookup → authenticated 
 2. The updater creates a cookie-aware server client, refreshes claims, and writes refreshed cookies in [proxy.ts](<../../src/lib/supabase/proxy.ts:4>).
 3. The dashboard calls getCurrentProfile, redirects unauthenticated users to /login, and redirects valid profiles to their role route in [dashboard/page.tsx](<../../src/app/(protected)/dashboard/page.tsx:6>).
 4. A role page calls requireRole and redirects users with a missing or mismatched profile back to /dashboard in [server.ts](<../../src/lib/auth/server.ts:33>).
+5. Two-step login (audited 2026-11-15): `getCurrentProfile` redirects to `/login/verify` when the profile query fails with `two_step_required`, the error raised by the Data API pre-request check for a password-only session on an account with a verified factor, in [server.ts](<../../src/lib/auth/server.ts>). The verify page reads claims directly so it does not loop.
 
 ## Consumes
 

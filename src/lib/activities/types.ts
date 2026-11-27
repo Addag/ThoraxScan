@@ -1,5 +1,5 @@
 import type { StudentSubmission, SubmissionStatus } from "@/lib/submissions/types";
-import type { ActivityAIFeedback, ActivityAIStatusProjection } from "@/lib/activity-ai/types";
+import type { ActivityAIFeedback, ActivityAILabel, ActivityAIStatusProjection } from "@/lib/activity-ai/types";
 export type ActivityStatus = "draft" | "published" | "archived";
 
 export type CaseUploadStatus = "pending" | "ready" | "failed";
@@ -26,6 +26,12 @@ export type ProfessorActivityDetails = ProfessorActivitySummary & {
   imageUrl: string | null;
   imageError: boolean;
   aiStatus: ActivityAIStatusProjection;
+  // The AI's finding labels and per-label maps, once its analysis is ready.
+  aiFindings: ActivityAILabel[] | null;
+  aiHeatmap: number[] | null;
+  // The Professor's answer key: validated labels and edited per-label maps. Null until validated.
+  validatedLabels: ActivityAILabel[] | null;
+  validatedHeatmap: number[] | null;
 };
 
 export type StudentActivitySummary = {
@@ -44,6 +50,8 @@ export type StudentActivityDetails = StudentActivitySummary & {
   instructions: string;
   imageUrl: string | null;
   imageError: boolean;
+  // True when the answer key has per-finding maps, so the Student must mark a heatmap for each finding.
+  heatmapRequired: boolean;
   aiFeedback: ActivityAIFeedback;
 };
 

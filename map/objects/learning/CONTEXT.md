@@ -23,7 +23,7 @@ Separate implemented workspace, activity, submission, AI analysis, feedback, eva
 
 ## Outputs
 
-The live learning cards in [../_index.md](../_index.md), including the role workspace, activity, submission, AI analysis, feedback release, faculty evaluation, X-ray case, and built-in library; remaining ghost entries stay marked there.
+The live learning cards in [../_index.md](../_index.md), including the role workspace, activity, submission, AI analysis, feedback release, faculty evaluation, X-ray case, built-in library, and Learning case note; remaining ghost entries stay marked there.
 
 ## Human check
 

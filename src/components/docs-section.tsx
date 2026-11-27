@@ -9,9 +9,9 @@ const repoFile = (path: string) => `https://github.com/Addag/ThoraxScan/blob/mai
 type Topic = { id: string; title: string; gist: string; body: ReactNode; sources: string[] };
 
 const p = "m-0 text-[0.9375rem] leading-[1.6] text-[#c3d0e2]";
-const steps = "m-0 list-decimal space-y-2 pl-5 text-[0.9375rem] leading-[1.6] text-[#c3d0e2] marker:font-bold marker:text-brand";
+const steps = "m-0 list-decimal space-y-2 pl-5 text-[0.9375rem] leading-[1.6] text-[#c3d0e2] marker:font-extrabold marker:text-brand";
 const bullets = "m-0 list-disc space-y-2 pl-5 text-[0.9375rem] leading-[1.6] text-[#c3d0e2] marker:text-brand";
-const code = "rounded-[6px] bg-(--glass-inset) px-1.5 py-0.5 font-mono text-[0.8125rem] text-[#e7f1ff]";
+const code = "rounded-control bg-(--glass-inset) px-1.5 py-0.5 font-mono text-[0.8125rem] text-[#e7f1ff]";
 const pre = "m-0 overflow-x-auto rounded-[12px] border border-[rgb(175_207_255/20%)] bg-(--glass-inset) p-4 font-mono text-[0.8125rem] leading-[1.6] text-[#e7f1ff]";
 const table = "w-full border-collapse text-left text-[0.875rem] leading-[1.5] text-[#c3d0e2] [&_td]:border-t [&_td]:border-[rgb(175_207_255/16%)] [&_td]:py-2 [&_td]:pr-4 [&_td]:align-top [&_td:first-child]:whitespace-nowrap [&_td:first-child]:font-mono [&_td:first-child]:text-[0.8125rem] [&_td:first-child]:text-[#e7f1ff]";
 
@@ -49,7 +49,8 @@ const userTopics: Topic[] = [
     body: (
       <ol className={steps}>
         <li>Open a published activity from your workspace. You see the instructions, the due date and the X-ray.</li>
-        <li>Record your findings, whether the image is normal or abnormal, and for abnormal cases the relevant region.</li>
+        <li>Tick every finding you see from the 14 labels. Choose No Finding on its own for a normal X-ray.</li>
+        <li>Optionally explain each label in writing, then mark where each finding is: pick it and drag over the X-ray. The brush has an adjustable size, strength and hardness, and strokes can be undone. Every finding needs a marked area before you can submit.</li>
         <li>Save a draft as often as you like. Drafts are private.</li>
         <li>Submit when you&rsquo;re sure. You confirm first, and the final answer can&rsquo;t be changed. A draft left past the due date stays unsubmitted.</li>
       </ol>
@@ -59,12 +60,12 @@ const userTopics: Topic[] = [
   {
     id: "doc-feedback",
     title: "Read your feedback",
-    gist: "AI feedback after you submit, then your professor's evaluation.",
+    gist: "Your results after you submit, then your professor's evaluation.",
     body: (
       <ul className={bullets}>
-        <li><b>AI feedback</b> appears only after your final submission. It lists likely findings, possible findings (often false alarms), every label the model scores, and the attention heatmap.</li>
-        <li>The heatmap shows where the model&rsquo;s attention was concentrated. It doesn&rsquo;t mark a lesion or confirm a diagnosis.</li>
-        <li><b>Faculty evaluation</b> shows your score and feedback once your professor releases it. Until then the activity shows as awaiting review.</li>
+        <li><b>Results</b> appear only after your final submission. They show the correct labels, which your professor validated starting from the AI&rsquo;s result, which ones you selected, missed or added wrongly, and your written answers.</li>
+        <li>Pick a finding to see your heatmap next to the validated one: the AI&rsquo;s map, corrected by your professor where needed. The heatmaps don&rsquo;t outline a lesion or confirm a diagnosis.</li>
+        <li><b>Faculty evaluation</b> shows your professor&rsquo;s grade and feedback once it is released. Until then the activity shows as awaiting review.</li>
       </ul>
     ),
     sources: ["map/processes/student-activity-view.md", "map/objects/learning/ai-feedback-release.md", "map/processes/faculty-evaluation.md"],
@@ -72,16 +73,17 @@ const userTopics: Topic[] = [
   {
     id: "doc-learning",
     title: "Practice in Learning Mode",
-    gist: "Run the model on any X-ray without saving anything.",
+    gist: "Run the model on any X-ray; results aren't saved.",
     body: (
       <ol className={steps}>
         <li>Open <b>Learning mode</b> from the sidebar (Students and Professors).</li>
-        <li>Pick an image from the built-in CheXpert library, or choose your own JPEG or PNG.</li>
-        <li>Select <b>Analyze</b>. The model runs in your browser and shows findings, every label, and the attention heatmap.</li>
-        <li>Nothing is saved: no submission, no upload, no stored result. <b>Reset</b> clears it.</li>
+        <li>Pick an image from the built-in CheXpert library, or choose your own JPEG or PNG, frontal or lateral.</li>
+        <li>Select <b>Analyze</b>. The model runs in your browser and shows findings, every label, and a heatmap for each likely or possible finding. An image that doesn&rsquo;t look like a chest X-ray is refused and not analyzed.</li>
+        <li>Results aren&rsquo;t saved: no submission, no upload, no stored result. <b>Reset</b> clears them.</li>
+        <li>On a library case you can keep a private note for your own review. Notes are saved to your account and nobody else can see them.</li>
       </ol>
     ),
-    sources: ["map/processes/student-learning-mode-inference.md", "map/objects/ui/student-learning-mode-surface.md"],
+    sources: ["map/processes/student-learning-mode-inference.md", "map/objects/ui/student-learning-mode-surface.md", "map/objects/learning/chest-gate.md", "map/objects/learning/learning-case-note.md"],
   },
   {
     id: "doc-class",
@@ -99,16 +101,17 @@ const userTopics: Topic[] = [
   {
     id: "doc-publish",
     title: "Publish an activity",
-    gist: "Professors: draft, attach an X-ray, publish.",
+    gist: "Professors: draft, attach an X-ray, validate the AI result, publish.",
     body: (
       <ol className={steps}>
         <li>Create a draft with a title, instructions and an optional due date.</li>
-        <li>Attach one frontal chest X-ray: upload a JPEG or PNG, or pick one from the built-in library. Images that look like lateral views are rejected.</li>
-        <li>Write the reference evaluation. Students never see it.</li>
-        <li>Publish. A published activity&rsquo;s case can&rsquo;t be replaced; archiving is final.</li>
+        <li>Attach one frontal chest X-ray: upload a JPEG or PNG, or pick one from the built-in library. Images that aren&rsquo;t chest X-rays, or that look like lateral views, are rejected.</li>
+        <li>The AI reads the case in your browser as soon as it is attached. Keep the page open while it runs.</li>
+        <li>Validate the AI result: tick the labels that are truly present, adding what the AI missed, and paint over each finding&rsquo;s heatmap to correct it with an adjustable brush (size, strength, hardness, undo). Save the answer key.</li>
+        <li>Publish. A published activity&rsquo;s case and answer key can&rsquo;t be changed; archiving is final.</li>
       </ol>
     ),
-    sources: ["map/processes/activity-authoring-publication.md", "map/objects/learning/view-detector.md"],
+    sources: ["map/processes/activity-authoring-publication.md", "map/objects/learning/chest-gate.md", "map/objects/learning/view-detector.md"],
   },
   {
     id: "doc-review",
@@ -117,7 +120,7 @@ const userTopics: Topic[] = [
     body: (
       <ul className={bullets}>
         <li>The review queue lists final submissions, including those in archived activities.</li>
-        <li>Save a private draft evaluation, then release it with a score and feedback. Released evaluations can&rsquo;t be changed, and students never see your remarks.</li>
+        <li>Each submission shows the student&rsquo;s labels and written answers against your answer key, and their heatmap next to yours. Nothing is scored automatically: save a private draft evaluation, then release it with your grade and feedback. Released evaluations can&rsquo;t be changed, and students never see your remarks.</li>
         <li><b>Analytics</b> shows each workspace&rsquo;s on-time, late and missing work, released-score averages, the review backlog, and how often students agree with the AI&rsquo;s normal/abnormal call. Export the per-student table as CSV.</li>
       </ul>
     ),
@@ -131,6 +134,7 @@ const userTopics: Topic[] = [
       <ul className={bullets}>
         <li><b>Profile:</b> display name, plus an optional work phone for Professors.</li>
         <li><b>Security:</b> change your sign-in email (confirmed from both addresses) or your password.</li>
+        <li><b>Two-step login</b> (optional, under Security): scan the QR code with an authenticator app, then enter a 6-digit code after your password each time you log in. Turning it off asks for your password. If you lose your phone, an administrator can reset it.</li>
         <li><b>Accessibility:</b> larger text and high contrast, saved in this browser. The theme button switches light and dark.</li>
       </ul>
     ),
@@ -151,7 +155,7 @@ const devTopics: Topic[] = [
           <tr><td>src/lib</td><td>Server data access, validation, analytics, and the in-browser inference runtime</td></tr>
           <tr><td>supabase</td><td>SQL migrations, pgTAP database tests and email templates</td></tr>
           <tr><td>scripts</td><td>Model-release CLI, ONNX Runtime asset prep, CheXpert library import, guide rendering</td></tr>
-          <tr><td>model-export</td><td>ONNX export with the attention output, and view-detector training</td></tr>
+          <tr><td>model-export</td><td>ONNX export with the heatmap output, and view-detector and chest-gate training</td></tr>
           <tr><td>public</td><td>Images, the built-in X-ray library, guides and ONNX Runtime assets</td></tr>
           <tr><td>docs · map</td><td>Operator docs, and the source-backed system map</td></tr>
         </tbody>
@@ -167,7 +171,7 @@ const devTopics: Topic[] = [
       <ul className={bullets}>
         <li><b>Learning records:</b> browser → Next.js Server Components and Server Actions → Supabase Auth (cookie sessions), Postgres (row-level security, RPCs, triggers) and Storage (private cases behind short-lived signed URLs).</li>
         <li><b>Inference:</b> the browser asks for the active release, downloads and verifies the model, preprocesses the image and runs ONNX Runtime Web (WebGPU, falling back to WebAssembly).</li>
-        <li>Activity results (14 probabilities, the attention map and provenance) are saved once through an authorized RPC; Learning Mode results stay in memory.</li>
+        <li>Activity results (14 probabilities, the heatmaps and provenance) are saved once through an authorized RPC; Learning Mode results stay in memory.</li>
       </ul>
     ),
     sources: ["map/objects/inference/browser-inference-runtime.md", "map/processes/activity-ai-analysis.md", "map/CAPSTONE_CURRENT_STATE.md"],
@@ -206,13 +210,14 @@ const devTopics: Topic[] = [
         <pre className={`${pre} mt-3`}>{"npm run model:validate   # checksums, shapes, determinism, WASM and WebGPU parity\nnpm run model:stage      # upload as an inactive release\nnpm run model:status\nnpm run model:activate   # compare-and-swap the active pointer\nnpm run model:rollback"}</pre>
         <ul className={`${bullets} mt-3`}>
           <li>Contract v1: input <code className={code}>[batch, 1, 224, 224]</code>, Rec. 601 grayscale, bilinear resize, <code className={code}>(pixel / 255 − 0.5) / 0.25</code>; output 14 logits in a fixed label order.</li>
-          <li>Contract v2 adds a <code className={code}>[batch, 1, 7, 7]</code> attention map.</li>
-          <li>Weights and thresholds can change without a deploy while the contract stays the same.</li>
+          <li>Contract v2 adds a global <code className={code}>[batch, 1, 7, 7]</code> attention map; contract v3 replaces it with per-finding class activation maps, <code className={code}>[batch, 14, 14, 14]</code>.</li>
+          <li>A release picks its resize: straight to 224, or <code className={code}>shortside320-bilinear-center</code>, which first shrinks images with a short side over 320 to 320, the way CheXpert-small was made.</li>
+          <li>Weights and thresholds can change without a deploy while the contract and resize mode stay the same. A release that needs a newer contract or resize mode only runs on an app built to accept it, so deploy first.</li>
           <li>Validate locally first. Publisher service-role keys belong only in the operator environment, never in Vercel.</li>
         </ul>
       </>
     ),
-    sources: ["docs/model-releases.md", "map/processes/model-validation.md", "map/processes/model-activation.md"],
+    sources: ["docs/model-releases.md", "map/objects/inference/preprocessing-tensor.md", "map/processes/model-validation.md", "map/processes/model-activation.md"],
   },
   {
     id: "doc-admins",
@@ -223,7 +228,8 @@ const devTopics: Topic[] = [
         <li>Administrator is a separate capability, not a registration role.</li>
         <li>An operator adds the first administrator once, directly in the database, after that person has registered and confirmed their email.</li>
         <li>From then on, administrators add or remove others in the Administrators section of <code className={code}>/admin</code>. Nobody can remove themselves, so one always remains.</li>
-        <li>Administrators sign in by choosing <b>Administrator</b> on the normal login page.</li>
+        <li>Administrators log in as the Student or Professor they are, then open <b>Administration</b> in the sidebar. The console&rsquo;s <b>My dashboard</b> link goes back.</li>
+        <li>The console at <code className={code}>/admin</code> also reviews Professor applications, manages accounts (rename, temporary password, sign out, reset two-step login, disable, delete), posts site-wide notices, and shows platform statistics, an activity feed and a Professor report (CSV). Every administrator action is logged.</li>
       </ul>
     ),
     sources: ["README.md", "map/objects/identity/platform-administrator.md"],
@@ -237,9 +243,10 @@ const devTopics: Topic[] = [
         <li>Vercel Production points only at the hosted Supabase project, using its public URL and publishable key. There is no separate preview or staging database.</li>
         <li>Deploy the CAPTCHA-aware app before turning on CAPTCHA in hosted Supabase. To roll back, turn CAPTCHA off first.</li>
         <li>Before a production migration: run a linked dry run, review the Supabase Security and Performance Advisors, and take a backup.</li>
+        <li>Rolling out a model that needs app changes goes in this order: apply the migration, deploy the app, <code className={code}>model:stage</code>, check <code className={code}>model:status</code>, then <code className={code}>model:activate</code>. Activating before the deploy breaks inference until the deploy lands.</li>
       </ul>
     ),
-    sources: ["README.md", "supabase/README.md"],
+    sources: ["README.md", "supabase/README.md", "docs/model-releases.md", "map/objects/inference/attention-heatmap.md"],
   },
 ];
 

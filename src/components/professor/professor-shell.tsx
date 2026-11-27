@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 
 import { AppShell } from "@/components/app-shell";
+import { isPlatformAdmin } from "@/lib/auth/server";
 import { getNotifications } from "@/lib/notifications/server";
 
 export async function ProfessorShell({
@@ -21,13 +22,14 @@ export async function ProfessorShell({
       navLabel="Main menu"
       navAriaLabel="Professor navigation"
       navItems={[
-        { label: "Student Reviews", href: "/professor/submissions", icon: "reviews", active: activeItem === "submissions" },
-        { label: "Home", href: "/professor", icon: "dashboard", active: activeItem === "dashboard" },
-        { label: "Class Analytics", href: "/professor/analytics", glyph: "▥", active: activeItem === "analytics" },
-        { label: "Activities", href: "/professor/activities", icon: "activities", active: activeItem === "activities" },
-        { label: "Learning mode", href: "/professor/learning", icon: "learning", active: activeItem === "learning" },
-        { label: "Attention maps", href: "/professor/attention", icon: "attention", active: activeItem === "attention" },
-        { label: "User Profile", href: "/professor/settings", icon: "settings", active: activeItem === "settings" },
+        { label: "Home", href: "/professor", icon: "dashboard.png", active: activeItem === "dashboard" },
+        { label: "Activities", href: "/professor/activities", icon: "activities.png", active: activeItem === "activities" },
+        { label: "Student Reviews", href: "/professor/submissions", icon: "reviews.png", active: activeItem === "submissions" },
+        { label: "Class Analytics", href: "/professor/analytics", icon: "analytics.svg", active: activeItem === "analytics" },
+        { label: "Learning Mode", href: "/professor/learning", icon: "learning.png", active: activeItem === "learning" },
+        { label: "Attention Maps", href: "/professor/attention", icon: "attention.png", active: activeItem === "attention" },
+        { label: "User Profile", href: "/professor/settings", icon: "settings.png", active: activeItem === "settings" },
+        ...((await isPlatformAdmin()) ? [{ label: "Administration", href: "/admin", icon: "application.svg" }] : []),
       ]}
       sectionLabel={sectionLabel}
       sectionDescription={sectionDescription}
